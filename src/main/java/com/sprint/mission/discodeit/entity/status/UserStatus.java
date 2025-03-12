@@ -35,9 +35,4 @@ public class UserStatus extends BaseUpdatableEntity {
   public boolean isActive() {
     return Instant.now().minusSeconds(USER_ACTIVE_TIMEOUT_SECONDS).isBefore(this.getLastActiveAt());
   }
-
-  // 이 메소드가 왜 필요한지 생각해보자.
-  public boolean isUpdated(Instant updatedAt) {
-    return this.getUpdatedAt() != updatedAt;
-  }
 }

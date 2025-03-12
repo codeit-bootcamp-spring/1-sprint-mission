@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +24,10 @@ public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
+  private final UserStatusMapper userStatusMapper;
 
   @Override
+  @Transactional(readOnly = true)
   public UserStatusDto findById(String userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(UUID.fromString(userStatusId))
         .orElse(null);
@@ -31,10 +35,11 @@ public class BasicUserStatusService implements UserStatusService {
       throw new IllegalArgumentException("userStatus not found");
     }
 
-    return UserStatusDto.from(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserStatusDto findByUserId(String userId) {
     User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
     if (user == null) {
@@ -44,15 +49,16 @@ public class BasicUserStatusService implements UserStatusService {
     if (userStatus == null) {
       throw new IllegalArgumentException("User Status not found");
     }
-    return UserStatusDto.from(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
   public List<UserStatusDto> findAll() {
-    return userStatusRepository.findAll().stream().map(UserStatusDto::from).toList();
+    return userStatusRepository.findAll().stream().map(userStatusMapper::toDto).toList();
   }
 
   @Override
+  @Transactional
   public UserStatusDto create(CreateUserStatusDto createUserStatusDto)
       throws CustomException {
     User user = userRepository.findById(createUserStatusDto.getUserId()).orElse(null);
@@ -65,10 +71,14 @@ public class BasicUserStatusService implements UserStatusService {
     }
     userStatus = new UserStatus(user);
 
-    return UserStatusDto.from(userStatusRepository.save(userStatus));
+    userStatusRepository.save(userStatus);
+
+    return userStatusMapper.toDto(userStatus);
+
   }
 
   @Override
+  @Transactional
   public UserStatusDto updateByUserId(String id, UpdateUserStatusDto updateUserStatusDto) {
 
     User user = userRepository.findById(UUID.fromString(id)).orElse(null);
@@ -79,13 +89,14 @@ public class BasicUserStatusService implements UserStatusService {
     if (userStatus == null) {
       throw new IllegalArgumentException("userStatus not found");
     }
-    if (userStatus.isUpdated(updateUserStatusDto.updateAt())) {
-      return UserStatusDto.from(userStatusRepository.save(userStatus));
-    }
-    return UserStatusDto.from(userStatus);
+    userStatus.setUpdatedAt(updateUserStatusDto.updateAt());
+    userStatusRepository.save(userStatus);
+
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
+  @Transactional
   public boolean delete(String userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(UUID.fromString(userStatusId))
         .orElse(null);
