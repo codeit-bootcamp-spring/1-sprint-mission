@@ -1,6 +1,10 @@
 spring:
   application:
     name: discodeit
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
 
 discodeit:
   repository:
