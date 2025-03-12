@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 
+import com.sprint.mission.discodeit.dto.response.PageResponse;
+import java.awt.print.Pageable;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,9 +32,9 @@ public interface MessageService {
 
   //다건 조회 - 날짜
   List<MessageDto> findAllByCreatedAt(Instant createdAt);
-
-  //다건 조회 - 특정 채널
-  List<MessageDto> findAllByChannelId(String channelId, String userId);
+  
+  PageResponse<MessageDto> findAllByChannelIdWithPaging(String channelId,
+      Pageable pageable);
 
   //수정
   MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);

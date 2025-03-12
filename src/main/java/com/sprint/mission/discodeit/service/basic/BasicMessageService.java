@@ -4,22 +4,27 @@ import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import java.io.IOException;
+import java.awt.print.Pageable;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
@@ -29,18 +34,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-  // todo - 고민
-  //userService를 의존하는게 맞는가?
-  //userRepository를 의존하는게 맞는가?
-
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final PageResponseMapper pageResponseMapper;
+  private final MessageMapper messageMapper;
 
   //텍스트만 있는 메세지
   @Override
+  @Transactional
   public MessageDto create(CreateMessageDto createMessageDto) throws CustomException {
     if (createMessageDto.content() == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
@@ -60,11 +64,12 @@ public class BasicMessageService implements MessageService {
         readStatus.getChannel());
     Message saved = messageRepository.save(message);
 
-    return MessageDto.from(saved);
+    return messageMapper.toDto(saved);
   }
 
   //텍스트 + 파일 메세지
   @Override
+  @Transactional
   public MessageDto create(CreateMessageDto createMessageDto, List<MultipartFile> files)
       throws CustomException {
     MessageDto messageDto = create(createMessageDto);
@@ -85,12 +90,11 @@ public class BasicMessageService implements MessageService {
       try {
         BinaryContent binaryContent = new BinaryContent(
             file.getName(),
-            file.getBytes(),
             file.getContentType(),
             file.getSize()
         );
         savedContent = binaryContentRepository.save(binaryContent);
-      } catch (IOException e) {
+      } catch (RuntimeException e) {
         throw new RuntimeException(e);
       }
       message.addFile(savedContent);
@@ -98,30 +102,35 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.save(message);
 
-    return MessageDto.from(message);
+    return messageMapper.toDto(message);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<MessageDto> findAll() {
-    return messageRepository.findAll().stream().map(MessageDto::from).toList();
+    return messageRepository.findAll().stream().map(messageMapper::toDto).toList();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public MessageDto findById(String messageId) {
     Message message = messageRepository.findById(UUID.fromString(messageId)).orElse(null);
     if (message == null) {
       throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
     }
-    return MessageDto.from(message);
+    return messageMapper.toDto(message);
   }
 
   //특정 문자열이 내용에 포함되어 있는 메세지 찾기
   @Override
+  @Transactional(readOnly = true)
   public List<MessageDto> findAllContainsContent(String content) {
-    return messageRepository.findByContentContains(content).stream().map(MessageDto::from).toList();
+    return messageRepository.findByContentContains(content).stream().map(messageMapper::toDto)
+        .toList();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<MessageDto> findAllByAuthorId(String authorId) {
     User author = userRepository.findById(UUID.fromString(authorId)).orElse(null);
 
@@ -131,36 +140,49 @@ public class BasicMessageService implements MessageService {
       //나중에 search 기능 만들때 더 고민해보고 수정하기
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    return messageRepository.findByAuthorId(authorId).stream().map(MessageDto::from).toList();
+    return messageRepository.findByAuthorId(authorId).stream().map(messageMapper::toDto).toList();
   }
 
   //todo - repository 에 날짜로 조회하는 기능 만들기
   @Override
+  @Transactional(readOnly = true)
   public List<MessageDto> findAllByCreatedAt(Instant createdAt) {
     return messageRepository.findAll().stream().filter(m -> m.getCreatedAt().equals(createdAt))
-        .map(MessageDto::from).toList();
+        .map(messageMapper::toDto).toList();
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(String channelId, String userId) {
+  @Transactional(readOnly = true)
+  public PageResponse<MessageDto> findAllByChannelIdWithPaging(String channelId,
+      Pageable pageable) {
 
-    //해당 유저가 지금 채널에 속한 사람인지 확인하기
-    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
-        UUID.fromString(channelId), UUID.fromString(userId)).orElse(null);
+//    조회하는 User가 해당 channel에 속하는지 확인하기 위함
+//    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
+//        UUID.fromString(channelId), UUID.fromString(userId)).orElse(null);
+//    if (readStatus == null) {
+//      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+//    }
 
-    if (readStatus == null) {
+    if (channelId == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
+
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
-    return messageRepository.findByChannelId(channelId).stream().map(MessageDto::from).toList();
+    Slice<Message> messageSlice = messageRepository.findByChannelIdOrderByCreatedAtDesc(
+        UUID.fromString(channelId), pageable);
+
+    Slice<MessageDto> messageDtoSlice = messageSlice.map(messageMapper::toDto);
+
+    return pageResponseMapper.fromSlice(messageDtoSlice);
   }
 
   @Override
+  @Transactional
   public MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto)
       throws CustomException {
     Message message = messageRepository.findById(UUID.fromString(messageId)).orElse(null);
@@ -174,10 +196,9 @@ public class BasicMessageService implements MessageService {
       throw new CustomException(ErrorCode.MESSAGE_OWNER_NOT_MATCH);
     }
 
-    if (!message.getContent().equals(updateMessageDto.newContent())) {
-      message.setContent(updateMessageDto.newContent());
-      message.setUpdatedAt(updateMessageDto.updatedAt());
-    }
+    message.setContent(updateMessageDto.newContent());
+    message.setUpdatedAt(updateMessageDto.updatedAt());
+
     //todo - 메세지의 이미지를 삭제하거나 추가하는 기능
     //if(!updateMessageDto.binaryContentIds().isEmpty()) {
     //여기 수정해야겠다
@@ -187,10 +208,11 @@ public class BasicMessageService implements MessageService {
     //message.addImages(updateMessageDto.binaryContentIds());
     //}
 
-    return MessageDto.from(messageRepository.save(message));
+    return messageMapper.toDto(message);
   }
 
   @Override
+  @Transactional
   public boolean delete(String messageId, String userId) throws CustomException {
     Message message = messageRepository.findById(UUID.fromString(messageId)).orElse(null);
     if (message == null) {
@@ -200,10 +222,6 @@ public class BasicMessageService implements MessageService {
       throw new CustomException(ErrorCode.MESSAGE_OWNER_NOT_MATCH);
     }
 
-    //todo - 고민: 이거는 cascade 옵션으로 같이 없앨 수 있을 것 같다.
-    for (BinaryContent content : message.getAttachments()) {
-      binaryContentRepository.delete(content);
-    }
     messageRepository.delete(message);
 
     return true;
