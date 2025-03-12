@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.List;
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
 
   @GetMapping("/{contentId}")
   public ResponseEntity<BinaryContentDto> getBinaryContent(@PathVariable String contentId,
@@ -57,5 +59,11 @@ public class BinaryContentController {
   public ResponseEntity<BinaryContentDto> uploadBinaryContent(
       @RequestParam("file") MultipartFile file) {
     return ResponseEntity.status(HttpStatus.CREATED).body(binaryContentService.create(file));
+  }
+
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<?> downloadBinaryContent(@PathVariable String binaryContentId) {
+    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+    return binaryContentStorage.download(binaryContentDto);
   }
 }
