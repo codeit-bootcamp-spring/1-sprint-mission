@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -14,7 +15,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,15 +73,19 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId).stream()
-        .toList();
-  }
+  public PageResponse<Message> findAllByChannelId(UUID channelId, int page) {
+    int pageSize = 50;
+    Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-  @Override
-  @Transactional(readOnly = true)
-  public Page<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
-    return messageRepository.findAllByChannelId(channelId, pageable);
+    Page<Message> messagePage = messageRepository.findAllByChannelId(channelId, pageable);
+
+    return new PageResponse<>(
+            messagePage.getContent(),
+            messagePage.getNumber(),
+            messagePage.getSize(),
+            messagePage.hasNext(),
+            null
+    );
   }
 
   @Override

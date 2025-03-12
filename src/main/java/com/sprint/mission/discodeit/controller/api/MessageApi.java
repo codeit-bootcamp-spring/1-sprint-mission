@@ -85,6 +85,6 @@ public interface MessageApi {
       )
   })
   ResponseEntity<PageResponse<Message>> findAllByChannelId(
-      @Parameter(description = "조회할 Channel ID") UUID channelId, Pageable pageable
+      @Parameter(description = "조회할 Channel ID") UUID channelId, int page
   );
 }
