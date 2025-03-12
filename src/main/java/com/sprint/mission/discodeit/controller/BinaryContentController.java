@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ContentDisposition;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
 
   @GetMapping("/{binaryContentId}")
   public ResponseEntity<BinaryContent> find(
@@ -42,16 +45,16 @@ public class BinaryContentController implements BinaryContentApi {
   }
 
   @GetMapping("/{binaryContentId}/download")
-  public ResponseEntity<byte[]> download(@PathVariable UUID binaryContentId) {
+  public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.find(binaryContentId);
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.parseMediaType(binaryContent.getContentType()));
-    headers.setContentLength(binaryContent.getSize());
-    headers.setContentDisposition(ContentDisposition.builder("attachment")
-        .filename(binaryContent.getFileName())
-        .build());
+    BinaryContentDto binaryContentDto = new BinaryContentDto(
+            binaryContent.getId(),
+            binaryContent.getFileName(),
+            binaryContent.getSize(),
+            binaryContent.getContentType()
+    );
 
-    return new ResponseEntity<>(binaryContent.getBytes(), headers, HttpStatus.OK);
+    return binaryContentStorage.download(binaryContentDto);
   }
 }

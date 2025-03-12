@@ -34,4 +34,6 @@ logging:
 discodeit:
   repository:
     type: file  # 파일 저장소 설정 유지
-    file-directory: .discodeit
+  storage:
+    local:
+      root-path: .discodeit # 파일 저장소의 루트 경로 지정

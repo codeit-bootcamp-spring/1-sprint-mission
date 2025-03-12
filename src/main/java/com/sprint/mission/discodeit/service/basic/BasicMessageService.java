@@ -51,8 +51,7 @@ public class BasicMessageService implements MessageService {
       BinaryContent binaryContent = new BinaryContent(
               req.fileName(),
               (long) req.bytes().length,
-              req.contentType(),
-              req.bytes()
+              req.contentType()
       );
       binaryContent.setMessage(message);
       binaryContentRepository.save(binaryContent);
