@@ -10,8 +10,8 @@ import java.util.UUID;
 public class MessageDto {
     private UUID id;
     private UUID channelId;
-    private UUID AuthorId;
-    private String senderName;
+    private UUID authorId;
+    private String author;
     private String channelName;
     private String content;
     private Instant createdAt;
