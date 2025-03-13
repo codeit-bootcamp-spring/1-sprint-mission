@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.api.MessageApiDocs;
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -27,7 +28,7 @@ public class MessageController implements MessageApiDocs {
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<Message> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
@@ -44,7 +45,7 @@ public class MessageController implements MessageApiDocs {
             throw new RuntimeException(e);
           }
         }).toList()).orElse(new ArrayList<>());
-    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
   }
 
@@ -64,13 +65,14 @@ public class MessageController implements MessageApiDocs {
   @GetMapping("/channel/{channelId}")
   public ResponseEntity<List<Message>> findAllByChannelId(@PathVariable UUID channelId) {
     List<Message> messages = messageService.findAllByChannelId(channelId);
+    System.out.println("messages findAllByChannelId = " + messages);
     return ResponseEntity.ok(messages);
   }
 
   @GetMapping()
   public ResponseEntity<List<Message>> findAll() {
     List<Message> messages = messageService.findAll();
-    System.out.println("messages = " + messages);
+    System.out.println("messages findAll = " + messages);
     return ResponseEntity.ok(messages);
   }
 }

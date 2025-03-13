@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.api;
 
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
@@ -21,7 +22,7 @@ public interface MessageApiDocs {
       @ApiResponse(responseCode = "201", description = "Message가 성공적으로 생성됨"),
       @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음")
   })
-  ResponseEntity<Message> create(MessageCreateRequest messageCreateRequest,
+  ResponseEntity<MessageDto> create(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments);
 
   @Operation(summary = "Message 수정", description = "기존 메시지를 수정합니다.")

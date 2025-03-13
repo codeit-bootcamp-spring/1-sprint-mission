@@ -46,25 +46,30 @@ public class BasicChannelService implements ChannelService {
     String description = request.description();
     Channel channel = new Channel(ChannelType.PUBLIC, name, description);
     Channel save = channelRepository.save(channel);
-    return toDto(channel);
+    System.out.println("save = " + save);
+    return channelMapper.toPublicDto(channel);
   }
 
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     Channel createdChannel = channelRepository.save(channel);
+    System.out.println("createdChannel = " + createdChannel);
     for (UUID userId : request.participantIds()) {
       User user = userRepository.findById(userId).get();
       ReadStatus save = readStatusRepository.save(
           new ReadStatus(user, channel, channel.getCreatedAt()));
       System.out.println("save = " + save);
     }
-    //request.participantIds().stream().map(user -> new ReadStatus(user, createdChannel, Instant.now())).forEach(System.out::println);
-    //.forEach(readStatusRepository::save);
     List<ReadStatus> readStatuses = readStatusRepository.findAll();
     System.out.println("readStatuses = " + readStatuses);
 
-    return toDto(createdChannel);
+    //request.participantIds().stream().map(user -> new ReadStatus(user, createdChannel, Instant.now())).forEach(System.out::println);
+    //.forEach(readStatusRepository::save);
+    //List<ReadStatus> readStatuses = readStatusRepository.findAll();
+    //System.out.println("readStatuses = " + readStatuses);
+
+    return channelMapper.toPrivateDto(createdChannel);
   }
 
   public Optional<Instant> getLastMessageAt(UUID channelId) {
@@ -149,8 +154,9 @@ public class BasicChannelService implements ChannelService {
         .limit(1)
         .findFirst()
         .orElse(Instant.MIN);
-
+    System.out.println("lastMessageAt = " + lastMessageAt);
     List<UserDto> participants = getParticipants(channel);
+    System.out.println("participants = " + participants);
     Instant instant = getLastMessageAt(channel.getId()).get();
     /*new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {
@@ -160,8 +166,6 @@ public class BasicChannelService implements ChannelService {
           .forEach(UserDto::new);
     }*/
     System.out.println("instant = " + instant);
-    System.out.println("participants = " + participants);
-    System.out.println("channel = " + channel);
 
     return new ChannelDto(
         channel.getId(),

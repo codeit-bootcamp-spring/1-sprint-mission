@@ -12,7 +12,7 @@ spring:
     hibernate:
       ddl-auto: create
       format_sql: true
-      default_batch_fetch_size: 1000
+      default_batch_fetch_size: 1000 #쿼츠
       #generate_statistics: true;
     open-in-view: false
 

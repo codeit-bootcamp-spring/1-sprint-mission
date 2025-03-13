@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "messages")
-public class Message extends BaseUpdateableEntity{
+public class Message extends BaseUpdateableEntity {
 
   //
   @Column(nullable = false, columnDefinition = "TEXT")
@@ -36,11 +36,12 @@ public class Message extends BaseUpdateableEntity{
   private Channel channel;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "author_id")
+  @JoinColumn(name = "user_id") //?author_id
   private User author;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  @JoinTable(name = "message_attachments", joinColumns = @JoinColumn(name = "message_id"), inverseJoinColumns = {@JoinColumn(name = "attachment_id")})
+  @JoinTable(name = "message_attachments", joinColumns = @JoinColumn(name = "message_id"), inverseJoinColumns = {
+      @JoinColumn(name = "attachment_id")})
   private List<BinaryContent> attachments;
 
   public void update(String newContent) {
@@ -53,5 +54,12 @@ public class Message extends BaseUpdateableEntity{
     if (anyValueUpdated) {
       this.updatedAt = Instant.now();
     }
+  }
+
+  @Override
+  public String toString() {
+    return "Message{" + "content='" + content + '\'' + ", channel=" + channel + ", author=" + author
+        + ", attachments=" + attachments + ", updatedAt=" + updatedAt + ", id=" + id
+        + ", createdAt=" + createdAt + '}';
   }
 }
