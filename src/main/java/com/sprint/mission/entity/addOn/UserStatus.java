@@ -18,7 +18,8 @@ import static jakarta.persistence.FetchType.*;
 
 @Entity
 @EqualsAndHashCode(of = {"lastActiveAt"}, callSuper = true)
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+//@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor
 @ToString(of = "lastActiveAt")
 @Getter
 @Schema(description = "유저 상태")

@@ -5,33 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/fetchJoin/AllChannel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/mapper/Test.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/ChannelMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/ChannelMapperImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/UserMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/UserMapperImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ChannelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ChannelController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/BinaryContentMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/BinaryContentMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/ChannelMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/ChannelMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/UserMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/mappedDto/ChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/mappedDto/ChannelDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/BinaryContentDtoForCreate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/BinaryContentDtoForCreate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/UserDtoForCreate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/UserDtoForCreate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/UserDtoForUpdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/UserDtoForUpdate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelAllDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelAllDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPrivateChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPrivateChannelDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPublicChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPublicChannelDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Channel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ChannelRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ReadStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ReadStatusRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/ChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/ChannelService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFChannelService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/UserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/UserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/BinaryContentMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/ChannelMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/MessageMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/ReadStatusMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/UserMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/UserStatusMapperImpl.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -185,6 +165,9 @@
       <recent name="C:\1-sprint-mission\src" />
       <recent name="C:\1-sprint-mission\src\main\resources\static" />
       <recent name="C:\1-sprint-mission\test\java\com\sprint\mission" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.sprint.mission.entity" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="com.sprint.mission.dto.mappedDto" />
@@ -350,6 +333,8 @@
       <workItem from="1741685563759" duration="798000" />
       <workItem from="1741705237617" duration="2060000" />
       <workItem from="1741811584727" duration="4546000" />
+      <workItem from="1741823612406" duration="11000" />
+      <workItem from="1741823633185" duration="975000" />
     </task>
     <servers />
   </component>

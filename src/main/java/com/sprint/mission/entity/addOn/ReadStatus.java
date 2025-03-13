@@ -17,7 +17,8 @@ import java.util.UUID;
 import static jakarta.persistence.FetchType.*;
 @Entity
 @EqualsAndHashCode(of = {"user", "channel"}, callSuper = true)
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+//@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor
 @ToString(of = {"lastReadAt"})
 @Getter
 @Schema(description = "메시지 읽음 상태 정보")

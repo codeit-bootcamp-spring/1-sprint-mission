@@ -14,7 +14,8 @@ import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.*;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+//@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor
 @EqualsAndHashCode(of = {"content", "author", "channel"}, callSuper = true)
 @ToString(of = "content")
 @Getter

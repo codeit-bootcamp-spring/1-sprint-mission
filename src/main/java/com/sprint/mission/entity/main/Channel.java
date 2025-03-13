@@ -17,7 +17,8 @@ import static jakarta.persistence.CascadeType.*;
 
 @Entity
 @EqualsAndHashCode(of = {"channelType", "name"}, callSuper = true)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @ToString(of = {"channelType", "name", "description"})
 @Getter @Setter
 @Schema(description = "채널")
