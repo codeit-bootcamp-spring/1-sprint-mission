@@ -1,31 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
 @Getter
-public class BinaryContent implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Table(name = "binary_contents")
+@Entity
+@AllArgsConstructor
+@Builder
+public class BinaryContent extends BaseEntity {
 
-    private transient UUID id;
-    private final Instant createdAt;
+  // 메타데이터
+  @Column(nullable = false, length = 255) // PostgreSQL : 길이를 지정하지 않으면 TEXT로 인식되고, 무제한 글자 수가 저장 가능
+  private String fileName;
 
-    // 메타데이터
-    private String fileName;
-    private Long size;
-    private String contentType;
-    private byte[] bytes;
+  @Column(nullable = false)
+  private Long size;
 
-    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
-        this.fileName = fileName;
-        this.size = size;
-        this.contentType = contentType;
-        this.bytes = bytes;
-    }
+  @Column(nullable = false, length = 100)
+  private String contentType;
+
+  // JPA용 기본 생성자, JPA만 접근할 수 있도록 protected 접근자 설정
+  protected BinaryContent() {
+  }
+
 }

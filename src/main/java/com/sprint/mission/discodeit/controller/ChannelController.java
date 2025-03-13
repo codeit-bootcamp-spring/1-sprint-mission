@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -19,20 +20,15 @@ public class ChannelController {
   private final ChannelService channelService;
 
   @PostMapping(value = "/public")
-  public ResponseEntity<Channel> createPublicChannel(
+  public ResponseEntity<ChannelDto> createPublicChannel(
       @RequestBody ChannelPublicRequest channelPublicRequest) {
-
-    /* 스프린트 미션 5 심화 조건 중 API 스펙을 준수
-    ChannelPublicResponse channelPublicResponse = channelService.createPublicChannel(
-        channelPublicRequest);
-     */
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelService.createPublicChannel(channelPublicRequest)); // 201
   }
 
   @PostMapping(value = "/private")
-  public ResponseEntity<Channel> createPrivateChannel(
+  public ResponseEntity<ChannelDto> createPrivateChannel(
       @RequestBody ChannelPrivateRequest channelPrivateRequest) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelService.createPrivateChannel(channelPrivateRequest)); // 201
@@ -45,7 +41,7 @@ public class ChannelController {
   // 위와 같은 엔드 포인트를 사용했을 때의 단점도 궁금합니다!(public, prviate 뿐만 아니라 type 더 추가되면 더 복잡해진다거나)
   // 무엇보다 Public 채널을 업데이트하는 건데 엔드 포인트에 public이 붙지 않는 것도 고민되는 부분입니다.
   @PatchMapping(value = "/{channelId}")
-  public ResponseEntity<Channel> updatePublicChannel(@PathVariable UUID channelId,
+  public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateRequest channelUpdateRequest) {
     return ResponseEntity.ok(channelService.updateChannel(channelId, channelUpdateRequest));
   }
@@ -58,8 +54,9 @@ public class ChannelController {
     return ResponseEntity.noContent().build(); // 204
   }
 
+  // /api/channels?userId=1
   @GetMapping
-  public ResponseEntity<Collection<ChannelFindAllResponse>> getChannelListByUserId(
+  public ResponseEntity<Collection<ChannelDto>> getChannelListByUserId(
       @RequestParam UUID userId) {
     return ResponseEntity.ok(channelService.findAllByUserId(userId)); // 200
   }

@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,63 +21,82 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
+  //
+  private final UserStatusMapper userStatusMapper;
 
+  @Transactional
   @Override
-  public UserStatus createUserStatus(UserStatusCreateRequest request) {
-    UserStatus userStatus = new UserStatus(request.userId(), request.lastConnectAt());
-    return userStatusRepository.save(userStatus);
-  }
-
-  @Override
-  public UserStatus findUserStatusById(UUID userStatusId) {
-    return userStatusRepository.findById(userStatusId)
-        .orElseThrow(() -> new NoSuchElementException("UserStatus가 존재하지 않습니다."));
-  }
-
-  @Override
-  public UserStatus findUserStatusByUserId(UUID userId) {
-    return userStatusRepository.findByUserId(userId)
-        .orElseThrow(
-            () -> new NoSuchElementException("userId가 " + userId + " 인 UserStatus가 존재하지 않습니다."));
-  }
-
-  @Override
-  public List<UserStatus> findAllUserStatus() {
-    return userStatusRepository.findAll();
-  }
-
-  @Override
-  public UserStatus updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest) {
-    // UserStatus의 id기준으로 바꾸는 것으로 이해
-    UserStatus userStatus =
-        userStatusRepository.findById(userStatusUpdateRequest.UserStatusId())
-            .orElseThrow(() -> new NoSuchElementException(
-                "UserStatus(" + userStatusUpdateRequest.UserStatusId() + ")가 없습니다."));
-
-    userStatus.refreshLastConnectAt(userStatusUpdateRequest.lastConnectTime());
-    userStatus.refreshUpdateAt();
+  public UserStatusDto createUserStatus(UserStatusCreateRequest request) {
+    UserStatus userStatus = UserStatus.builder()
+        .user(request.user())
+        .lastActiveAt(request.lastConnectAt())
+        .build();
     userStatusRepository.save(userStatus);
-    return userStatus;
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
-  public UserStatus updateUserStatusByUserId(UUID userId,
-      UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
+  public UserStatusDto findUserStatusById(UUID userStatusId) {
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+        .orElseThrow(
+            () -> new NoSuchElementException("UserStatus(" + userStatusId + ")가 존재하지 않습니다."));
+    return userStatusMapper.toDto(userStatus);
+  }
+
+  @Override
+  public UserStatusDto findUserStatusByUserId(UUID userId) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(
+            () -> new NoSuchElementException("userId(" + userId + ")인 UserStatus가 존재하지 않습니다."));
+    return userStatusMapper.toDto(userStatus);
+  }
+
+  @Override
+  public List<UserStatusDto> findAllUserStatus() {
+    // TODO 예외 처리
+    return userStatusRepository.findAll().stream()
+        .map(userStatusMapper::toDto)
+        .toList();
+  }
+
+  @Transactional
+  @Override
+  public UserStatusDto updateUserStatus(UserStatusUpdateRequest request) {
+    UserStatus userStatus =
+        userStatusRepository.findById(request.UserStatusId())
+            .orElseThrow(() -> new NoSuchElementException(
+                "UserStatus(" + request.UserStatusId() + ")가 없습니다."));
+
+    userStatus.updateLastConnectAt(request.lastConnectTime());
+    userStatus.refreshUpdateAt();
+    // userStatusRepository.save(userStatus); JPA 의 더티 채킹으로 save 하지 않아도 DB에 자동 업데이트
+
+    return userStatusMapper.toDto(userStatus);
+  }
+
+  @Transactional
+  @Override
+  public UserStatusDto updateUserStatusByUserId(UUID userId,
+      UserStatusUpdateByUserIdRequest request) {
     UserStatus userStatus =
         userStatusRepository.findByUserId(userId)
-            .orElseThrow(() -> new NoSuchElementException("userStatus가 존재하지 않습니다."));
+            .orElseThrow(
+                () -> new NoSuchElementException("userId(" + userId + ")인 UserStatus가 존재하지 않습니다."));
 
-    userStatus.refreshLastConnectAt(userStatusUpdateByUserIdRequest.newLastActiveAt());
+    userStatus.updateLastConnectAt(request.newLastActiveAt());
     userStatus.refreshUpdateAt();
-    userStatusRepository.save(userStatus);
-    return userStatus;
+    // userStatusRepository.save(userStatus); JPA 의 더티 채킹으로 save 하지 않아도 DB에 자동 업데이트
+
+    return userStatusMapper.toDto(userStatus);
   }
 
+  @Transactional
   @Override
   public void deleteUserStatusById(UUID userStatusId) {
     userStatusRepository.deleteById(userStatusId);
   }
 
+  @Transactional
   @Override
   public void delteUserStatusByUserId(UUID userId) {
     userStatusRepository.deleteByUserId(userId);

@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import ch.qos.logback.classic.spi.IThrowableProxy;
+import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateResponse;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStautsfindAllByUserIdResponse;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,59 +21,74 @@ public class BasicReadStatusService implements ReadStatusService {
 
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
+  //
   private final ReadStatusRepository readStatusRepository;
+  //
+  private final ReadStatusMapper readStatusMapper;
 
-  public ReadStatus createReadStatus(ReadStatusCreateRequest readStatusRequest) {
-    if (channelRepository.findChannelById(readStatusRequest.channelId()).isEmpty() &&
-        userRepository.findUserById(readStatusRequest.userId()).isEmpty()
-    ) {
-      throw new NoSuchElementException( // 전역 에러에서 404 처리
-          "createReadStatus 실패 : 채널 ID " + readStatusRequest.channelId() +
-              "또는 사용자 ID" + readStatusRequest.userId() + "가 존재하지 않습니다.");
-    }
-    List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(
-        readStatusRequest.userId());
 
-    if (readStatuses.stream()
-        .anyMatch(readStatus -> readStatus.getChannelId().equals(readStatusRequest.channelId()))
-    ) {
-      throw new IllegalArgumentException("이미 동일한 ReadStatus가 존재합니다."); // 전역 에러에서 400 처리
+  @Transactional
+  @Override
+  public ReadStatusDto createReadStatus(ReadStatusCreateRequest request) {
+
+    // TODO 채널하고 와서 채우기
+    if (channelRepository.findById(request.channel().getId()).isEmpty()) {
+      throw new NoSuchElementException("채널(" + request.channel().getId() + ")이 존재하지 않습니다.");
     }
-    return readStatusRepository.save(
-        new ReadStatus(readStatusRequest.userId(), readStatusRequest.channelId(),
-            readStatusRequest.lastReadAt()));
+
+    if (userRepository.findById(request.user().getId()).isEmpty()) {
+      throw new NoSuchElementException("유저(" + request.user().getId() + ")가 존재하지 않습니다.");
+    }
+
+    if (readStatusRepository.existsByChannelIdAndUserId(request.channel().getId(),
+        request.user().getId())) {
+      throw new IllegalArgumentException("ReadStatus는 이미 존재합니다."); // 전역 에러에서 400 처리
+    }
+
+    ReadStatus readStatus = ReadStatus.builder()
+        .lastReadAt(request.lastReadAt())
+        .user(request.user())
+        .channel(request.channel())
+        .build();
+
+    readStatusRepository.save(readStatus);
+
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
-  public ReadStatus findReadStatusById(UUID readStatusId) {
-    return readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new NoSuchElementException("ReadStatus 가 존재하지 않습니다."));
+  public ReadStatusDto findReadStatusById(UUID readStatusId) {
+    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+        .orElseThrow(
+            () -> new NoSuchElementException("ReadStatus(" + readStatusId + ")가 존재하지 않습니다."));
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
-  public List<ReadStatus> findAllByUserId(UUID userId) {
-        /* 스프린트 미션 5 심화 조건 중 API 스펙을 준수
-        return readStatusRepository.findAllByUserId(userId).stream()
-                .map(readStatus ->
-                        new ReadStautsfindAllByUserIdResponse(
-                                readStatus.getId(),
-                                readStatus.getUserId(),
-                                readStatus.getChannelId(),
-                                readStatus.getLastMessageReadAt()
-                        )
-                )
-                .toList();
-         */
+  public List<ReadStatusDto> findAllByUserId(UUID userId) {
+    // TODO 예외 처리
+    return readStatusRepository.findAllByUserId(userId).stream()
+        .map(readStatusMapper::toDto)
+        .toList();
+  }
+
+  @Override
+  public List<ReadStatus> findAllReadStatusEntitiesByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId);
   }
 
   @Override
-  public List<ReadStatus> findAllByChannelId(UUID channelId) {
-    return readStatusRepository.findAllByChannelId(channelId);
+  public List<ReadStatusDto> findAllByChannelId(UUID channelId) {
+    // TODO 예외 처리
+    return readStatusRepository.findByChannelId(channelId).stream()
+        .map(readStatusMapper::toDto)
+        .toList();
   }
 
+
+  @Transactional
   @Override
-  public ReadStatus updateReadStatus(
+  public ReadStatusDto updateReadStatus(
       UUID id, ReadStatusUpdateRequest readStatusUpdateRequest) {
 
     ReadStatus readStatus = readStatusRepository.findById(id)
@@ -82,22 +97,14 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatus.updateLastMessageReadAt(readStatusUpdateRequest.lastReadAt());
     readStatus.refreshUpdateAt();
 
-    /* 스프린트 미션 5 심화 조건 중 API 스펙을 준수
-    // ReadStatusUpdateRequest 에 없는 정보도 포함되어야 하는데,
-    // 연산이나 리소스 아낀다고 깔끔하게 하지 않는 게 싫어서 그냥 맞춥니다!
-    ReadStatusUpdateResponse readStatusUpdateResponse = new ReadStatusUpdateResponse(
-        readStatus.getId(),
-        readStatus.getUserId(),
-        readStatus.getChannelId(),
-        readStatus.getLastMessageReadAt());
+    // JPA 의 더티 채킹으로 save 하지 않아도 DB에 자동 업데이트인데 전 미션 때 save를 빼먹었습니다
 
-     */
-
-    return readStatus;
+    return readStatusMapper.toDto(readStatus);
   }
 
+  @Transactional
   @Override
-  public void deleteReadStatusById(UUID readStatusId) {
-    readStatusRepository.deleteById(readStatusId);
+  public void deleteReadStatusById(UUID id) {
+    readStatusRepository.deleteById(id);
   }
 }
