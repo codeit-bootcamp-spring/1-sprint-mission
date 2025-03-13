@@ -22,9 +22,9 @@ public record BinaryContentDtoForCreate(
         Long size,
         byte[] bytes) {
 
-    public BinaryContent toEntity() {
-        return new BinaryContent(fileName, contentType, size);
-    }
+//    public BinaryContent toEntity() {
+//        return new BinaryContent(fileName, contentType, size);
+//    }
 //
 //    public static Optional<BinaryContentDtoForCreate> convertToBinaryContentDto(MultipartFile file) {
 //        log.info("file : {}", file);

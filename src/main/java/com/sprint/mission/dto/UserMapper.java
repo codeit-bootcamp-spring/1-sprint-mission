@@ -16,7 +16,8 @@ import static org.mapstruct.MappingInheritanceStrategy.*;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "online", source = "status.online")
+    //@Mapping(target = "online", source = "status.isOnline")
+    @Mapping(target = "online", expression = "java(user.getStatus() != null ? user.getStatus().isOnline() : null)")
     UserDto toDto(User user);
 
     @Mapping(target = "username", source = "newName")

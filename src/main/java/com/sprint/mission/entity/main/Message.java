@@ -18,11 +18,10 @@ import static jakarta.persistence.FetchType.*;
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"content", "author", "channel"}, callSuper = true)
 @ToString(of = "content")
-@Getter
+@Getter @Setter
 @Schema(description = "메시지 엔티티")
 @Table(name = "messages")
 public class Message  extends BaseUpdatableEntity{
-
 //    @ToString.Exclude
 //    private static final long serialVersionUID = 1L;
 

@@ -5,7 +5,6 @@ import com.sprint.mission.dto.mappedDto.UserDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -23,17 +22,17 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        Boolean online = null;
         UUID id = null;
         String username = null;
         String email = null;
         BinaryContentDto profile = null;
 
-        online = userStatusOnline( user );
         id = user.getId();
         username = user.getUsername();
         email = user.getEmail();
         profile = binaryContentToBinaryContentDto( user.getProfile() );
+
+        Boolean online = user.getStatus() != null ? user.getStatus().isOnline() : null;
 
         UserDto userDto = new UserDto( id, username, email, profile, online );
 
@@ -66,14 +65,6 @@ public class UserMapperImpl implements UserMapper {
         user.setPassword( userDto.password() );
 
         return user;
-    }
-
-    private Boolean userStatusOnline(User user) {
-        UserStatus status = user.getStatus();
-        if ( status == null ) {
-            return null;
-        }
-        return status.isOnline();
     }
 
     protected BinaryContentDto binaryContentToBinaryContentDto(BinaryContent binaryContent) {

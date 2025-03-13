@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+import static com.sprint.mission.entity.main.ChannelType.PRIVATE;
 import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
 
 
@@ -45,7 +46,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateDTO request) {
-        Channel createdChannel = channelRepository.save(channelMapper.toPrivateEntity());
+        Channel createdChannel = channelRepository.save(channelMapper.toPrivateEntity(PRIVATE));
         request.participantIds().stream()
                 .map(userId -> {
                     User participatingUser = userRepository.findById(userId)

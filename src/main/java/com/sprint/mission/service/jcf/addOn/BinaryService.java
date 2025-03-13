@@ -2,6 +2,7 @@ package com.sprint.mission.service.jcf.addOn;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
+import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
@@ -22,11 +23,12 @@ public class BinaryService {
 
     private final BinarycontentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentMapper binaryContentMapper;
 
 
     public BinaryContent create(BinaryContentDtoForCreate request){
         //binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
-        return binaryContentRepository.save(request.toEntity());
+        return binaryContentRepository.save(binaryContentMapper.toEntity(request));
     }
 
     public BinaryContent findById(UUID id){

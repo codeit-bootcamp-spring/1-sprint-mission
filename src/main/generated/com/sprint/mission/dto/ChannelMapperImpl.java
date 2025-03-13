@@ -60,10 +60,25 @@ public class ChannelMapperImpl implements ChannelMapper {
             return null;
         }
 
-        Channel channel = toPrivateEntity();
+        Channel channel = new Channel();
 
         channel.setName( request.name() );
         channel.setDescription( request.description() );
+
+        channel.setChannelType( ChannelType.PUBLIC );
+
+        return channel;
+    }
+
+    @Override
+    public Channel toPrivateEntity(ChannelType type) {
+        if ( type == null ) {
+            return null;
+        }
+
+        Channel channel = new Channel();
+
+        channel.setChannelType( type );
 
         return channel;
     }

@@ -3,6 +3,8 @@ package com.sprint.mission.controller;
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
 import com.sprint.mission.dto.BinaryContentMapper;
+import com.sprint.mission.dto.MessageMapper;
+import com.sprint.mission.dto.mappedDto.MessageDto;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
@@ -39,6 +41,7 @@ public class MessageController {
 
     private final MessageService messageService;
     private final BinaryContentMapper binaryContentMapper;
+    private final MessageMapper messageMapper;
 
     @Operation(summary = "Message 생성")
     @ApiResponses({
@@ -54,7 +57,7 @@ public class MessageController {
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
         //  MultipartFile[] : 배열로 여러 파일 받는 방법 in 공식문서 (기존 사용하던 것 : List<MultipartFile>)
 
-        // 컬렉션을 DTO로 반환하는 것 피하기 : 생성 비용 + 불필요한 중첩 구조 (애초에 컬렉션이 Optional같은 역할)
+        // 컬렉션을 옵셔널로 반환하는 것 피하기 : 생성 비용 + 불필요한 중첩 구조 (애초에 컬렉션이 Optional같은 역할)
         List<BinaryContentDtoForCreate> binaryContentDtoForCreateList = attachments == null || attachments.isEmpty()
                 ? Collections.emptyList()
                 : attachments.stream().map(binaryContentMapper::convertFileToBinaryContentDto)
@@ -62,9 +65,8 @@ public class MessageController {
                 .toList();
 
         Message createdMessage = messageService.create(requestDTO, binaryContentDtoForCreateList);
-
         return CommonResponse.toResponseEntity
-                (CREATED, "메시지가 성공적으로 생성되었습니다.", new FindMessageDto(createdMessage));
+                (CREATED, "메시지가 성공적으로 생성되었습니다.", messageMapper.toDto(createdMessage));
     }
 
 
@@ -75,8 +77,8 @@ public class MessageController {
     public ResponseEntity<CommonResponse> findInChannel(
             @Parameter(description = "조회할 Channel ID") @RequestParam("channelId") UUID channelId) {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
-        List<FindMessageDto> dtoList = messageList.stream()
-                .map(FindMessageDto::new).toList();
+        List<MessageDto> dtoList = messageList.stream()
+                .map(messageMapper::toDto).toList();
 
         return CommonResponse.toResponseEntity
                 (OK, "메시지 목록을 성공적으로 조회했습니다.", dtoList);
@@ -95,9 +97,9 @@ public class MessageController {
             @Parameter(description = "수정할 Message ID")
             @PathVariable("id") UUID messageId,
             @RequestBody @Valid MessageDtoForUpdate requestDTO) {
-        messageService.update(messageId, requestDTO);
+        Message updatedMessage = messageService.update(messageId, requestDTO);
         return CommonResponse.toResponseEntity
-                (OK, "메시지가 성공적으로 업데이트되었습니다.", requestDTO);
+                (OK, "메시지가 성공적으로 업데이트되었습니다.", messageMapper.toDto(updatedMessage));
     }
 
 

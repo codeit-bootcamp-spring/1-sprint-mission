@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.entity.main.ChannelType.PRIVATE;
+import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
@@ -35,7 +36,7 @@ public class ChannelTest {
         assertThat(findedChannel).isNotNull();
         assertThat(findedChannel.getName()).isEqualTo(publicChannelCreateDTO.name());
         assertThat(findedChannel.getDescription()).isEqualTo(publicChannelCreateDTO.description());
-
+        assertThat(findedChannel.getChannelType()).isEqualTo(PUBLIC);
     }
 
     @DisplayName("PrivateChannel 생성")

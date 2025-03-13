@@ -1,6 +1,7 @@
 package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.mappedDto.BinaryContentDto;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -33,5 +34,16 @@ public class BinaryContentMapperImpl implements BinaryContentMapper {
         BinaryContentDto binaryContentDto = new BinaryContentDto( id, fileName, size, contentType, bytes );
 
         return binaryContentDto;
+    }
+
+    @Override
+    public BinaryContent toEntity(BinaryContentDtoForCreate request) {
+        if ( request == null ) {
+            return null;
+        }
+
+        BinaryContent binaryContent = new BinaryContent();
+
+        return binaryContent;
     }
 }

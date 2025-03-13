@@ -36,4 +36,6 @@ public interface BinaryContentMapper {
             throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
         }
     }
+
+    BinaryContent toEntity(BinaryContentDtoForCreate request);
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.service.jcf.main;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
+import com.sprint.mission.dto.MessageMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
@@ -38,6 +39,7 @@ public class JCFMessageService implements MessageService {
     private final UserRepository userRepository;
     private final BinaryService binaryService;
     private final BinaryContentStorage binaryContentStorage;
+    private final MessageMapper messageMapper;
 
 
     @Override
@@ -49,7 +51,8 @@ public class JCFMessageService implements MessageService {
         Channel writtenPlace = channelRepository.findById(responseDto.channelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
-        Message createdMessage = new Message(writtenPlace, author, responseDto.content());
+        Message createdMessage = messageMapper.toEntity(responseDto, writtenPlace, author);
+        //Message createdMessage = new Message(writtenPlace, author, responseDto.content());
 
         log.info("attachmentsDto: {}", binaryContentDtoForCreateList);
         if (!binaryContentDtoForCreateList.isEmpty()) {
@@ -65,10 +68,9 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void update(UUID messageId, MessageDtoForUpdate updateDto) {
+    public Message update(UUID messageId, MessageDtoForUpdate updateDto) {
         Message updatingMessage = this.findById(messageId);
-        updatingMessage.update(updateDto.newContent());
-        messageRepository.save(updatingMessage);
+        return messageMapper.update(updateDto, updatingMessage);
     }
 
 
@@ -80,10 +82,10 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        if (channelRepository.existsById(channelId)) {
+        if (!channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
-        return new ArrayList<>();
+        return messageRepository.findAllByChannel_Id(channelId);
     }
 //
 //        Page<Message> paging = (Page<Message>) pageable;
@@ -119,6 +121,6 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-        messageRepository.deleteAllByChannelId(channelId);
+        messageRepository.deleteAllByChannel_Id(channelId);
     }
 }

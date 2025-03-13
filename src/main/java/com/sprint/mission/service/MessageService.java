@@ -15,7 +15,7 @@ public interface MessageService {
 
     Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> attachmentsDto);
 
-    void update(UUID messageId, MessageDtoForUpdate updateDto);
+    Message update(UUID messageId, MessageDtoForUpdate updateDto);
     //List<Message> findAllByChannelId(UUID channelId, Pageable pageable);
     List<Message> findAllByChannelId(UUID channelId);
     //List<Message> findAll();
