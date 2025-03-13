@@ -4,7 +4,6 @@ import com.sprint.mission.dto.mappedDto.UserStatusDto;
 import com.sprint.mission.entity.addOn.UserStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
-import org.mapstruct.MappingInheritanceStrategy;
 
 import static org.mapstruct.MappingInheritanceStrategy.*;
 

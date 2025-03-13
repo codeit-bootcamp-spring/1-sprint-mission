@@ -58,6 +58,7 @@ public class JCFMessageService implements MessageService {
         if (!binaryContentDtoForCreateList.isEmpty()) {
             for (BinaryContentDtoForCreate bcd : binaryContentDtoForCreateList) {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
+                log.info("메시지의 생성된 BinaryContent: {}", createdBinaryContent);
                 binaryContentStorage.put(createdBinaryContent.getId(), bcd.bytes());
                 createdMessage.addAttachment(createdBinaryContent);
             }

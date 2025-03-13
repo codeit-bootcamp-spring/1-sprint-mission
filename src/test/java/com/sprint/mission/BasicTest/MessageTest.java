@@ -3,9 +3,11 @@ package com.sprint.mission.BasicTest;
 import com.sprint.mission.dto.MessageMapper;
 import com.sprint.mission.dto.mappedDto.MessageDto;
 import com.sprint.mission.dto.request.*;
+import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.BinarycontentRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.UserService;
@@ -33,6 +35,8 @@ public class MessageTest {
 
     @Autowired
     private ChannelService channelService;
+    @Autowired
+    private BinarycontentRepository binarycontentRepository;
 
 
     @Test
@@ -83,12 +87,17 @@ public class MessageTest {
 
         MessageDto dto = messageMapper.toDto(updatedMessage);
 
+        List<BinaryContent> all = binarycontentRepository.findAll();
+        System.out.println("가자~~~~~~~~~~~~~~~~~");
+        all.forEach(System.out::println);
+
         assertThat(updatedMessage.getContent()).isNotEqualTo(testMessageDto.content());
         assertThat(updatedMessage.getId()).isEqualTo(createdMessage.getId());
         assertThat(updatedMessage.getAuthor().getId()).isEqualTo(testMessageDto.userId());
         assertThat(dto.attachments().size()).isEqualTo(3);
         System.out.println("dto.attachments() = " + dto.attachments());
         System.out.println("dto.author() = " + dto.author());
+
     }
 
     void setting(){

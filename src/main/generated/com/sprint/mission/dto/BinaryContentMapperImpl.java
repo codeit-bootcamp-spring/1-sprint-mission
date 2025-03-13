@@ -44,6 +44,10 @@ public class BinaryContentMapperImpl implements BinaryContentMapper {
 
         BinaryContent binaryContent = new BinaryContent();
 
+        binaryContent.setFileName( request.fileName() );
+        binaryContent.setContentType( request.contentType() );
+        binaryContent.setSize( request.size() );
+
         return binaryContent;
     }
 }

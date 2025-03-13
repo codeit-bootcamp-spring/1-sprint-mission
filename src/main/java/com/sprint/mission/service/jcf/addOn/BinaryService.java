@@ -8,6 +8,7 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.BinarycontentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BinaryService {
@@ -28,6 +30,8 @@ public class BinaryService {
 
     public BinaryContent create(BinaryContentDtoForCreate request){
         //binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
+        BinaryContent entity = binaryContentMapper.toEntity(request);
+        log.info("Create binary content: {}", entity);
         return binaryContentRepository.save(binaryContentMapper.toEntity(request));
     }
 
