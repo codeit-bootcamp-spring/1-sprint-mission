@@ -85,10 +85,7 @@ public class BasicUserStatusService implements UserStatusService {
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    UserStatus userStatus = userStatusRepository.findById(UUID.fromString(id)).orElse(null);
-    if (userStatus == null) {
-      throw new IllegalArgumentException("userStatus not found");
-    }
+    UserStatus userStatus = user.getUserStatus();
     userStatus.setUpdatedAt(updateUserStatusDto.updateAt());
     userStatusRepository.save(userStatus);
 

@@ -10,7 +10,6 @@ import lombok.Getter;
 
 import java.time.Instant;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -18,7 +17,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "user_statuses")
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class UserStatus extends BaseUpdatableEntity {
 
   @OneToOne
@@ -28,6 +26,7 @@ public class UserStatus extends BaseUpdatableEntity {
 
   public UserStatus(User user) {
     this.user = user;
+    this.lastActiveAt = Instant.now();
   }
 
   private static final int USER_ACTIVE_TIMEOUT_SECONDS = 5 * 60;
