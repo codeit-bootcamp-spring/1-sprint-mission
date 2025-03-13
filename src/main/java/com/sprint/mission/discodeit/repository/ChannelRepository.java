@@ -18,9 +18,9 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
   @EntityGraph(attributePaths = {"readStatuses", "messages", "readStatuses.user"})
   @Query("""
       select c from Channel c
-      where c.type='PUBLIC'
+      where c.type = 'PUBLIC'
       or c.id in (
-      select rs.channel.id from ReadStatus  rs where rs.user.id= :userId
+          select rs.channel.id from ReadStatus rs where rs.user.id = :userId
       )
       """)
   List<Channel> findAllByUserId(UUID userId);

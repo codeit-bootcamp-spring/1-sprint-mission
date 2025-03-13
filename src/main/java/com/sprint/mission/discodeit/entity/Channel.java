@@ -34,10 +34,10 @@ public class Channel extends BaseUpdatableEntity {
   private String description;
 
   @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<Message> messages; //= new HashSet<>();
+  private Set<Message> messages = new HashSet<>();
 
   @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ReadStatus> readStatuses;// = new HashSet<>();
+  private Set<ReadStatus> readStatuses = new HashSet<>();
 
   public Channel(ChannelType type, String name, String description) {
     this.type = type;
