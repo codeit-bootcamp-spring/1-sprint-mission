@@ -14,6 +14,9 @@ public class BinaryContentMapper {
   private final BinaryContentStorage binaryContentStorage;
 
   public BinaryContentDto toDto(BinaryContent binaryContent) {
+    if (binaryContent == null) {
+      return null;
+    }
     byte[] file = null;
     try {
       file = binaryContentStorage.get(binaryContent.getId()).readAllBytes();
