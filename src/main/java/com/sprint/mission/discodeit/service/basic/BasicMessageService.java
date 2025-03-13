@@ -142,7 +142,8 @@ public class BasicMessageService implements MessageService {
       //나중에 search 기능 만들때 더 고민해보고 수정하기
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    return messageRepository.findByAuthorId(authorId).stream().map(messageMapper::toDto).toList();
+    return messageRepository.findByAuthorId(author.getId()).stream().map(messageMapper::toDto)
+        .toList();
   }
 
   //todo - repository 에 날짜로 조회하는 기능 만들기

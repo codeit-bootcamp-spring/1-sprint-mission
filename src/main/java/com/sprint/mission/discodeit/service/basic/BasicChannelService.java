@@ -110,7 +110,8 @@ public class BasicChannelService implements ChannelService {
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
-    return messageRepository.findByChannelId(channelId).stream().map(messageMapper::toDto).toList();
+    return messageRepository.findByChannelId(channel.getId()).stream().map(messageMapper::toDto)
+        .toList();
   }
 
   @Override
