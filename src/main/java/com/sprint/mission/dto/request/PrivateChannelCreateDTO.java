@@ -9,10 +9,5 @@ import java.util.UUID;
 
 public record PrivateChannelCreateDTO(
 //        @NotEmpty(message = "참여자 ID는 필수입니다.")
-        List<UUID> participantIds
-) {
-    public Channel toChannel() {
-        return new Channel(ChannelType.PRIVATE);
-    }
-    // 나중에
+        List<UUID> participantIds) {
 }

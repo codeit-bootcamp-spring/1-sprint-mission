@@ -2,6 +2,8 @@ package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.mappedDto.ChannelDto;
 import com.sprint.mission.dto.mappedDto.UserDto;
+import com.sprint.mission.dto.request.ChannelDtoForUpdate;
+import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import java.time.Instant;
@@ -10,12 +12,6 @@ import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
-/**
-* <h2>ChannelMapper</h2>
-* 채널 관련 DTO 변환을 위한 Mapper입니다.
-* 채널 조회 시 사용되는 DTO 변환을 담당합니다.
-*
-*/
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor"
 )
@@ -44,5 +40,31 @@ public class ChannelMapperImpl implements ChannelMapper {
         ChannelDto channelDto = new ChannelDto( id, channelType, name, description, participants, lastMessageAt );
 
         return channelDto;
+    }
+
+    @Override
+    public Channel update(ChannelDtoForUpdate dto, Channel channel) {
+        if ( dto == null ) {
+            return channel;
+        }
+
+        channel.setName( dto.name() );
+        channel.setDescription( dto.description() );
+
+        return channel;
+    }
+
+    @Override
+    public Channel toPublicEntity(PublicChannelCreateDTO request) {
+        if ( request == null ) {
+            return null;
+        }
+
+        Channel channel = toPrivateEntity();
+
+        channel.setName( request.name() );
+        channel.setDescription( request.description() );
+
+        return channel;
     }
 }

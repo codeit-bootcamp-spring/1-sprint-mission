@@ -80,7 +80,7 @@ public class UserTest {
         UserDtoForCreate createDto = new UserDtoForCreate("test 유저 1", "test 패스워드 1", "test 이메일 1");
         User createdUser1 = userService.create(createDto, null);
 
-        User createdUser = createDto.toEntity();
+        User createdUser = userMapper.toEntity(createDto);
         User savedUser = userRepository.save(createdUser);
         System.out.println("createdUser = " + createdUser + "ID = " + createdUser.getId());
         System.out.println("savedUser = " + savedUser + "ID = " + savedUser.getId());

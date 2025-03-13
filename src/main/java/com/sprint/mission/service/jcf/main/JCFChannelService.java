@@ -3,14 +3,11 @@ package com.sprint.mission.service.jcf.main;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.mappedDto.ChannelDto;
+import com.sprint.mission.dto.ChannelMapper;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.entity.addOn.ReadStatus;
-import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.ChannelType;
-import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
@@ -23,12 +20,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
 
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
+
 
 @Slf4j
 @Service
@@ -39,22 +35,23 @@ public class JCFChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageService messageService;
     private final UserRepository userRepository;
+    private final ChannelMapper channelMapper;
 
     @Override
     public Channel createPublicChannel(PublicChannelCreateDTO request) {
         log.info("createPublicChannel = {}", request);
-        return channelRepository.save(request.toChannel());
+        return channelRepository.save(channelMapper.toPublicEntity(request));
     }
 
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateDTO request) {
-        Channel createdChannel = channelRepository.save(request.toChannel());
+        Channel createdChannel = channelRepository.save(channelMapper.toPrivateEntity());
         request.participantIds().stream()
                 .map(userId -> {
                     User participatingUser = userRepository.findById(userId)
                             .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
                     return new ReadStatus(participatingUser, createdChannel, createdChannel.getCreatedAt());
-                })
+                })// 나중에
                 .forEach(readStatusRepository::save);
         return createdChannel;
     }
@@ -107,23 +104,19 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void update(UUID channelId, ChannelDtoForUpdate dto) {
+    public Channel update(UUID channelId, ChannelDtoForUpdate dto) {
         Channel updatingChannel = this.findById(channelId);
-        if (updatingChannel.getChannelType().equals(ChannelType.PRIVATE)) {
+        if (updatingChannel.isPrivate()) {
             throw new CustomException(ErrorCode.CANNOT_UPDATE_PRIVATE_CHANNEL);
         }
-
-        updatingChannel.update(dto.newName(), dto.newDescription());
-        // updatingChannel.updateByDTO(dto); dto는 변경이 잦기에 엔티티와 분리
-        channelRepository.save(updatingChannel);
+        return channelMapper.update(dto, updatingChannel);
     }
-
 
     @Override
     public void delete(UUID channelId) {
         Channel deletingChannel = this.findById(channelId);
 
-        if (deletingChannel.getChannelType().equals(ChannelType.PRIVATE)) {
+        if (deletingChannel.isPrivate()) {
             readStatusRepository.deleteAllByChannel(deletingChannel);
         }
         messageService.deleteAllByChannelId(channelId);

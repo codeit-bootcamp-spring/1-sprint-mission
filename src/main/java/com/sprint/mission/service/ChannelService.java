@@ -23,7 +23,7 @@ public interface ChannelService {
 
   Channel findById(UUID id);
 
-  void update(UUID channelId, ChannelDtoForUpdate dto);
+  Channel update(UUID channelId, ChannelDtoForUpdate dto);
 
   void delete(UUID channelId);
 //    void validateDuplicateName(String name);
