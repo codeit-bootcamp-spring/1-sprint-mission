@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -21,11 +22,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "messages")
-public class Message extends BaseUpdateableEntity implements Serializable {
-
-  private static final long serialVersionUID = 1L;
+public class Message extends BaseUpdateableEntity{
 
   //
   @Column(nullable = false, columnDefinition = "TEXT")

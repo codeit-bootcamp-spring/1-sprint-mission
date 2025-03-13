@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class LocalBinaryContentStorage implements BinaryContentStorage {
   private final Path root;
 
-  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root.root-path}") String root) {
+  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String root) {
     this.root = Paths.get(root);
   }
 

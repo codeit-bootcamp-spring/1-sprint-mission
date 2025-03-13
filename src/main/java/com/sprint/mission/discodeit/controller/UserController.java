@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +24,6 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-//@Controller
 @RequestMapping("/api/users")
 public class UserController implements UserApiDocs {
 
@@ -39,7 +37,9 @@ public class UserController implements UserApiDocs {
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    UserDto createdUser = userService.create(userCreateRequest, profileRequest); //binarycontentstorage에 저장 추후 생각
+    UserDto createdUser = userService.create(userCreateRequest,
+        profileRequest); //binarycontentstorage에 저장 추후 생각
+    System.out.println("createdUser = " + createdUser);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
   }
 
@@ -74,13 +74,16 @@ public class UserController implements UserApiDocs {
     return ResponseEntity.ok(updatedUserStatus);
   }
 
-  private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile)
-      throws IOException {
-    if (profileFile.isEmpty()) {
-      return Optional.empty();
-    } else {
-      return Optional.of(new BinaryContentCreateRequest(null, profileFile.getOriginalFilename(),
-         profileFile.getSize(), profileFile.getContentType(), profileFile.getBytes()));
+  private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
+    try {
+      if (profileFile.isEmpty()) {
+        return Optional.empty();
+      } else {
+        return Optional.of(new BinaryContentCreateRequest(null, profileFile.getOriginalFilename(),
+            profileFile.getSize(), profileFile.getContentType(), profileFile.getBytes()));
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to process profile file", e);
     }
   }
 }

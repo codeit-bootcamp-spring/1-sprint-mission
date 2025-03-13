@@ -21,13 +21,13 @@ public interface ChannelApiDocs {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Public Channel이 성공적으로 생성됨")
   })
-  ResponseEntity<Channel> createPublic(PublicChannelCreateRequest request);
+  ResponseEntity<ChannelDto> createPublic(PublicChannelCreateRequest request);
 
   @Operation(summary = "Private Channel 생성", description = "새로운 비공개 채널을 생성합니다.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Private Channel이 성공적으로 생성됨")
   })
-  ResponseEntity<Channel> createPrivate(PrivateChannelCreateRequest request);
+  ResponseEntity<ChannelDto> createPrivate(PrivateChannelCreateRequest request);
 
   @Operation(summary = "Channel 정보 수정", description = "기존의 채널 정보를 수정합니다.")
   @ApiResponses(value = {

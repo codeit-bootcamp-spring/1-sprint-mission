@@ -70,6 +70,7 @@ public class MessageController implements MessageApiDocs {
   @GetMapping()
   public ResponseEntity<List<Message>> findAll() {
     List<Message> messages = messageService.findAll();
+    System.out.println("messages = " + messages);
     return ResponseEntity.ok(messages);
   }
 }

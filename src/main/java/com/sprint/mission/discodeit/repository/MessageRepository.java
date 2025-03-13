@@ -12,8 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  @Query("select m.author from Message m join m.channel where m.channel = :channel")
-  List<Message> findAllByChannelId(@Param("channel") Channel channel);
+  @Query("select m.author from Message m join m.channel where m.channel.id = :channelId")
+  List<Message> findAllByChannelId(@Param("channelId") UUID id);
 
   boolean existsById(UUID id);
 

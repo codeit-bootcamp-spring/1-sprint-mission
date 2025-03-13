@@ -8,6 +8,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -18,11 +19,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "read_status")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReadStatus extends BaseUpdateableEntity implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReadStatus extends BaseUpdateableEntity {
 
-  private static final long serialVersionUID = 1L;
-  //
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
@@ -44,5 +44,11 @@ public class ReadStatus extends BaseUpdateableEntity implements Serializable {
     if (anyValueUpdated) {
       this.updatedAt = Instant.now();
     }
+  }
+
+  @Override
+  public String toString() {
+    return "ReadStatus{" + "user=" + user + ", channel=" + channel + ", lastReadAt=" + lastReadAt
+        + ", updatedAt=" + updatedAt + ", id=" + id + ", createdAt=" + createdAt + '}';
   }
 }

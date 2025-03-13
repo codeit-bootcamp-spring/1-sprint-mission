@@ -5,14 +5,15 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-public interface UserRepository  extends CrudRepository<User, UUID> {
+public interface UserRepository  extends JpaRepository<User, UUID> {
 
-  Optional<User> findByUsername(String username);
+  Optional<User> findUserByUsername(String username);
 
-  @Query("select m from User m join fetch m.userStatus join fetch m.profile")
+  //@Query("select m from User m join fetch m.userStatus join fetch m.profile")
   List<User> findAll();
 
   boolean existsById(UUID id);

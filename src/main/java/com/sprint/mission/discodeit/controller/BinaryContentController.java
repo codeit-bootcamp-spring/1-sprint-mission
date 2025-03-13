@@ -16,7 +16,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/binaryContents")
 public class BinaryContentController implements BinaryContentApiDocs {
-
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
 

@@ -23,7 +23,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatus create(UserStatusCreateRequest request) {
-    UUID userId = request.userId();
+    UUID userId = request.user().getId();
 
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException("User with id " + userId + " does not exist");
@@ -33,7 +33,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     Instant lastActiveAt = request.lastActiveAt();
-    UserStatus userStatus = new UserStatus(userId, lastActiveAt);
+    UserStatus userStatus = new UserStatus(request.user(), lastActiveAt);
     return userStatusRepository.save(userStatus);
   }
 
@@ -46,8 +46,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public List<UserStatus> findAll() {
-    return userStatusRepository.findAll().stream()
-        .toList();
+    return userStatusRepository.findAll();
   }
 
   @Override

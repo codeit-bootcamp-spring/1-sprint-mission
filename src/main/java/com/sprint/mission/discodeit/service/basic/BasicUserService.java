@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -8,7 +7,6 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -66,7 +64,9 @@ public class BasicUserService implements UserService {
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(createdUser, now);
     userStatusRepository.save(userStatus);
-    user.setUserStatus(userStatus); //변경 감지?
+    user.setUserStatus(userStatus);
+    Optional<User> byId = userRepository.findById(createdUser.getId());
+    byId.ifPresent(value -> System.out.println("byId.get() = " + value));
     return new UserDto(createdUser);
   }
 
@@ -79,10 +79,15 @@ public class BasicUserService implements UserService {
 
   @Override
   public List<UserDto> findAll() {
-    return userRepository.findAll()
-        .stream()
-        .map(this::toDto)
-        .toList();
+    List<User> users = userRepository.findAll();
+    for (User user : users) {
+      System.out.println("user = " + user);
+    }
+    List<UserDto> list = users.stream().map(this::toDto).toList();
+    for (UserDto userDto : list) {
+      System.out.println("userDto = " + userDto);
+    }
+    return list;
   }
 
   @Override
@@ -129,16 +134,14 @@ public class BasicUserService implements UserService {
   }
 
   private UserDto toDto(User user) {
-    Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
-        .orElse(null);
+    //Boolean online = userStatusRepository.findByUserId(user.getId()).map(UserStatus::isOnline).orElse(false);
 
     return new UserDto(
         user.getId(),
         user.getUsername(),
         user.getEmail(),
         user.getProfile(),
-        online
+        user.getUserStatus().isOnline()
     );
   }
 }

@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "user_status")
 @AllArgsConstructor
-public class UserStatus extends BaseUpdateableEntity implements Serializable {
+public class UserStatus extends BaseUpdateableEntity{
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
