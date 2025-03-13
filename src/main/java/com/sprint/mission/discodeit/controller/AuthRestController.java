@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.sprint.mission.discodeit.dto.UserRequest;
+import com.sprint.mission.discodeit.dto.request.UserRequest;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;

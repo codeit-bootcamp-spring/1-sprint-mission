@@ -34,7 +34,7 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: .discodeit/storage
+      root-path: file-byte
 
 
 springdoc:

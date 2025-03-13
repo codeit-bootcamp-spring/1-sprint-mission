@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.dto.CustomApiResponse;
+import com.sprint.mission.discodeit.dto.response.CustomApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

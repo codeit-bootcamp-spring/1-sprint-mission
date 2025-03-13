@@ -1,17 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
 
-import com.sprint.mission.discodeit.dto.UserRequest;
-import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.dto.request.UserRequest;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.exception.ValidationException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validation.Impl.ValidatorImpl;
 import com.sprint.mission.discodeit.validation.Validator;
 import jakarta.transaction.Transactional;
@@ -21,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     public UserResponse create(UserRequest request) {
@@ -53,7 +55,8 @@ public class BasicUserService implements UserService {
             throw new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + request.phoneNumber());
         }
 
-        User user = new User(request.username(), request.password(), request.email(), request.phoneNumber());
+//        User user = new User(request.username(), request.password(), request.email(), request.phoneNumber());
+        User user = UserMapper.INSTANCE.toEntity(request);
         userRepository.save(user);
 //        userRepository.flush();
 
@@ -64,12 +67,14 @@ public class BasicUserService implements UserService {
 
             binaryContentRepository.save(profileImage);
             user.setProfileImageId(profileImage.getId());
+
+            binaryContentStorage.put(profileImage.getId(), file.getBytes());
         }
 
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
 
-        return UserResponse.fromEntity(user , userStatus.isOnline());
+        return UserMapper.INSTANCE.toDto(user, userStatus);
     }
 
     @Override
@@ -77,9 +82,8 @@ public class BasicUserService implements UserService {
         try {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다." + id));
-            boolean isOnline = userStatusRepository.findByUserid(user.getId()).isOnline();
 
-            return UserResponse.fromEntity(user, isOnline);
+            return UserMapper.INSTANCE.toDto(user, userStatusRepository.findByUserid(user.getId()));
         } catch (NullPointerException e){
             throw new NullPointerException("ID를 찾을 수 없습니다." + e.getMessage());
         }
@@ -91,8 +95,7 @@ public class BasicUserService implements UserService {
 
         List<UserResponse> responses = users.stream().map(user -> {
                     try {
-                        boolean isOnline = userStatusRepository.findByUserid(user.getId()).isOnline();
-                        return UserResponse.fromEntity(user, isOnline);
+                        return UserMapper.INSTANCE.toDto(user, userStatusRepository.findByUserid(user.getId()));
                     } catch (NullPointerException e){
                         throw new NullPointerException("user id 값이 null 입니다." + e.getMessage());
                     }
@@ -126,10 +129,8 @@ public class BasicUserService implements UserService {
 
             userRepository.save(user);
 
-            boolean isOnline = userStatusRepository.findByUserid(id).isOnline();
-
             System.out.println("업데이트가 완료되었습니다.");
-            return UserResponse.fromEntity(user, isOnline);
+            return UserMapper.INSTANCE.toDto(user, userStatusRepository.findByUserid(id));
 
         } catch (ResourceNotFoundException e){
             throw new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디 입니다." + id);

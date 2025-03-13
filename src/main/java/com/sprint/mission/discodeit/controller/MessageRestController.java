@@ -1,14 +1,19 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.MessageRequest;
-import com.sprint.mission.discodeit.dto.MessageResponse;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sprint.mission.discodeit.dto.request.*;
+import com.sprint.mission.discodeit.dto.response.*;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,9 +25,11 @@ public class MessageRestController {
     private final MessageService messageService;
 
     @Operation(summary = "message send", description = "메시지 보내기")
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public MessageResponse sendMessage(@RequestBody MessageRequest request){
-        return messageService.create(request);
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public MessageResponse sendMessage(@Valid @RequestPart(value = "request", required = true) @NotNull @JsonProperty MessageRequest request,
+                                       @RequestPart(value = "file", required = false) MultipartFile[] files) throws IOException {
+
+        return messageService.messageCreate(request, files);
     }
 
     @Operation(summary = "message list", description = "메시지 리스트")

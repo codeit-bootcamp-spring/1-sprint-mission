@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.*;
+import com.sprint.mission.discodeit.dto.response.*;
+import com.sprint.mission.discodeit.dto.request.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +30,11 @@ public class BasicChannelService implements ChannelService {
 //            response = publicChannelCreate(publicChannel);
 //        }
 
-        Channel channel = new Channel(request.name(), request.description(), request.channelType());
+//        Channel channel = new Channel(request.name(), request.description(), request.channelType());
+        Channel channel = ChannelMapper.INSTANCE.toEntity(request);
+
         channelRepository.save(channel);
-        return ChannelResponse.fromEntity(channel);
+        return ChannelMapper.INSTANCE.toDto(channel);
     }
 
 //    private ChannelResponse privateChannelCreate(PrivateChannelRequest request){
@@ -63,14 +67,14 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다. : " + id));
 
-        return ChannelResponse.fromEntity(channel);
+        return ChannelMapper.INSTANCE.toDto(channel);
     }
 
     @Override
     public List<ChannelResponse> readAll() {
         List<Channel> channels = channelRepository.findAll();
         List<ChannelResponse> responses = channels.stream()
-                .map(channel -> ChannelResponse.fromEntity(channel))
+                .map(channel -> ChannelMapper.INSTANCE.toDto(channel))
                 .collect(Collectors.toList());
         return responses;
     }
@@ -80,7 +84,7 @@ public class BasicChannelService implements ChannelService {
         List<Channel> channels = channelRepository.findAll();
         List<ChannelResponse> responses = channels.stream()
                 .filter(channel -> channel.getChannelType().equals(Channel.ChannelType.Public))
-                .map(channel -> ChannelResponse.fromEntity(channel))
+                .map(channel -> ChannelMapper.INSTANCE.toDto(channel))
                 .collect(Collectors.toList());
         return responses;
     }
@@ -91,7 +95,7 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다. : " + id));
 
         if(channel.getChannelType().equals(Channel.ChannelType.Public)){
-            return ChannelResponse.fromEntity(channel);
+            return ChannelMapper.INSTANCE.toDto(channel);
         }
         return null;
     }
@@ -111,7 +115,7 @@ public class BasicChannelService implements ChannelService {
 
         channelRepository.save(channel);
 
-        return ChannelResponse.fromEntity(channel);
+        return ChannelMapper.INSTANCE.toDto(channel);
     }
 
     @Override

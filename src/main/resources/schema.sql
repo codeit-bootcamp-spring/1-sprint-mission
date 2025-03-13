@@ -69,8 +69,9 @@ ALTER TABLE users
             REFERENCES binary_contents(id)
             ON DELETE CASCADE;
 
-SELECT * FROM binary_contents;
-
-SELECT schemaname, tablename FROM pg_tables WHERE tablename = 'binary_contents';
-
-SELECT current_database();
+CREATE TABLE message_attachments (
+                                     message_id UUID NOT NULL,
+                                     attachment_id UUID NOT NULL,
+                                     FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
+                                     FOREIGN KEY (attachment_id) REFERENCES binary_contents(id) ON DELETE CASCADE
+);
