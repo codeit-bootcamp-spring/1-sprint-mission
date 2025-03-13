@@ -1,65 +1,73 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Message implements Serializable {                  // 메시지 (게시물)
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity implements Serializable {                  // 메시지 (게시물)
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // 공통 필드
-    private final UUID id;              // pk
-    private final Instant createdAt;    // 생성 시간
-    private Instant updatedAt;          // 수정 시간
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private final Channel channel;       // 메시지가 속해있는 채널
 
-    private final UUID channelId;       // 메시지가 속해있는 채널
-    private final UUID writerId;        // 작성자 id
-    private String context;             // 메시지 내용
-    private List<UUID> imagesId;       // 첨부 이미지 id
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private final User author;        // 작성자 id
+
+    @Column(name = "content")
+    private String content;             // 메시지 내용
+
+    @OneToMany
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id")
+    )
+    private List<BinaryContent> attachments;       // 첨부 이미지 id
 
 
     // 생성자
-    public Message(UUID channelId, UUID writerId, String context, List<UUID> imagesId){
-        id = UUID.randomUUID();
-        createdAt = Instant.now();
-
-        this.channelId = channelId;
-        validationAndSetContext(context);
-        this.writerId = writerId;
-        this.imagesId = imagesId;
+    public Message(Channel channel, User author, String content, List<BinaryContent> attachments) {
+        this.channel = channel;
+        validationAndSetContent(content);
+        this.author = author;
+        this.attachments = attachments;
     }
 
 
     // update 함수
-    public void updateContext(String context) {
-        validationAndSetContext(context);
-        updateUpdateAt();
+    public void updateContent(String content) {
+        validationAndSetContent(content);
     }
 
-    public void updateImagesId(List<UUID> imagesId) {
-        this.imagesId = this.imagesId;
-    }
-
-    public void updateUpdateAt(){
-        this.updatedAt = Instant.now();
+    public void updateAttachments(List<BinaryContent> attachments) {
+        this.attachments = attachments;
     }
 
 
     // 메시지 내용 유효성 검사 및 세팅
-    private void validationAndSetContext(String context) {
-        if (context == null || context.isBlank()) {
+    private void validationAndSetContent(String content) {
+        if (content == null || content.isBlank()) {
             throw new IllegalArgumentException("메시지 내용을 입력해주세요.");
         }
 
-        context = context.trim();
+        content = content.trim();
 
-        this.context = context;
+        this.content = content;
     }
 }

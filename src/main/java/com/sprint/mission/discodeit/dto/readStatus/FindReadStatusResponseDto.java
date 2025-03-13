@@ -20,7 +20,7 @@ public class FindReadStatusResponseDto {
                 readStatus.getId(),
                 readStatus.getUserId(),
                 readStatus.getChannelId(),
-                readStatus.getLastReadTime()
+                readStatus.getLastReadAt()
         );
     }
 }

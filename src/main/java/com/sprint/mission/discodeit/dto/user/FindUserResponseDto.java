@@ -22,9 +22,9 @@ public class FindUserResponseDto {
     public static FindUserResponseDto fromEntity(User user) {
         return new FindUserResponseDto(user.getId()
                 , user.getEmail().toString()
-                , user.getName(), user.getNickname()
+                , user.getUsername(), user.getNickname()
                 , user.getPhoneNumber().toString()
-                , user.getProfileImageId()
-                , user.getUserStatus().checkAccess());
+                , user.getProfile().getId()
+                , user.getStatus().checkAccess());
     }
 }

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto.channel;
 
+import com.sprint.mission.discodeit.util.ChannelType;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +17,7 @@ public interface FindChannelResponseDto {
 
     List<UUID> getMembers();
 
-    boolean getIsPublic();
+    ChannelType getType();
     // default method
     // Java 8부터 도입됨
     // 인터페이스에 있는 구현 메서드

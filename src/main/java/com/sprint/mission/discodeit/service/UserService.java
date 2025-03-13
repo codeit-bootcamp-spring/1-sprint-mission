@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,7 +14,7 @@ public interface UserService {
     UUID create(CreateUserRequestDto createUserDto) throws IOException;
 
     // 읽기
-    FindUserResponseDto find(UUID id);
+    User find(UUID id);
 
     // 모두 읽기
     List<FindUserResponseDto> findAll();

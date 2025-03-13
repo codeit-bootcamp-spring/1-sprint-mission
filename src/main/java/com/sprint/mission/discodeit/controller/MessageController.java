@@ -40,7 +40,7 @@ public class MessageController implements MessageApi {
     public ResponseEntity<FindMessageResponseDto> updateMessage(@PathVariable UUID id,
                                                                 @RequestParam String context) {
         UpdateMessageRequestDto updateMessageRequestDto = new UpdateMessageRequestDto(id, context);
-        FindMessageResponseDto findMessageResponseDto = messageService.updateContext(updateMessageRequestDto);
+        FindMessageResponseDto findMessageResponseDto = messageService.updateContent(updateMessageRequestDto);
 
         return ResponseEntity.ok(findMessageResponseDto);
     }

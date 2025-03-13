@@ -1,17 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.ChannelApi;
-import com.sprint.mission.discodeit.dto.binarycontent.FindBinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.FindPrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.FindPublicChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.UpdatePublicChannelRequestDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,8 +36,9 @@ public class ChannelController implements ChannelApi {
     public ResponseEntity<FindChannelResponseDto> createPublicChannel(@RequestBody CreatePublicChannelRequestDto createPublicChannelRequestDto) {
 
         UUID id = channelService.createPublic(createPublicChannelRequestDto);
+        Channel channel = channelService.find(id);
 
-        return ResponseEntity.created(URI.create("/api/channel/" + id)).body(channelService.find(id));
+        return ResponseEntity.created(URI.create("/api/channel/" + id)).body(FindPublicChannelResponseDto.fromEntity(channel));
     }
 
     @PostMapping("/private")
@@ -49,8 +46,9 @@ public class ChannelController implements ChannelApi {
 
         CreatePrivateChannelRequestDto createPrivateChannelDto = new CreatePrivateChannelRequestDto(ownerId);
         UUID id = channelService.createPrivate(createPrivateChannelDto);
+        Channel channel = channelService.find(id);
 
-        return ResponseEntity.created(URI.create("/api/channel/" + id)).body(channelService.find(id));
+        return ResponseEntity.created(URI.create("/api/channel/" + id)).body(FindPrivateChannelResponseDto.fromEntity(channel));
     }
 
     @PutMapping("/{id}")

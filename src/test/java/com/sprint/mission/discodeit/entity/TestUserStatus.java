@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.util.UUID;
 
 public class TestUserStatus {
 
@@ -16,7 +15,7 @@ public class TestUserStatus {
         User user = new User("email@email.com", "PWpw12!!", "name", "nickname", "010-0000-1111", null);
 
         // when(실행) : 어떠한 함수를 실행하면
-        boolean isUserAccess = user.getUserStatus().checkAccess();
+        boolean isUserAccess = user.getStatus().checkAccess();
 
         // then(검증) : 어떠한 결과가 나와야 한다.
         System.out.println(isUserAccess);

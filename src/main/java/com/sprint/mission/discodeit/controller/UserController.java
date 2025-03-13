@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class UserController implements UserApi {
 
         UUID id = userService.create(createUserRequestDto);
 
-        return ResponseEntity.created(URI.create("/api/user/" + id)).body(userService.find(id));
+        return ResponseEntity.created(URI.create("/api/user/" + id)).body(FindUserResponseDto.fromEntity(userService.find(id)));
     }
 
     // 사용자 다건 조회
@@ -54,7 +55,7 @@ public class UserController implements UserApi {
 
         userService.updateUser(id, updateUserRequestDto);
 
-        return ResponseEntity.ok(userService.find(id));
+        return ResponseEntity.ok(FindUserResponseDto.fromEntity(userService.find(id)));
     }
 
     // 사용자 삭제

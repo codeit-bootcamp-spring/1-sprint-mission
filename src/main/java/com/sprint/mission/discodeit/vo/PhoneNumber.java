@@ -1,13 +1,20 @@
 package com.sprint.mission.discodeit.vo;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
+
 import java.io.Serial;
 import java.io.Serializable;
 
+@Embeddable
+@NoArgsConstructor
 public class PhoneNumber implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     // 전화번호 정규식

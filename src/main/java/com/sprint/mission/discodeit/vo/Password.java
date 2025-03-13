@@ -1,13 +1,20 @@
 package com.sprint.mission.discodeit.vo;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
+
 import java.io.Serial;
 import java.io.Serializable;
 
+@Embeddable
+@NoArgsConstructor
 public class Password implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Column(name = "password")
     private String password;
 
     // 대문자, 소문자, 숫자, 특수문자 각각 하나 이상 포함, 6자리 이상

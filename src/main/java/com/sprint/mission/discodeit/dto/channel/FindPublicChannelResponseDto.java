@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.util.ChannelType;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 
@@ -14,23 +16,25 @@ public class FindPublicChannelResponseDto implements FindChannelResponseDto {
 
     UUID id;
     UUID ownerId;
+    String category;
     String name;
     String explanation;
-    String category;
-    Instant lastMessageTime;
     List<UUID> members;
-    boolean isPublic;
+    Instant lastMessageTime;
+    ChannelType type;
 
     public static FindPublicChannelResponseDto fromEntity(Channel channel) {
         return new FindPublicChannelResponseDto(
                 channel.getId(),
-                channel.getOwnerId(),
-                channel.getName(),
-                channel.getExplanation(),
+                channel.getOwner().getId(),
                 channel.getCategory(),
+                channel.getName(),
+                channel.getDescription(),
+                channel.getMembers().stream()
+                        .map(BaseEntity::getId)
+                        .toList(),
                 channel.getLastMessageTime(),
-                channel.getMembers(),
-                channel.isPublic()
+                channel.getType()
         );
     }
 
@@ -42,11 +46,6 @@ public class FindPublicChannelResponseDto implements FindChannelResponseDto {
     @Override
     public UUID getOwnerId() {
         return ownerId;
-    }
-
-    @Override
-    public String getCategory() {
-        return category;
     }
 
     @Override
@@ -70,7 +69,7 @@ public class FindPublicChannelResponseDto implements FindChannelResponseDto {
     }
 
     @Override
-    public boolean getIsPublic() {
-        return isPublic;
+    public ChannelType getType() {
+        return type;
     }
 }

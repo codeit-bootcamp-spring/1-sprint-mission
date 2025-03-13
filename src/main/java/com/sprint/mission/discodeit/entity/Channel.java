@@ -1,133 +1,140 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.util.ChannelType;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class Channel implements Serializable {      // 채널 (게시판)
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity implements Serializable {      // 채널 (게시판)
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // 공통 필드
-    private final UUID id;            // pk
-    private final Instant createdAt;  // 생성 시간
-    private Instant updatedAt;        // 수정 시간
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private final User owner;       // 채널 주인
 
-    private final UUID ownerId;       // 채널 주인
+    @Column(name = "category")
     private String category;          // 채널 카테고리
+
+    @Column(name = "name")
     private String name;              // 채널 이름
-    private String explanation;       // 채널 설명
-    private final List<UUID> members; // 멤버 목록
-    private final Map<UUID, ReadStatus> readStatuses;    // 멤버별 읽음 상태
-    private Instant lastMessageTime;
-    private final boolean isPublic; // 공개 채널 여부
+
+    @Column(name = "description")
+    private String description;       // 채널 설명
+
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private final ChannelType type; // 공개 채널 여부
+
+    @ManyToMany
+    @JoinTable( // 조인 테이블 정의
+            name = "channel_members",   // 조인 테이블 이름
+            joinColumns = @JoinColumn(name = "channel_id"), // 외래키: 채널 ID
+            inverseJoinColumns = @JoinColumn(name = "user_id")    // 외래키: 멤버 ID
+    )
+    private final List<User> members; // 멤버 목록
+
+    @Transient  // DB에 저장되지 않게 함
+    private Instant lastMessageTime;    // 마지막 메시지 시간
+
 
     // 생성자
     // public 채널
-    public Channel(UUID ownerId, String name, String explanation) {
-        // 공통 필드 초기화
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+    public Channel(User owner, String name, String description) {
 
         // Channel 필드
-        this.ownerId = ownerId;
+        this.owner = owner;
         this.category = null;                       // 카테고리는 기본적으로 null로 설정
         validationAndSetName(name);
-        this.explanation = explanation.trim();      // 앞뒤 공백 제거 후 저장
+        this.description = description.trim();      // 앞뒤 공백 제거 후 저장
 
         // member
         this.members = new ArrayList<>();           // 텅빈 ArrayList로 초기화
-        members.add(ownerId);                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
+        members.add(owner);                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
 
-        // readStatus
-        this.readStatuses = new HashMap<>();
-        readStatuses.put(ownerId, new ReadStatus(this.ownerId, this.id));    // 채널주 readStatus 넣어놓음
+        this.type = ChannelType.PUBLIC;
 
-        this.isPublic = true;
+        owner.addChannel(this);
     }
 
     // private 채널
-    public Channel(UUID userId) {
+    public Channel(User user) {
         // 공통 필드 초기화
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         // Channel 필드
-        this.ownerId = userId;
+        this.owner = user;
         this.category = null;                       // 카테고리는 기본적으로 null로 설정
         this.name = null;
-        this.explanation = null;
+        this.description = null;
 
         // member
         this.members = new ArrayList<>();           // 텅빈 ArrayList로 초기화
-        members.add(userId);                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
+        members.add(user);                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
 
-        // readStatus
-        this.readStatuses = new HashMap<>();
-        readStatuses.put(ownerId, new ReadStatus(this.ownerId, this.id));    // 채널주 readStatus 넣어놓음
+        this.type = ChannelType.PRIVATE;
 
-        this.isPublic = false;
+        owner.addChannel(this);
     }
-
 
 
     // update 함수
     public void updateCategory(String category) {
         if (!category.isEmpty()){
             validationAndSetCategory(category);
-            updateUpdateAt();
         }
     }
 
     public void updateName(String name) {
         if (!name.isEmpty()){
             validationAndSetName(name);
-            updateUpdateAt();
         }
     }
 
-    public void updateExplanation(String explanation) {
-        if (!explanation.isEmpty()){
-            this.explanation = explanation;
-            updateUpdateAt();
+    public void updateDescription(String description) {
+        if (!description.isEmpty()) {
+            this.description = description;
         }
     }
 
-    public void addMember(UUID memberId) {
-        this.members.add(memberId);
-        updateUpdateAt();
+    public void addMember(User user) {
+        if (!members.contains(user)) {
+            this.members.add(user);
+        }
     }
 
     public void deleteMember(UUID memberId) {
-        this.members.remove(memberId);
-        updateUpdateAt();
-    }
+        User userToRemove = this.members.stream()
+                .filter(member -> member.getId().equals(memberId))
+                .findFirst()
+                .orElse(null);
 
-    public void updateReadStatus(UUID memberId) {
-        if (members.contains(memberId)) {
-            this.readStatuses.get(memberId).updateLastReadTime();
-        } else {
-            this.readStatuses.put(memberId, new ReadStatus(memberId, this.id));
+        if (userToRemove != null) {
+            members.remove(userToRemove);
         }
-        updateUpdateAt();
     }
 
     public void updateLastMessageTime(Instant lastMessageTime) {
         this.lastMessageTime = lastMessageTime;
-        updateUpdateAt();
-    }
-
-    public void updateUpdateAt() {
-        this.updatedAt = Instant.now();
     }
 
 
@@ -158,10 +165,10 @@ public class Channel implements Serializable {      // 채널 (게시판)
     @Override
     public String toString() {
         return "Channel{" +
-                "ownerId=" + ownerId +
+                "owner=" + owner +
                 ", category=" + category +
                 ", name='" + name + '\'' +
-                ", explanation='" + explanation + '\'' +
+                ", explanation='" + description + '\'' +
                 ", members=" + members +
                 '}';
     }

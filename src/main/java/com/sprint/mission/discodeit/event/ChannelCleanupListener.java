@@ -21,12 +21,8 @@ public class ChannelCleanupListener {
     public void handlerChannelDeleted(ChannelDeletedEvent event) {
         Channel channel = event.channel();
 
-        // 채널 readStatus 삭제
-        if (channel.getReadStatuses() != null) {
-            for (UUID id : channel.getReadStatuses().keySet()) {
-                readStatusService.delete(id);
-            }
-        }
+        // 해당 채널 readStatus 삭제
+        readStatusService.deleteByChannelId(channel.getId());
 
         // 해당 채널 메시지 삭제
         List<FindMessageResponseDto> messages = messageService.findAllByChannelId(channel.getId());

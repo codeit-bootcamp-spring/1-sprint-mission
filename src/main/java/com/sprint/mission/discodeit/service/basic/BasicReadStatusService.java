@@ -80,6 +80,15 @@ public class BasicReadStatusService implements ReadStatusService {
         readStatusRepository.delete(id);
     }
 
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        channelService.channelIsExist(channelId);
+
+        readStatusRepository.load().values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .forEach(readStatus -> readStatusRepository.delete(readStatus.getId()));
+    }
+
     private void ReadStatusIsExist(UUID id) {
         Map<UUID, ReadStatus> map = readStatusRepository.load();
 

@@ -12,6 +12,6 @@ public class FindUserStatusResponseDto {
 
     public FindUserStatusResponseDto(UserStatus userStatus) {
         this.id = userStatus.getId();
-        this.lastAccessTime = userStatus.getLastAccessTime();
+        this.lastAccessTime = userStatus.getLastActiveAt();
     }
 }

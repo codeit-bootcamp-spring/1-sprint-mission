@@ -1,54 +1,69 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.util.FilePathContents;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.vo.Email;
 import com.sprint.mission.discodeit.vo.Password;
 import com.sprint.mission.discodeit.vo.PhoneNumber;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
-public class User implements Serializable {             // 유저 정보
+@Table(name = "users")
+public class User extends BaseUpdatableEntity implements Serializable {             // 유저 정보
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // 공통 필드
-    private final UUID id;                  // pk
-    private final Instant createdAt;        // 생성 시간
-    private Instant updatedAt;              // 수정 시간
-
     // User 필드
+    @Column(name = "username")
+    private String username;                // 로그인 시 필요한 아이디
+
+    @Embedded
     private Email email;                    // 이메일
+
+    @Embedded
     private Password password;              // 비밀번호
-    private String name;                    // 이름(로그인 시 필요한 아이디)
+
+    @Column(name = "nickname")
     private String nickname;                // 닉네임
+
+    @Embedded
     private PhoneNumber phoneNumber;        // 휴대폰 번호
-    private UUID profileImageId;     // 프로필 사진
-    private final UserStatus userStatus;    // 유저 접속 상태
+
+    @OneToOne
+    @JoinColumn(name = "profile_id", referencedColumnName = "id")
+    private BinaryContent profile;                 // 프로필 사진
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final UserStatus status;        // 유저 접속 상태
+
+    @OneToMany(mappedBy = "owner")
+    private final List<Channel> ownedChannels;
 
     // 생성자
-    public User(String email, String password, String name, String nickname, String phoneNumber, UUID profileImageId) throws IOException {
-        // 생성자
-        // 공통 필드 초기화
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        
-        // User 필드
+    public User(String email, String password, String username, String nickname, String phoneNumber, BinaryContent profile) throws IOException {
+
         this.email = new Email(email);
         this.password = new Password(password);
-        validationAndSetName(name);
+        validationAndSetName(username);
         validationAndSetNickname(nickname);
         this.phoneNumber = new PhoneNumber(phoneNumber);
-        this.userStatus = new UserStatus(this.id);
+        this.profile = profile;
 
-        this.profileImageId = profileImageId;
+        this.status = new UserStatus(this);
+        this.ownedChannels = new ArrayList<>();
     }
 
 
@@ -56,47 +71,45 @@ public class User implements Serializable {             // 유저 정보
     public void updateEmail(String updateEmail) {
         if (!updateEmail.isBlank()){       // 수정 시에는 null 들어올 시 IllegalArgumentException이 뜨지 않고, 메서드가 무시되도록 하기 위해 if문 작성
             this.email = new Email(updateEmail);
-            updateUpdateAt();
         }
     }
 
     public void updatePassword(String updatePassword) {
         if (!updatePassword.isBlank()){
             this.password = new Password(updatePassword);
-            updateUpdateAt();
         }
     }
 
-    public void updateName(String updateName) {
+    public void updateUsername(String updateName) {
         if (!updateName.isBlank()){
             validationAndSetName(updateName);
-            updateUpdateAt();
         }
     }
 
     public void updateNickname(String updateNickname) {
         if (!updateNickname.isBlank()){
             validationAndSetNickname(updateNickname);
-            updateUpdateAt();
         }
     }
 
     public void updatePhoneNumber(String updatePhoneNumber) {
         if (!updatePhoneNumber.isBlank()){
             this.phoneNumber = new PhoneNumber(updatePhoneNumber);
-            updateUpdateAt();
         }
     }
 
-    public void updateProfileImageId(UUID profileImageId) throws IOException {
-        if (profileImageId != null) {
-            this.profileImageId = profileImageId;
-            updateUpdateAt();
+    public void updateProfile(BinaryContent profile) throws IOException {
+        if (profile != null) {
+            this.profile = profile;
         }
     }
 
-    public void updateUpdateAt(){
-        this.updatedAt = Instant.now();
+    public void addChannel(Channel channel) {
+        this.ownedChannels.add(channel);
+    }
+
+    public void deleteChannel(Channel channel) {
+        this.ownedChannels.remove(channel);
     }
 
 
@@ -109,7 +122,7 @@ public class User implements Serializable {             // 유저 정보
 
         name = name.trim();
 
-        this.name = name;
+        this.username = name;
     }
 
     // 닉네임 유효성 검사 및 세팅
@@ -129,7 +142,7 @@ public class User implements Serializable {             // 유저 정보
         return "User{" +
                 "email=" + email +
                 ", password=" + password +
-                ", name='" + name + '\'' +
+                ", name='" + username + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", phoneNumber=" + phoneNumber +
                 '}';

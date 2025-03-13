@@ -1,17 +1,22 @@
 package com.sprint.mission.discodeit.vo;
 
 import com.sprint.mission.discodeit.repository.UserRepository;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
 
+@Embeddable
+@NoArgsConstructor
 public class Email implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-
     // 이메일
+    @Column(name = "email")
     private String email;
 
     // 이메일 정규식

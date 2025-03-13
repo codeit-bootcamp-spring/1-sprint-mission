@@ -4,7 +4,10 @@ import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.MessageDeletedEvent;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -40,23 +43,25 @@ public class BasicMessageService implements MessageService {
 
         UUID channelId = createMessageRequestDto.channelId();
         channelService.channelIsExist(channelId);
+        Channel channel = channelService.find(channelId);
 
-        UUID writerId = createMessageRequestDto.writerId();
-        userService.userIsExist(writerId);
+        UUID authorId = createMessageRequestDto.authorId();
+        userService.userIsExist(authorId);
+        User author = userService.find(authorId);
 
         String context = createMessageRequestDto.context();
         List<MultipartFile> images = createMessageRequestDto.images();
 
-        List<UUID> imagesId = new ArrayList<>();
+        List<BinaryContent> attachments = new ArrayList<>();
         if (!images.isEmpty()){
             for (MultipartFile image : images) {
                 CreateBinaryContentRequestDto createBinaryContentRequestDto = new CreateBinaryContentRequestDto(image, FilePathContents.MESSAGEIMAGE_DIR);
-                UUID imageId = binaryContentService.create(createBinaryContentRequestDto);
-                imagesId.add(imageId);
+                BinaryContent attachment = binaryContentService.create(createBinaryContentRequestDto);
+                attachments.add(attachment);
             }
         }
 
-        Message message = new Message(channelId, writerId, context, imagesId);
+        Message message = new Message(channel, author, context, attachments);
 
         messageRepository.save(message);
 
@@ -79,7 +84,7 @@ public class BasicMessageService implements MessageService {
         channelService.channelIsExist(channelID);
 
         return messageRepository.load().values().stream()
-                .filter(message -> message.getChannelId().equals(channelID))
+                .filter(message -> message.getChannel().equals(channelID))
                 .map(FindMessageResponseDto::fromEntity)
                 .toList();
     }
@@ -90,19 +95,19 @@ public class BasicMessageService implements MessageService {
         userService.userIsExist(userId);
 
         return messageRepository.load().values().stream()
-                .filter(message -> message.getWriterId().equals(userId))
+                .filter(message -> message.getAuthor().equals(userId))
                 .map(FindMessageResponseDto::fromEntity)
                 .toList();
     }
 
     @Override
-    public FindMessageResponseDto updateContext(UpdateMessageRequestDto updateMessageRequestDto) {
+    public FindMessageResponseDto updateContent(UpdateMessageRequestDto updateMessageRequestDto) {
 
         messageIsExist(updateMessageRequestDto.id());
 
         Message message = messageRepository.load().get(updateMessageRequestDto.id());
 
-        message.updateContext(updateMessageRequestDto.context());
+        message.updateContent(updateMessageRequestDto.context());
 
         messageRepository.save(message);
 

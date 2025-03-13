@@ -22,7 +22,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public UUID create(CreateBinaryContentRequestDto createBinaryContentRequestDto) throws IOException {
+    public BinaryContent create(CreateBinaryContentRequestDto createBinaryContentRequestDto) throws IOException {
 
         MultipartFile multipartFile = createBinaryContentRequestDto.multipartFile();
         String fileName = createBinaryContentRequestDto.filePath();
@@ -31,7 +31,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         binaryContentRepository.save(binaryContent);
 
-        return binaryContent.getId();
+        return binaryContent;
     }
 
     @Override

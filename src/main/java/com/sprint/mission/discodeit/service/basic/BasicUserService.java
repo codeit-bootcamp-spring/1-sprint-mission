@@ -36,11 +36,11 @@ public class BasicUserService implements UserService {
     public UUID create(CreateUserRequestDto createUserDto) throws IOException {
 
         MultipartFile profileImageFile = createUserDto.profileImageFile();
-        UUID profileImageId = null;
+        BinaryContent profile = null;
 
         if (profileImageFile != null) {
             CreateBinaryContentRequestDto createBinaryContentRequestDto = new CreateBinaryContentRequestDto(profileImageFile, FilePathContents.PROFILEIMAGE_DIR);
-            profileImageId = binaryContentService.create(createBinaryContentRequestDto);
+            profile = binaryContentService.create(createBinaryContentRequestDto);
         }
 
         User user = new User(
@@ -49,7 +49,7 @@ public class BasicUserService implements UserService {
                 createUserDto.name(),
                 createUserDto.nickname(),
                 createUserDto.phoneNumber(),
-                profileImageId
+                profile
         );
 
         validationUser(user);
@@ -62,13 +62,11 @@ public class BasicUserService implements UserService {
     // 데이터 읽기
     // id 같은 사람 읽기
     @Override
-    public FindUserResponseDto find(UUID id) {
+    public User find(UUID id) {
 
         userIsExist(id);
 
-        User user = userRepository.load().get(id);
-
-        return FindUserResponseDto.fromEntity(user);
+        return userRepository.load().get(id);
     }
 
     // 모든 데이터 읽어오기
@@ -93,7 +91,7 @@ public class BasicUserService implements UserService {
         // 업데이트 시 해당 데이터가 null이면 기존 정보를, 아니면 새로운 정보를 저장
         updateUser.updateEmail(updateUserRequestDto.email());
         updateUser.updatePassword(updateUserRequestDto.password());
-        updateUser.updateName(updateUserRequestDto.name());
+        updateUser.updateUsername(updateUserRequestDto.name());
         updateUser.updateNickname(updateUserRequestDto.nickname());
         updateUser.updatePhoneNumber(updateUserRequestDto.phoneNumber());
 
@@ -101,7 +99,7 @@ public class BasicUserService implements UserService {
 
         if (!profileImageFile.isEmpty()) {
             BinaryContent profileImage = new BinaryContent(profileImageFile, FilePathContents.PROFILEIMAGE_DIR);
-            updateUser.updateProfileImageId(profileImage.getId());
+            updateUser.updateProfile(profileImage);
         }
 
         userRepository.save(updateUser);
@@ -113,8 +111,8 @@ public class BasicUserService implements UserService {
         userIsExist(id);
 
         User user = userRepository.load().get(id);
-        UUID profileImageId = user.getProfileImageId();
-        UUID userStatusId = user.getUserStatus().getUserId();
+        UUID profileImageId = user.getProfile().getId();
+        UUID userStatusId = user.getStatus().getId();
 
         // 유저 삭제 이벤트 발생
         eventPublisher.publishEvent(new UserDeletedEvent(id, profileImageId, userStatusId));
@@ -141,7 +139,7 @@ public class BasicUserService implements UserService {
 
     private void validationUser(User user) {
         Email email = user.getEmail();
-        String name = user.getName();
+        String name = user.getUsername();
 
         if (checkIsEmailExist(email)) {
             throw new IllegalArgumentException("이미 가입된 이메일입니다.");
@@ -166,7 +164,7 @@ public class BasicUserService implements UserService {
 
         // 가입된 이름일 경우 true 반환
         return userRepository.load().values().stream()
-                .map(User::getName)
+                .map(User::getUsername)
                 .anyMatch(name::equals);
     }
 }

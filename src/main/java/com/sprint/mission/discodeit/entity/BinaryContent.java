@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentResponseDto;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,22 +14,25 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent implements Serializable {
+@Table(name = "binary_contents")
+public class BinaryContent extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    // 공통 필드
-    private final UUID id;              // pk
-    private final Instant createAt;     // 생성 시간
-
+    @Column(name = "file_name")
     private final String fileName;      // 파일 이름
-    private final String contentType;   // MIME 타입 (image/png, application/pdf 등)
+
+    @Column(name = "size")
     private final Long size;            // 파일 크기(바이트)
+
+    @Column(name = "content_type")
+    private final String contentType;   // MIME 타입 (image/png, application/pdf 등)
+
+    @Column(name = "file_path")
     private final String filePath;      // 파일 경로
 
     // 생성자 호출 시 파일 저장 및 객체 초기화
@@ -38,9 +44,6 @@ public class BinaryContent implements Serializable {
         CreateBinaryContentResponseDto createBinaryContentResponseDto = saveFile(file, filePath);
 
         // 객체 초기화
-        this.id = createBinaryContentResponseDto.id();
-        this.createAt = Instant.now();
-
         this.fileName = createBinaryContentResponseDto.fileName();
         this.contentType = file.getContentType();
         this.size = file.getSize();

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.event;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,9 @@ public class MessageCleanupListener {
         Message message = event.message();
 
         // 메시지 관련 파일 삭제
-        if (message.getImagesId() != null) {
-            for (UUID id : message.getImagesId()) {
-                binaryContentService.delete(id);
+        if (message.getAttachments() != null) {
+            for (BinaryContent attachment : message.getAttachments()) {
+                binaryContentService.delete(attachment.getId());
             }
         }
     }

@@ -28,7 +28,7 @@ public class BasicUserStatusService implements UserStatusService {
         userService.userIsExist(userId);
 
         User user = userRepository.load().get(userId);  // 유저 생성 시 userStatus도 생성됨
-        UserStatus userStatus = user.getUserStatus();
+        UserStatus userStatus = user.getStatus();
 
         userStatusRepository.save(userStatus);
 
@@ -66,7 +66,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         User user = userRepository.load().get(userId);
 
-        UserStatus userStatus = user.getUserStatus();
+        UserStatus userStatus = user.getStatus();
         userStatus.updateLastAccessTime();
 
         userStatusRepository.save(userStatus);

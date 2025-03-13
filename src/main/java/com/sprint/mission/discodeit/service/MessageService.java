@@ -20,7 +20,7 @@ public interface MessageService {
     List<FindMessageResponseDto> findAllByUserId(UUID userId);
 
     // 수정
-    FindMessageResponseDto updateContext(UpdateMessageRequestDto updateMessageRequestDto);
+    FindMessageResponseDto updateContent(UpdateMessageRequestDto updateMessageRequestDto);
     
     // 삭제
     void delete(UUID id);

@@ -19,9 +19,9 @@ public class BasicAuthService implements AuthService {
         return checkAccount(loginRequestDto.name(), loginRequestDto.password());
     }
 
-    private FindUserResponseDto checkAccount(String name, String password) {
+    private FindUserResponseDto checkAccount(String username, String password) {
         User user = userRepository.load().values().stream()
-                .filter(u -> u.getName().equals(name))
+                .filter(u -> u.getUsername().equals(username))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
