@@ -1,25 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import java.util.Collection;
+import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
 
-  Channel createPublicChannel(ChannelPublicRequest channelPublicRequest);
+  @Transactional
+  ChannelDto createPublicChannel(ChannelPublicRequest channelPublicRequest);
 
-  Channel createPrivateChannel(ChannelPrivateRequest channelPrivateRequest);
+  @Transactional
+  ChannelDto createPrivateChannel(ChannelPrivateRequest channelPrivateRequest);
 
   // Read : 전체 채널 조회, 특정 채널 조회
-  Collection<ChannelFindAllResponse> findAllByUserId(UUID userId);
+  List<ChannelDto> findAllByUserId(UUID userId);
 
-  ChannelFindResponse getChannelById(UUID id);
+  ChannelDto getChannelById(UUID id);
 
   // Update : 특정 채널 이름 변경
-  Channel updateChannel(UUID id, ChannelUpdateRequest channelUpdateRequest);
+  @Transactional
+  ChannelDto updateChannel(UUID id, ChannelUpdateRequest channelUpdateRequest);
 
   // Delete : 특정 채널 삭제
+  @Transactional
   void deleteChannelById(UUID id);
 }

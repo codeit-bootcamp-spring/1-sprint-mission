@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.repository.*;
-import com.sprint.mission.discodeit.repository.file.*;
-import com.sprint.mission.discodeit.repository.jcf.*;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.storage.LocalBinaryContentStorage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
   @Bean
-  @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
+  @ConditionalOnProperty(name = "discodeit.stroage.type", havingValue = "local")
   public BinaryContentStorage binaryContentStorage() {
     return new LocalBinaryContentStorage();
   }

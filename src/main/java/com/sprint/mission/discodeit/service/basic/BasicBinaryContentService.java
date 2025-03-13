@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.BinaryContentFindResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,65 +21,48 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
+  @Transactional
   @Override
-  public BinaryContent createBinaryContent(BinaryContentCreateRequest request) {
-    BinaryContent binaryContent = new BinaryContent(request.fileName(),
-        request.size(),
-        request.contentType(),
-        request.bytes());
-    return binaryContentRepository.save(binaryContent);
+  public BinaryContentDto createBinaryContent(BinaryContentCreateRequest request) {
+    BinaryContent binaryContent = BinaryContent.builder()
+        .fileName(request.fileName())
+        .size(request.size())
+        .contentType(request.contentType())
+        .build();
+    binaryContentRepository.save(binaryContent);
+    binaryContentStorage.put(binaryContent.getId(), request.bytes());
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override
-  public BinaryContent findBinaryContentById(UUID binaryContentId) {
+  public BinaryContentDto findBinaryContentById(UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> {
-          throw new NoSuchElementException(
-              "binaryContent(" + binaryContentId + ")가 없습니다."); // 전역 404
-        });
-
-    /* 스프린트 미션 5 심화 조건 중 API 스펙을 준수
-    // DTO의 변환은 Service 레이어에서
-    return new BinaryContentFindResponse(
-        binaryContent.getId(),
-        binaryContent.getCreatedAt(),
-        binaryContent.getFileName(),
-        binaryContent.getSize(),
-        binaryContent.getContentType(),
-        binaryContent.getBytes()
-    );
-     */
-
-    return binaryContent;
+        .orElseThrow(() -> new NoSuchElementException(
+            "binaryContent(" + binaryContentId + ")가 없습니다."));
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override
-  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-
-    /* 스프린트 미션 5 심화 조건 중 API 스펙을 준수
-    return binaryContentRepository.findAll().stream()
-        .map(binaryContent ->
-            new BinaryContentFindResponse(
-                binaryContent.getId(),
-                binaryContent.getCreatedAt(),
-                binaryContent.getFileName(),
-                binaryContent.getSize(),
-                binaryContent.getContentType(),
-                binaryContent.getBytes()
-            )
-        ).toList();
-     */
-
-    return binaryContentRepository.findAll().stream()
-        .filter(binaryContent -> ids.contains(binaryContent.getId()))
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> ids) {
+    return binaryContentRepository.findAllById(ids).stream()
+        .map(binaryContentMapper::toDto)
         .toList();
   }
 
   @Override
-  public void deleteBinaryContentById(UUID binaryContentId) {
-    binaryContentRepository.delete(binaryContentId);
+  public ResponseEntity<?> downloadBinaryContent(UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new NoSuchElementException(
+            "binaryContent(" + binaryContentId + ")가 없습니다."));
+    return binaryContentStorage.download(binaryContentMapper.toDto(binaryContent));
   }
 
-
+  @Transactional
+  @Override
+  public void deleteBinaryContentById(UUID binaryContentId) {
+    binaryContentRepository.deleteById(binaryContentId);
+  }
 }

@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.dto.reponse;
 
 import java.util.List;
-import lombok.Builder;
 
-@Builder
 //  제네릭 타입임을 명시해야 한다.
 public record PageResponse<T>(
     List<T> content, // 실제 데이터

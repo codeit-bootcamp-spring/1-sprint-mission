@@ -1,62 +1,60 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.UUID;
-
+@Entity
+@Table(name = "users")
 @Getter
-// 직렬화하려는 클래스가 Serializable 인터페이스를 구현해야 한다.
-public class User extends BaseEntity implements Serializable {
-        @Serial
-        private static final long serialVersionUID = 1L;
-        //
-        private String username;
-        private String email;
-        private String password;
-        private UUID profileId;
+@AllArgsConstructor // @Builder가 모든 필드를 받는 생성자를 필요로 한다
+@Builder
+public class User extends BaseUpdatableEntity {
 
-        public User(String username,
-                    String email,
-                    String password,
-                    UUID profileId){
-            this.username = username;
-            this.email = email;
-            this.password = password;
-            this.profileId = profileId;
-        }
+  @Column(nullable = false, length = 50)
+  private String username;
 
-    // BaseEntity 의 refreshUpdateAt() 를 도메인 차원에서 조절해야 하나?
-    public void updateUsername(String username){
-        if(username == null || username.trim().isEmpty()){
-            throw new IllegalArgumentException("username 은 공백일 수 없습니다.");
-        }
-        this.username = username;
-        this.refreshUpdateAt();
-    }
+  @Column(nullable = false, length = 100)
+  private String email;
 
-    public void updateUserEmail(String email){
-        if(email == null || !email.matches("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$")) {
-            throw new IllegalArgumentException("email 이 잘못되었습니다.");
-        }
-        this.email = email;
-        this.refreshUpdateAt();
-    }
+  @Column(nullable = false, length = 60)
+  private String password;
 
-    public void updateUserPassword(String password){
-        if(password == null || password.trim().isEmpty()){
-            throw new IllegalArgumentException("password 가 잘못되었습니다.");
-        }
-        this.password = password;
-        this.refreshUpdateAt();
-    }
+  @OneToOne
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
 
-    public void updateProfileId(UUID profileId){
-            if(profileId == null){
-                throw new IllegalArgumentException("profileId 가 잘못디되었습니다.");
-            }
-            this.profileId = profileId;
-            this.refreshUpdateAt();
-    }
+  // mappedBy : 비주인 객체, 컬럼 만들지 마. 읽기 전용
+  @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  // 읽기 전용으로 만들고,
+  // users 테이블에는 컬럼을 만들지 않는다.
+  // mappedBy ->> userStatus의 user 필드에 본 객체가 참조되도록 만든다
+  private UserStatus userStatus;
+
+  // JPA용 기본 생성자, JPA만 접근할 수 있도록 protected 접근자 설정
+  protected User() {
+  }
+
+  public void updateUsername(String newUsername) {
+    this.username = newUsername;
+  }
+
+  public void updateEmail(String newEmail) {
+    this.email = newEmail;
+  }
+
+  public void updatePassword(String newPassword) {
+    this.password = newPassword;
+  }
+
+  public void updateProfile(BinaryContent newProfile) {
+    this.profile = newProfile;
+  }
 }

@@ -1,11 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.Locked.Read;
 
 
 /**
@@ -16,20 +23,26 @@ import java.util.UUID;
  * ! ReadStatus lastMessageReadTime 시간 이후의 createdAt된 Messages 는 읽지 않은 메세지이다. !
  **/
 
+@Entity
+@Table(name = "read_statuses")
 @Getter
-public class ReadStatus extends BaseEntity implements Serializable {
+@AllArgsConstructor
+@Builder
+public class ReadStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-
-  private UUID userId;
-  private UUID channelId;
+  @Column(nullable = false)
   private Instant lastReadAt; // 마지막으로 읽은 메시지의 시각
 
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.userId = userId;
-    this.channelId = channelId;
-    this.lastReadAt = lastReadAt;
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
+
+  @ManyToOne
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
+
+  // JPA용 기본 생성자, JPA만 접근할 수 있도록 protected 접근자 설정
+  protected ReadStatus() {
   }
 
   public void updateLastMessageReadAt(Instant lastReadAt) {
