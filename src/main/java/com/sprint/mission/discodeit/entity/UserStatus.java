@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -22,7 +23,7 @@ import java.time.Instant;
 public class UserStatus extends BaseUpdatableEntity {
 
   @JsonIgnore
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "user_id", nullable = false, unique = true)
   private User user;
 

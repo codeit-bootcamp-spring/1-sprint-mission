@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-  @EntityGraph(attributePaths = {"status"})
+  @EntityGraph(attributePaths = {"status", "profile"})
   List<User> findAll();
 
   boolean existsById(UUID id);
