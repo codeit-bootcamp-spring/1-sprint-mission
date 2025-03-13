@@ -46,7 +46,7 @@ public class MessageController {
     @Operation(summary = "Message 생성")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Message가 성공적으로 생성됨",
-                    content = @Content(schema = @Schema(implementation = Message.class))),
+                    content = @Content(schema = @Schema(implementation = MessageDto.class))),
             @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
@@ -72,7 +72,7 @@ public class MessageController {
 
     @Operation(summary = "Channel의 Message 목록 조회")
     @ApiResponse(responseCode = "200", description = "Message 목록 조회 성공",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindMessageDto.class))))
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MessageDto.class))))
     @GetMapping
     public ResponseEntity<CommonResponse> findInChannel(
             @Parameter(description = "조회할 Channel ID") @RequestParam("channelId") UUID channelId) {
@@ -88,7 +88,7 @@ public class MessageController {
     @Operation(summary = "Message 내용 수정")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Message가 성공적으로 수정됨",
-                    content = @Content(schema = @Schema(implementation = Message.class))),
+                    content = @Content(schema = @Schema(implementation = MessageDto.class))),
             @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
