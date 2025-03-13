@@ -14,7 +14,7 @@ public record MessageDto (
   @NotNull
   UUID channelId,
 
-  UserDto author,
+  UUID authorId,
   List<BinaryContentDto> attachments
 ){
 

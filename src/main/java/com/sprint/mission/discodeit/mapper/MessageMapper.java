@@ -25,7 +25,7 @@ public class MessageMapper {
       binaryContentDtos.add(BinaryContentMapper.toDto(attachment));
     }
     return new MessageDto(message.getId(), message.getCreatedAt(), message.getUpdatedAt(),
-        message.getContent(), message.getChannel().getId(), userDto, binaryContentDtos);
+        message.getContent(), message.getChannel().getId(), userDto.id(), binaryContentDtos);
   }
 
 }
