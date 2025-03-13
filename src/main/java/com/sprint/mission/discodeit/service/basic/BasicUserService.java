@@ -189,7 +189,7 @@ public class BasicUserService implements UserService {
 
     if (user.getProfile() != null) {
 
-      binaryContentRepository.delete(user.getProfile().getId());
+      binaryContentRepository.delete(user.getProfile());
     }
     BinaryContentDto binaryContentDto = binaryContentService.create(file);
 
