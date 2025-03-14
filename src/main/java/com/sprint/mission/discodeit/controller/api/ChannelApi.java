@@ -63,7 +63,6 @@ public interface ChannelApi {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "채널 정보 수정 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelResponse.class))),
       @ApiResponse(responseCode = "404", description = "해당 ID의 채널을 찾을 수 없음")})
-  @PatchMapping("/{id}")
   ResponseEntity<ChannelResponse> updateChannel(
       @Parameter(description = "수정할 채널의 ID", required = true) UUID id,
       @RequestBody UpdateChannelRequest request

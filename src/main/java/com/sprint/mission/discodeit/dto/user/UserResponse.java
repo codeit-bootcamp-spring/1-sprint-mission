@@ -5,6 +5,6 @@ import com.sprint.mission.discodeit.dto.status.UserStatusResponse;
 import java.util.UUID;
 
 public record UserResponse(UUID id, String username, String email, UserStatusResponse status,
-                           BinaryContentResponse profile) {
+                           BinaryContentResponse profile, String role) {
 
 }

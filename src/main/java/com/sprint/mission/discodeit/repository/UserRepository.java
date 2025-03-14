@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
   @Query("SELECT u FROM User u LEFT JOIN FETCH u.userStatus LEFT JOIN FETCH u.profileImage")
   List<User> findWithStatusAndProfile();
+
+  List<User> findAllByRole(Role role);
 }
