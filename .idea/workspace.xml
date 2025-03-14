@@ -6,24 +6,31 @@
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/BinaryContentMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/BinaryContentMapperImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/MessageMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/MessageMapperImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/BinaryContentMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/ChannelMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/MessageMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/ReadStatusMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/UserMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/UserStatusMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/BinaryContentMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/BinaryContentMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/ChannelMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/ChannelMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/MessageMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/MessageMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/UserStatusMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/UserStatusMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/mappedDto/MessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/mappedDto/MessageDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/BinaryContentDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelAllDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindMessageDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPrivateChannelDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPublicChannelDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindUserDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/SaveUserDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/UserMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/UserDtoForUpdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/UserDtoForUpdate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/BinaryContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/BinaryContent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/BinaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/BinaryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/ReadStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/ReadStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/UserStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/UserStatus.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/BaseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/BaseEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Channel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/MessageTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/MessageTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/MockUserTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/UserRepoTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/UserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/UserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/fetchJoin/AllChannel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/fetchJoin/AllChannel.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +156,7 @@
     "git-widget-placeholder": "part2-이요한-sprint6-dev",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/요한/Argorism",
+    "last_opened_file_path": "C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -158,8 +165,9 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.28965518",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
+    "settings.editor.selected.configurable": "reference.projectsettings.compiler.javacompiler",
     "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "two.files.diff.last.used.file": "C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -194,55 +202,7 @@
       <recent name="com.sprint.mission.entity.main" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.MessageTest.updateMessage">
-    <configuration name="ChannelTest.createPrivateService" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.BasicTest.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.ChannelTest" />
-      <option name="METHOD_NAME" value="createPrivateService" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ChannelTest.createPublicService" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.BasicTest.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.ChannelTest" />
-      <option name="METHOD_NAME" value="createPublicService" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="MessageTest.createMessage" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.BasicTest.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.MessageTest" />
-      <option name="METHOD_NAME" value="createMessage" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.UserTest.updateUser">
     <configuration name="MessageTest.updateMessage" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
@@ -254,6 +214,54 @@
       <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
       <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.MessageTest" />
       <option name="METHOD_NAME" value="updateMessage" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserTest.cascadeUserAndUserStatusTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.BasicTest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.UserTest" />
+      <option name="METHOD_NAME" value="cascadeUserAndUserStatusTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserTest.updateUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.BasicTest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.UserTest" />
+      <option name="METHOD_NAME" value="updateUser" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserTest.userEqualsHashCodeTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.BasicTest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.UserTest" />
+      <option name="METHOD_NAME" value="userEqualsHashCodeTest" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -274,11 +282,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.MessageTest.updateMessage" />
+        <item itemvalue="JUnit.UserTest.updateUser" />
         <item itemvalue="Spring Boot.DiscodeitApplication" />
-        <item itemvalue="JUnit.MessageTest.createMessage" />
-        <item itemvalue="JUnit.ChannelTest.createPublicService" />
-        <item itemvalue="JUnit.ChannelTest.createPrivateService" />
+        <item itemvalue="JUnit.UserTest.userEqualsHashCodeTest" />
+        <item itemvalue="JUnit.UserTest.cascadeUserAndUserStatusTest" />
+        <item itemvalue="JUnit.MessageTest.updateMessage" />
       </list>
     </recent_temporary>
   </component>
@@ -355,7 +363,11 @@
       <workItem from="1741827629705" duration="3025000" />
       <workItem from="1741848137200" duration="232000" />
       <workItem from="1741849647296" duration="4619000" />
-      <workItem from="1741864678049" duration="5023000" />
+      <workItem from="1741864678049" duration="5162000" />
+      <workItem from="1741911826564" duration="30000" />
+      <workItem from="1741912541623" duration="436000" />
+      <workItem from="1741915769167" duration="2252000" />
+      <workItem from="1741918080914" duration="2362000" />
     </task>
     <servers />
   </component>

@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.mapstruct.MappingInheritanceStrategy.*;
 
 
-@MapperConfig(mappingInheritanceStrategy = AUTO_INHERIT_ALL_FROM_CONFIG)
+//@MapperConfig(mappingInheritanceStrategy = AUTO_INHERIT_ALL_FROM_CONFIG)
 @Mapper(componentModel = "spring")
 public interface BinaryContentMapper {
     BinaryContentDto toDto(BinaryContent binaryContent);

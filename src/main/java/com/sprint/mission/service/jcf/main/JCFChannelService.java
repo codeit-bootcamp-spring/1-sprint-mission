@@ -110,7 +110,8 @@ public class JCFChannelService implements ChannelService {
         if (updatingChannel.isPrivate()) {
             throw new CustomException(ErrorCode.CANNOT_UPDATE_PRIVATE_CHANNEL);
         }
-        return channelMapper.update(dto, updatingChannel);
+        updatingChannel.update(dto.name(), dto.description());
+        return updatingChannel;
     }
 
     @Override

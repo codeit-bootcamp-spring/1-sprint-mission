@@ -17,10 +17,10 @@ import static jakarta.persistence.CascadeType.*;
 
 @Entity
 @EqualsAndHashCode(of = {"channelType", "name"}, callSuper = true)
-//@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@NoArgsConstructor
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor
 @ToString(of = {"channelType", "name", "description"})
-@Getter @Setter
+@Getter @Builder
 @Schema(description = "채널")
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity{
@@ -42,7 +42,6 @@ public class Channel extends BaseUpdatableEntity{
         this.channelType = channelType;
     }
 
-
     public void update(String newName, String newDescription) {
         this.name = newName;
         this.description = newDescription;
@@ -52,6 +51,11 @@ public class Channel extends BaseUpdatableEntity{
         if (this.channelType == ChannelType.PRIVATE) return true;
         else return false;
     }
+
+    public static Channel createChannel(String name, String description, ChannelType channelType) {
+        return new Channel(name, description, channelType);
+    }
+
 
 //    @AssertTrue(message = "채널 이름은 설명보다 짧아야 합니다.")
 //    public boolean nameValidCheck() {

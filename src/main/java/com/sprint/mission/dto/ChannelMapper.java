@@ -6,6 +6,7 @@ import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import org.mapstruct.*;
+import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import static org.mapstruct.MappingInheritanceStrategy.*;
 
@@ -15,18 +16,12 @@ public interface ChannelMapper {
 
     ChannelDto toDto(Channel channel);
 
+    //@Mapping(target = ".", expression = "java(Channel.createChannel(request.name, request.description, PUBLIC))")
+    default Channel toPublicEntity(PublicChannelCreateDTO request){
+        return new Channel(request.name(), request.description(), ChannelType.PUBLIC);
+    };
 
-    Channel update(ChannelDtoForUpdate dto, @MappingTarget Channel channel);
-
-    @Mapping(target = "channelType", constant = "PUBLIC")
-    Channel toPublicEntity(PublicChannelCreateDTO request);
-
-    //@ValueMapping(target = "channelType", source = "PRIVATE")
-    @Mapping(target = "channelType", source = "type")
-    Channel toPrivateEntity(ChannelType type);
-//    default Channel toPrivateEntity(){
-//        Channel privateChannel = new Channel();
-//        privateChannel.setChannelType(PRIVATE);
-//        return privateChannel;
-//    };
+    default Channel toPrivateEntity(ChannelType channelType){
+        return new Channel(channelType);
+    }
 }

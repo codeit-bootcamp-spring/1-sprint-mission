@@ -3,7 +3,6 @@ package com.sprint.mission.dto;
 import com.sprint.mission.dto.mappedDto.ChannelDto;
 import com.sprint.mission.dto.mappedDto.UserDto;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
-import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import java.time.Instant;
@@ -47,38 +46,6 @@ public class ChannelMapperImpl implements ChannelMapper {
         if ( dto == null ) {
             return channel;
         }
-
-        channel.setName( dto.name() );
-        channel.setDescription( dto.description() );
-
-        return channel;
-    }
-
-    @Override
-    public Channel toPublicEntity(PublicChannelCreateDTO request) {
-        if ( request == null ) {
-            return null;
-        }
-
-        Channel channel = new Channel();
-
-        channel.setName( request.name() );
-        channel.setDescription( request.description() );
-
-        channel.setChannelType( ChannelType.PUBLIC );
-
-        return channel;
-    }
-
-    @Override
-    public Channel toPrivateEntity(ChannelType type) {
-        if ( type == null ) {
-            return null;
-        }
-
-        Channel channel = new Channel();
-
-        channel.setChannelType( type );
 
         return channel;
     }

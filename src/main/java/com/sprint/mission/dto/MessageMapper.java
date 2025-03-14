@@ -27,10 +27,7 @@ public interface MessageMapper {
     @Mapping(target = "online", expression = "java(user.getStatus() != null ? user.getStatus().isOnline() : null)")
     UserDto userToUserDto(User user);
 
-    @Mapping(target = "id", ignore = true) // 테스트용으로 ID SETTER 열어놔서 ignore 설정 필요
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "content", source = "responseDto.content")
-    Message toEntity(MessageDtoForCreate responseDto, Channel channel, User author);
+    Message toEntity(Channel channel, User author, String content);
 
-    Message update(MessageDtoForUpdate updateDto, @MappingTarget Message updatingMessage);
+    //Message update(MessageDtoForUpdate updateDto, @MappingTarget Message updatingMessage);
 }

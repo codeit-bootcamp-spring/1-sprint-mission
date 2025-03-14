@@ -19,8 +19,9 @@ import static jakarta.persistence.FetchType.*;
 @Entity
 @EqualsAndHashCode(of = {"username", "email", "password"}, callSuper = true)
 @ToString(of = {"username", "email", "password", "profile"})  // callSuper 제거 및 id 등 직접 명시
-@Getter @Setter
-@NoArgsConstructor
+@Getter @Builder
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Schema(description = "유저")
 @Table(name = "users")
 public class User extends BaseUpdatableEntity{
@@ -54,11 +55,11 @@ public class User extends BaseUpdatableEntity{
         this.email = email;
     }
 
-//    public void update(String newName, String newPassword, String newEmail) {
-//        this.username = newName;
-//        this.password = newPassword;
-//        this.email = newEmail;
-//    }
+    public void update(String newName, String newPassword, String newEmail) {
+        this.username = newName;
+        this.password = newPassword;
+        this.email = newEmail;
+    }
 
 //    public Optional<BinaryContent> getProfile() { // mapping은 null 체크 해줌
 //        return Optional.ofNullable(profile);

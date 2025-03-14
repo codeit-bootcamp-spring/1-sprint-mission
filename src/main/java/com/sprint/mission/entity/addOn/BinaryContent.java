@@ -10,9 +10,9 @@ import java.io.Serializable;
 import java.util.UUID;
 @Entity
 @EqualsAndHashCode(of = {"fileName", "contentType", "size"}, callSuper = true)
-//@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@NoArgsConstructor
-@ToString @Getter @Setter
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor
+@ToString @Getter @Builder
 @Schema(description = "바이너리 컨텐츠")
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {

@@ -42,23 +42,17 @@ public class JCFUserService implements UserService {
 
     @Override
     public User create(UserDtoForCreate requestDTO, MultipartFile profile) {
-
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
-        //User createdUser = requestDTO.toEntity();
-        User createdUser = userMapper.toEntity(requestDTO);
-
         Optional<BinaryContentDtoForCreate> profileDto = binaryContentMapper.convertFileToBinaryContentDto(profile);
-        //Optional<BinaryContentDtoForCreate> profileDto = BinaryContentDtoForCreate.convertToBinaryContentDto(profile);
         // 선택적 프로필 생성
-        profileDto.ifPresent((dto) -> {
-            BinaryContent createdBinaryContent = profileService.create(dto);
-            binaryContentStorage.put(createdBinaryContent.getId(), dto.bytes());
-            createdUser.setProfile(createdBinaryContent);
-        });
+        User createdUser = profileDto.map((binaryDto) -> {
+            BinaryContent createdBinaryContent = profileService.create(binaryDto);
+            binaryContentStorage.put(createdBinaryContent.getId(), binaryDto.bytes());
+            return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
+        }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
 
         userRepository.save(createdUser);// SAVE해야 UUID 생성
-        UserStatus userStatus = userStatusService.create(createdUser);
-        createdUser.setStatus(userStatus);
+        userStatusService.create(createdUser);
         return createdUser;
     }
 
@@ -66,12 +60,13 @@ public class JCFUserService implements UserService {
     // 패스워드 정보 제외
     @Override
     public User update(UUID userId, UserDtoForUpdate requestDTO) {
-        isDuplicateNameEmail(requestDTO.newName(), requestDTO.newEmail());
+        isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
         User updatingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        //updatingUser.update(requestDTO.newName(), requestDTO.newEmail(), requestDTO.newPassword());
-        return userMapper.update(requestDTO, updatingUser);
+        updatingUser.update(requestDTO.username(), requestDTO.password(), requestDTO.email());
+        //return userMapper.update(requestDTO, updatingUser);
+        return updatingUser;
     }
 
     @Override

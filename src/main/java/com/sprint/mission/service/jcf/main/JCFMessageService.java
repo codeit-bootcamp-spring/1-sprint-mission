@@ -51,7 +51,7 @@ public class JCFMessageService implements MessageService {
         Channel writtenPlace = channelRepository.findById(responseDto.channelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
-        Message createdMessage = messageMapper.toEntity(responseDto, writtenPlace, author);
+        Message createdMessage = messageMapper.toEntity(writtenPlace, author, responseDto.content());
         //Message createdMessage = new Message(writtenPlace, author, responseDto.content());
 
         log.info("attachmentsDto: {}", binaryContentDtoForCreateList);
@@ -71,7 +71,8 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message update(UUID messageId, MessageDtoForUpdate updateDto) {
         Message updatingMessage = this.findById(messageId);
-        return messageMapper.update(updateDto, updatingMessage);
+        updatingMessage.update(updateDto.content());
+        return updatingMessage;
     }
 
 

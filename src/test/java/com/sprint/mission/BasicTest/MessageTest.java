@@ -82,18 +82,19 @@ public class MessageTest {
         // when
         Message createdMessage = messageService.create(testMessageDto, binaryContentDtoList);
         System.out.println("업데이트 전 getContent() = " + createdMessage.getContent());
-        Message updatedMessage = messageMapper.update(new MessageDtoForUpdate("새로운 컨텐츠"), createdMessage);
-        System.out.println("업데이트 후 getContent() = " + updatedMessage.getContent());
+        createdMessage.update("새로운 컨텐츠");
+        //Message updatedMessage = messageMapper.update(new MessageDtoForUpdate("새로운 컨텐츠"), createdMessage);
+        System.out.println("업데이트 후 getContent() = " + createdMessage.getContent());
 
-        MessageDto dto = messageMapper.toDto(updatedMessage);
+        MessageDto dto = messageMapper.toDto(createdMessage);
 
         List<BinaryContent> all = binarycontentRepository.findAll();
         System.out.println("가자~~~~~~~~~~~~~~~~~");
         all.forEach(System.out::println);
 
-        assertThat(updatedMessage.getContent()).isNotEqualTo(testMessageDto.content());
-        assertThat(updatedMessage.getId()).isEqualTo(createdMessage.getId());
-        assertThat(updatedMessage.getAuthor().getId()).isEqualTo(testMessageDto.userId());
+        assertThat(createdMessage.getContent()).isNotEqualTo(testMessageDto.content());
+        assertThat(createdMessage.getId()).isEqualTo(createdMessage.getId());
+        assertThat(createdMessage.getAuthor().getId()).isEqualTo(testMessageDto.userId());
         assertThat(dto.attachments().size()).isEqualTo(3);
         System.out.println("dto.attachments() = " + dto.attachments());
         System.out.println("dto.author() = " + dto.author());

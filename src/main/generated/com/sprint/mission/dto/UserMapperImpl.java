@@ -3,7 +3,6 @@ package com.sprint.mission.dto;
 import com.sprint.mission.dto.mappedDto.BinaryContentDto;
 import com.sprint.mission.dto.mappedDto.UserDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
-import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.User;
 import java.util.UUID;
@@ -40,31 +39,36 @@ public class UserMapperImpl implements UserMapper {
     }
 
     @Override
-    public User update(UserDtoForUpdate updateUserDto, User user) {
-        if ( updateUserDto == null ) {
-            return user;
-        }
-
-        user.setUsername( updateUserDto.newName() );
-        user.setPassword( updateUserDto.newPassword() );
-        user.setEmail( updateUserDto.newEmail() );
-
-        return user;
-    }
-
-    @Override
-    public User toEntity(UserDtoForCreate userDto) {
+    public User toEntityWithoutProfile(UserDtoForCreate userDto) {
         if ( userDto == null ) {
             return null;
         }
 
-        User user = new User();
+        User.UserBuilder user = User.builder();
 
-        user.setUsername( userDto.username() );
-        user.setEmail( userDto.email() );
-        user.setPassword( userDto.password() );
+        user.username( userDto.username() );
+        user.email( userDto.email() );
+        user.password( userDto.password() );
 
-        return user;
+        return user.build();
+    }
+
+    @Override
+    public User toEntityWithProfile(UserDtoForCreate userDto, BinaryContent profile) {
+        if ( userDto == null && profile == null ) {
+            return null;
+        }
+
+        User.UserBuilder user = User.builder();
+
+        if ( userDto != null ) {
+            user.username( userDto.username() );
+            user.email( userDto.email() );
+            user.password( userDto.password() );
+        }
+        user.profile( profile );
+
+        return user.build();
     }
 
     protected BinaryContentDto binaryContentToBinaryContentDto(BinaryContent binaryContent) {

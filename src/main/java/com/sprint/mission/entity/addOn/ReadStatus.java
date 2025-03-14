@@ -5,10 +5,7 @@ import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -17,10 +14,10 @@ import java.util.UUID;
 import static jakarta.persistence.FetchType.*;
 @Entity
 @EqualsAndHashCode(of = {"user", "channel"}, callSuper = true)
-//@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@NoArgsConstructor
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor
 @ToString(of = {"lastReadAt"})
-@Getter
+@Getter @Builder
 @Schema(description = "메시지 읽음 상태 정보")
 @Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {
@@ -34,12 +31,6 @@ public class ReadStatus extends BaseUpdatableEntity {
     private Channel channel;
 
     private Instant lastReadAt;
-
-    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
-        this.user = user;
-        this.channel = channel;
-        this.lastReadAt = lastReadAt;
-    }
 
     public void update(Instant newLastReadAt) {
         if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {

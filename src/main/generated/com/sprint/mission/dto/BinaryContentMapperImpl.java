@@ -42,12 +42,12 @@ public class BinaryContentMapperImpl implements BinaryContentMapper {
             return null;
         }
 
-        BinaryContent binaryContent = new BinaryContent();
+        BinaryContent.BinaryContentBuilder binaryContent = BinaryContent.builder();
 
-        binaryContent.setFileName( request.fileName() );
-        binaryContent.setContentType( request.contentType() );
-        binaryContent.setSize( request.size() );
+        binaryContent.fileName( request.fileName() );
+        binaryContent.contentType( request.contentType() );
+        binaryContent.size( request.size() );
 
-        return binaryContent;
+        return binaryContent.build();
     }
 }
