@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.status.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
