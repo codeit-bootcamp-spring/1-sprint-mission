@@ -54,7 +54,8 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional(readOnly = true)
   public List<UserResponse> findAllUsers() {
-    return userRepository.findAll().stream().map(UserMapper.INSTANCE::userToUserResponse)
+    return userRepository.findWithStatusAndProfile().stream()
+        .map(UserMapper.INSTANCE::userToUserResponse)
         .toList();
   }
 

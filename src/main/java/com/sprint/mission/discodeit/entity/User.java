@@ -1,12 +1,20 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.io.Serial;
-import java.io.Serializable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -16,8 +24,13 @@ import java.util.*;
 @Table(name = "users")
 public class User extends BaseUpdateEntity {
 
+  @Column(unique = true, nullable = false)
   private String username;
+
+  @Column(nullable = false)
   private String email;
+
+  @Column(nullable = false)
   private String password;
 
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
