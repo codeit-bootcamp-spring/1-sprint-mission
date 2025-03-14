@@ -4,7 +4,8 @@ import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
 import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.MessageMapper;
-import com.sprint.mission.dto.mappedDto.MessageDto;
+import com.sprint.mission.dto.response.MessageDto;
+import com.sprint.mission.dto.response.PageResponse;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
@@ -21,6 +22,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,8 +58,6 @@ public class MessageController {
             @RequestPart("messageCreateDto") @Valid MessageDtoForCreate requestDTO,
             @Parameter(description = "Message 첨부 파일들")
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
-        //  MultipartFile[] : 배열로 여러 파일 받는 방법 in 공식문서 (기존 사용하던 것 : List<MultipartFile>)
-
         // 컬렉션을 옵셔널로 반환하는 것 피하기 : 생성 비용 + 불필요한 중첩 구조 (애초에 컬렉션이 Optional같은 역할)
         List<BinaryContentDtoForCreate> binaryContentDtoForCreateList = attachments == null || attachments.isEmpty()
                 ? Collections.emptyList()
@@ -75,12 +77,12 @@ public class MessageController {
     @GetMapping
     public ResponseEntity<CommonResponse> findInChannel(
             @Parameter(description = "조회할 Channel ID") @RequestParam("channelId") UUID channelId) {
-        List<Message> messageList = messageService.findAllByChannelId(channelId);
-        List<MessageDto> dtoList = messageList.stream()
-                .map(messageMapper::toDto).toList();
 
+        Pageable pageable = PageRequest.of(0, 50, Sort.by("createdAt").descending());
+
+        List<PageResponse<MessageDto>> pagedMessageList = messageService.findAllByChannelId(channelId, pageable);
         return CommonResponse.toResponseEntity
-                (OK, "메시지 목록을 성공적으로 조회했습니다.", dtoList);
+                (OK, "메시지 목록을 성공적으로 조회했습니다.", pagedMessageList);
     }
 
 

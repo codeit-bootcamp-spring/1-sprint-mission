@@ -2,14 +2,13 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
-import com.sprint.mission.dto.mappedDto.ChannelDto;
+import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.service.ChannelService;
 
-import java.util.List;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

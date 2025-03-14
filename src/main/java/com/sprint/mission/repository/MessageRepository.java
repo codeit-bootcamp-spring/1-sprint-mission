@@ -1,8 +1,8 @@
 package com.sprint.mission.repository;
 
 import com.sprint.mission.entity.main.Message;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,9 +23,11 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     Optional<Message> findById(UUID id);
     // 가져올 것 : CHANNEL이랑 BINARY
 
-    @EntityGraph(attributePaths = {"channel", "attachments", "author"})
-    @Query("SELECT m FROM Message m WHERE m.channel.id = :channelId")
-    List<Message> findAllByChannel_Id(@Param("channelId") UUID channelId);
+    @EntityGraph(attributePaths = {"channel", "attachments", "author", "author.status"})
+    Page<Message> findPagingAllByChannel_Id(UUID channelId, Pageable pageable);
+
+    // 테스트 용
+    List<Message> findAllByChannel_Id(UUID channelId);
 
     //Slice<Message> findSliceAll(Pageable pageable);
 }

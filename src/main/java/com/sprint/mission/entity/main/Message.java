@@ -34,8 +34,7 @@ public class Message  extends BaseUpdatableEntity{
     @ManyToOne(fetch = LAZY)
     private User author;
 
-    @OneToMany(cascade = REMOVE, orphanRemoval = true)
-    @JoinColumn(name = "message_id")
+    @OneToMany(mappedBy = "message", cascade = REMOVE, orphanRemoval = true)
     private List<BinaryContent> attachments = new ArrayList<>();
 
     public Message(Channel channel, User user, String content) {

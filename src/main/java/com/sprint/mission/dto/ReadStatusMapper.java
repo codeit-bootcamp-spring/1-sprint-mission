@@ -1,11 +1,9 @@
 package com.sprint.mission.dto;
 
-import com.sprint.mission.dto.mappedDto.ReadStatusDto;
+import com.sprint.mission.dto.response.ReadStatusDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
-import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
-import org.mapstruct.MappingInheritanceStrategy;
 
 import static org.mapstruct.MappingInheritanceStrategy.*;
 

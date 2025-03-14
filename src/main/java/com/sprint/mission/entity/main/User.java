@@ -30,11 +30,11 @@ public class User extends BaseUpdatableEntity{
     private String password;
 
     //변경가능하니
-    @OneToOne(fetch = LAZY, cascade = REMOVE, orphanRemoval = true)
-    @JoinColumn(name = "profile_id")
+    @OneToOne(mappedBy = "user", cascade = REMOVE, orphanRemoval = true)
     private BinaryContent profile;
 
-    @OneToOne(fetch = LAZY, mappedBy = "user", cascade = ALL)
+    @OneToOne(cascade = ALL)
+    @JoinColumn(name = "user_status_id")
     private UserStatus status;
 
     // REMOVE => user가 삭제되면 readStatus도 삭제됨
@@ -48,11 +48,10 @@ public class User extends BaseUpdatableEntity{
         this.profile = profile;
     }
 
-//    public User(String username, String password, String email) {
-//        this.username = username;
-//        this.password = password;
-//        this.email = email;
-//    }
+    public User createStatus(UserStatus status) {
+        this.status = status;
+        return this;
+    }
 
     public void update(String newName, String newPassword, String newEmail) {
         this.username = newName;

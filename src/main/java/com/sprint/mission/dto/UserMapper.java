@@ -1,8 +1,9 @@
 package com.sprint.mission.dto;
 
-import com.sprint.mission.dto.mappedDto.UserDto;
+import com.sprint.mission.dto.response.UserDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import org.mapstruct.*;
 
@@ -21,4 +22,6 @@ public interface UserMapper {
     User toEntityWithoutProfile(UserDtoForCreate userDto);
 
     User toEntityWithProfile(UserDtoForCreate userDto, BinaryContent profile);
+
+    User toEntityWithProfileAndStatus(UserDtoForCreate userDto, BinaryContent profile, UserStatus status);
 }

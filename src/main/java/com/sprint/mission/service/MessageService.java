@@ -1,6 +1,8 @@
 package com.sprint.mission.service;
 
 
+import com.sprint.mission.dto.response.MessageDto;
+import com.sprint.mission.dto.response.PageResponse;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
@@ -16,8 +18,8 @@ public interface MessageService {
     Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> attachmentsDto);
 
     Message update(UUID messageId, MessageDtoForUpdate updateDto);
-    //List<Message> findAllByChannelId(UUID channelId, Pageable pageable);
-    List<Message> findAllByChannelId(UUID channelId);
+    List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable);
+
     //List<Message> findAll();
     void delete(UUID messageId);
 

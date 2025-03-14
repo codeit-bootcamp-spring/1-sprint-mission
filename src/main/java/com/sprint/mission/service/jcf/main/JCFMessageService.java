@@ -3,6 +3,9 @@ package com.sprint.mission.service.jcf.main;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.MessageMapper;
+import com.sprint.mission.dto.PageResponseMapper;
+import com.sprint.mission.dto.response.MessageDto;
+import com.sprint.mission.dto.response.PageResponse;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
@@ -20,9 +23,7 @@ import com.sprint.mission.service.jcf.addOn.BinaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class JCFMessageService implements MessageService {
     private final BinaryService binaryService;
     private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
+    private final PageResponseMapper pageResponseMapper;
 
 
     @Override
@@ -63,8 +65,6 @@ public class JCFMessageService implements MessageService {
                 createdMessage.addAttachment(createdBinaryContent);
             }
         }
-        //log.info("createdMessage 채널 : {}", createdMessage.getChannelId());
-        //channelRepository.save(writtenChannel);
         return messageRepository.save(createdMessage);
     }
 
@@ -83,11 +83,31 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
+    public List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable) {
         if (!channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
-        return messageRepository.findAllByChannel_Id(channelId);
+
+        Page<Message> pageMessages;
+        List<PageResponse<MessageDto>> messageDtoList = new ArrayList<>();
+        do {
+            pageMessages = messageRepository.findPagingAllByChannel_Id(channelId, pageable);
+            log.info("현재 페이지 : {}", pageMessages.getNumber());
+            log.info("dto 변환 전 channel 정보 : {}", pageMessages.getContent().get(0).getChannel());
+            pageMessages.map((message) -> {
+                System.out.println("message.getAuthor().getStatus() = " + message.getAuthor().getStatus());
+                MessageDto dtoMessage = messageMapper.toDto(message);
+                System.out.println("dtoMessage.author().online() = " + dtoMessage.author().online());
+                return message;
+            });
+            PageResponse<MessageDto> messagePageResponse = pageResponseMapper.fromPage(pageMessages.map(messageMapper::toDto));
+            messageDtoList.add(messagePageResponse);
+            log.info("생성한 DTO : {}", pageMessages);
+            log.info("다음 페이지 여부 : {}", pageMessages.hasNext());
+            pageable = pageMessages.nextPageable();
+        } while (pageMessages.hasNext());
+
+        return messageDtoList;
     }
 //
 //        Page<Message> paging = (Page<Message>) pageable;

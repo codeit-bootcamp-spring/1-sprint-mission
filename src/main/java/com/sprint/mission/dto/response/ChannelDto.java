@@ -1,4 +1,4 @@
-package com.sprint.mission.dto.mappedDto;
+package com.sprint.mission.dto.response;
 
 import com.sprint.mission.entity.main.ChannelType;
 import io.swagger.v3.oas.annotations.media.Schema;

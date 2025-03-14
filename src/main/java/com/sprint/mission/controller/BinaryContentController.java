@@ -3,7 +3,7 @@ package com.sprint.mission.controller;
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
 import com.sprint.mission.dto.BinaryContentMapper;
-import com.sprint.mission.dto.mappedDto.BinaryContentDto;
+import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
@@ -21,9 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.*;

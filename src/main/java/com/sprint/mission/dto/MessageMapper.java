@@ -1,20 +1,11 @@
 package com.sprint.mission.dto;
 
-import com.sprint.mission.dto.mappedDto.BinaryContentDto;
-import com.sprint.mission.dto.mappedDto.MessageDto;
-import com.sprint.mission.dto.mappedDto.UserDto;
-import com.sprint.mission.dto.request.MessageDtoForCreate;
-import com.sprint.mission.dto.request.MessageDtoForUpdate;
-import com.sprint.mission.dto.request.UserDtoForUpdate;
-import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.dto.response.MessageDto;
+import com.sprint.mission.dto.response.UserDto;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
 import org.mapstruct.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 import static org.mapstruct.MappingInheritanceStrategy.*;
 
@@ -23,8 +14,10 @@ import static org.mapstruct.MappingInheritanceStrategy.*;
 public interface MessageMapper {
 
     @Mapping(target = "channelId", source = "channel.id")
+    @Mapping(target = "author", source = "author", qualifiedByName = "toUserDto")
     MessageDto toDto(Message message);
 
+    @Named("toUserDto")
     @Mapping(target = "online", expression = "java(user.getStatus() != null ? user.getStatus().isOnline() : null)")
     UserDto userToUserDto(User user);
 

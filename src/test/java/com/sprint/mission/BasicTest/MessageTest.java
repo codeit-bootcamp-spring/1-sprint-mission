@@ -1,20 +1,27 @@
 package com.sprint.mission.BasicTest;
 
 import com.sprint.mission.dto.MessageMapper;
-import com.sprint.mission.dto.mappedDto.MessageDto;
+import com.sprint.mission.dto.response.MessageDto;
 import com.sprint.mission.dto.request.*;
+import com.sprint.mission.dto.response.PageResponse;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinarycontentRepository;
+import com.sprint.mission.repository.BinaryContentRepository;
+import com.sprint.mission.repository.MessageRepository;
+import com.sprint.mission.repository.UserStatusRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.UserService;
-import org.assertj.core.api.Assertions;
+import com.sprint.mission.service.jcf.addOn.BinaryService;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +30,9 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 public class MessageTest {
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private MessageMapper messageMapper;
@@ -36,7 +46,15 @@ public class MessageTest {
     @Autowired
     private ChannelService channelService;
     @Autowired
-    private BinarycontentRepository binarycontentRepository;
+    private BinaryContentRepository binarycontentRepository;
+    @Autowired
+    private BinaryService binaryService;
+    @Autowired
+    private BinaryContentRepository binaryContentRepository;
+    @Autowired
+    private MessageRepository messageRepository;
+    @Autowired
+    private UserStatusRepository userStatusRepository;
 
 
     @Test
@@ -52,13 +70,13 @@ public class MessageTest {
 
         // when
         Message createdMessage = messageService.create(testMessageDto, new ArrayList<>());
-        System.out.println("======================EntityGraph 쿼리 시작======================");
-        List<Message> allByChannelId = messageService.findAllByChannelId(publicChannel.getId());
-        System.out.println("======================EntityGraph 쿼리 끝======================");
-
-        // then
-        assertThat(allByChannelId.size()).isEqualTo(1);
-        assertThat(createdMessage.getId()).isEqualTo(allByChannelId.get(0).getId());
+//        System.out.println("======================EntityGraph 쿼리 시작======================");
+//        List<Message> allByChannelId = messageService.findAllByChannelId(publicChannel.getId());
+//        System.out.println("======================EntityGraph 쿼리 끝======================");
+//
+//        // then
+//        assertThat(allByChannelId.size()).isEqualTo(1);
+//        assertThat(createdMessage.getId()).isEqualTo(allByChannelId.get(0).getId());
         assertThat(createdMessage.getAuthor().getId()).isEqualTo(testMessageDto.userId());
         assertThat(createdMessage.getContent()).isEqualTo(testMessageDto.content());
     }
@@ -101,7 +119,38 @@ public class MessageTest {
 
     }
 
+    @Test
+    @Transactional
     void setting(){
+
+        UserDtoForCreate userDtoForCreate = new UserDtoForCreate("testUser", "testPassword", "testEmail");
+        User createdUser = userService.create(userDtoForCreate, null);
+
+        PublicChannelCreateDTO publicChannelCreateDTO = new PublicChannelCreateDTO("testChannel", "testChannelName");
+        Channel publicChannel = channelService.createPublicChannel(publicChannelCreateDTO);
+
+        List<Message> messageList = new ArrayList<>();
+        Pageable pageable = Pageable.ofSize(50);
+        for (int i = 0; i < 102; i++) {
+            String fileNumber = i + "테스트 용 bytes";
+            messageList.add(new Message(publicChannel, createdUser, "testMessage" + i));
+        }
+        messageRepository.saveAll(messageList);
+        // 중간 점검
+        List<UserStatus> userStatusList = userStatusRepository.findAll();
+        System.out.println("userStatusList = " + userStatusList);
+        assertThat(messageList.size()).isEqualTo(102);
+        assertThat(userStatusList.get(0).getUser()).isEqualTo(createdUser);
+        em.flush();
+        em.clear();
+
+//        List<Message> savedMessageInChannel = messageRepository.findAllByChannel_Id(publicChannel.getId());
+//        assertThat(savedMessageInChannel.size()).isEqualTo(102);
+        System.out.println("messageList.get(0).getAuthor().getStatus() = " + messageList.get(0).getAuthor().getStatus());
+
+        List<PageResponse<MessageDto>> pageResponseList = messageService.findAllByChannelId(publicChannel.getId(), pageable);
+        System.out.println("pageResponseList = " + pageResponseList);
+        assertThat(pageResponseList.size()).isEqualTo(3);
 
     }
 }

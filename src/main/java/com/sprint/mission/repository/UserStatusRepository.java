@@ -11,6 +11,8 @@ import java.util.UUID;
 
 public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
     Optional<UserStatus> findByUser(User user);
+
+    boolean existsByUser(User user);
 }
 //  UserStatus save(UserStatus userStatus);
 //

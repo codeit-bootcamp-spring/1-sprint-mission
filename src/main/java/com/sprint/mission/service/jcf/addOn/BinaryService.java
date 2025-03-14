@@ -6,15 +6,11 @@ import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
-import com.sprint.mission.repository.BinarycontentRepository;
+import com.sprint.mission.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BinaryService {
 
-    private final BinarycontentRepository binaryContentRepository;
+    private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
 

@@ -1,8 +1,10 @@
 package com.sprint.mission.dto;
 
-import com.sprint.mission.dto.mappedDto.BinaryContentDto;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
+import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.main.Message;
+import com.sprint.mission.entity.main.User;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
@@ -42,12 +44,19 @@ public class BinaryContentMapperImpl implements BinaryContentMapper {
             return null;
         }
 
-        BinaryContent.BinaryContentBuilder binaryContent = BinaryContent.builder();
+        String fileName = null;
+        String contentType = null;
+        Long size = null;
 
-        binaryContent.fileName( request.fileName() );
-        binaryContent.contentType( request.contentType() );
-        binaryContent.size( request.size() );
+        fileName = request.fileName();
+        contentType = request.contentType();
+        size = request.size();
 
-        return binaryContent.build();
+        User user = null;
+        Message message = null;
+
+        BinaryContent binaryContent = new BinaryContent( fileName, contentType, size, user, message );
+
+        return binaryContent;
     }
 }

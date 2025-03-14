@@ -25,10 +25,9 @@ public class UserStatusService {
 
     // DTO로 파라미터 그룹화
     public UserStatus create(User user) {
-        if (userStatusRepository.existsById(user.getId()))
+        if (userStatusRepository.existsByUser(user))
             throw new CustomException(ErrorCode.ALREADY_EXIST_USER_STATUS);
-        return new UserStatus(user);
-        //return userStatusRepository.save(new UserStatus(user));
+        return userStatusRepository.save(new UserStatus(user));
     }
 
     // 나중에 바꾸기

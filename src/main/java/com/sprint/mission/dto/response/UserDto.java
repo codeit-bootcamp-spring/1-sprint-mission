@@ -1,7 +1,6 @@
-package com.sprint.mission.dto.mappedDto;
+package com.sprint.mission.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
 
 import java.util.UUID;
 

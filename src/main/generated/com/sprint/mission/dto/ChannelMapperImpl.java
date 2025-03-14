@@ -1,8 +1,8 @@
 package com.sprint.mission.dto;
 
-import com.sprint.mission.dto.mappedDto.ChannelDto;
-import com.sprint.mission.dto.mappedDto.UserDto;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
+import com.sprint.mission.dto.response.ChannelDto;
+import com.sprint.mission.dto.response.UserDto;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import java.time.Instant;
@@ -47,15 +47,18 @@ public class ChannelMapperImpl implements ChannelMapper {
             return null;
         }
 
-        Channel.ChannelBuilder channel = Channel.builder();
-
+        String name = null;
+        String description = null;
         if ( request != null ) {
-            channel.name( request.name() );
-            channel.description( request.description() );
+            name = request.name();
+            description = request.description();
         }
-        channel.channelType( channelType );
+        ChannelType channelType1 = null;
+        channelType1 = channelType;
 
-        return channel.build();
+        Channel channel = new Channel( name, description, channelType1 );
+
+        return channel;
     }
 
     @Override
@@ -64,10 +67,15 @@ public class ChannelMapperImpl implements ChannelMapper {
             return null;
         }
 
-        Channel.ChannelBuilder channel = Channel.builder();
+        ChannelType channelType1 = null;
 
-        channel.channelType( channelType );
+        channelType1 = channelType;
 
-        return channel.build();
+        String name = null;
+        String description = null;
+
+        Channel channel = new Channel( name, description, channelType1 );
+
+        return channel;
     }
 }

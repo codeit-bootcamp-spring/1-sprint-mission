@@ -1,6 +1,6 @@
 package com.sprint.mission.dto;
 
-import com.sprint.mission.dto.mappedDto.UserStatusDto;
+import com.sprint.mission.dto.response.UserStatusDto;
 import com.sprint.mission.entity.addOn.UserStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;

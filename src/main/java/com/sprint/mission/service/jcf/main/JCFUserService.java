@@ -8,6 +8,7 @@ import com.sprint.mission.dto.UserMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.UserRepository;
@@ -50,9 +51,9 @@ public class JCFUserService implements UserService {
             return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
         }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
 
-        userRepository.save(createdUser);// SAVE해야 UUID 생성
-        userStatusService.create(createdUser);
-        return createdUser;
+        User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
+        UserStatus userStatus = userStatusService.create(savedUser);
+        return savedUser.createStatus(userStatus);
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기

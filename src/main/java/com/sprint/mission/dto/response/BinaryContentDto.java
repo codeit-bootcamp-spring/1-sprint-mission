@@ -1,4 +1,4 @@
-package com.sprint.mission.dto.mappedDto;
+package com.sprint.mission.dto.response;
 
 import java.util.UUID;
 

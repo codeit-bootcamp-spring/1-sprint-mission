@@ -4,7 +4,7 @@ import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
 import com.sprint.mission.dto.UserMapper;
 
-import com.sprint.mission.dto.mappedDto.UserDto;
+import com.sprint.mission.dto.response.UserDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.UserStatus;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;

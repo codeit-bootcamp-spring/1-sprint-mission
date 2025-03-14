@@ -1,4 +1,4 @@
-package com.sprint.mission.dto.mappedDto;
+package com.sprint.mission.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -14,7 +14,6 @@ public record MessageDto(
         UUID channelId,
         UserDto author,
         List<BinaryContentDto> attachments) {
-
 }
 
 //public class Message  extends BaseUpdatableEntity{

@@ -1,8 +1,8 @@
 package com.sprint.mission.dto;
 
-import com.sprint.mission.dto.mappedDto.BinaryContentDto;
-import com.sprint.mission.dto.mappedDto.MessageDto;
-import com.sprint.mission.dto.mappedDto.UserDto;
+import com.sprint.mission.dto.response.BinaryContentDto;
+import com.sprint.mission.dto.response.MessageDto;
+import com.sprint.mission.dto.response.UserDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
@@ -27,19 +27,19 @@ public class MessageMapperImpl implements MessageMapper {
         }
 
         UUID channelId = null;
+        UserDto author = null;
         UUID id = null;
         Instant createdAt = null;
         Instant updatedAt = null;
         String content = null;
-        UserDto author = null;
         List<BinaryContentDto> attachments = null;
 
         channelId = messageChannelId( message );
+        author = userToUserDto( message.getAuthor() );
         id = message.getId();
         createdAt = message.getCreatedAt();
         updatedAt = message.getUpdatedAt();
         content = message.getContent();
-        author = userToUserDto( message.getAuthor() );
         attachments = binaryContentListToBinaryContentDtoList( message.getAttachments() );
 
         MessageDto messageDto = new MessageDto( id, createdAt, updatedAt, content, channelId, author, attachments );

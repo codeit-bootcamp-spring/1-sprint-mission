@@ -1,6 +1,6 @@
 package com.sprint.mission.dto;
 
-import com.sprint.mission.dto.mappedDto.ReadStatusDto;
+import com.sprint.mission.dto.response.ReadStatusDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import java.time.Instant;
 import java.util.UUID;

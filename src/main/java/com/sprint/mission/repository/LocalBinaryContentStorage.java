@@ -1,8 +1,6 @@
 package com.sprint.mission.repository;
 
-import com.sprint.mission.common.CommonResponse;
-import com.sprint.mission.dto.mappedDto.BinaryContentDto;
-import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
+import com.sprint.mission.dto.response.BinaryContentDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -12,10 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
