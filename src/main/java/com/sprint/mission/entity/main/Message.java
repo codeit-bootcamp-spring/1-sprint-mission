@@ -15,10 +15,9 @@ import static jakarta.persistence.FetchType.*;
 
 @Entity
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@AllArgsConstructor
 @EqualsAndHashCode(of = {"content", "author", "channel"}, callSuper = true)
 @ToString(of = "content")
-@Getter @Builder
+@Getter
 @Schema(description = "메시지 엔티티")
 @Table(name = "messages")
 public class Message  extends BaseUpdatableEntity{

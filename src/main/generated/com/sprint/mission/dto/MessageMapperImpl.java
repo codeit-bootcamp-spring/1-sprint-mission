@@ -3,7 +3,6 @@ package com.sprint.mission.dto;
 import com.sprint.mission.dto.mappedDto.BinaryContentDto;
 import com.sprint.mission.dto.mappedDto.MessageDto;
 import com.sprint.mission.dto.mappedDto.UserDto;
-import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
@@ -77,22 +76,16 @@ public class MessageMapperImpl implements MessageMapper {
             return null;
         }
 
-        Message.MessageBuilder message = Message.builder();
+        Channel channel1 = null;
+        channel1 = channel;
+        String content1 = null;
+        content1 = content;
 
-        message.channel( channel );
-        message.author( author );
-        message.content( content );
+        User user = null;
 
-        return message.build();
-    }
+        Message message = new Message( channel1, user, content1 );
 
-    @Override
-    public Message update(MessageDtoForUpdate updateDto, Message updatingMessage) {
-        if ( updateDto == null ) {
-            return updatingMessage;
-        }
-
-        return updatingMessage;
+        return message;
     }
 
     private UUID messageChannelId(Message message) {

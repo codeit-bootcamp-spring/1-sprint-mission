@@ -41,7 +41,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel createPublicChannel(PublicChannelCreateDTO request) {
         log.info("createPublicChannel = {}", request);
-        return channelRepository.save(channelMapper.toPublicEntity(request));
+        return channelRepository.save(channelMapper.toPublicEntity(request, PUBLIC));
     }
 
     @Override

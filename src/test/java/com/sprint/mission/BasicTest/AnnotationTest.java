@@ -11,7 +11,7 @@ public class AnnotationTest {
 
     @Test
     void toStringTest() {
-        User user = new User("testName", "testEmail", "testPassword");
+        User user = new User("testName", "testEmail", "testPassword", null);
         System.out.println("user = " + user);
         //user = User(id=3cae1ede-9fc9-4449-b9ce-3f4fb6e44fc4, name=testName, email=testPassword, password=testEmail, profileImgId=null)
 

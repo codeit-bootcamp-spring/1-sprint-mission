@@ -37,7 +37,7 @@ public class AllChannel {
 
     @BeforeEach
     void setting() {
-        User user = new User("testUser", "testPassword", "testEmail");
+        User user = new User("testUser", "testPassword", "testEmail", null);
         userRepository.save(user);
         Channel channel = new Channel("testChannel ", "testChannelName", ChannelType.PUBLIC);
         channelRepository.save(channel);
@@ -83,7 +83,7 @@ public class AllChannel {
         // Fetch all channels for the user
         em.flush();
         em.clear();
-        User user = new User("또다른 유저", "또 다른 패스워드", "또 다른 이메일");
+        User user = new User("또다른 유저", "또 다른 패스워드", "또 다른 이메일", null);
         userRepository.save(user);
         Channel channel = new Channel("testChannel ", "testChannelName", ChannelType.PUBLIC);
         channelRepository.save(channel);

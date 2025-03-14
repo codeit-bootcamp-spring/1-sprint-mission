@@ -17,11 +17,7 @@ public interface ChannelMapper {
     ChannelDto toDto(Channel channel);
 
     //@Mapping(target = ".", expression = "java(Channel.createChannel(request.name, request.description, PUBLIC))")
-    default Channel toPublicEntity(PublicChannelCreateDTO request){
-        return new Channel(request.name(), request.description(), ChannelType.PUBLIC);
-    };
+    Channel toPublicEntity(PublicChannelCreateDTO request, ChannelType channelType);
 
-    default Channel toPrivateEntity(ChannelType channelType){
-        return new Channel(channelType);
-    }
+    Channel toPrivateEntity(ChannelType channelType);
 }

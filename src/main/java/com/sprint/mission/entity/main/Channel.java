@@ -18,9 +18,8 @@ import static jakarta.persistence.CascadeType.*;
 @Entity
 @EqualsAndHashCode(of = {"channelType", "name"}, callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@AllArgsConstructor
 @ToString(of = {"channelType", "name", "description"})
-@Getter @Builder
+@Getter
 @Schema(description = "채널")
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity{
@@ -36,10 +35,6 @@ public class Channel extends BaseUpdatableEntity{
         this.name = name;
         this.channelType = channelType;
         this.description = description;
-    }
-
-    public Channel(ChannelType channelType) {
-        this.channelType = channelType;
     }
 
     public void update(String newName, String newDescription) {

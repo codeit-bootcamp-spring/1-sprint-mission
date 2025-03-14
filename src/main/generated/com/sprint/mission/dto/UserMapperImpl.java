@@ -44,13 +44,19 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        User.UserBuilder user = User.builder();
+        String username = null;
+        String password = null;
+        String email = null;
 
-        user.username( userDto.username() );
-        user.email( userDto.email() );
-        user.password( userDto.password() );
+        username = userDto.username();
+        password = userDto.password();
+        email = userDto.email();
 
-        return user.build();
+        BinaryContent profile = null;
+
+        User user = new User( username, password, email, profile );
+
+        return user;
     }
 
     @Override
@@ -59,16 +65,20 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
 
-        User.UserBuilder user = User.builder();
-
+        String username = null;
+        String password = null;
+        String email = null;
         if ( userDto != null ) {
-            user.username( userDto.username() );
-            user.email( userDto.email() );
-            user.password( userDto.password() );
+            username = userDto.username();
+            password = userDto.password();
+            email = userDto.email();
         }
-        user.profile( profile );
+        BinaryContent profile1 = null;
+        profile1 = profile;
 
-        return user.build();
+        User user = new User( username, password, email, profile1 );
+
+        return user;
     }
 
     protected BinaryContentDto binaryContentToBinaryContentDto(BinaryContent binaryContent) {

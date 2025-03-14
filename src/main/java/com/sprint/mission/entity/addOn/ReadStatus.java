@@ -17,7 +17,7 @@ import static jakarta.persistence.FetchType.*;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString(of = {"lastReadAt"})
-@Getter @Builder
+@Getter
 @Schema(description = "메시지 읽음 상태 정보")
 @Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {

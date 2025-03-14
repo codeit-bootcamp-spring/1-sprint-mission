@@ -86,7 +86,7 @@ public class UserTest {
         System.out.println("savedUser = " + savedUser + "ID = " + savedUser.getId());
         Assertions.assertThat(createdUser).isEqualTo(createdUser);
 
-        User user = new User(createdUser1.getUsername(), createdUser1.getPassword(), createdUser1.getEmail());
+        User user = new User(createdUser1.getUsername(), createdUser1.getPassword(), createdUser1.getEmail(), null);
         //user.setId(createdUser1.getId());
 
         em.flush();
@@ -98,17 +98,17 @@ public class UserTest {
 
     @Test
     void duplicateUserTest() {
-        User user = new User("test 유저 1", "test 패스워드 1", "test 이메일 1");
+        User user = new User("test 유저 1", "test 패스워드 1", "test 이메일 1", null);
         userRepository.save(user);
 
-        User nameDuplicatedUser = new User("test 유저 1", "test 패스워드 1", "test 이메일1111");
+        User nameDuplicatedUser = new User("test 유저 1", "test 패스워드 1", "test 이메일1111", null);
         assertThatThrownBy(() -> userService.isDuplicateNameEmail(nameDuplicatedUser.getUsername(), nameDuplicatedUser.getEmail()))
                 .isInstanceOf(CustomException.class);
     }
 
     @Test
     void updateUser() {
-        User beforeUpdateUser = new User("업데이트 전 이름", "업데이트 전 비밀번호", "업데이트 전 이메일");
+        User beforeUpdateUser = new User("업데이트 전 이름", "업데이트 전 비밀번호", "업데이트 전 이메일", null);
         userRepository.save(beforeUpdateUser);
         em.flush();
         em.clear();
@@ -133,7 +133,7 @@ public class UserTest {
 
     @Test
     void delete() {
-        User beforeDeleteUser = new User("삭제 전 이름", "삭제 전 비밀번호", "삭제 전 이메일");
+        User beforeDeleteUser = new User("삭제 전 이름", "삭제 전 비밀번호", "삭제 전 이메일", null);
         userRepository.save(beforeDeleteUser);
         em.flush();
         em.clear();
