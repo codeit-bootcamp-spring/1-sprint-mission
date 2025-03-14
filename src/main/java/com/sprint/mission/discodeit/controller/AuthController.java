@@ -17,7 +17,7 @@ public class AuthController {
 
   private final AuthService authService;
 
-  @Operation(summary = "사용자 로그인", description = "사용자가 로그인하면 인증된 사용자 정보를 반환합니다.")
+  @Operation(summary = "로그인", description = "사용자가 로그인하면 인증된 사용자 정보를 반환합니다.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "로그인 성공"),
       @ApiResponse(responseCode = "401", description = "인증 실패"),

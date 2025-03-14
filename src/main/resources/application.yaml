@@ -16,13 +16,17 @@ spring:
 
   jpa:
     open-in-view: false
+    generate_statistics: true
     database: postgresql
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        highlight_sql: true # ANSI 코드에 색을 나타낸다
+        use_sql_comments: true
+        format_sql: true
 
 file:
   path:

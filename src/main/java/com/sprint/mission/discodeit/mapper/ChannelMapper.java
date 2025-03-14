@@ -23,6 +23,8 @@ public interface ChannelMapper {
     return channel.getId();
   }
 
+  List<ChannelResponse> toChannelResponseList(List<Channel> channels);
+
   @Mapping(source = "id", target = "channelId")
   @Mapping(source = "private", target = "isPrivate")
   @Mapping(source = "users", target = "userList")

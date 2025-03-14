@@ -107,6 +107,12 @@ public class BasicChannelService implements ChannelService {
     return ChannelMapper.INSTANCE.toChannelResponse(channelRepository.save(channel));
   }
 
+  @Override
+  public List<ChannelResponse> getChannelsByUserId(UUID userId) {
+    return ChannelMapper.INSTANCE.toChannelResponseList(
+        channelRepository.findAllByUsers_Id(userId));
+  }
+
   private Channel getOrCreateChannel(String channelName) {
     return Optional.ofNullable(channelRepository.findByChannelName(channelName))
         .orElseGet(() -> channelRepository.save(new Channel(channelName, false)));

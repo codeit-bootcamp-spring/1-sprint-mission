@@ -29,4 +29,6 @@ public interface ChannelService {
   void deleteChannel(UUID uuid);
 
   ChannelResponse createPrivateChannel(CreatePrivateChannelRequest request);
+
+  List<ChannelResponse> getChannelsByUserId(UUID userId);
 }

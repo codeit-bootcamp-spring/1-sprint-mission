@@ -36,17 +36,17 @@ public class BinaryContent extends BaseEntity implements Serializable {
     this.filePath = filePath;
   }
 
+  public BinaryContent(String fileName, String contentType) {
+    this.createdAt = Instant.now();
+    this.fileName = fileName;
+    this.mimeType = contentType;
+  }
+
   public BinaryContent(UUID fileId, String fileName, String mimeType, String filePath) {
     this.id = fileId;
     this.createdAt = Instant.now();
     this.fileName = fileName;
     this.mimeType = mimeType;
     this.filePath = filePath;
-  }
-
-  public BinaryContent(String fileName, String contentType) {
-    this.createdAt = Instant.now();
-    this.fileName = fileName;
-    this.mimeType = contentType;
   }
 }

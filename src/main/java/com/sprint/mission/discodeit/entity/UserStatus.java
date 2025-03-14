@@ -1,18 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.*;
+import static com.sprint.mission.discodeit.entity.Status.CONNECTED;
+import static com.sprint.mission.discodeit.entity.Status.DISCONNECTED;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
+import java.time.Duration;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.UUID;
-
-import static com.sprint.mission.discodeit.entity.Status.CONNECTED;
-import static com.sprint.mission.discodeit.entity.Status.DISCONNECTED;
 
 @Getter
 @Entity

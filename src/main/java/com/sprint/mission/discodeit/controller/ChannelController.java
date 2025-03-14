@@ -15,11 +15,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "채널 관리", description = "채널 관련 API")
+@Tag(name = "Channel", description = "채널 관련 API")
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
@@ -61,6 +62,18 @@ public class ChannelController {
   @GetMapping
   public ResponseEntity<List<ChannelResponse>> getChannels() {
     List<ChannelResponse> channels = channelService.getChannelsResponse();
+    return ResponseEntity.ok(channels);
+  }
+
+  @Operation(summary = "User가 참여 중인 Channel 목록 조회")
+  @ApiResponse(responseCode = "200", description = "Channel 목록 조회 성공",
+      content = @Content(mediaType = "application/json",
+          schema = @Schema(implementation = ChannelResponse.class)))
+  @GetMapping("/userId")
+  public ResponseEntity<List<ChannelResponse>> findAll_1(
+      @Parameter(description = "검색할 userId") @RequestParam UUID userId
+  ) {
+    List<ChannelResponse> channels = channelService.getChannelsByUserId(userId);
     return ResponseEntity.ok(channels);
   }
 
