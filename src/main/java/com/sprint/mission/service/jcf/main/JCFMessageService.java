@@ -123,13 +123,14 @@ public class JCFMessageService implements MessageService {
         ScrollPosition position = ScrollPosition.keyset();
 
         while (true){
-            Window<MessageDto> messageDtoWindow = messageRepository.findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, (KeysetScrollPosition) position)
+            Window<MessageDto> messageDtoWindow = messageRepository
+                    .findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, (KeysetScrollPosition) position)
                     .map(messageMapper::toDto);
 
             messageDtoList.add(pageResponseMapper.toScrollPageResponse(messageDtoWindow, position, totalMessageCount));
 
             // 포지션 초기화
-            position = getScrollPosition(messageDtoWindow.getContent().getLast());
+            position = getScrollPosition(messageDtoWindow);
             if (!messageDtoWindow.hasNext()) {
                 break;
             }
@@ -137,7 +138,8 @@ public class JCFMessageService implements MessageService {
         return messageDtoList;
     }
 
-    private ScrollPosition getScrollPosition(MessageDto lastDto) {
+    private ScrollPosition getScrollPosition(Window<MessageDto> messageDtoWindow) {
+        MessageDto lastDto = messageDtoWindow.getContent().getLast();
         Map<String, Object> keysetMap = new HashMap<>();
         keysetMap.put("createdAt", lastDto.createdAt());
         keysetMap.put("id", lastDto.id());

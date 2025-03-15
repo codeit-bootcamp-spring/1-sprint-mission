@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/ScrollPageResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/PageResponseMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/PageResponseMapperImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/PageResponseMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/PageResponseMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/MessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/MessageRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/MessageTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/MessageTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -82,6 +75,11 @@
     &quot;accountId&quot;: &quot;c3b7675d-cb84-4590-9844-f892f30550c4&quot;
   }
 }</component>
+  <component name="JsbtTreeLayoutManager">
+    <layout place="tools.popupGrunt">
+      <scroll-view-position x="0" y="0" />
+    </layout>
+  </component>
   <component name="PackageJsonUpdateNotifier">
     <dismissed value="$PROJECT_DIR$/react-project/package.json" />
   </component>
@@ -356,7 +354,7 @@
       <workItem from="1741915769167" duration="2252000" />
       <workItem from="1741918080914" duration="2916000" />
       <workItem from="1741925536804" duration="12564000" />
-      <workItem from="1742033379175" duration="9169000" />
+      <workItem from="1742033379175" duration="9835000" />
     </task>
     <servers />
   </component>
