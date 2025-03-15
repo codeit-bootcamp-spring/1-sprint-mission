@@ -119,6 +119,7 @@ public class JCFMessageService implements MessageService {
 
         List<ScrollPageResponse<MessageDto>> messageDtoList = new ArrayList<>();
 
+        // 매번 새 페이지마다 요청할지 아니면 한번에 다 가져올지 고민 (중간에 총개수가 바뀔 수 있으니)
         Long totalMessageCount = messageRepository.countByChannel_Id(channelId);
         ScrollPosition position = ScrollPosition.keyset();
 
@@ -138,13 +139,6 @@ public class JCFMessageService implements MessageService {
         return messageDtoList;
     }
 
-    private ScrollPosition getScrollPosition(Window<MessageDto> messageDtoWindow) {
-        MessageDto lastDto = messageDtoWindow.getContent().getLast();
-        Map<String, Object> keysetMap = new HashMap<>();
-        keysetMap.put("createdAt", lastDto.createdAt());
-        keysetMap.put("id", lastDto.id());
-        return ScrollPosition.forward(keysetMap);
-    }
 
     @Override
     public void delete(UUID messageId) {
@@ -161,5 +155,14 @@ public class JCFMessageService implements MessageService {
     @Override
     public void deleteAllByChannelId(UUID channelId) {
         messageRepository.deleteAllByChannel_Id(channelId);
+    }
+
+
+    private ScrollPosition getScrollPosition(Window<MessageDto> messageDtoWindow) {
+        MessageDto lastDto = messageDtoWindow.getContent().getLast();
+        Map<String, Object> keysetMap = new HashMap<>();
+        keysetMap.put("createdAt", lastDto.createdAt());
+        keysetMap.put("id", lastDto.id());
+        return ScrollPosition.forward(keysetMap);
     }
 }
