@@ -15,6 +15,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "messages")
@@ -25,13 +27,14 @@ public class Message extends BaseUpdatableEntity {
   @Column(columnDefinition = "TEXT")
   private String content;
 
-  //  @ManyToOne(cascade = CascadeType.REMOVE)
   @ManyToOne
   @JoinColumn(name = "channel_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private Channel channel;
 
   @ManyToOne
   @JoinColumn(name = "author_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
   private User author;
 
   @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)

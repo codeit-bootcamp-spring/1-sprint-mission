@@ -103,8 +103,6 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void deleteById(UUID id) {
-    messageRepository.findAllByChannelId(id);
-    readStatusService.deleteAllByChannelId(id);
     channelRepository.deleteById(id);
   }
 
