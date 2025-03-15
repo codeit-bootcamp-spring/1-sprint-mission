@@ -12,6 +12,9 @@ public class UserMapper {
   private final BinaryContentMapper binaryContentMapper;
 
   public UserResponse entityToDto(User user) {
+    if (user == null) {
+      return null;
+    }
     return UserResponse.builder()
         .id(user.getId())
         .username(user.getUsername())

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.MessageApiDocs;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
@@ -54,7 +55,7 @@ public class MessageController implements MessageApiDocs {
 
   @GetMapping
   @Override
-  public ResponseEntity<CustomApiResponse<List<MessageResponse>>> getMessageListByChannel(
+  public ResponseEntity<CustomApiResponse<PageResponse<MessageResponse>>> getMessageListByChannel(
       @RequestParam("channelId") UUID channelId) {
     return ResponseEntity.ok(
         CustomApiResponse.success(messageService.findAllByChannelId(channelId))

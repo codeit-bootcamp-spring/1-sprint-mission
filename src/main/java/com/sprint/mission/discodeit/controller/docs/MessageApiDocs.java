@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.docs;
 
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
@@ -85,5 +86,6 @@ public interface MessageApiDocs {
           content = @Content(schema = @Schema(implementation = ErrorResponse.class))
       )
   })
-  ResponseEntity<CustomApiResponse<List<MessageResponse>>> getMessageListByChannel(UUID channelId);
+  ResponseEntity<CustomApiResponse<PageResponse<MessageResponse>>> getMessageListByChannel(
+      UUID channelId);
 }
