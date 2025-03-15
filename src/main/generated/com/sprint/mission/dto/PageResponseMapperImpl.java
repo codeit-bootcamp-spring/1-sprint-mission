@@ -44,7 +44,7 @@ public class PageResponseMapperImpl implements PageResponseMapper {
     }
 
     @Override
-    public ScrollPageResponse<MessageDto> fromScrollPage(Window<MessageDto> window, ScrollPosition nextCursor, Long totalElements) {
+    public ScrollPageResponse<MessageDto> toScrollPageResponse(Window<MessageDto> window, ScrollPosition nextCursor, Long totalElements) {
         if ( window == null && nextCursor == null && totalElements == null ) {
             return null;
         }

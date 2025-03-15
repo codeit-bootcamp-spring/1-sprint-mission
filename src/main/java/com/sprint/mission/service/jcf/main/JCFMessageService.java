@@ -24,7 +24,6 @@ import com.sprint.mission.service.jcf.addOn.BinaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
-import org.springframework.data.support.WindowIterator;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -121,13 +120,16 @@ public class JCFMessageService implements MessageService {
         List<ScrollPageResponse<MessageDto>> messageDtoList = new ArrayList<>();
 
         Long totalMessageCount = messageRepository.countByChannel_Id(channelId);
-        KeysetScrollPosition position = ScrollPosition.keyset();
+        ScrollPosition position = ScrollPosition.keyset();
 
         while (true){
-            Window<MessageDto> messageDtoWindow = messageRepository.findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, position)
+            Window<MessageDto> messageDtoWindow = messageRepository.findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, (KeysetScrollPosition) position)
                     .map(messageMapper::toDto);
-            messageDtoList.add(pageResponseMapper.fromScrollPage(messageDtoWindow, getScrollPosition(messageDtoWindow.getContent().getLast()), totalMessageCount));
-            //messageDtoList.add(new ScrollPageResponse<>(content, nextCursor, size, hasNext, totalMessageCount));
+
+            messageDtoList.add(pageResponseMapper.toScrollPageResponse(messageDtoWindow, position, totalMessageCount));
+
+            // 포지션 초기화
+            position = getScrollPosition(messageDtoWindow.getContent().getLast());
             if (!messageDtoWindow.hasNext()) {
                 break;
             }
