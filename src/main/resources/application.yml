@@ -21,7 +21,7 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: %{user.dir}/binaryContents
+      root-path: ${user.dir}/binaryContents
 
 logging:
   #  file:

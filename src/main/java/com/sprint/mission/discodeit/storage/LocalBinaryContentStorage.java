@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @ConditionalOnProperty(value = "discodeit.storage.type", havingValue = "local", matchIfMissing = false)
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -76,15 +78,17 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentResponse binaryContentResponse) {
-    Resource resource = new InputStreamResource(get(binaryContentResponse.id()));
+    InputStream inputStream = get(binaryContentResponse.id());
+    InputStreamResource resource = new InputStreamResource(inputStream);
 
     return ResponseEntity.status(HttpStatus.OK)
         .header(
             HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename="
-                + binaryContentResponse.fileName()
-                + getExtension(binaryContentResponse.contentType()))
-        .contentType(new MediaType(binaryContentResponse.contentType()))
+            "attachment; filename=\""
+                + binaryContentResponse.fileName() + "\"")
+//                + getExtension(binaryContentResponse.contentType()))
+//        .contentType(new MediaType(binaryContentResponse.contentType()))
+        .contentType(MediaType.valueOf(binaryContentResponse.contentType()))
         .body(resource);
   }
 
