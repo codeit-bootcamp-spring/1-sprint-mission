@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import lombok.Getter;
 
@@ -8,39 +9,24 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-
+public class ReadStatus extends BaseUpdatableEntity {
+    // TODO: channelId, userId 변수 및 관련 로직 제거
     private UUID channelId;
     private UUID userId;
+
+    private User user;
+    private Channel channel;
     private Instant lastReadAt;
 
-    public ReadStatus(UUID channelId, UUID userId, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-
-        this.channelId = channelId;
-        this.userId = userId;
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = user;
+        this.channel = channel;
         this.lastReadAt = lastReadAt;
     }
 
-    public void updateUpdatedAt() {
-        this.updatedAt = Instant.now();
-    }
-
     public void update(Instant lastReadAt) {
-        boolean updated = false;
         if (lastReadAt != null && !lastReadAt.equals(this.lastReadAt)) {
             this.lastReadAt = lastReadAt;
-            updated = true;
-        }
-
-        if (updated) {
-            updateUpdatedAt();
         }
     }
 

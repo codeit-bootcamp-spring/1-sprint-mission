@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -8,38 +9,29 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Message implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private final UUID id;
-    private final Instant createdAt;
-
-    private Instant updatedAt;
+public class Message extends BaseUpdatableEntity {
+    // TODO: authorId, channelId, attachmentsIds 변수 및 관련 로직 제거
     private final UUID authorId;
     private final UUID channelId;
-
-    private String content;
     private List<UUID> attachmentsIds;
 
-    public Message(String content, UUID authorId, UUID channelId, List<UUID> attachmentsIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+    private String content;
 
-        this.authorId = authorId;
-        this.channelId = channelId;
+    private Channel channel;
+    private User author;
+    private List<BinaryContent> attachments;
 
+    public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
         this.content = content;
-        this.attachmentsIds = attachmentsIds;
-    }
 
-    public void updateUpdatedAt() {
-        updatedAt = Instant.now();
+        this.channel = channel;
+        this.author = author;
+        this.attachments = attachments;
     }
 
     public void updateContent(String content) {
         if (!this.content.equals(content)) {
             this.content = content;
-            updateUpdatedAt();
         }
     }
 

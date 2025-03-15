@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import lombok.Getter;
@@ -10,85 +11,62 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-
+public class User extends BaseUpdatableEntity {
+    // TODO: profileId 변수 및 관련 로직 제거
     private UUID profileId;
+
     private String username;
     private String email;
     private String password;
 
-    public User(UUID profileId, String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+    private BinaryContent profile;
+    private UserStatus status;
 
-        this.profileId = profileId;
+    public User(String username, String email, String password, BinaryContent profile, UserStatus status) {
         this.username = username;
         this.email = email;
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
-    }
 
-    public void updateUpdatedAt() {
-        this.updatedAt = Instant.now();
+        this.profile = profile;
+        this.status = status;
     }
 
     public void update(UUID binaryContentId, String name, String email, String password) {
-        boolean updated = false;
-        if (updateBinaryContentId(binaryContentId)) {
-            updated = true;
-        }
-        if (updateName(name)) {
-            updated = true;
-        }
-        if (updateEmail(email)) {
-            updated = true;
-        }
-        if (updatePassword(password)) {
-            updated = true;
-        }
-
-        if (updated) {
-            updateUpdatedAt();
-        }
+        updateBinaryContentId(binaryContentId);
+        updateName(name);
+        updateEmail(email);
+        updatePassword(password);
     }
 
-    public boolean updateBinaryContentId(UUID profileId) {
+    public void updateBinaryContentId(UUID profileId) {
         if (profileId == null || this.profileId.equals(profileId)) {
-            return false;
+            return;
         }
         this.profileId = profileId;
-        return true;
     }
 
-    public boolean updateName(String username) {
+    public void updateName(String username) {
         if (username.isBlank() || this.username.equals(username)) {
-            return false;
+            return;
         }
         this.username = username;
-        return true;
     }
 
-    public boolean updateEmail(String email) {
+    public void updateEmail(String email) {
         if (email.isBlank() || this.email.equals(email)) {
-            return false;
+            return;
         }
         this.email = email;
-        return true;
     }
 
-    public boolean updatePassword(String newPassword) {
+    public void updatePassword(String newPassword) {
         String decodedPassword = new String(Base64.getDecoder().decode(this.password), StandardCharsets.UTF_8);
         if (newPassword.isBlank() || BCrypt.checkpw(newPassword, decodedPassword)) {
-            return false;
+            return;
         }
         String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
         this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
-        return true;
     }
 
     public boolean isSameName(String name) {
