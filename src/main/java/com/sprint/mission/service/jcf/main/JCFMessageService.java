@@ -7,6 +7,7 @@ import com.sprint.mission.dto.PageResponseMapper;
 import com.sprint.mission.dto.response.MessageDto;
 import com.sprint.mission.dto.response.PageResponse;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
+import com.sprint.mission.dto.response.ScrollPageResponse;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
@@ -22,13 +23,13 @@ import com.sprint.mission.service.jcf.addOn.BinaryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
+import org.springframework.data.support.WindowIterator;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
+//import java.util.*;
 
 @Slf4j
 @Service
@@ -109,25 +110,37 @@ public class JCFMessageService implements MessageService {
 
         return messageDtoList;
     }
-//
-//        Page<Message> paging = (Page<Message>) pageable;
-//        do {
-//            Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, paging);
-//            //paging = sliceMessage.getPageable();
-//        } while (paging.hasNext());
-//
-//        Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, pageable);
-//        sliceMessage.getNumberOfElements();
 
+    // 스크롤링
+    // CREATED_AT이 겹칠 경우 어떻게 해결해야하는지 (쿼리보면 spring data jpa가 id기준 정렬도 자동 추가해주나?)
+    public List<ScrollPageResponse<MessageDto>> findAllByChannelIdWithScroll(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+        }
 
+        List<ScrollPageResponse<MessageDto>> messageDtoList = new ArrayList<>();
 
-//    @Override
-//    public List<Message> findAllByChannelId(UUID channelId) {
-//        if (channelRepository.existsById(channelId)) {
-//            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-//        }
-//        return messageRepository.findAllByChannelId(channelId);
-//    }
+        Long totalMessageCount = messageRepository.countByChannel_Id(channelId);
+        KeysetScrollPosition position = ScrollPosition.keyset();
+
+        while (true){
+            Window<MessageDto> messageDtoWindow = messageRepository.findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, position)
+                    .map(messageMapper::toDto);
+            messageDtoList.add(pageResponseMapper.fromScrollPage(messageDtoWindow, getScrollPosition(messageDtoWindow.getContent().getLast()), totalMessageCount));
+            //messageDtoList.add(new ScrollPageResponse<>(content, nextCursor, size, hasNext, totalMessageCount));
+            if (!messageDtoWindow.hasNext()) {
+                break;
+            }
+        }
+        return messageDtoList;
+    }
+
+    private ScrollPosition getScrollPosition(MessageDto lastDto) {
+        Map<String, Object> keysetMap = new HashMap<>();
+        keysetMap.put("createdAt", lastDto.createdAt());
+        keysetMap.put("id", lastDto.id());
+        return ScrollPosition.forward(keysetMap);
+    }
 
     @Override
     public void delete(UUID messageId) {

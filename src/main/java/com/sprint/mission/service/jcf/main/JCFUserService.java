@@ -52,8 +52,7 @@ public class JCFUserService implements UserService {
         }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
 
         User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
-        UserStatus userStatus = userStatusService.create(savedUser);
-        return savedUser.createStatus(userStatus);
+        return savedUser.assignStatus(userStatusService.create(savedUser));
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기

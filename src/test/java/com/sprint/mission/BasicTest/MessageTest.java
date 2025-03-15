@@ -4,6 +4,7 @@ import com.sprint.mission.dto.MessageMapper;
 import com.sprint.mission.dto.response.MessageDto;
 import com.sprint.mission.dto.request.*;
 import com.sprint.mission.dto.response.PageResponse;
+import com.sprint.mission.dto.response.ScrollPageResponse;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
@@ -16,6 +17,7 @@ import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
+import com.sprint.mission.service.jcf.main.JCFMessageService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,7 @@ public class MessageTest {
     private MessageMapper messageMapper;
 
     @Autowired
-    private MessageService messageService;
+    private JCFMessageService messageService;
 
     @Autowired
     private UserService userService;
@@ -47,10 +49,7 @@ public class MessageTest {
     private ChannelService channelService;
     @Autowired
     private BinaryContentRepository binarycontentRepository;
-    @Autowired
-    private BinaryService binaryService;
-    @Autowired
-    private BinaryContentRepository binaryContentRepository;
+
     @Autowired
     private MessageRepository messageRepository;
     @Autowired
@@ -122,7 +121,6 @@ public class MessageTest {
     @Test
     @Transactional
     void setting(){
-
         UserDtoForCreate userDtoForCreate = new UserDtoForCreate("testUser", "testPassword", "testEmail");
         User createdUser = userService.create(userDtoForCreate, null);
 
@@ -131,7 +129,7 @@ public class MessageTest {
 
         List<Message> messageList = new ArrayList<>();
         Pageable pageable = Pageable.ofSize(50);
-        for (int i = 0; i < 102; i++) {
+        for (int i = 0; i < 122; i++) {
             String fileNumber = i + "테스트 용 bytes";
             messageList.add(new Message(publicChannel, createdUser, "testMessage" + i));
         }
@@ -139,7 +137,7 @@ public class MessageTest {
         // 중간 점검
         List<UserStatus> userStatusList = userStatusRepository.findAll();
         System.out.println("userStatusList = " + userStatusList);
-        assertThat(messageList.size()).isEqualTo(102);
+        assertThat(messageList.size()).isEqualTo(122);
         assertThat(userStatusList.get(0).getUser()).isEqualTo(createdUser);
         em.flush();
         em.clear();
@@ -148,9 +146,11 @@ public class MessageTest {
 //        assertThat(savedMessageInChannel.size()).isEqualTo(102);
         System.out.println("messageList.get(0).getAuthor().getStatus() = " + messageList.get(0).getAuthor().getStatus());
 
-        List<PageResponse<MessageDto>> pageResponseList = messageService.findAllByChannelId(publicChannel.getId(), pageable);
-        System.out.println("pageResponseList = " + pageResponseList);
-        assertThat(pageResponseList.size()).isEqualTo(3);
+
+
+        //List<PageResponse<MessageDto>> pageResponseList = messageService.findAllByChannelId(publicChannel.getId(), pageable);
+        List<ScrollPageResponse<MessageDto>> scrollPageList = messageService.findAllByChannelIdWithScroll(publicChannel.getId());
+        assertThat(scrollPageList.size()).isEqualTo(3);
 
     }
 }

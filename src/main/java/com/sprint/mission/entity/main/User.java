@@ -6,15 +6,11 @@ import com.sprint.mission.entity.addOn.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static jakarta.persistence.CascadeType.*;
-import static jakarta.persistence.FetchType.*;
 
 @Entity
 @EqualsAndHashCode(of = {"username", "email", "password"}, callSuper = true)
@@ -48,7 +44,7 @@ public class User extends BaseUpdatableEntity{
         this.profile = profile;
     }
 
-    public User createStatus(UserStatus status) {
+    public User assignStatus(UserStatus status) {
         this.status = status;
         return this;
     }
