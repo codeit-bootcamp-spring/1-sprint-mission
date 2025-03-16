@@ -1,114 +1,120 @@
-package com.sprint.mission.discodeit.repository.file;
-
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.UUID;
-
-@Repository
-@ConditionalOnProperty(name = "sprint-mission.repository.type", havingValue = "file")
-public class FileMessageRepository implements MessageRepository {
-
-  private static final String FILE_PATH = "files/messages.ser";
-  private Map<UUID, Message> messages;
-
-  public FileMessageRepository() {
-    this.messages = loadFromFile();
-  }
-
-  @Override
-  public Message save(Message message) {
-    messages.put(message.getId(), message);
-    saveToFile();
-    return message;
-  }
-
-  @Override
-  public Message findById(UUID messageId) {
-    return messages.get(messageId);
-  }
-
-//    @Override
-//    public Message findBySenderId(UUID senderId) {
-//        for (Message message : messages.values()) {
-//            if (message.getSenderId().equals(senderId)) {
-//                return message;
-//            }
-//        }
-//        return null;
+//package com.sprint.mission.discodeit.repository.file;
+//
+//import com.sprint.mission.discodeit.entity.Message;
+//import com.sprint.mission.discodeit.repository.MessageRepository;
+//import java.io.FileInputStream;
+//import java.io.FileOutputStream;
+//import java.io.IOException;
+//import java.io.ObjectInputStream;
+//import java.io.ObjectOutputStream;
+//import java.nio.file.Files;
+//import java.nio.file.Path;
+//import java.nio.file.Paths;
+//import java.util.List;
+//import java.util.Optional;
+//import java.util.UUID;
+//import java.util.stream.Stream;
+//import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+//import org.springframework.stereotype.Repository;
+//
+//@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+//@Repository
+//public class FileMessageRepository implements MessageRepository {
+//
+//  private final Path DIRECTORY;
+//  private final String EXTENSION = ".ser";
+//
+//  public FileMessageRepository(
+//      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+//  ) {
+//    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+//        Message.class.getSimpleName());
+//    if (Files.notExists(DIRECTORY)) {
+//      try {
+//        Files.createDirectories(DIRECTORY);
+//      } catch (IOException e) {
+//        throw new RuntimeException(e);
+//      }
 //    }
-
-  @Override
-  public List<Message> findAllByAuthorId(UUID authorId) {
-    List<Message> result = new ArrayList<>();
-    for (Message message : messages.values()) {
-      if (message.getAuthorId().equals(authorId)) {
-        result.add(message);
-      }
-    }
-    return result;
-  }
-
-  @Override
-  public List<Message> findAllByChannelId(UUID channelId) {
-    List<Message> result = new ArrayList<>();
-    for (Message message : messages.values()) {
-      if (message.getChannelId().equals(channelId)) {
-        result.add(message);
-      }
-    }
-    return result;
-  }
-
-  @Override
-  public boolean existsById(UUID id) {
-    return messages.containsKey(id);
-  }
-
-  @Override
-  public void deleteById(UUID messageId) {
-    messages.remove(messageId);
-    saveToFile();
-  }
-
-  @Override
-  public void deleteAllByChannelId(UUID channelId) {
-    List<UUID> toDelete = new ArrayList<>();
-    for (Map.Entry<UUID, Message> entry : messages.entrySet()) {
-      if (entry.getValue().getChannelId().equals(channelId)) {
-        toDelete.add(entry.getKey());
-      }
-    }
-    for (UUID id : toDelete) {
-      messages.remove(id);
-    }
-    saveToFile();
-  }
-
-  private void saveToFile() {
-    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-      oos.writeObject(messages);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private Map<UUID, Message> loadFromFile() {
-    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-      return (Map<UUID, Message>) ois.readObject();
-    } catch (Exception e) {
-      return new HashMap<>();
-    }
-  }
-}
+//  }
+//
+//  private Path resolvePath(UUID id) {
+//    return DIRECTORY.resolve(id + EXTENSION);
+//  }
+//
+//  @Override
+//  public Message save(Message message) {
+//    Path path = resolvePath(message.getId());
+//    try (
+//        FileOutputStream fos = new FileOutputStream(path.toFile());
+//        ObjectOutputStream oos = new ObjectOutputStream(fos)
+//    ) {
+//      oos.writeObject(message);
+//    } catch (IOException e) {
+//      throw new RuntimeException(e);
+//    }
+//    return message;
+//  }
+//
+//  @Override
+//  public Optional<Message> findById(UUID id) {
+//    Message messageNullable = null;
+//    Path path = resolvePath(id);
+//    if (Files.exists(path)) {
+//      try (
+//          FileInputStream fis = new FileInputStream(path.toFile());
+//          ObjectInputStream ois = new ObjectInputStream(fis)
+//      ) {
+//        messageNullable = (Message) ois.readObject();
+//      } catch (IOException | ClassNotFoundException e) {
+//        throw new RuntimeException(e);
+//      }
+//    }
+//    return Optional.ofNullable(messageNullable);
+//  }
+//
+//  @Override
+//  public List<Message> findAllByChannelId(UUID channelId) {
+//    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+//      return paths
+//          .filter(path -> path.toString().endsWith(EXTENSION))
+//          .map(path -> {
+//            try (
+//                FileInputStream fis = new FileInputStream(path.toFile());
+//                ObjectInputStream ois = new ObjectInputStream(fis)
+//            ) {
+//              return (Message) ois.readObject();
+//            } catch (IOException | ClassNotFoundException e) {
+//              throw new RuntimeException(e);
+//            }
+//          })
+//          .filter(message -> message.getChannel().getId().equals(channelId))
+//          .toList();
+//    } catch (IOException e) {
+//      throw new RuntimeException(e);
+//    }
+//  }
+//
+//  @Override
+//  public boolean existsById(UUID id) {
+//    Path path = resolvePath(id);
+//    return Files.exists(path);
+//  }
+//
+//  @Override
+//  public void deleteById(UUID id) {
+//    Path path = resolvePath(id);
+//    try {
+//      Files.delete(path);
+//    } catch (IOException e) {
+//      throw new RuntimeException(e);
+//    }
+//  }
+//
+//  @Override
+//  public void deleteAllByChannelId(UUID channelId) {
+//    this.findAllByChannelId(channelId)
+//        .forEach(message -> this.deleteById(message.getId()));
+//  }
+//}

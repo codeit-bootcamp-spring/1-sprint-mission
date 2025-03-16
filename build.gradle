@@ -26,26 +26,28 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-}
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-application {
-    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
-}
+    implementation 'org.postgresql:postgresql'
 
-task runAsJava(type: JavaExec) {
-    group = "application"
-    description = "Run the application as a plain Java application"
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+//application {
+//    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
+//}
+//
+//task runAsJava(type: JavaExec) {
+//    group = "application"
+//    description = "Run the application as a plain Java application"
+//    classpath = sourceSets.main.runtimeClasspath
+//    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
+//}
