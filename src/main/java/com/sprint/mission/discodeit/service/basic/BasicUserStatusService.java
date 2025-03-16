@@ -21,6 +21,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
 
+  @Transactional
   @Override
   public UserStatus create(UserStatusCreateRequest request) {
     User user = userRepository.findById(request.userId())
@@ -34,8 +35,9 @@ public class BasicUserStatusService implements UserStatusService {
     return userStatusRepository.save(userStatus);
   }
 
-  @Override
+
   @Transactional
+  @Override
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
@@ -44,6 +46,15 @@ public class BasicUserStatusService implements UserStatusService {
 
     return userStatus;
   }
+
+  @Override
+  public UserStatus findByUserId(UUID userStatusId) {
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+        .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
+
+    return userStatus;
+  }
+
 
   @Override
   public void delete(UUID userStatusId) {

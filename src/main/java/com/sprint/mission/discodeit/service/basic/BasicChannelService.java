@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +34,10 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
 
+  @Transactional
   @Override
   public ChannelDTO create(PublicChannelCreateRequest publicChannelCreateRequest) {
-    if (channelRepository.existsName(publicChannelCreateRequest.channelName())) {
+    if (channelRepository.existsByName((publicChannelCreateRequest.channelName()))) {
       throw new IllegalArgumentException("이미 존재하는 채널 이름입니다.");
     }
 
@@ -45,6 +47,7 @@ public class BasicChannelService implements ChannelService {
     return toDto(channel);
   }
 
+  @Transactional
   @Override
   public ChannelDTO create(PrivateChannelCreateRequest privateChannelCreateRequest) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
@@ -90,24 +93,26 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
+  @Transactional
   @Override
   public ChannelDTO update(UUID channelId,
       PublicChannelUpdateRequest publicChannelUpdateRequest) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
 
-    channel.update(publicChannelUpdateRequest.newName());
+    channel.update(publicChannelUpdateRequest.newName(),
+        publicChannelUpdateRequest.newDescription());
     channelRepository.save(channel);
     return toDto(channel);
   }
 
   @Override
   public void delete(UUID channelId, UUID adminId) {
-    if (!channelRepository.existsId(channelId)) {
+    if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("채널이 존재하지 않습니다.");
     }
 
-    channelRepository.delete(channelId);
+    channelRepository.deleteById(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
   }
 

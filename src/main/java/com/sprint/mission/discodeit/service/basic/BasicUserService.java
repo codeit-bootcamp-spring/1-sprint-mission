@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,33 +34,33 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
   private final BinaryContentService binaryContentService;
 
+  @Transactional
   @Override
   public User create(UserCreateRequest userCreateRequest, MultipartFile profile) {
     if (!isValidEmail(userCreateRequest.email())) {
       throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
     }
 
-    if (userRepository.existsName(userCreateRequest.userName())) {
+    if (userRepository.existsByUsername((userCreateRequest.userName()))) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
     }
 
-    if (userRepository.existsEmail(userCreateRequest.email())) {
+    if (userRepository.existsByEmail((userCreateRequest.email()))) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이메일입니다.");
     }
 
-    Optional<BinaryContentCreateRequest> profileRequest = resolveProfileRequest(profile);
-    UUID nullableProfileId = profileRequest
-        .map(request -> binaryContentService.create(request).getId())
+    BinaryContent nullableProfile = Optional.ofNullable(profile)
+        .filter(p -> !p.isEmpty())
+        .flatMap(this::resolveProfileRequest)
+        .map(binaryContentService::create)
         .orElse(null);
-
-    BinaryContent nullableProfile = binaryContentRepository.findById(nullableProfileId)
-        .orElseThrow(() -> new NoSuchElementException("프로필이 존재하지 않습니다."));
 
     User user = new User(
         userCreateRequest.userName(),
         userCreateRequest.email(),
         userCreateRequest.password(),
-        nullableProfile);
+        nullableProfile,
+        null);
     userRepository.save(user);
 
     UserStatus userStatus = new UserStatus(user, Instant.EPOCH);
@@ -90,6 +91,7 @@ public class BasicUserService implements UserService {
         .toList();
   }
 
+  @Transactional
   @Override
   public User update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile profile) {
     User user = userRepository.findById(userId)
@@ -103,31 +105,39 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
     }
 
-    if (userRepository.existsName(userUpdateRequest.newUserName())) {
+    if (userRepository.existsByUsername(userUpdateRequest.newUserName())) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
     }
 
-    if (userRepository.existsEmail(userUpdateRequest.newEmail())) {
+    if (userRepository.existsByEmail(userUpdateRequest.newEmail())) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이메일입니다.");
     }
 
-    Optional<BinaryContentCreateRequest> profileRequest = resolveProfileRequest(profile);
-    if (profileRequest.isPresent()) {
-      BinaryContentCreateRequest profileData = profileRequest.get();
-      BinaryContent binaryContent = binaryContentService.create(profileData);
+    Optional<BinaryContent> newProfile = Optional.ofNullable(profile)
+        .filter(p -> !p.isEmpty())
+        .flatMap(this::resolveProfileRequest)
+        .map(binaryContentService::create);
+
+    newProfile.ifPresent(binaryContent -> {
+      if (user.getProfile() != null) {
+        binaryContentRepository.deleteById(user.getProfile().getId());
+      }
       binaryContentRepository.save(binaryContent);
-    }
+      user.updateProfile(binaryContent);
+    });
 
     user.update(userUpdateRequest.newUserName(), userUpdateRequest.newEmail());
     return userRepository.save(user);
   }
+
 
   @Override
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-    if (binaryContentRepository.existsById(user.getProfile().getId())) {
+    if (user.getProfile() != null && binaryContentRepository.existsById(
+        user.getProfile().getId())) {
       binaryContentRepository.deleteById(user.getProfile().getId());
     }
 

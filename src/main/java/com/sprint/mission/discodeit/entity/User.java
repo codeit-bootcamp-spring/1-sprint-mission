@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -13,10 +14,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Entity
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
 public class User extends BaseUpdatableEntity {
@@ -45,6 +48,10 @@ public class User extends BaseUpdatableEntity {
     if (!newEmail.equals(this.email)) {
       this.email = newEmail;
     }
+  }
+
+  public void updateProfile(BinaryContent newProfile) {
+    this.profile = newProfile;
   }
 
 }

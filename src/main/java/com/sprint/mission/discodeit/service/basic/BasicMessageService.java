@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentService binaryContentService;
   private final ChannelService channelService;
 
+  @Transactional
   @Override
   public Message create(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
@@ -80,13 +82,6 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public MessageDTO findById(UUID messageId) {
-    Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
-    return MessageDTO.fromEntity(message);
-  }
-
-  @Override
   public List<MessageDTO> findByChannel(UUID channelId) {
     List<Message> messages = messageRepository.findByChannelId(channelId);
     return messages.stream()
@@ -94,14 +89,8 @@ public class BasicMessageService implements MessageService {
         .toList();
   }
 
-  @Override
-  public List<MessageDTO> findByUser(UUID userId) {
-    List<Message> messages = messageRepository.findByUserId(userId);
-    return messages.stream()
-        .map(MessageDTO::fromEntity)
-        .toList();
-  }
 
+  @Transactional
   @Override
   public Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
     Message message = messageRepository.findById(messageId)
@@ -128,6 +117,6 @@ public class BasicMessageService implements MessageService {
         .map(BinaryContent::getId)
         .forEach(binaryContentRepository::deleteById);
 
-    messageRepository.delete(messageId);
+    messageRepository.deleteById(messageId);
   }
 }

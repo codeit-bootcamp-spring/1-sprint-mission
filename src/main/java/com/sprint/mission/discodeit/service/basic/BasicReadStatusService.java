@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
 
+  @Transactional
   @Override
   public ReadStatus create(ReadStatusCreateRequest request) {
 
@@ -55,6 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
         .toList();
   }
 
+  @Transactional
   @Override
   public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
     Instant newLastReadAt = request.newLastReadAt();
@@ -66,7 +69,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public void delete(UUID readStatusId) {
-    if (!readStatusRepository.existsId(readStatusId)) {
+    if (!readStatusRepository.existsById(readStatusId)) {
       throw new NoSuchElementException("수신정보가 존재하지 않습니다.");
     }
     readStatusRepository.deleteById(readStatusId);

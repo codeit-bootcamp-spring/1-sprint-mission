@@ -41,8 +41,3 @@ springdoc:
   swagger-ui:
     path: /swagger-ui
     enabled: true
-
-#discodeit:
-#  repository:
-#    type: file
-#    file-directory: .discodeit

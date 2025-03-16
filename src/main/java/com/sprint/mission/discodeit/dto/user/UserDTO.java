@@ -20,9 +20,9 @@ public record UserDTO(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),
-        user.getUserName(),
+        user.getUsername(),
         user.getEmail(),
-        user.getProfile().getId(),
+        user.getProfile() != null ? user.getProfile().getId() : null,
         false
     );
   }
@@ -32,9 +32,9 @@ public record UserDTO(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),
-        user.getUserName(),
+        user.getUsername(),
         user.getEmail(),
-        user.getProfile().getId(),
+        user.getProfile() != null ? user.getProfile().getId() : null,
         userStatus.isUserOnline()
     );
   }

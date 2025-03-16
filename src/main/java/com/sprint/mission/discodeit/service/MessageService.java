@@ -13,11 +13,7 @@ public interface MessageService {
 
   Message create(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachments);
 
-  MessageDTO findById(UUID messageId);
-
   List<MessageDTO> findByChannel(UUID channelId);
-
-  List<MessageDTO> findByUser(UUID userId);
 
   Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest);
 
