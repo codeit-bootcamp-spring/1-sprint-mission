@@ -33,10 +33,10 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> binaryContentRequests) {
-        User author = Optional.ofNullable(userRepository.find(messageCreateRequest.authorId()))
+        User author = userRepository.findById(messageCreateRequest.authorId())
             .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
-        Channel channel = Optional.ofNullable(channelRepository.find(messageCreateRequest.channelId()))
+        Channel channel = channelRepository.findById(messageCreateRequest.channelId())
             .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
         validator.validate(messageCreateRequest.content());
@@ -50,7 +50,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message find(UUID messageId) {
-      return Optional.ofNullable(messageRepository.find(messageId))
+      return messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
     }
 
@@ -60,7 +60,7 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
 
-        return messageRepository.findAllByChannelId(channelId).stream()
+        return messageRepository.findByChannelId(channelId).stream()
                 .toList();
     }
 
@@ -70,14 +70,14 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
 
-        return messageRepository.findAllByAuthorId(authorId).stream()
+        return messageRepository.findByAuthorId(authorId).stream()
                 .toList();
     }
 
 
     @Override
     public Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
-        Message message = messageRepository.find(messageId);
+        Message message = find(messageId);
         message.updateContent(messageUpdateRequest.newContent());
 
         return messageRepository.save(message);
@@ -85,8 +85,10 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
-        find(messageId);
+        if (!messageRepository.existsById(messageId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다.");
+        }
 
-        messageRepository.delete(messageId);
+        messageRepository.deleteById(messageId);
     }
 }

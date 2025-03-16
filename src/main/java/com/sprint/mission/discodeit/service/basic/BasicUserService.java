@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -14,15 +13,12 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +46,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponse find(UUID userId) {
-        User user = Optional.ofNullable(userRepository.find(userId))
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
         return getUserInfo(user);
@@ -80,7 +76,7 @@ public class BasicUserService implements UserService {
     @Override
     public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentRequest> binaryContentRequest) {
         validator.checkEmailFormat(userUpdateRequest.newEmail());
-        User user = Optional.ofNullable(userRepository.find(userId))
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
         validateDuplicateName(userUpdateRequest.newUsername());
         validateDuplicateEmail(userUpdateRequest.newEmail());
@@ -98,7 +94,7 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 
     @Override

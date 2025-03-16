@@ -16,8 +16,9 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public User login(LoginRequest loginRequest) {
-        User user = userRepository.findByName(loginRequest.username());
-        if (user == null || !user.isSamePassword(loginRequest.password())) {
+        User user = userRepository.findByUsername(loginRequest.username())
+            .orElseThrow(() -> new NoSuchElementException("[ERROR] 잘못된 정보입니다."));
+        if (!user.isSamePassword(loginRequest.password())) {
             throw new NoSuchElementException("[ERROR] 잘못된 정보입니다.");
         }
 

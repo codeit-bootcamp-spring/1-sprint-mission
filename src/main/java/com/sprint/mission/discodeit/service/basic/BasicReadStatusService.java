@@ -27,10 +27,10 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest) {
-        User user = Optional.ofNullable(userRepository.find(readStatusCreateRequest.userId()))
+        User user = userRepository.findById(readStatusCreateRequest.userId())
             .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
-        Channel channel = Optional.ofNullable(channelRepository.find(readStatusCreateRequest.channelId()))
+        Channel channel = channelRepository.findById(readStatusCreateRequest.channelId())
             .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
         findAllByUserId(readStatusCreateRequest.userId())
@@ -45,13 +45,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus find(UUID readStatusId) {
-        return Optional.ofNullable(readStatusRepository.find(readStatusId))
+        return readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
+        return readStatusRepository.findByUserId(userId);
     }
 
     @Override
@@ -66,12 +66,12 @@ public class BasicReadStatusService implements ReadStatusService {
         if (!readStatusRepository.existsById(readStatusId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다.");
         }
-        readStatusRepository.delete(readStatusId);
+        readStatusRepository.deleteById(readStatusId);
     }
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
-        readStatuses.forEach(readStatus -> readStatusRepository.delete(readStatus.getId()));
+        List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(channelId);
+        readStatuses.forEach(readStatus -> readStatusRepository.deleteById(readStatus.getId()));
     }
 }

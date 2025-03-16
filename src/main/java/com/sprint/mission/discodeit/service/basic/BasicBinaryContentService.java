@@ -29,7 +29,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent find(UUID binaryContentId) {
-        return Optional.ofNullable(binaryContentRepository.find(binaryContentId))
+        return binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
     }
 
@@ -54,6 +54,6 @@ public class BasicBinaryContentService implements BinaryContentService {
         if (!binaryContentRepository.existsById(binaryContentId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다.");
         }
-        binaryContentRepository.delete(binaryContentId);
+        binaryContentRepository.deleteById(binaryContentId);
     }
 }

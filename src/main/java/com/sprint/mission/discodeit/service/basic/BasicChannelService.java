@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -13,15 +13,18 @@ import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.ChannelValidator;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +33,6 @@ public class BasicChannelService implements ChannelService {
     private final ChannelValidator validator;
 
     private final ReadStatusService readStatusService;
-    private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
@@ -54,7 +56,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponse find(UUID channelId) {
-        Channel channel = Optional.ofNullable(channelRepository.find(channelId))
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
         return getChannelInfo(channel, findLastMessageTime(channelId), findParticipantsIds(channel));
@@ -86,7 +88,7 @@ public class BasicChannelService implements ChannelService {
     public List<UUID> findParticipantsIds(Channel channel) {
         List<UUID> participantIds = new ArrayList<>();
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            readStatusRepository.findAllByChannelId(channel.getId())
+            readStatusRepository.findByChannelId(channel.getId())
                     .stream()
                     .map(ReadStatus::getUser)
                     .map(BaseEntity::getId)
@@ -104,7 +106,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel update(UUID channelId, PublicChannelUpdateRequest channelUpdateRequest) {
         validator.validate(channelUpdateRequest.newName(), channelUpdateRequest.newDescription());
-        Channel channel = Optional.ofNullable(channelRepository.find(channelId))
+        Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
         channel.update(channelUpdateRequest.newName(), channelUpdateRequest.newDescription());
@@ -116,6 +118,6 @@ public class BasicChannelService implements ChannelService {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
-        channelRepository.delete(channelId);
+        channelRepository.deleteById(channelId);
     }
 }
