@@ -31,8 +31,8 @@ public class UserStatusService {
     }
 
     // 나중에 바꾸기
-    public UserStatus findById(UUID userStatusId) {
-        return userStatusRepository.findById(userStatusId)
+    public UserStatus findByUserId(UUID userId) {
+        return userStatusRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER_STATUS));
     }
 

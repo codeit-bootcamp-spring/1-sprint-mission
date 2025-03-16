@@ -1,7 +1,6 @@
 package com.sprint.mission.entity.main;
 
 import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.entity.addOn.MessageAttachments;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +20,7 @@ import static jakarta.persistence.FetchType.*;
 @Getter
 @Schema(description = "메시지 엔티티")
 @Table(name = "messages")
-public class Message  extends BaseUpdatableEntity{
+public class Message extends BaseUpdatableEntity{
 //    @ToString.Exclude
 //    private static final long serialVersionUID = 1L;
 
@@ -34,8 +33,13 @@ public class Message  extends BaseUpdatableEntity{
     @ManyToOne(fetch = LAZY)
     private User author;
 
-    @OneToMany(mappedBy = "message", cascade = REMOVE, orphanRemoval = true)
-    private List<MessageAttachments> messageAttachments = new ArrayList<>();
+    @OneToMany(mappedBy = "message", cascade = REMOVE)
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id")
+    )
+    private List<BinaryContent> messageAttachments = new ArrayList<>();
 
     public Message(Channel channel, User user, String content) {
         this.content = content;

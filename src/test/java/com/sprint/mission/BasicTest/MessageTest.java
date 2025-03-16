@@ -149,7 +149,7 @@ public class MessageTest {
 
 
         //List<PageResponse<MessageDto>> pageResponseList = messageService.findAllByChannelId(publicChannel.getId(), pageable);
-        List<ScrollPageResponse<MessageDto>> scrollPageList = messageService.findAllByChannelIdWithScroll(publicChannel.getId());
+        List<ScrollPageResponse<MessageDto>> scrollPageList = messageService.findAllByChannelId(publicChannel.getId());
         assertThat(scrollPageList.size()).isEqualTo(3);
 
     }

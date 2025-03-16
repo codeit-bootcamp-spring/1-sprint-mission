@@ -28,8 +28,6 @@ public class BinaryContent extends BaseEntity {
     @OneToOne(mappedBy = "profile")
     private User user;
 
-    @OneToOne(mappedBy = "binaryContent")
-    private MessageAttachments attachments;
 }
 
 // 이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델

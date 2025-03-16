@@ -8,7 +8,6 @@ import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -32,7 +31,6 @@ public class MessageMapperImpl implements MessageMapper {
         Instant createdAt = null;
         Instant updatedAt = null;
         String content = null;
-        List<BinaryContentDto> attachments = null;
 
         channelId = messageChannelId( message );
         author = userToUserDto( message.getAuthor() );
@@ -40,7 +38,8 @@ public class MessageMapperImpl implements MessageMapper {
         createdAt = message.getCreatedAt();
         updatedAt = message.getUpdatedAt();
         content = message.getContent();
-        attachments = binaryContentListToBinaryContentDtoList( message.getAttachments() );
+
+        List<BinaryContentDto> attachments = null;
 
         MessageDto messageDto = new MessageDto( id, createdAt, updatedAt, content, channelId, author, attachments );
 
@@ -116,18 +115,5 @@ public class MessageMapperImpl implements MessageMapper {
         BinaryContentDto binaryContentDto = new BinaryContentDto( id, fileName, size, contentType, bytes );
 
         return binaryContentDto;
-    }
-
-    protected List<BinaryContentDto> binaryContentListToBinaryContentDtoList(List<BinaryContent> list) {
-        if ( list == null ) {
-            return null;
-        }
-
-        List<BinaryContentDto> list1 = new ArrayList<BinaryContentDto>( list.size() );
-        for ( BinaryContent binaryContent : list ) {
-            list1.add( binaryContentToBinaryContentDto( binaryContent ) );
-        }
-
-        return list1;
     }
 }

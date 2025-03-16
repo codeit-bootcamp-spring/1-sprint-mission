@@ -12,12 +12,13 @@ import java.util.List;
 
 import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.*;
+import static lombok.AccessLevel.*;
 
 @Entity
 @EqualsAndHashCode(of = {"username", "email", "password"}, callSuper = true)
 @ToString(of = {"username", "email", "password", "profile"})  // callSuper 제거 및 id 등 직접 명시
 @Getter //@Builder
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Schema(description = "유저")
 @Table(name = "users")
 public class User extends BaseUpdatableEntity{

@@ -44,6 +44,7 @@ public class JCFUserService implements UserService {
     public User create(UserDtoForCreate requestDTO, MultipartFile profile) {
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
         Optional<BinaryContentDtoForCreate> profileDto = binaryContentMapper.convertFileToBinaryContentDto(profile);
+
         // 선택적 프로필 생성
         User createdUser = profileDto.map((binaryDto) -> {
             BinaryContent createdBinaryContent = profileService.create(binaryDto);

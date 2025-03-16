@@ -3,7 +3,7 @@ package com.sprint.mission.dto;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.entity.main.Message;
+import com.sprint.mission.entity.addOn.MessageAttachments;
 import com.sprint.mission.entity.main.User;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -45,17 +45,17 @@ public class BinaryContentMapperImpl implements BinaryContentMapper {
         }
 
         String fileName = null;
-        String contentType = null;
         Long size = null;
+        String contentType = null;
 
         fileName = request.fileName();
-        contentType = request.contentType();
         size = request.size();
+        contentType = request.contentType();
 
         User user = null;
-        Message message = null;
+        MessageAttachments attachments = null;
 
-        BinaryContent binaryContent = new BinaryContent( fileName, contentType, size, user, message );
+        BinaryContent binaryContent = new BinaryContent( fileName, size, contentType, user, attachments );
 
         return binaryContent;
     }
