@@ -33,7 +33,7 @@ public class Message extends BaseUpdatableEntity{
     @ManyToOne(fetch = LAZY)
     private User author;
 
-    @OneToMany(mappedBy = "message", cascade = REMOVE)
+    @OneToMany(cascade = REMOVE)
     @JoinTable(
             name = "message_attachments",
             joinColumns = @JoinColumn(name = "message_id"),

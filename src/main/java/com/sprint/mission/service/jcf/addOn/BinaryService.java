@@ -26,9 +26,11 @@ public class BinaryService {
 
     public BinaryContent create(BinaryContentDtoForCreate request){
         //binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
-        BinaryContent entity = binaryContentMapper.toEntity(request);
-        log.info("Create binary content: {}", entity);
-        return binaryContentRepository.save(binaryContentMapper.toEntity(request));
+        BinaryContent createdBinaryContent = binaryContentMapper.toEntity(request);
+        log.info("Create binary content: {}", createdBinaryContent);
+        binaryContentRepository.save(binaryContentMapper.toEntity(request));
+        binaryContentStorage.put(createdBinaryContent.getId(), request.bytes());
+        return createdBinaryContent;
     }
 
     public BinaryContent findById(UUID id){

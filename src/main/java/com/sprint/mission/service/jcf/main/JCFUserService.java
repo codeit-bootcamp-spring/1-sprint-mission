@@ -36,7 +36,6 @@ public class JCFUserService implements UserService {
     private final UserStatusService userStatusService;
     private final BinaryService profileService;
     private final ExecutorService ves;
-    private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
     private final BinaryContentMapper binaryContentMapper;
 
@@ -48,7 +47,6 @@ public class JCFUserService implements UserService {
         // 선택적 프로필 생성
         User createdUser = profileDto.map((binaryDto) -> {
             BinaryContent createdBinaryContent = profileService.create(binaryDto);
-            binaryContentStorage.put(createdBinaryContent.getId(), binaryDto.bytes());
             return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
         }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
 
@@ -84,7 +82,6 @@ public class JCFUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         //if (!userRepository.existsById(userId)) throw new NotFoundId();
-
         User deletingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
         userRepository.delete(deletingUser);
