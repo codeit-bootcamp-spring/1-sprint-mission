@@ -38,13 +38,12 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-    UUID channelId = messageCreateRequest.channel().getId();
-    UUID authorId = messageCreateRequest.author().getId();
-
-    Channel channel = channelRepository.findById(channelId).orElseThrow(
-        () -> new NoSuchElementException("Channel with id " + channelId + " does not exist"));
-    User author = userRepository.findById(authorId).orElseThrow(
-        () -> new NoSuchElementException("Author with id " + authorId + " does not exist"));
+    Channel channel = channelRepository.findById(messageCreateRequest.channelId()).orElseThrow(
+        () -> new NoSuchElementException(
+            "Channel with id " + messageCreateRequest.channelId() + " does not exist"));
+    User author = userRepository.findById(messageCreateRequest.authorId()).orElseThrow(
+        () -> new NoSuchElementException(
+            "Author with id " + messageCreateRequest.authorId() + " does not exist"));
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {

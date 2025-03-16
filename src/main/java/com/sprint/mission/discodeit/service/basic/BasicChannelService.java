@@ -6,10 +6,12 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,6 +29,7 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepository messageRepository;
 
   private final ChannelMapper channelMapper;
+  private final UserRepository userRepository;
 
   @Transactional
   @Override
@@ -35,6 +38,8 @@ public class BasicChannelService implements ChannelService {
     String description = request.description();
     Channel channel = Channel.ofPublic(name, description);
     channelRepository.save(channel);
+    userRepository.findAll().forEach(
+        user -> readStatusRepository.save(new ReadStatus(user, channel, channel.getCreatedAt())));
     return channelMapper.toDto(channel);
   }
 
@@ -44,8 +49,12 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.ofPrivate();
     Channel createdChannel = channelRepository.save(channel);
 
-    request.participants().stream()
-        .map(user -> new ReadStatus(user, createdChannel, createdChannel.getCreatedAt()))
+    request.participantIds().stream()
+        .map(userId -> {
+          User user = userRepository.findById(userId).orElseThrow(
+              () -> new NoSuchElementException("Message with id " + userId + " not found"));
+          return new ReadStatus(user, createdChannel, createdChannel.getCreatedAt());
+        })
         .forEach(readStatusRepository::save);
 
     return channelMapper.toDto(createdChannel);
@@ -79,8 +88,6 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
-    String newName = request.newName();
-    String newDescription = request.newDescription();
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
             () -> new NoSuchElementException("Channel with id " + channelId + " not found"));

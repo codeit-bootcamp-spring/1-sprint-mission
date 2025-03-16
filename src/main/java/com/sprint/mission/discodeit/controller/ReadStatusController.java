@@ -36,9 +36,9 @@ public class ReadStatusController implements ReadStatusApi {
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatusDto> create(@RequestBody String jsonRequest)
+  public ResponseEntity<ReadStatusDto> create(@RequestBody String readStatusCreateRequest)
       throws JsonProcessingException {
-    ReadStatusCreateRequest request = objectMapper.readValue(jsonRequest,
+    ReadStatusCreateRequest request = objectMapper.readValue(readStatusCreateRequest,
         ReadStatusCreateRequest.class);
     ReadStatusDto createdReadStatus = readStatusService.create(request);
     return ResponseEntity
@@ -51,8 +51,8 @@ public class ReadStatusController implements ReadStatusApi {
   public ResponseEntity<ReadStatusDto> update(
       @Parameter(description = "수정할 읽음 상태 ID", required = true)
       @PathVariable("id") UUID id,
-      @RequestBody String jsonRequest) throws JsonProcessingException {
-    ReadStatusUpdateRequest request = objectMapper.readValue(jsonRequest,
+      @RequestBody String readStatusUpdateRequest) throws JsonProcessingException {
+    ReadStatusUpdateRequest request = objectMapper.readValue(readStatusUpdateRequest,
         ReadStatusUpdateRequest.class);
     ReadStatusDto updatedReadStatus = readStatusService.update(id, request);
     return ResponseEntity
