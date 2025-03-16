@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.FetchType.*;
 
 @Entity
 @EqualsAndHashCode(of = {"username", "email", "password"}, callSuper = true)
@@ -26,11 +27,11 @@ public class User extends BaseUpdatableEntity{
     private String password;
 
     //변경가능하니
-    @OneToOne(mappedBy = "user", cascade = REMOVE, orphanRemoval = true)
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "profile_id")
     private BinaryContent profile;
 
-    @OneToOne(cascade = ALL)
-    @JoinColumn(name = "user_status_id")
+    @OneToOne(mappedBy = "user", cascade = REMOVE)
     private UserStatus status;
 
     // REMOVE => user가 삭제되면 readStatus도 삭제됨

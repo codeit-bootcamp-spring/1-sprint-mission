@@ -6,6 +6,7 @@ import com.sprint.mission.dto.response.PageResponse;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
+import com.sprint.mission.dto.response.ScrollPageResponse;
 import com.sprint.mission.entity.main.Message;
 import org.springframework.data.domain.Pageable;
 
@@ -19,7 +20,7 @@ public interface MessageService {
 
     Message update(UUID messageId, MessageDtoForUpdate updateDto);
     List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable);
-
+    List<ScrollPageResponse<MessageDto>> findAllByChannelId(UUID channelId);
     //List<Message> findAll();
     void delete(UUID messageId);
 

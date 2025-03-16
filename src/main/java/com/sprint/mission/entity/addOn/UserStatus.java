@@ -23,7 +23,8 @@ import static jakarta.persistence.FetchType.*;
 @Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
 
-    @OneToOne(mappedBy = "status", cascade = CascadeType.ALL)
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     private Instant lastActiveAt;

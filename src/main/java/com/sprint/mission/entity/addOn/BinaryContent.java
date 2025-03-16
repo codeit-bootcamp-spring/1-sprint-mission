@@ -9,6 +9,9 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.util.UUID;
+
+import static jakarta.persistence.FetchType.*;
+
 @Entity
 @EqualsAndHashCode(of = {"fileName", "contentType", "size"}, callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -19,19 +22,18 @@ import java.util.UUID;
 public class BinaryContent extends BaseEntity {
 
     private String fileName;
-    private String contentType;
     private Long size;
-    // 이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델
-    // 사용자의 프로필 이미지, 메시지에 첨부된 파일을 저장하기 위해 활용
-    // 수정 불가능한 도메인 모델
-    // updateAt 필드는 정의 X
-    // id 참조 필드 추가 (user, message)
+    private String contentType;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "profile")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "message_id")
-    private Message message;
+    @OneToOne(mappedBy = "binaryContent")
+    private MessageAttachments attachments;
 }
+
+// 이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델
+// 사용자의 프로필 이미지, 메시지에 첨부된 파일을 저장하기 위해 활용
+// 수정 불가능한 도메인 모델
+// updateAt 필드는 정의 X
+// id 참조 필드 추가 (user, message)

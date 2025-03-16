@@ -5,6 +5,7 @@ import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serializable;
@@ -23,13 +24,14 @@ import static jakarta.persistence.FetchType.*;
 public class ReadStatus extends BaseUpdatableEntity {
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "channel_id")
+    @JoinColumn(name = "channel_id", unique = true)
     private Channel channel;
 
+    @NotNull
     private Instant lastReadAt;
 
     public void update(Instant newLastReadAt) {

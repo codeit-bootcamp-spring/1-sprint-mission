@@ -1,6 +1,7 @@
 package com.sprint.mission.entity.main;
 
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.MessageAttachments;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,16 +27,15 @@ public class Message  extends BaseUpdatableEntity{
 
     private String content;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "channel_id")
+    @ManyToOne(fetch = LAZY, cascade = REMOVE)
+    @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
-    // 메시지는 user가 삭제되도 남기기?
     @ManyToOne(fetch = LAZY)
     private User author;
 
     @OneToMany(mappedBy = "message", cascade = REMOVE, orphanRemoval = true)
-    private List<BinaryContent> attachments = new ArrayList<>();
+    private List<MessageAttachments> messageAttachments = new ArrayList<>();
 
     public Message(Channel channel, User user, String content) {
         this.content = content;
@@ -49,8 +49,8 @@ public class Message  extends BaseUpdatableEntity{
         }
     }
 
-    public void addAttachment(BinaryContent attachment) {
-        attachments.add(attachment);
-        //일단은 단방향이니
-    }
+//    public void addAttachment(BinaryContent attachment) {
+//        attachments.add(attachment);
+//        //일단은 단방향이니
+//    }
 }

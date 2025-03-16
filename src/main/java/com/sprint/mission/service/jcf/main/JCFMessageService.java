@@ -62,7 +62,7 @@ public class JCFMessageService implements MessageService {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
                 log.info("메시지의 생성된 BinaryContent: {}", createdBinaryContent);
                 binaryContentStorage.put(createdBinaryContent.getId(), bcd.bytes());
-                createdMessage.addAttachment(createdBinaryContent);
+                //createdMessage.addAttachment(createdBinaryContent);???
             }
         }
         return messageRepository.save(createdMessage);
@@ -112,7 +112,8 @@ public class JCFMessageService implements MessageService {
 
     // 스크롤링
     // CREATED_AT이 겹칠 경우 어떻게 해결해야하는지 (쿼리보면 spring data jpa가 id기준 정렬도 자동 추가해주나?)
-    public List<ScrollPageResponse<MessageDto>> findAllByChannelIdWithScroll(UUID channelId) {
+    @Override
+    public List<ScrollPageResponse<MessageDto>> findAllByChannelId(UUID channelId) {
         if (!channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }

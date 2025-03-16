@@ -9,6 +9,7 @@ import com.sprint.mission.dto.response.PageResponse;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
+import com.sprint.mission.dto.response.ScrollPageResponse;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -78,11 +79,12 @@ public class MessageController {
     public ResponseEntity<CommonResponse> findInChannel(
             @Parameter(description = "조회할 Channel ID") @RequestParam("channelId") UUID channelId) {
 
-        Pageable pageable = PageRequest.of(0, 50, Sort.by("createdAt").descending());
-
-        List<PageResponse<MessageDto>> pagedMessageList = messageService.findAllByChannelId(channelId, pageable);
+        // Page 인터페이스 버전
+        // Pageable pageable = PageRequest.of(0, 50, Sort.by("createdAt").descending());
+        // List<PageResponse<MessageDto>> pagedMessageList = messageService.findAllByChannelId(channelId, pageable);
+        List<ScrollPageResponse<MessageDto>> scrollPageResponseList = messageService.findAllByChannelId(channelId);
         return CommonResponse.toResponseEntity
-                (OK, "메시지 목록을 성공적으로 조회했습니다.", pagedMessageList);
+                (OK, "메시지 목록을 성공적으로 조회했습니다.", scrollPageResponseList);
     }
 
 
