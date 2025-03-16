@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
+    @Transactional
     public BinaryContent create(BinaryContentRequest binaryContentRequest) {
         return binaryContentRepository.save(new BinaryContent(
                 binaryContentRequest.fileName(),
@@ -47,6 +49,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID binaryContentId) {
         if (binaryContentId == null) {
             return;

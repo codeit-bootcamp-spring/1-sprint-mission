@@ -78,7 +78,7 @@ public class UserController {
       @RequestBody UserStatusUpdateRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(userStatusService.updateByUserUd(userId, request));
+        .body(userStatusService.updateByUserId(userId, request));
   }
 
   @GetMapping("/{id}")

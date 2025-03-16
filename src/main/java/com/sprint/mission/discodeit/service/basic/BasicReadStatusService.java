@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
+    @Transactional
     public ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest) {
         User user = userRepository.findById(readStatusCreateRequest.userId())
             .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
@@ -55,6 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    @Transactional
     public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
         ReadStatus readStatus = find(readStatusId);
         readStatus.update(readStatusUpdateRequest.newLastReadAt());
@@ -62,6 +65,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID readStatusId) {
         if (!readStatusRepository.existsById(readStatusId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다.");
@@ -70,6 +74,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    @Transactional
     public void deleteByChannelId(UUID channelId) {
         List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(channelId);
         readStatuses.forEach(readStatus -> readStatusRepository.deleteById(readStatus.getId()));

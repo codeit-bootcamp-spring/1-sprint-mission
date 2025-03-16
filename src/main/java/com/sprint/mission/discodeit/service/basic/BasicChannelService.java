@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
     @Override
+    @Transactional
     public Channel create(PublicChannelCreateRequest channelCreateRequest) {
         Channel channel = new Channel(ChannelType.PUBLIC, channelCreateRequest.name(), channelCreateRequest.description());
 
@@ -44,6 +46,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public Channel create(PrivateChannelCreateRequest privateChannelCreateRequest) {
         Channel channel = channelRepository.save(new Channel(ChannelType.PRIVATE, null, null));
 
@@ -104,6 +107,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public Channel update(UUID channelId, PublicChannelUpdateRequest channelUpdateRequest) {
         validator.validate(channelUpdateRequest.newName(), channelUpdateRequest.newDescription());
         Channel channel = channelRepository.findById(channelId)
@@ -114,6 +118,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID channelId) {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");

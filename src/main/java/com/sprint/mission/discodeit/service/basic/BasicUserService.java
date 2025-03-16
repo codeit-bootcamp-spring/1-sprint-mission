@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class BasicUserService implements UserService {
     private final UserStatusService userStatusService;
 
     @Override
+    @Transactional
     public User create(UserCreateRequest userRequest, Optional<BinaryContentRequest> binaryContentRequest) {
         validator.validate(userRequest.username(), userRequest.email());
         validateDuplicateName(userRequest.username());
@@ -74,6 +76,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentRequest> binaryContentRequest) {
         validator.checkEmailFormat(userUpdateRequest.newEmail());
         User user = userRepository.findById(userId)
@@ -90,6 +93,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID userId) {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");

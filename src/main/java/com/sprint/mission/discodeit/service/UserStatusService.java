@@ -15,7 +15,7 @@ public interface UserStatusService {
     List<UserStatus> findAll();
     Boolean getOnlineStatus(UUID userId);
     UserStatus update(UUID userStatusId, UserStatusUpdateRequest userStatusUpdateRequest);
-    UserStatus updateByUserUd(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest);
+    UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest);
     void delete(UUID userStatusId);
     void deleteByUserId(UUID userId);
 }

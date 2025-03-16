@@ -12,6 +12,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserStatus create(UserStatusCreateRequest userStatusCreateRequest) {
         User user = userRepository.findById(userStatusCreateRequest.userId())
             .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
@@ -59,6 +61,7 @@ public class BasicUserStatusService implements UserStatusService {
         return userStatus.isOnline();
     }
 
+    @Transactional
     @Override
     public UserStatus update(UUID userStatusId, UserStatusUpdateRequest userStatusUpdateRequest) {
         UserStatus userStatus = find(userStatusId);
@@ -66,19 +69,22 @@ public class BasicUserStatusService implements UserStatusService {
         return userStatusRepository.save(userStatus);
     }
 
+    @Transactional
     @Override
-    public UserStatus updateByUserUd(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
         UserStatus userStatus = findByUserId(userId);
         userStatus.update(userStatusUpdateRequest.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
 
+    @Transactional
     @Override
     public void delete(UUID userStatusId) {
         userStatusRepository.existsById(userStatusId);
         userStatusRepository.deleteById(userStatusId);
     }
 
+    @Transactional
     @Override
     public void deleteByUserId(UUID userId) {
         UserStatus userStatus = findByUserId(userId);

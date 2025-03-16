@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
 
     @Override
+    @Transactional
     public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> binaryContentRequests) {
         User author = userRepository.findById(messageCreateRequest.authorId())
             .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
@@ -74,8 +76,8 @@ public class BasicMessageService implements MessageService {
                 .toList();
     }
 
-
     @Override
+    @Transactional
     public Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
         Message message = find(messageId);
         message.updateContent(messageUpdateRequest.newContent());
@@ -84,6 +86,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID messageId) {
         if (!messageRepository.existsById(messageId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다.");
