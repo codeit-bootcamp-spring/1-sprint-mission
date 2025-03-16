@@ -75,7 +75,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                             throw new RuntimeException(e);
                         }
                     }).filter(Objects::nonNull)
-                    .filter(readStatus -> readStatus.isSameChannelId(channelId))
+                    .filter(readStatus -> readStatus.isSameChannelById(channelId))
                     .toList();
             return readStatuses;
         } catch (IOException e) {
@@ -98,7 +98,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                             throw new RuntimeException(e);
                         }
                     }).filter(Objects::nonNull)
-                    .filter(readStatus -> readStatus.isSameUserId(userId))
+                    .filter(readStatus -> readStatus.isSameUserById(userId))
                     .toList();
             return readStatuses;
         } catch (IOException e) {

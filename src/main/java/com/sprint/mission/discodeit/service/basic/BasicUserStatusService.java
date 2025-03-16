@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.OnlineStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -24,17 +25,16 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus create(UserStatusCreateRequest userStatusCreateRequest) {
-        if (!userRepository.existsById(userStatusCreateRequest.userId())) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
-        }
+        User user = Optional.ofNullable(userRepository.find(userStatusCreateRequest.userId()))
+            .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
         findAll().forEach(userStatus -> {
-                    if (userStatus.isSameUserId(userStatusCreateRequest.userId())) {
+                    if (userStatus.isSameUserById(userStatusCreateRequest.userId())) {
                         throw new IllegalArgumentException("[ERROR] 이미 존재하는 데이터입니다.");
                     }
                 });
 
-        return userStatusRepository.save(new UserStatus(userStatusCreateRequest.userId()));
+        return userStatusRepository.save(new UserStatus(user, userStatusCreateRequest.lastActiveAt()));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus findByUserId(UUID userId) {
         return findAll().stream()
-                .filter(userStatus -> userStatus.isSameUserId(userId))
+                .filter(userStatus -> userStatus.isSameUserById(userId))
                 .findAny()
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
     }

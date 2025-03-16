@@ -9,9 +9,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.ChannelValidator;
@@ -28,6 +30,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelValidator validator;
 
     private final ReadStatusService readStatusService;
+    private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
@@ -60,7 +63,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public List<ChannelResponse> findAllByUserId(UUID userId) {
         List<UUID> joinedChannels = readStatusService.findAllByUserId(userId).stream()
-                .map(ReadStatus::getChannelId)
+                .map(ReadStatus::getChannel)
+                .map(BaseEntity::getId)
                 .toList();
 
         return channelRepository.findAll().stream()
@@ -72,7 +76,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Instant findLastMessageTime(UUID channelId) {
         return messageRepository.findAll().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
+                .filter(message -> message.isSameChannelById(channelId))
                 .max(Comparator.comparing(Message::getCreatedAt))
                 .map(Message::getCreatedAt)
                 .orElse(Instant.EPOCH);
@@ -84,7 +88,8 @@ public class BasicChannelService implements ChannelService {
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             readStatusRepository.findAllByChannelId(channel.getId())
                     .stream()
-                    .map(ReadStatus::getUserId)
+                    .map(ReadStatus::getUser)
+                    .map(BaseEntity::getId)
                     .forEach(participantIds::add);
         }
         return participantIds;
@@ -111,10 +116,6 @@ public class BasicChannelService implements ChannelService {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
-        messageRepository.findAll().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .forEach(message -> messageRepository.delete(message.getId()));
-        readStatusService.deleteByChannelId(channelId);
         channelRepository.delete(channelId);
     }
 }

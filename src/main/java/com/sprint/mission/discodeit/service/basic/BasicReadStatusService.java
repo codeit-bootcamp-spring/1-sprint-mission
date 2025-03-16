@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -25,23 +27,20 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest) {
-        if (!channelRepository.existsById(readStatusCreateRequest.channelId())) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
-        }
-        if (!userRepository.existsById(readStatusCreateRequest.userId())) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
-        }
+        User user = Optional.ofNullable(userRepository.find(readStatusCreateRequest.userId()))
+            .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
+
+        Channel channel = Optional.ofNullable(channelRepository.find(readStatusCreateRequest.channelId()))
+            .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
         findAllByUserId(readStatusCreateRequest.userId())
                 .forEach(readStatus -> {
-                    if (readStatus.isSameChannelId(readStatusCreateRequest.channelId())) {
+                    if (readStatus.isSameChannelById(readStatusCreateRequest.channelId())) {
                         throw new IllegalArgumentException("[ERROR] 이미 존재하는 데이터입니다.");
                     }
                 });
 
-        return readStatusRepository.save(new ReadStatus(readStatusCreateRequest.channelId(),
-            readStatusCreateRequest.userId(),
-            readStatusCreateRequest.lastReadAt()));
+        return readStatusRepository.save(new ReadStatus(user, channel, readStatusCreateRequest.lastReadAt()));
     }
 
     @Override

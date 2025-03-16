@@ -1,18 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
+@NoArgsConstructor
 public class Channel extends BaseUpdatableEntity {
-    private ChannelType type;
+
+    @Column(length = 100)
     private String name;
+
+    @Column(length = 500)
     private String description;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ChannelType type;
 
     public Channel(ChannelType type, String name, String description) {
         this.type = type;
@@ -20,10 +34,9 @@ public class Channel extends BaseUpdatableEntity {
         this.description = description;
     }
 
-
     public void update(String name, String description) {
         updateName(name);
-        updatedescription(description);
+        updateDescription(description);
     }
 
     public void updateName(String name) {
@@ -33,7 +46,7 @@ public class Channel extends BaseUpdatableEntity {
         this.name = name;
     }
 
-    public void updatedescription(String description) {
+    public void updateDescription(String description) {
         if (this.description.equals(description)) {
             return;
         }

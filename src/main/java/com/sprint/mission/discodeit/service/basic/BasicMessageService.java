@@ -3,7 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -30,29 +33,25 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> binaryContentRequests) {
-        if (!userRepository.existsById(messageCreateRequest.authorId())) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
-        }
-        if (!channelRepository.existsById(messageCreateRequest.channelId())) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
-        }
+        User author = Optional.ofNullable(userRepository.find(messageCreateRequest.authorId()))
+            .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
+
+        Channel channel = Optional.ofNullable(channelRepository.find(messageCreateRequest.channelId()))
+            .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
+
         validator.validate(messageCreateRequest.content());
 
-        List<UUID> attachmentsIds = binaryContentRequests.stream()
-                .map(binaryContentRequest -> binaryContentService.create(binaryContentRequest).getId())
+        List<BinaryContent> attachments = binaryContentRequests.stream()
+                .map(binaryContentService::create)
                 .toList();
 
-        return messageRepository.save(new Message(messageCreateRequest.content(),
-                messageCreateRequest.authorId(),
-                messageCreateRequest.channelId(),
-            attachmentsIds));
+        return messageRepository.save(new Message(messageCreateRequest.content(), channel, author, attachments));
     }
 
     @Override
     public Message find(UUID messageId) {
-        Message message = Optional.ofNullable(messageRepository.find(messageId))
+      return Optional.ofNullable(messageRepository.find(messageId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
-        return message;
     }
 
     @Override
@@ -86,10 +85,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
-        Message message = Optional.ofNullable(messageRepository.find(messageId))
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
+        find(messageId);
 
-        message.getAttachmentsIds().forEach(binaryContentService::delete);
         messageRepository.delete(messageId);
     }
 }

@@ -33,14 +33,14 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
         return data.values().stream()
-                .filter(readstatus -> readstatus.isSameChannelId(channelId))
+                .filter(readstatus -> readstatus.isSameChannelById(channelId))
                 .toList();
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return data.values().stream()
-                .filter(readstatus -> readstatus.isSameUserId(userId))
+                .filter(readstatus -> readstatus.isSameUserById(userId))
                 .toList();
     }
 

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.dto.readStatus;
 
-import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import java.time.Instant;
 import java.util.UUID;
 

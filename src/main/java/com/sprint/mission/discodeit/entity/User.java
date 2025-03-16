@@ -1,49 +1,65 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
 @Getter
+@NoArgsConstructor
 public class User extends BaseUpdatableEntity {
-    // TODO: profileId 변수 및 관련 로직 제거
-    private UUID profileId;
-
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
+
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
+    @OneToOne
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "profile_id")
     private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
     private UserStatus status;
 
-    public User(String username, String email, String password, BinaryContent profile, UserStatus status) {
+    public User(String username, String email, String password, BinaryContent profile) {
         this.username = username;
         this.email = email;
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
 
         this.profile = profile;
-        this.status = status;
     }
 
-    public void update(UUID binaryContentId, String name, String email, String password) {
-        updateBinaryContentId(binaryContentId);
+    public void update(BinaryContent profile, String name, String email, String password) {
+        updateProfile(profile);
         updateName(name);
         updateEmail(email);
         updatePassword(password);
     }
 
-    public void updateBinaryContentId(UUID profileId) {
-        if (profileId == null || this.profileId.equals(profileId)) {
+    public void updateProfile(BinaryContent profile) {
+        if (profile.getId() == null || this.profile.getId().equals(profile.getId())) {
             return;
         }
-        this.profileId = profileId;
+        this.profile = profile;
     }
 
     public void updateName(String username) {

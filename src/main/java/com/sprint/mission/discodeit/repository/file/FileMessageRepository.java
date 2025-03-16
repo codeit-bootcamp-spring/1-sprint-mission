@@ -98,7 +98,7 @@ public class FileMessageRepository implements MessageRepository {
                             throw new RuntimeException(e);
                         }
                     }).filter(Objects::nonNull)
-                    .filter(message -> message.isSameChannelId(channelId))
+                    .filter(message -> message.isSameChannelById(channelId))
                     .toList();
             return messages;
         } catch (IOException e) {
@@ -121,7 +121,7 @@ public class FileMessageRepository implements MessageRepository {
                             throw new RuntimeException(e);
                         }
                     }).filter(Objects::nonNull)
-                    .filter(message -> message.isSameAuthorId(authorId))
+                    .filter(message -> message.isSameAuthorById(authorId))
                     .toList();
             return messages;
         } catch (IOException e) {

@@ -2,20 +2,36 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
+@Table(uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+})
+@NoArgsConstructor
 public class ReadStatus extends BaseUpdatableEntity {
-    // TODO: channelId, userId 변수 및 관련 로직 제거
-    private UUID channelId;
-    private UUID userId;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
+
+    @Column(nullable = false)
     private Instant lastReadAt;
 
     public ReadStatus(User user, Channel channel, Instant lastReadAt) {
@@ -30,11 +46,11 @@ public class ReadStatus extends BaseUpdatableEntity {
         }
     }
 
-    public boolean isSameChannelId(UUID channelId) {
-        return this.channelId.equals(channelId);
+    public boolean isSameChannelById(UUID channelId) {
+        return this.channel.getId().equals(channelId);
     }
 
-    public boolean isSameUserId(UUID userId) {
-        return this.userId.equals(userId);
+    public boolean isSameUserById(UUID userId) {
+        return this.user.getId().equals(userId);
     }
 }
