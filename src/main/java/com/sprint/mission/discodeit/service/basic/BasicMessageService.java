@@ -1,18 +1,20 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.MessageDTO;
-import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDTO;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.util.Optional;
@@ -33,6 +35,7 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentService binaryContentService;
+  private final ChannelService channelService;
 
   @Override
   public Message create(MessageCreateRequest messageCreateRequest,
@@ -40,18 +43,17 @@ public class BasicMessageService implements MessageService {
     Channel channel = channelRepository.findById(messageCreateRequest.channelId())
         .orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
 
-    if (!userRepository.existsId(messageCreateRequest.writerId())) {
-      throw new NoSuchElementException("유저가 존재하지 않습니다.");
-    }
+    User writer = userRepository.findById(messageCreateRequest.writerId())
+        .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-    boolean isMember = channel.getMemberList().stream()
+    boolean isMember = channelService.getParticipantIds(channel.getId()).stream()
         .anyMatch(uuid -> uuid.equals(messageCreateRequest.writerId()));
 
     if (channel.getType() == ChannelType.PRIVATE && !isMember) {
       throw new IllegalArgumentException("PRIVATE 채널의 멤버가 아닙니다.");
     }
 
-    List<UUID> binaryContentIds = Optional.ofNullable(attachments)
+    List<BinaryContent> binaryContents = Optional.ofNullable(attachments)
         .filter(list -> !list.isEmpty()) // 리스트가 비어있지 않은 경우만 처리
         .map(files -> files.stream()
             .map(this::resolveAttachment)
@@ -59,20 +61,19 @@ public class BasicMessageService implements MessageService {
         .orElse(List.of());
 
     Message message = new Message(
-        messageCreateRequest.channelId(),
+        channel,
+        writer,
         messageCreateRequest.content(),
-        messageCreateRequest.writerId(),
-        binaryContentIds);
+        binaryContents);
     return messageRepository.save(message);
   }
 
-  private UUID resolveAttachment(MultipartFile file) {
+  private BinaryContent resolveAttachment(MultipartFile file) {
     try {
-      BinaryContent binaryContent = binaryContentService.create(new BinaryContentCreateRequest(
+      return binaryContentService.create(new BinaryContentCreateRequest(
           file.getOriginalFilename(),
           file.getContentType(),
           file.getBytes()));
-      return binaryContent.getId();
     } catch (IOException e) {
       throw new RuntimeException("파일 처리 중 오류 발생", e);
     }
@@ -106,7 +107,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
 
-    if (!message.getWriterId().equals(messageUpdateRequest.writerId())) {
+    if (!message.getWriter().getId().equals(messageUpdateRequest.writerId())) {
       throw new IllegalArgumentException("작성자만 수정 할 수 있습니다.");
     }
 
@@ -119,11 +120,12 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
 
-    if (!message.getWriterId().equals(writerId)) {
+    if (!message.getWriter().getId().equals(writerId)) {
       throw new IllegalArgumentException("작성자만 삭제 할 수 있습니다.");
     }
 
-    message.getAttachmentIds()
+    message.getAttachments().stream()
+        .map(BinaryContent::getId)
         .forEach(binaryContentRepository::deleteById);
 
     messageRepository.delete(messageId);

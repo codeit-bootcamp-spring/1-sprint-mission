@@ -1,36 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class UserStatus extends BaseEntity implements Serializable {
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-  private final UUID userId;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
+
+  @Column(name = "last_active_at")
   private Instant lastActiveAt;
 
-  public UserStatus(UUID userId, Instant lastActiveAt) {
-    super();
-    this.userId = userId;
-    this.lastActiveAt = lastActiveAt;
-  }
 
-  public void update(Instant lastActiveAt) {
-    boolean isUpdated = false;
-    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
-      this.lastActiveAt = lastActiveAt;
-      isUpdated = true;
-    }
-
-    if (isUpdated) {
-      updated();
-    }
+  public void update(Instant newLastActiveAt) {
+    this.lastActiveAt = newLastActiveAt;
   }
 
   public boolean isUserOnline() {

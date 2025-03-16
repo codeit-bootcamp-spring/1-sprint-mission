@@ -1,51 +1,37 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class Channel extends BaseEntity implements Serializable {
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-  private final User admin;
-  private final ChannelType type;
-  private String channelName;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(nullable = false)
+  private String name;
+  @Column(columnDefinition = "TEXT")
   private String description;
-  private List<UUID> memberList;
 
-  public Channel(ChannelType type, String channelName, String description, User admin) {
-    super();
-    this.channelName = channelName;
-    this.admin = admin;
-    this.memberList = new ArrayList<>();
-    this.type = type;
-    this.description = description;
-  }
-
-  public void update(String newName) {
-    boolean isUpdated = false;
-    if (!newName.equals(this.channelName)) {
-      this.channelName = newName;
-      isUpdated = true;
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    if (isUpdated) {
-      updated();
+    if (!newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
   }
-
-  public void addMember(UUID userId) {
-    memberList.add(userId);
-  }
-
-  public void deleteMember(UUID userId) {
-    memberList.remove(userId);
-  }
-
 }

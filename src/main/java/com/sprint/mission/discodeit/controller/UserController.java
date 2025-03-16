@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.user_status.UserStatusUpdateRequest;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -30,7 +30,7 @@ public class UserController {
 
   @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDTO> createUser(
-      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     User user = userService.create(userCreateRequest, profile);

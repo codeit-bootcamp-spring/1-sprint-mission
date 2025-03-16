@@ -1,39 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.List;
-import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class Message extends BaseEntity implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID channelId;
-    private final UUID writerId;
-    private String content;
-    private List<UUID> attachmentIds;
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
-    public Message(UUID channelId, String content, UUID writerId, List<UUID> attachmentIds) {
-        super();
-        this.channelId = channelId;
-        this.writerId = writerId;
-        this.content = content;
-        this.attachmentIds = attachmentIds;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", nullable = false)
+  private User writer;
+
+  @Column(columnDefinition = "TEXT")
+  private String content;
+
+  @OneToMany
+  private List<BinaryContent> attachments;
+
+
+  public void update(String newContent) {
+    if (!newContent.equals(this.content)) {
+      this.content = newContent;
     }
-
-    public void update(String newContent) {
-        boolean isUpdated = false;
-        if (!newContent.equals(this.content)) {
-            this.content = newContent;
-            isUpdated = true;
-        }
-
-        if (isUpdated) {
-            updated();
-        }
-    }
-
+  }
 
 }

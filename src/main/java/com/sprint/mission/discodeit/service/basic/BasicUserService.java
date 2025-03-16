@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -52,14 +52,17 @@ public class BasicUserService implements UserService {
         .map(request -> binaryContentService.create(request).getId())
         .orElse(null);
 
+    BinaryContent nullableProfile = binaryContentRepository.findById(nullableProfileId)
+        .orElseThrow(() -> new NoSuchElementException("프로필이 존재하지 않습니다."));
+
     User user = new User(
         userCreateRequest.userName(),
         userCreateRequest.email(),
         userCreateRequest.password(),
-        nullableProfileId);
+        nullableProfile);
     userRepository.save(user);
 
-    UserStatus userStatus = new UserStatus(user.getId(), Instant.EPOCH);
+    UserStatus userStatus = new UserStatus(user, Instant.EPOCH);
     userStatusRepository.save(userStatus);
 
     return user;
@@ -124,12 +127,12 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-    if (binaryContentRepository.existsId(user.getProfileId())) {
-      binaryContentRepository.deleteById(user.getProfileId());
+    if (binaryContentRepository.existsById(user.getProfile().getId())) {
+      binaryContentRepository.deleteById(user.getProfile().getId());
     }
 
-    userStatusRepository.deleteByUserId(userId);
-    userRepository.delete(userId);
+    userStatusRepository.deleteById(userId);
+    userRepository.deleteById(userId);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
