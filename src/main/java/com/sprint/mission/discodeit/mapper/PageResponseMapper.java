@@ -7,7 +7,7 @@ import org.springframework.data.domain.Slice;
 
 public class PageResponseMapper {
 
-  public static <T> PageResponse<T> fromSlice(Slice<T> slice) {
+/*  public static <T> PageResponse<T> fromSlice(Slice<T> slice) {
     return new PageResponse<>(
         slice.getContent(),
         slice.getNumber(),
@@ -25,5 +25,5 @@ public class PageResponseMapper {
         page.hasNext(),
         page.getTotalElements()
     );
-  }
+  }*/
 }

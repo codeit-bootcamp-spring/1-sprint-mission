@@ -21,6 +21,7 @@ import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validator.MessageValidator;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -89,11 +90,37 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-    Page<MessageDto> messageDtos = messageRepository.findAllByChannel_Id(channelId, pageable)
-        .map(messageMapper::toDto);
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
+      Pageable pageable) {
+    Page<Message> messagePage;
+    boolean hasNext;
+    Long totalElements = null;
 
-    return PageResponseMapper.fromPage(messageDtos);
+    // 커서가 없으면 첫 페이지 요청, 커서가 있으면 해당 커서 이후 데이터 요청
+    if (cursor == null) {
+      messagePage = messageRepository.findAllByChannel_Id(channelId, pageable);
+      hasNext = messagePage.hasNext();
+      totalElements = messagePage.getTotalElements();
+    } else {
+      messagePage = messageRepository.findAllByChannel_IdAndCreatedAtBefore(channelId, cursor,
+          pageable);
+      hasNext = messagePage.hasNext();
+      totalElements = messagePage.getTotalElements();
+    }
+
+    // 메시지 DTO로 변환
+    List<MessageDto> messageDtos = messagePage.getContent().stream()
+        .map(messageMapper::toDto)
+        .toList();
+
+    // 다음 페이지의 커서값 설정 (최신 메시지의 createdAt 값)
+    Instant nextCursor = null;
+    if (hasNext && !messagePage.getContent().isEmpty()) {
+      nextCursor = messagePage.getContent().get(messagePage.getContent().size() - 1).getCreatedAt();
+    }
+
+    return new PageResponse<>(messageDtos, nextCursor, pageable.getPageSize(), hasNext,
+        totalElements);
   }
 
   @Override
