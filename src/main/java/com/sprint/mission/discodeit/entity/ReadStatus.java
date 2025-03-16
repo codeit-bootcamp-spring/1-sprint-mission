@@ -1,35 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 
 @Getter
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "read_statuses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    }
+)
 public class ReadStatus extends BaseUpdatableEntity {
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-  private UUID userId;
-  private UUID channelId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
 
-  @Column(nullable = false)
+
+  @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
 
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.userId = userId;
-    this.channelId = channelId;
-    this.lastReadAt = lastReadAt;
-  }
 
   //lastReadAt 시간 수정.
-  public void updateReadStatus(Instant time) {
+  public void updateLastReadAt(Instant time) {
     lastReadAt = time;
   }
-
 
 }

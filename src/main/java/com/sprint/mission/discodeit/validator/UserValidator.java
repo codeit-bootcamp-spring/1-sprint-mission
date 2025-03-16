@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.validator;
 
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +32,9 @@ public class UserValidator {
   }
 
   public void validateUserId(UUID userId) {
-    User findUser = userRepository.findById(userId);
-    Optional.ofNullable(findUser)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+    if (!userRepository.existsById(userId)) {
+      throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
+    }
   }
 
   public void validateUsername(String username) {

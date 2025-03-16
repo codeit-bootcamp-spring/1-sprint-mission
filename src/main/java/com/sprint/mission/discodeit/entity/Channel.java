@@ -1,6 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -8,19 +16,25 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "channels")
 public class Channel extends BaseUpdatableEntity {
 
+  @Column(length = 100)
   private String name;
-  private String description;
-  private ChannelType type;
 
-  public Channel(String name, String description, ChannelType type) {
-    this.name = name;
-    this.description = description;
-    this.type = type;
-  }
+  @Column(length = 500)
+  private String description;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type", nullable = false)
+  private ChannelType channelType;
+
 
   public void setChannel(String name, String description) {
     if (name != null && !name.equals(this.name)) {

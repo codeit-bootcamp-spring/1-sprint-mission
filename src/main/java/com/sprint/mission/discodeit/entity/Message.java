@@ -1,26 +1,56 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "messages")
 public class Message extends BaseUpdatableEntity {
 
   private String content;
-  private UUID authorId;
-  private UUID channelId;
-  private List<UUID> attachmentIds;
 
-  public Message(String content, UUID userId, UUID channelId, List<UUID> attachmentIds) {
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", nullable = false)
+  private User author;
+
+  //생성시 persist, 삭제는 ddl - on delete cascade
+  @OneToMany(cascade = CascadeType.PERSIST)
+  @JoinTable(
+      name = "message_attachments", // ERD에 있는 중간 테이블 이름
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachments = new ArrayList<>();
+
+  public Message(String content, User author, Channel channel) {
     this.content = content;
-    this.authorId = userId;
-    this.channelId = channelId;
-    attachmentIds = attachmentIds;
+    this.author = author;
+    this.channel = channel;
+  }
+
+  public void addAttachments(BinaryContent attachment) {
+    this.attachments.add(attachment);
   }
 
 

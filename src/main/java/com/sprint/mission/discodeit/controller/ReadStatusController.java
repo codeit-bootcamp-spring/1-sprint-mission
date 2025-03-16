@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.swagger.ReadStatusApi;
-import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,14 +21,14 @@ public class ReadStatusController implements ReadStatusApi {
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateDTO request) {
+  public ResponseEntity<ReadStatusDto> create(@RequestBody ReadStatusCreateDTO request) {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(readStatusService.create(request));
   }
 
   @PatchMapping("{readStatusId}")
-  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId,
+  public ResponseEntity<ReadStatusDto> update(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateDTO request) {
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -37,7 +36,7 @@ public class ReadStatusController implements ReadStatusApi {
   }
 
   @GetMapping
-  public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam("userId") UUID userId) {
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(readStatusService.findAllByUserId(userId));

@@ -3,13 +3,13 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.swagger.UserApi;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserFindDTO;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class UserController implements UserApi {
   private final UserStatusService userStatusService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<User> create(
+  public ResponseEntity<UserDto> create(
       @RequestPart("userCreateRequest") UserCreateDTO userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
@@ -44,7 +44,7 @@ public class UserController implements UserApi {
   }
 
   @PatchMapping("{userId}")
-  public ResponseEntity<User> update(@PathVariable UUID userId,
+  public ResponseEntity<UserDto> update(@PathVariable UUID userId,
       @RequestPart("userUpdateDTO") UserUpdateDTO userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
@@ -64,14 +64,14 @@ public class UserController implements UserApi {
   }
 
   @GetMapping
-  public ResponseEntity<List<UserFindDTO>> findAll() {
+  public ResponseEntity<List<UserDto>> findAll() {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userService.findAll());
   }
 
   @PatchMapping("{userId}/userStatus")
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateDTO request) {
     return ResponseEntity
         .status(HttpStatus.OK)

@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.UUID;
 import lombok.NoArgsConstructor;
 
 @Getter
@@ -27,26 +30,37 @@ public class User extends BaseUpdatableEntity {
   @Column(nullable = false)
   private String password;
 
-  //one to one (이 필드 바꿔야함)
-  private UUID profileId;
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private UserStatus status;
 
-  //1대1
-  //userStatus 추가
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
 
-  public User(String username, String email, String password, UUID profileId) {
+  public User(String username, String email, String password, BinaryContent profile) {
 
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
+  }
+
+  public void addUserStatus(UserStatus status) {
+    this.status = status;
+    status.addUser(this);
+  }
+
+  public void updateProfile(BinaryContent profile) {
+    this.profile = profile;
   }
 
 
-  public void updateUser(String username, String email, String password, UUID profileId) {
+  public void updateUser(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
+    //this.profileId = profileId;
   }
 
 }

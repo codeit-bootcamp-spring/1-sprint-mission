@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.swagger.MessageApi;
-import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class MessageController implements MessageApi {
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<Message> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateDTO messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
@@ -49,11 +48,11 @@ public class MessageController implements MessageApi {
         .orElse(new ArrayList<>());
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(messageService.create(messageCreateRequest, attachments));
+        .body(messageService.create(messageCreateRequest, attachmentRequests));
   }
 
   @PatchMapping("{messageId}")
-  public ResponseEntity<Message> update(@PathVariable UUID messageId,
+  public ResponseEntity<MessageDto> update(@PathVariable UUID messageId,
       @RequestBody MessageUpdateDTO request) {
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -69,7 +68,7 @@ public class MessageController implements MessageApi {
   }
 
   @GetMapping
-  public ResponseEntity<List<Message>> findAllByChannelId(
+  public ResponseEntity<List<MessageDto>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId) {
     return ResponseEntity
         .status(HttpStatus.OK)

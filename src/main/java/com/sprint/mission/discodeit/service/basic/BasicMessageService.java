@@ -2,87 +2,109 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jpa.MessageRepository;
+import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validator.MessageValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
+
   private final MessageRepository messageRepository;
-  private final BinaryContentService binaryContentService;
   private final MessageValidator messageValidator;
+
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
+  private final MessageMapper messageMapper;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  public Message create(MessageCreateDTO dto,
+  @Transactional
+  public MessageDto create(MessageCreateDTO dto,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-    messageValidator.validateMessage(dto.getContent(), dto.getAuthorId(), dto.getChannelId());
+    //messageValidator.validateMessage(dto.getContent(), dto.getAuthorId(), dto.getChannelId());
+    User findUser = userRepository.findById(dto.getAuthorId())
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+    Channel findChannel = channelRepository.findById(dto.getChannelId())
+        .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+
+    Message message = new Message(dto.getContent(), findUser, findChannel);
+
+    binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
-          String fileName = attachmentRequest.getFileName();
-          String contentType = attachmentRequest.getContentType();
-          byte[] bytes = attachmentRequest.getBytes();
+          BinaryContent binaryContent = new BinaryContent(
+              attachmentRequest.getFileName(),
+              attachmentRequest.getContentType(),
+              (long) attachmentRequest.getBytes().length
+          );
 
-          return binaryContentRepository.save(
-              new BinaryContent(bytes, fileName, contentType, (long) bytes.length)).getId();
-        }).toList();
+          BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(savedBinaryContent.getId(), attachmentRequest.getBytes());
+          return savedBinaryContent;
+        })
+        .forEach(message::addAttachments);
 
-    Message message = new Message(dto.getContent(), dto.getAuthorId(), dto.getChannelId(),
-        attachmentIds);
-
-    return messageRepository.save(message);
+    messageRepository.save(message);
+    return messageMapper.toDto(message);
   }
 
+
+  //no use
   @Override
-  public Message find(UUID id) {
-    Message findMessage = messageRepository.findById(id);
-    return Optional.ofNullable(findMessage)
+  @Transactional(readOnly = true)
+  public MessageDto find(UUID id) {
+    Message message = messageRepository.findById(id)
         .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+    return messageMapper.toDto(message);
+  }
+
+
+  //나중에 페이징해서 처리해야함
+  @Override
+  @Transactional(readOnly = true)
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannel_Id(channelId).stream()
+        .map(messageMapper::toDto).toList();
   }
 
   @Override
-  public List<Message> findAll() {
-    return messageRepository.findAll();
-  }
-
-  @Override
-  public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId).stream().toList();
-  }
-
-  @Override
-  public Message update(UUID id, MessageUpdateDTO dto) {
-    Message findMessage = messageRepository.findById(id);
-
+  @Transactional
+  public MessageDto update(UUID id, MessageUpdateDTO dto) {
+    Message findMessage = messageRepository.findById(id)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
     findMessage.setMessage(dto.getNewContent());
-    messageRepository.update(findMessage);
-    return findMessage;
+    return messageMapper.toDto(findMessage);
   }
 
   @Override
   public void delete(UUID id) {
-    Message findMessage = messageRepository.findById(id);
-
-    for (UUID binaryContentId : findMessage.getAttachmentIds()) {
-      binaryContentService.delete(binaryContentId);
-    }
-    messageRepository.delete(findMessage.getId());
+    //binaryContent ddl - on delete cascade
+    messageRepository.deleteById(id);
   }
+
+
 }

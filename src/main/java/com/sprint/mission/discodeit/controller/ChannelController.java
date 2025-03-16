@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.swagger.ChannelApi;
-import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,21 +22,21 @@ public class ChannelController implements ChannelApi {
   private final ChannelService channelService;
 
   @PostMapping("public")
-  public ResponseEntity<Channel> createPublic(@RequestBody ChannelCreatePublicDTO request) {
+  public ResponseEntity<ChannelDto> createPublic(@RequestBody ChannelCreatePublicDTO request) {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(channelService.create(request));
   }
 
   @PostMapping("private")
-  public ResponseEntity<Channel> createPrivate(@RequestBody ChannelCreatePrivateDTO request) {
+  public ResponseEntity<ChannelDto> createPrivate(@RequestBody ChannelCreatePrivateDTO request) {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(channelService.create(request));
   }
 
   @PatchMapping("{channelId}")
-  public ResponseEntity<Channel> update(@PathVariable UUID channelId,
+  public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateDTO request) {
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -54,7 +52,7 @@ public class ChannelController implements ChannelApi {
   }
 
   @GetMapping
-  public ResponseEntity<List<ChannelFindDTO>> findAllByUserId(@RequestParam("userId") UUID userId) {
+  public ResponseEntity<List<ChannelDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(channelService.findAllByUserId(userId));

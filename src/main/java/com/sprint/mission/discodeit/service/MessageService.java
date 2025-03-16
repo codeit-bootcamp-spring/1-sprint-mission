@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
 
@@ -13,16 +14,14 @@ import org.springframework.web.multipart.MultipartFile;
 public interface MessageService {
 
 
-  Message create(MessageCreateDTO dto,
+  MessageDto create(MessageCreateDTO dto,
       List<BinaryContentCreateRequest> binaryContentCreateRequests);
 
-  Message find(UUID id);
+  MessageDto find(UUID id);
 
-  List<Message> findAll();
+  List<MessageDto> findAllByChannelId(UUID ChannelId);
 
-  List<Message> findAllByChannelId(UUID ChannelId);
-
-  Message update(UUID id, MessageUpdateDTO messageUpdateDTO);
+  MessageDto update(UUID id, MessageUpdateDTO messageUpdateDTO);
 
   void delete(UUID id);
 }

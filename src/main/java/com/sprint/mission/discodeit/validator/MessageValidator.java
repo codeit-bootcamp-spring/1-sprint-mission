@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,14 +34,12 @@ public class MessageValidator {
   }
 
   public void validateUserId(UUID userId) {
-    User findUser = userRepository.findById(userId);
-    Optional.ofNullable(findUser)
+    User findUser = userRepository.findById(userId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
   }
 
   public void validateChannelId(UUID channelId) {
-    Channel findChannel = channelRepository.findById(channelId);
-    Optional.ofNullable(findChannel)
+    Channel findChannel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
   }
 }
