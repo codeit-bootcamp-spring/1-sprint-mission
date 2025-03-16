@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record PrivateChannelCreateRequest(
-        List<UUID> participantIds
+    List<UUID> participantIds // TODO찐: array<String> 형으로 수정
 ) {
+
 }

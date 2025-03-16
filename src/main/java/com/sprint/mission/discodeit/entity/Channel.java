@@ -1,43 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Channel implements Serializable {
+@Entity
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private final UUID id = UUID.randomUUID();
-  private final Instant createdAt = Instant.now();
-  private Instant updatedAt;
-
+  @Column(length = 100)
   private String name;
-  private String topic;
+  @Column(length = 500)
+  private String description;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 10)
   private ChannelType type;
 
-
-  public void update(String name, String topic) {
+  public void update(String name, String description) {
     this.name = name;
-    this.topic = topic;
+    this.description = description;
     this.updatedAt = Instant.now();
-  }
-
-  @Override
-  public String toString() {
-    return "Channel{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", topic='" + topic + '\'' +
-        '}';
   }
 }

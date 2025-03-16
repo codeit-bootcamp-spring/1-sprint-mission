@@ -1,61 +1,59 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
-import com.sprint.mission.discodeit.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.*;
 
-@RequiredArgsConstructor
+// TODO 부모 클래스 ChannelMapper에 반드시 기본생성자가 있어야 함-> 자식클래스의 생성자에서는 부모클래스의 기본생성자를 호출하기 때문.
+@AllArgsConstructor
 @Service
-public class BasicChannelService implements ChannelService {
+public class BasicChannelService extends ChannelMapper implements ChannelService {
 
-  private final ChannelRepository channelRepository;
-  private final ReadStatusRepository readStatusRepository;
-  private final MessageRepository messageRepository;
-  private final BinaryContentRepository binaryContentRepository;
+  private ChannelRepository channelRepository;
 
 
+  @Transactional
   @Override
-  public Channel createPublicChannel(PublicChannelCreateRequest request) {
+  public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
     // 1. 파라미터 예외처리, 변수에 넣기 2. 객체 만들기 3. repository.save
     String channelName = request.name();
-    String channelTopic = request.topic();
+    String channelDescription = request.description();
     Channel channel = Channel.builder()
         .name(channelName)
-        .topic(channelTopic)
+        .description(channelDescription)
         .type(ChannelType.PUBLIC)
         .build();
-    return channelRepository.save(channel);
+    return toDto(channelRepository.save(channel));
   }
 
+
+  @Transactional
   @Override
-  public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
+  public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
     Channel channel = Channel.builder()
         .name(null)
-        .topic(null)
+        .description(null)
         .type(ChannelType.PRIVATE)
         .build();
     Channel createdChannel = channelRepository.save(channel);
     for (UUID userId : request.participantIds()) {
       ReadStatus readStatus = ReadStatus.builder()
-          .userId(userId)
-          .channelId(createdChannel.getId())
-          .lastReadAt(Instant.MIN)
+          .channel(createdChannel)
+          .lastReadAt(createdChannel.getCreatedAt())
           .build();
       readStatusRepository.save(readStatus);
     }
-    return createdChannel;
+    return toDto(createdChannel);
   }
 
   @Override
@@ -76,7 +74,8 @@ public class BasicChannelService implements ChannelService {
         returnChannels.add(toDto(channel));
       } else if (channel.getType().equals(ChannelType.PRIVATE)) {
         Optional<ReadStatus> optionalReadStatus = readStatusRepository.findById(channel.getId());
-        if (optionalReadStatus.isPresent() && optionalReadStatus.get().getUserId().equals(userId)) {
+        if (optionalReadStatus.isPresent() && optionalReadStatus.get().getUser().getId()
+            .equals(userId)) {
           returnChannels.add(toDto(channel));
         }
       }
@@ -85,26 +84,30 @@ public class BasicChannelService implements ChannelService {
   }
 
 
+  @Transactional
   @Override
-  public Channel update(UUID channelId, ChannelUpdateRequest request) {
+  public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     // private 채널이면 수정할 수 없다는 말
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("해당 채널이 존재하지 않습니다."));
+        .orElseThrow(() -> new NoSuchElementException("해당 채널을 찾을 수 없습니다."));
     if (channel.getType().equals(ChannelType.PRIVATE)) {
-      System.out.println("PRIVATE 채널은 수정할 수 없습니다.");
+      throw new IllegalArgumentException("private 채널은 수정할 수 없습니다.");
     }
-    String newName = request.name();
-    String newTopic = request.topic();
-    channel.update(newName, newTopic);
-    return channelRepository.save(channel);
+    String newName = request.newName();
+    String newDescription = request.newDescription();
+    channel.update(newName, newDescription);
+    return toDto(
+        channel); // TODO 변경 감지(Dirty Checking) : save 안해줘도 JPA가 변경사항을 감지해서 트랜잭션이 끝날 때 자동으로 UPDATE 쿼리 실행
   }
 
+
+  @Transactional
   @Override
   public void delete(UUID channelId) {
     // 삭제 전에 채널 정보 가져오기 (로그를 위해)
     Optional<Channel> channelToDelete = channelRepository.findById(channelId);
     if (channelToDelete.isEmpty()) {
-      System.out.println("삭제하려는 채널이 존재하지 않습니다: ID = " + channelId);
+      throw new NoSuchElementException("해당 채널을 찾을 수 없습니다.");
     }
     // 관련 도메인 데이터 삭제
     readStatusRepository.deleteAllByChannelId(channelId);
@@ -114,34 +117,4 @@ public class BasicChannelService implements ChannelService {
     channelRepository.deleteById(channelId);
   }
 
-  private ChannelDto toDto(Channel channel) {
-    // 1. lastMessageAt과 participantIds 포함한 채널dto 값 반환
-    // 2. lastMessageAt과 participantIds 정의
-    // 3. private만 participantIds 포함하도록
-
-    Instant lastMessageAt = Instant.MIN; // 초기값은 가장 과거의 시간인 .MIN으로 초기화
-    List<Message> msgs = messageRepository.findAllByChannelId(channel.getId());
-    for (Message msg : msgs) {
-      if (msg.getCreatedAt().isAfter(lastMessageAt)) {
-        lastMessageAt = msg.getCreatedAt();
-      }
-    }
-
-    List<UUID> participantIds = new ArrayList<>();
-    if (channel.getType().equals(ChannelType.PRIVATE)) {
-      readStatusRepository.findAllByChannelId(channel.getId())
-          .forEach(readStatus -> participantIds.add(readStatus.getUserId()));
-      // .forEach()는 Iterable에서 제공하는 메서드라서 .stream() 안써도 된다.
-
-    }
-
-    return new ChannelDto(
-        channel.getId(),
-        channel.getType(),
-        channel.getName(),
-        channel.getTopic(),
-        participantIds,
-        lastMessageAt
-    );
-  }
 }

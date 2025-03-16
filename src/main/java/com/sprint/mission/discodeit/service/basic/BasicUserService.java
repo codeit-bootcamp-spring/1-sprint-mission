@@ -1,36 +1,40 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
-// final/nonnull 이라 값이 반드시 있어야 하는 생성자 자동 생성, @Autowired 안써줘도 생성자가 하나일 때는 자동으로 의존성 주입! (+생성자 있으면 자바단에서 기본생성자 생성 안함)
+// final/nonnull 이라 값이 반드시 있어야 하는 생성자 자동 생성, @Autowired 안써줘도 생성자가 하나일 때는 자동으로 의존성 주입 (+생성자 있으면 자바단에서 기본생성자 생성 안함)
 @Service
-public class BasicUserService implements UserService {
+public class BasicUserService extends UserMapper implements UserService {
 
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
-  private final UserStatusRepository userStatusRepository;
 
+
+  @Transactional
   @Override
   // TODO : 회원이 입력할 수 있는 값만 따로 dto로 묶어 전달
-  public User create(UserCreateRequest request,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+  public UserDto create(UserCreateRequest request,
+      Optional<MultipartFile> nullableFile) {
     // TODO : 1. 발생 가능한 예외를 먼저 생각하기 -> 예외 처리 : email과 username 검색 => 이존회
     // TODO : 2. dto -> 변수 할당 3. 객체 생성 4. repository.save
     String email = request.email();
@@ -43,21 +47,21 @@ public class BasicUserService implements UserService {
 
     // 프로필 이미지 설정
     // TODO : 이해 1. .map의 기능, 문법 2. Optional 문법 -> ok
-    // TODO : 프로필 정보를 받았어 그런데 회원 객체 생성시 프로필 아이디가 필요해 -> 옵셔널을 이용해 프로필 아이디 겟하는 로직을 써야겠네
-    UUID nullableProfileId = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = BinaryContent.builder()
-              .fileName(fileName)
-              .size((long) bytes.length)
-              .contentType(contentType)
-              .bytes(bytes)
-              .build();
-          return binaryContentRepository.save(binaryContent).getId();
-        }) // TODO : 한줄로 끝나는 코드면 자동 반환되므로 {}, return문 필요 없는데, 여러 코드가 필요하고 최종적으로 반환할 값이 있다면 "{}, return문 필수"
-        .orElse(null);
+    // TODO : 프로필 정보를 받았어 그런데 회원 객체 생성시 프로필 객체가 필요해 -> 프로필을 겟하는 로직을 써야겠네
+    MultipartFile file = nullableFile.orElse(null);
+    BinaryContent profile = BinaryContent.builder()
+        .fileName(file.getOriginalFilename())
+        .size((int) file.getSize())
+        .contentType((file.getContentType()))
+        .build();
+
+    byte[] data = null;
+    try {
+      data = file.getBytes();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    binaryContentStorage.put(profile.getId(), data);
 
     String username = request.username();
     String password = request.password();
@@ -65,14 +69,15 @@ public class BasicUserService implements UserService {
         .username(username)
         .email(email)
         .password(password)
-        .profileId(nullableProfileId)
+        .profile(profile)
         .build();
-    User createdUser = userRepository.save(newUser);
+    User user = userRepository.save(newUser);
+    UserDto createdUser = toDto(user);
 
     // 생성된 회원 user status 설정
     Instant lastActiveAt = Instant.now();
     UserStatus userStatus = UserStatus.builder()
-        .userId(createdUser.getId())
+        .user(user)
         .lastActiveAt(lastActiveAt)
         .build();
     userStatusRepository.save(userStatus);
@@ -96,10 +101,12 @@ public class BasicUserService implements UserService {
         .toList(); // 스트림 메소드. 스트림 상태인 객체들을 리스트로 변환
   }
 
+
+  @Transactional
   @Override
   // TODO : 업뎃할거야. User 엔티티의 모든 필드를 업뎃요소로 줄 필요는 없어 -> DTO 만들자
-  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<MultipartFile> nullableFile) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("아이디가 " + userId + "인 회원이 존재하지 않습니다."));
 
@@ -112,60 +119,49 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이름이 " + newUsername + "인 회원이 이미 존재합니다.");
     }
 
-    UUID nullableProfileId = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          Optional.ofNullable(user.getProfileId())
-              .ifPresent(id -> binaryContentRepository.deleteById(id));
-          // TODO : DB에서 원래 프로필을 제거해주는 로직 (DB 정리)
+    MultipartFile file = nullableFile.orElse(null);
+    if (file != null) {
+      binaryContentRepository.deleteById(user.getProfile().getId());
+    } // DB에서 기존 프로필 삭제해주는 로직
 
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = BinaryContent.builder()
-              .fileName(fileName)
-              .size((long) bytes.length)
-              .contentType(contentType)
-              .bytes(bytes)
-              .build();
-          return binaryContentRepository.save(binaryContent).getId();
-        })
-        .orElse(null);
+    String fileName = file.getOriginalFilename();
+    String contentType = file.getContentType();
+    int size = (int) file.getSize();
+    byte[] data = null;
+    try {
+      data = file.getBytes();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    BinaryContent newProfile = BinaryContent.builder()
+        .fileName(fileName)
+        .size(size)
+        .contentType(contentType)
+        .build();
+
+    binaryContentStorage.put(newProfile.getId(), data);
+
+    binaryContentRepository.save(newProfile);
 
     String newPassword = userUpdateRequest.newPassword();
-    user.update(newUsername, newEmail, newPassword, nullableProfileId);
+    user.update(newUsername, newEmail, newPassword, newProfile);
 
-    return userRepository.save(user);
+    return toDto(user);
   }
 
+
+  @Transactional
   @Override
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("아이디가 " + userId + "인 회원이 존재하지 않습니다."));
 
-    Optional.ofNullable(user.getProfileId())
-        .ifPresent(binaryContentRepository::deleteById);
+    Optional.ofNullable(user.getProfile()).map(BinaryContent::getId)
+        .ifPresent(
+            binaryContentRepository::deleteById); // BinaryContent::getId는 BinaryContent 객체가 존재하면 그 객체의 getId() 메소드를 호출하는 것
     userStatusRepository.deleteByUserId(userId); // 관련 도메인 삭제 (프로필, 회원상태)
 
     userRepository.deleteById(userId);
-  }
-
-  // DTO 변환 로직 메서드
-  // TODO : 이 클래스 내부에서만 쓰일 자체 메서드이니까 private 선언
-  // TODO : 인터페이스는 외부와 상호작용할 메서드들(로미오 역할의 특징들-성격, 말투, 목소리 등. 이런거 줄리엣 역할도 알아야 연기를 같이 할 거 아냐~)의 나열(=public)이기 때문에 private은 인터페이스에 포함되지 않는다! 당연.
-  private UserDto toDto(User user) {
-    Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(
-            userStatus -> userStatus.isOnline())// UserStatus의 Optional 값이 존재하면 isOnline 메서드 호출-> Optional<Boolean> 반환
-        .orElse(null);
-    // TODO : 이렇게 User 엔티티 말고 외부의 값이 조합된 DTO -> 해당 값 (online)은 위처럼 따로 정의를 해줘야겠지.
-    return new UserDto(
-        user.getId(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        user.getUsername(),
-        user.getEmail(),
-        user.getProfileId(),
-        online
-    );
   }
 }

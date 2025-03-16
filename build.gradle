@@ -1,4 +1,5 @@
 plugins {
+    id 'checkstyle'
     id 'java'
     id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.7'
@@ -31,9 +32,24 @@ dependencies {
     // Gradle 5.x 이상
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok'
-
+    // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql:42.6.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+checkstyle {
+    toolVersion = '1.0' // Checkstyle 버전
+    configFile = rootProject.file('checkstyle.xml') // Checkstyle 설정 파일 경로
+}
+
+// 이하 필요시에만 사용
+tasks.withType(Checkstyle) {
+    reports {
+        html.required = true // HTML 보고서 생성
+        xml.required = false // XML 보고서는 비활성화
+    }
 }

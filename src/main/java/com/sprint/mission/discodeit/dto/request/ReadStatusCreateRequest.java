@@ -4,8 +4,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ReadStatusCreateRequest(
-        UUID userId,
-        UUID channelId,
-        Instant lastReadAt
+    UUID userId,
+    UUID channelId,
+    Instant lastReadAt // TODO찐 : date-time으로 수정
 ) {
+
 }

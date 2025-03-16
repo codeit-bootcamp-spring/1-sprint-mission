@@ -18,6 +18,8 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
+checkstyle.xml
+schema.sql
 .idea
 *.iws
 *.iml
