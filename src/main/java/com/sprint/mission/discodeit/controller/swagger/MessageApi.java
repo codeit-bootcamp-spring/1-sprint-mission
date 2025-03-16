@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.controller.swagger;
 
+import com.sprint.mission.discodeit.dto.ErrorResponse;
+import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
@@ -15,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,14 +80,27 @@ public interface MessageApi {
   );
 
 
-  @Operation(summary = "Channel의 Message 목록 조회")
+  @Operation(
+      summary = "Channel의 Message 목록 조회",
+      description = "특정 Channel에 속한 Message 목록을 페이지네이션과 정렬 기준을 적용하여 조회합니다."
+  )
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "Message 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = Message.class)))
+          responseCode = "200",
+          description = "Message 목록 조회 성공",
+          content = @Content(schema = @Schema(implementation = PageResponse.class)) // PageResponse<MessageDto>로 응답
+      ),
+      @ApiResponse(
+          responseCode = "400",
+          description = "잘못된 요청",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))
       )
   })
-  ResponseEntity<List<MessageDto>> findAllByChannelId(
-      @Parameter(description = "조회할 Channel ID") UUID channelId
+  ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+      @Parameter(description = "조회할 Channel ID") UUID channelId,
+      @Parameter(
+          description = "페이지 정보 (기본값: page=0, size=50, sort=createdAt,DESC)",
+          example = "page=0&size=50&sort=createdAt,DESC"
+      ) Pageable pageable
   );
 } 

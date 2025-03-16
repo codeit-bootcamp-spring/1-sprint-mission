@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
@@ -12,6 +13,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessageRepository;
@@ -20,6 +22,8 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validator.MessageValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -83,12 +87,13 @@ public class BasicMessageService implements MessageService {
   }
 
 
-  //나중에 페이징해서 처리해야함
   @Override
   @Transactional(readOnly = true)
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannel_Id(channelId).stream()
-        .map(messageMapper::toDto).toList();
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+    Page<MessageDto> messageDtos = messageRepository.findAllByChannel_Id(channelId, pageable)
+        .map(messageMapper::toDto);
+
+    return PageResponseMapper.fromPage(messageDtos);
   }
 
   @Override
