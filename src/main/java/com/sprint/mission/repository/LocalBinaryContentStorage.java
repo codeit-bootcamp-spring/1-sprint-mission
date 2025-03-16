@@ -72,7 +72,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public UUID put(UUID id, byte[] content) {
+    public UUID put(UUID binaryContentId, byte[] content) {
 
 //        String mimeType;
 //        try (ByteArrayInputStream bais = new ByteArrayInputStream(content)){
@@ -85,14 +85,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 //        }
 //
 
-        Path path = resolvePath(id);
+        Path path = resolvePath(binaryContentId);
         try {
             Files.createFile(path);
             Files.write(path, content);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return id;
+        return binaryContentId;
     }
 
     /**

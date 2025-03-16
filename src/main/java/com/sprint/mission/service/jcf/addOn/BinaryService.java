@@ -28,9 +28,9 @@ public class BinaryService {
         //binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
         BinaryContent createdBinaryContent = binaryContentMapper.toEntity(request);
         log.info("Create binary content: {}", createdBinaryContent);
-        binaryContentRepository.save(binaryContentMapper.toEntity(request));
-        binaryContentStorage.put(createdBinaryContent.getId(), request.bytes());
-        return createdBinaryContent;
+        BinaryContent savedUser = binaryContentRepository.save(binaryContentMapper.toEntity(request));
+        binaryContentStorage.put(savedUser.getId(), request.bytes());
+        return savedUser;
     }
 
     public BinaryContent findById(UUID id){
@@ -49,7 +49,9 @@ public class BinaryService {
 
     public void deleteById(UUID binaryId) {
         if (!binaryContentRepository.existsById(binaryId)) throw new CustomException(ErrorCode.NO_SUCH_BINARY);
-        else binaryContentRepository.deleteById(binaryId);
+        else {
+            binaryContentRepository.deleteById(binaryId);
+        }
     }
 
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {

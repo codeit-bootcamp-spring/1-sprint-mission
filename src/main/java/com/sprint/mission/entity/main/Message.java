@@ -4,6 +4,8 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -31,6 +33,7 @@ public class Message extends BaseUpdatableEntity{
     private Channel channel;
 
     @ManyToOne(fetch = LAZY)
+    @OnDelete(action = OnDeleteAction.SET_NULL) // profile이 삭제되면 user의 profile은 null로 변경
     private User author;
 
     @OneToMany(cascade = REMOVE)

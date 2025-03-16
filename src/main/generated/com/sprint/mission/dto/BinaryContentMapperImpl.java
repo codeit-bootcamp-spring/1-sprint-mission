@@ -3,8 +3,6 @@ package com.sprint.mission.dto;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.entity.addOn.MessageAttachments;
-import com.sprint.mission.entity.main.User;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
@@ -52,10 +50,7 @@ public class BinaryContentMapperImpl implements BinaryContentMapper {
         size = request.size();
         contentType = request.contentType();
 
-        User user = null;
-        MessageAttachments attachments = null;
-
-        BinaryContent binaryContent = new BinaryContent( fileName, size, contentType, user, attachments );
+        BinaryContent binaryContent = new BinaryContent( fileName, size, contentType );
 
         return binaryContent;
     }

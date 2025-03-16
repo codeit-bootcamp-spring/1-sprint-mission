@@ -1,11 +1,16 @@
 package com.sprint.mission.cascade;
 
 import com.sprint.mission.dto.UserMapper;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForCreate;
+import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.BinaryContentRepository;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.repository.UserStatusRepository;
+import com.sprint.mission.service.jcf.addOn.BinaryService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
 import jakarta.persistence.EntityManager;
@@ -21,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -39,6 +46,10 @@ public class UserUserStatusCascadeTest {
 
     @Autowired
     private UserStatusRepository userStatusRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private BinaryContentRepository binaryContentRepository;
 
     @DisplayName("User의 userstauts 필드가 cascade Remove설정된거 테스트")
     @Test
@@ -51,24 +62,81 @@ public class UserUserStatusCascadeTest {
         em.clear();
 
         Optional<UserStatus> userStatus = userStatusRepository.findByUser_Id(testUserId);
-        Assertions.assertThat(userStatus).isPresent();
+        assertThat(userStatus).isPresent();
 
         userService.delete(testUserId);
 
         Optional<UserStatus> deletedUserStatus = userStatusRepository.findByUser_Id(testUserId);
-        Assertions.assertThat(deletedUserStatus).isEmpty();
+        assertThat(deletedUserStatus).isEmpty();
     }
 
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private BinaryService binaryService;
+
+
+    @Test
+    void binaryTest(){
+        // Given
+        UserDtoForCreate userDto = new UserDtoForCreate("testUser", "testPassword", "testEmail");
+        BinaryContentDtoForCreate dto = new BinaryContentDtoForCreate("testFileName", "testContentType", 100L, new byte[100]);
+        BinaryContent binaryContent = binaryService.create(dto);
+        log.info("binaryContent = {}", binaryContent);
+        assertThat(binaryContent).isNotNull();
+    }
 
     @Test
     void userAndProfile(){
         // Given
         UserDtoForCreate userDto = new UserDtoForCreate("testUser", "testPassword", "testEmail");
-        new BinaryContent()
-        userMapper.toEntityWithProfile(userDto, )
+        userService.create(userDto, null);
+        BinaryContentDtoForCreate dto = new BinaryContentDtoForCreate("testFileName", "testContentType", 100L, new byte[100]);
+
+        // When
+        Optional<BinaryContentDtoForCreate> profileDto = Optional.of(dto);
+        User createdUser = profileDto.map((binaryDto) -> {
+            BinaryContent createdBinaryContent = binaryService.create(binaryDto);
+            return userMapper.toEntityWithProfile(userDto, createdBinaryContent);
+        }).orElseGet(() -> userMapper.toEntityWithoutProfile(userDto));
+
+        User savedUser = userRepository.save(createdUser);
+        log.info("savedUser = {}", savedUser);
+        //User(username=testUser, email=testEmail, password=testPassword,
+        //                  profile=BinaryContent(fileName=testFileName, size=100, contentType=testContentType))
+
+        BinaryContent profile = savedUser.getProfile();
+        em.flush();
+        em.clear();
+
+        // Then 1. 일단 잘 저장됐는지 확인
+        Optional<User> user = userRepository.findById(savedUser.getId());
+        assertThat(user).isPresent();
+        Optional<BinaryContent> fProfile = binaryContentRepository.findById(profile.getId());
+        assertThat(fProfile).isPresent();
+        log.info("================초기화 전================");
+        // Then 2. cascade 확인 : binaryContent 삭제되도 User의 profile필드는 null로 유지됨
+        em.flush();
+        em.clear();
+        BinaryContent deletedBinary = binaryService.findById(profile.getId());
+        binaryService.deleteById(deletedBinary.getId());
+        em.flush();
+        em.clear();
+        //User testUser = userService.findById(savedUser.getId());
+        User testUser = userService.findAll().get(0);
+        log.info("testUser = {}", testUser.getProfile());
+        assertThat(testUser.getProfile()).isNotNull();
 
     }
+
+
+    //@Slf4j
+    //public record BinaryContentDtoForCreate(
+    //
+    //        @Schema(example = "zessy")
+    //        String fileName,
+    //        String contentType,
+    //        Long size,
+    //        byte[] bytes) {
 }

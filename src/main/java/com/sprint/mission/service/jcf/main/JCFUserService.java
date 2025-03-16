@@ -49,9 +49,11 @@ public class JCFUserService implements UserService {
             BinaryContent createdBinaryContent = profileService.create(binaryDto);
             return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
         }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
+        log.info("Create user의 profile : {}", createdUser.getProfile());
 
-        User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
-        return savedUser.assignStatus(userStatusService.create(savedUser));
+        //User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
+        userRepository.save(createdUser);// SAVE해야 UUID 생성
+        return createdUser.assignStatus(userStatusService.create(createdUser));
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기

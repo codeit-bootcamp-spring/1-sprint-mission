@@ -6,6 +6,8 @@ import com.sprint.mission.entity.addOn.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ public class User extends BaseUpdatableEntity{
     //변경가능하니
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "profile_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL) // profile이 삭제되면 user의 profile은 null로 변경
     private BinaryContent profile;
 
     @OneToOne(mappedBy = "user", cascade = REMOVE)

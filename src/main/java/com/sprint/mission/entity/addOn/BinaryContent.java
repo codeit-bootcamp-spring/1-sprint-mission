@@ -15,8 +15,8 @@ import static jakarta.persistence.FetchType.*;
 @Entity
 @EqualsAndHashCode(of = {"fileName", "contentType", "size"}, callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@AllArgsConstructor
-@ToString @Getter
+@ToString(of = {"fileName", "size", "contentType"})
+@Getter
 @Schema(description = "바이너리 컨텐츠")
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
@@ -27,6 +27,16 @@ public class BinaryContent extends BaseEntity {
 
     @OneToOne(mappedBy = "profile")
     private User user;
+
+    public BinaryContent(String fileName, Long size, String contentType) {
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+    }
+
+    public void initUserProfile(){
+
+    }
 
 }
 

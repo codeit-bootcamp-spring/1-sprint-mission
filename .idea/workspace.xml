@@ -6,7 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/BinaryContentMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/BinaryContentMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/BinaryContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/BinaryContent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/BinaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/BinaryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/cascade/UserUserStatusCascadeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/cascade/UserUserStatusCascadeTest.java" afterDir="false" />
     </list>
@@ -129,6 +133,7 @@
     "JUnit.UserTest.updateUser.executor": "Run",
     "JUnit.UserTest.userEqualsHashCodeTest.executor": "Run",
     "JUnit.UserTest.userNotHashCode.executor": "Run",
+    "JUnit.UserUserStatusCascadeTest.userAndProfile.executor": "Run",
     "JUnit.UserUserStatusCascadeTest.userAndUserStatus.executor": "Run",
     "Repository.Attach.Annotations": "false",
     "Repository.Attach.JavaDocs": "false",
@@ -190,23 +195,7 @@
       <recent name="com.sprint.mission.controller" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.UserUserStatusCascadeTest.userAndUserStatus">
-    <configuration name="MapperTest.privateChannelTypeTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.mapper.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.mapper" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.mapper.MapperTest" />
-      <option name="METHOD_NAME" value="privateChannelTypeTest" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.UserUserStatusCascadeTest.userAndProfile">
     <configuration name="MessageTest.setting" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
@@ -234,6 +223,22 @@
       <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
       <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.StatusTest" />
       <option name="METHOD_NAME" value="testReadStatus" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserUserStatusCascadeTest.userAndProfile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.cascade.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.cascade" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.cascade.UserUserStatusCascadeTest" />
+      <option name="METHOD_NAME" value="userAndProfile" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -270,11 +275,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UserUserStatusCascadeTest.userAndProfile" />
         <item itemvalue="JUnit.UserUserStatusCascadeTest.userAndUserStatus" />
         <item itemvalue="Spring Boot.DiscodeitApplication" />
         <item itemvalue="JUnit.MessageTest.setting" />
         <item itemvalue="JUnit.StatusTest.testReadStatus" />
-        <item itemvalue="JUnit.MapperTest.privateChannelTypeTest" />
       </list>
     </recent_temporary>
   </component>
@@ -361,7 +366,7 @@
       <workItem from="1742053611401" duration="140000" />
       <workItem from="1742122109232" duration="208000" />
       <workItem from="1742132464307" duration="3612000" />
-      <workItem from="1742141885777" duration="2228000" />
+      <workItem from="1742141885777" duration="5069000" />
     </task>
     <servers />
   </component>
