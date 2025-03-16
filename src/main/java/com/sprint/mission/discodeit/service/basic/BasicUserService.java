@@ -2,11 +2,12 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.UserDeletedEvent;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -19,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -31,11 +31,10 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
     private final ApplicationEventPublisher eventPublisher;
 
-    // User 생성(가입)
+    // 유저 생성
     @Override
-    public UUID create(CreateUserRequestDto createUserDto) throws IOException {
+    public UUID create(CreateUserRequestDto createUserDto, MultipartFile profileImageFile) throws IOException {
 
-        MultipartFile profileImageFile = createUserDto.profileImageFile();
         BinaryContent profile = null;
 
         if (profileImageFile != null) {
@@ -59,34 +58,26 @@ public class BasicUserService implements UserService {
     }
 
 
-    // 데이터 읽기
-    // id 같은 사람 읽기
+    // 유저 단건 조회
     @Override
     public User find(UUID id) {
-
-        userIsExist(id);
-
-        return userRepository.load().get(id);
+        return userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }
 
-    // 모든 데이터 읽어오기
+    // 유저 다건 조회
     @Override
-    public List<FindUserResponseDto> findAll() {
+    public List<UserDto> findAll() {
 
-        List<User> users = changeMapToList(userRepository.load());
-
-        return users.stream()
-                .map(FindUserResponseDto::fromEntity)
+        return userRepository.findAll().stream()
+                .map(UserMapper.INSTANCE::toDto)
                 .toList();
     }
 
-    // 데이터 수정
+    // 유저 수정
     @Override
-    public void updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto) throws IOException {
+    public void updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto, MultipartFile profileImageFile) throws IOException {
 
-        userIsExist(id);
-
-        User updateUser = userRepository.load().get(id);
+        User updateUser = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
 
         // 업데이트 시 해당 데이터가 null이면 기존 정보를, 아니면 새로운 정보를 저장
         updateUser.updateEmail(updateUserRequestDto.email());
@@ -94,8 +85,6 @@ public class BasicUserService implements UserService {
         updateUser.updateUsername(updateUserRequestDto.name());
         updateUser.updateNickname(updateUserRequestDto.nickname());
         updateUser.updatePhoneNumber(updateUserRequestDto.phoneNumber());
-
-        MultipartFile profileImageFile = updateUserRequestDto.profileImageFile();
 
         if (!profileImageFile.isEmpty()) {
             BinaryContent profileImage = new BinaryContent(profileImageFile, FilePathContents.PROFILEIMAGE_DIR);
@@ -105,38 +94,22 @@ public class BasicUserService implements UserService {
         userRepository.save(updateUser);
     }
 
+    // 유저 삭제
     @Override
     public void delete(UUID id) {
 
-        userIsExist(id);
-
-        User user = userRepository.load().get(id);
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
         UUID profileImageId = user.getProfile().getId();
         UUID userStatusId = user.getStatus().getId();
 
         // 유저 삭제 이벤트 발생
         eventPublisher.publishEvent(new UserDeletedEvent(id, profileImageId, userStatusId));
 
-        userRepository.delete(id);
+        userRepository.deleteById(id);
 
     }
 
-    // 유저 존재 여부 확인
-    public void userIsExist(UUID id) {
-        Map<UUID, User> users = userRepository.load();
-
-        if (!users.containsKey(id)) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다.");
-        }
-    }
-
-    // 유저 삭제 (회원 탈퇴)
-    // 불러온 데이터 List로 변환
-    private List<User> changeMapToList(Map<UUID, User> map) {
-
-        return map.values().stream().toList();
-    }
-
+    // 유효성 검사
     private void validationUser(User user) {
         Email email = user.getEmail();
         String name = user.getUsername();
@@ -154,7 +127,7 @@ public class BasicUserService implements UserService {
         String emailString = email.toString();
 
         // 가입된 이메일일 경우 true 반환
-        return userRepository.load().values().stream()
+        return userRepository.findAll().stream()
                 .map(user -> user.getEmail().toString())
                 .anyMatch(emailString::equals);
     }
@@ -163,7 +136,7 @@ public class BasicUserService implements UserService {
     private boolean checkIsNameExist(String name) {
 
         // 가입된 이름일 경우 true 반환
-        return userRepository.load().values().stream()
+        return userRepository.findAll().stream()
                 .map(User::getUsername)
                 .anyMatch(name::equals);
     }

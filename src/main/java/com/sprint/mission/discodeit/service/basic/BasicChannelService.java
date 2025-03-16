@@ -37,7 +37,7 @@ public class BasicChannelService implements ChannelService {
     public UUID createPublic(CreatePublicChannelRequestDto createPublicChannelRequestDto) {
 
         User owner = createPublicChannelRequestDto.user();
-        userService.userIsExist(owner.getId());
+        userService.find(owner.getId());
 
         String name = createPublicChannelRequestDto.name();
         String explanation = createPublicChannelRequestDto.explanation();
@@ -64,27 +64,24 @@ public class BasicChannelService implements ChannelService {
         return channel.getId();
     }
 
-    // 읽기
     // 채널 단건 조회
     @Override
     public Channel find(UUID id) {
 
-        channelIsExist(id);
-
-        return channelRepository.load().get(id);
+        return channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
     }
 
     // 모든 유저의 모든 채널 반환
     @Override
     public List<FindChannelResponseDto> findAllByUserId(UUID userId) {
 
-        userService.userIsExist(userId);
+        userService.find(userId);
 
-        return channelRepository.load().values().stream()
+        return channelRepository.findAll().stream()
                 .map(channel -> {
                     if (channel.getType().equals(ChannelType.PUBLIC)) {
                         return FindPublicChannelResponseDto.fromEntity(channel);
-                    } else if (channel.getMembers().contains(userId)) {
+                    } else if (channel.getMembers().contains(userService.find(userId))) {
                         return FindPrivateChannelResponseDto.fromEntity(channel);
                     } else {
                         return null;
@@ -97,9 +94,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public FindChannelResponseDto updateChannel(UpdatePublicChannelRequestDto updatePublicChannelRequestDto) {
 
-        channelIsExist(updatePublicChannelRequestDto.id());
-
-        Channel updateChannel = channelRepository.load().get(updatePublicChannelRequestDto.id());
+        Channel updateChannel = channelRepository.findById(updatePublicChannelRequestDto.id()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
 
         if (updateChannel.getType().equals(ChannelType.PUBLIC)) {
             String updateCategory = updatePublicChannelRequestDto.category();
@@ -126,9 +121,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void addMember(UUID id, UUID userId) {
 
-        channelIsExist(id);
-
-        Channel channel = channelRepository.load().get(id);
+        Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
         User user = userService.find(channel.getOwner().getId());
         channel.addMember(user);
         channelRepository.save(channel);
@@ -138,9 +131,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteMember(UUID id, UUID memberId) {
 
-        channelIsExist(id);
-
-        Channel channel = channelRepository.load().get(id);
+        Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
         User user = userService.find(memberId);
 
         if (channel.getOwner().equals(user)) {
@@ -155,31 +146,18 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(UUID id) {
 
-        channelIsExist(id);
-
-        Channel channel = channelRepository.load().get(id);
+        Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
 
         // 채널 삭제 이벤트 발생
         eventPublisher.publishEvent(new ChannelDeletedEvent(channel));
 
-        channelRepository.delete(id);
+        channelRepository.deleteById(id);
 
     }
 
-    // 채널 존재 여부 확인
     @Override
-    public void channelIsExist(UUID id) {
-
-        Map<UUID, Channel> channels = channelRepository.load();
-
-        if (!channels.containsKey(id)) {
-            throw new NoSuchElementException("존재하지 않는 채널입니다.");
-        }
-    }
-
-    @Override
-    public void updateLastMessageTime(UUID channelID, Instant lastMessageTime) {
-        Channel channel = channelRepository.load().get(channelID);
+    public void updateLastMessageTime(UUID id, Instant lastMessageTime) {
+        Channel channel = channelRepository.findById(id).orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
         channel.updateLastMessageTime(lastMessageTime);
     }
 }

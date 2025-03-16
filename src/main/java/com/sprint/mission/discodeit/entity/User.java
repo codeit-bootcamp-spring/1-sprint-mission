@@ -7,11 +7,13 @@ import com.sprint.mission.discodeit.vo.PhoneNumber;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -21,6 +23,8 @@ import java.util.List;
 
 @Getter
 @Table(name = "users")
+@Entity
+@NoArgsConstructor(force = true)
 public class User extends BaseUpdatableEntity implements Serializable {             // 유저 정보
 
     @Serial
@@ -49,7 +53,7 @@ public class User extends BaseUpdatableEntity implements Serializable {         
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final UserStatus status;        // 유저 접속 상태
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Channel> ownedChannels;
 
     // 생성자

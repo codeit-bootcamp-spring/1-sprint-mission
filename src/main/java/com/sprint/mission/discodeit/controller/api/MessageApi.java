@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
-import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,14 +22,14 @@ public interface MessageApi {
             description = "메시지 생성 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = FindMessageResponseDto.class)
+                    schema = @Schema(implementation = MessageDto.class)
             )
     )
     @ApiResponse(
             responseCode = "404",
             description = "메시지 생성 실패 - 존재하지 않는 유저나 채널"
     )
-    ResponseEntity<FindMessageResponseDto> createMessage(CreateMessageRequestDto createMessageRequestDto) throws IOException;
+    ResponseEntity<MessageDto> createMessage(CreateMessageRequestDto createMessageRequestDto) throws IOException;
 
     @Operation(summary = "메시지 수정", description = "메시지를 수정합니다.")
     @ApiResponse(
@@ -37,14 +37,14 @@ public interface MessageApi {
             description = "메시지 수정 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = FindMessageResponseDto.class)
+                    schema = @Schema(implementation = MessageDto.class)
             )
     )
     @ApiResponse(
             responseCode = "404",
             description = "메시지 수정 실패 - 존재하지 않는 메시지"
     )
-    ResponseEntity<FindMessageResponseDto> updateMessage(UUID id, String context);
+    ResponseEntity<MessageDto> updateMessage(UUID id, String context);
 
     @Operation(summary = "메시지 삭제", description = "메시지를 삭제합니다.")
     @ApiResponse(
@@ -63,12 +63,12 @@ public interface MessageApi {
             description = "메시지 다건 조회 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = FindMessageResponseDto.class)
+                    schema = @Schema(implementation = MessageDto.class)
             )
     )
     @ApiResponse(
             responseCode = "404",
             description = "메시지 삭제 실패 - 존재하지 않는 유저"
     )
-    ResponseEntity<List<FindMessageResponseDto>> findMessage(UUID userId);
+    ResponseEntity<List<MessageDto>> findMessage(UUID userId);
 }

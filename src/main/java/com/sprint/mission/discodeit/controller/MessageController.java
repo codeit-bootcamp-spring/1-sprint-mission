@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageApi;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
-import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -30,19 +30,19 @@ public class MessageController implements MessageApi {
     private final MessageService messageService;
 
     @PostMapping
-    public ResponseEntity<FindMessageResponseDto> createMessage(@RequestBody CreateMessageRequestDto createMessageRequestDto) throws IOException {
-        FindMessageResponseDto findMessageResponseDto = messageService.create(createMessageRequestDto);
+    public ResponseEntity<MessageDto> createMessage(@RequestBody CreateMessageRequestDto createMessageRequestDto) throws IOException {
+        MessageDto messageDto = messageService.create(createMessageRequestDto);
 
-        return ResponseEntity.created(URI.create("/api/message/" + findMessageResponseDto.getId())).body(findMessageResponseDto);
+        return ResponseEntity.created(URI.create("/api/message/" + messageDto.getId())).body(messageDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FindMessageResponseDto> updateMessage(@PathVariable UUID id,
-                                                                @RequestParam String context) {
+    public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID id,
+                                                    @RequestParam String context) {
         UpdateMessageRequestDto updateMessageRequestDto = new UpdateMessageRequestDto(id, context);
-        FindMessageResponseDto findMessageResponseDto = messageService.updateContent(updateMessageRequestDto);
+        MessageDto messageDto = messageService.updateContent(updateMessageRequestDto);
 
-        return ResponseEntity.ok(findMessageResponseDto);
+        return ResponseEntity.ok(messageDto);
     }
 
     @DeleteMapping("/{id}")
@@ -53,8 +53,8 @@ public class MessageController implements MessageApi {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<FindMessageResponseDto>> findMessage(@PathVariable UUID userId) {
-        List<FindMessageResponseDto> findMessages = messageService.findAllByUserId(userId);
+    public ResponseEntity<List<MessageDto>> findMessage(@PathVariable UUID userId) {
+        List<MessageDto> findMessages = messageService.findAllByUserId(userId);
 
         return ResponseEntity.ok(findMessages);
     }

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
-import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,12 +18,12 @@ public interface AuthApi {
             description = "로그인 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = FindUserResponseDto.class)
+                    schema = @Schema(implementation = UserDto.class)
             )
     )
     @ApiResponse(
             responseCode = "400",
             description = "로그인 실패 - name이나 password가 틀림"
     )
-    ResponseEntity<FindUserResponseDto> login(LoginRequestDto loginRequestDto);
+    ResponseEntity<UserDto> login(LoginRequestDto loginRequestDto);
 }

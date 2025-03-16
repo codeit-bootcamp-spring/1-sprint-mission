@@ -33,8 +33,6 @@ public interface ChannelService {// 생성
     // 삭제
     void delete(UUID id);
 
-    // 채널 존재 여부 확인
-    void channelIsExist(UUID id);
-
+    // 마지막 메시지 시간
     void updateLastMessageTime(UUID channelID, Instant lastMessageTime);
 }

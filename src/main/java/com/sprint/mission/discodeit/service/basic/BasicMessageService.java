@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
-import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.MessageDeletedEvent;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -23,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -39,14 +39,12 @@ public class BasicMessageService implements MessageService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    public FindMessageResponseDto create(CreateMessageRequestDto createMessageRequestDto) throws IOException {
+    public MessageDto create(CreateMessageRequestDto createMessageRequestDto) throws IOException {
 
         UUID channelId = createMessageRequestDto.channelId();
-        channelService.channelIsExist(channelId);
         Channel channel = channelService.find(channelId);
 
         UUID authorId = createMessageRequestDto.authorId();
-        userService.userIsExist(authorId);
         User author = userService.find(authorId);
 
         String context = createMessageRequestDto.context();
@@ -65,76 +63,59 @@ public class BasicMessageService implements MessageService {
 
         messageRepository.save(message);
 
-        return FindMessageResponseDto.fromEntity(message);
+        return MessageMapper.INSTANCE.toDto(message);
     }
 
     @Override
-    public FindMessageResponseDto find(UUID id) {
+    public MessageDto find(UUID id) {
 
-        messageIsExist(id);
+        Message message = messageRepository.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 메시지입니다."));
 
-        Message message = messageRepository.load().get(id);
-
-        return FindMessageResponseDto.fromEntity(message);
+        return MessageMapper.INSTANCE.toDto(message);
     }
 
     @Override
-    public List<FindMessageResponseDto> findAllByChannelId(UUID channelID) {
+    public List<MessageDto> findAllByChannelId(UUID channelID) {
 
-        channelService.channelIsExist(channelID);
+        Channel channel = channelService.find(channelID);
 
-        return messageRepository.load().values().stream()
-                .filter(message -> message.getChannel().equals(channelID))
-                .map(FindMessageResponseDto::fromEntity)
+        return messageRepository.findAll().stream()
+                .filter(message -> message.getChannel().equals(channel))
+                .map(MessageMapper.INSTANCE::toDto)
                 .toList();
     }
 
     @Override
-    public List<FindMessageResponseDto> findAllByUserId(UUID userId) {
+    public List<MessageDto> findAllByUserId(UUID userId) {
 
-        userService.userIsExist(userId);
+        User user = userService.find(userId);
 
-        return messageRepository.load().values().stream()
-                .filter(message -> message.getAuthor().equals(userId))
-                .map(FindMessageResponseDto::fromEntity)
+        return messageRepository.findAll().stream()
+                .filter(message -> message.getAuthor().equals(user))
+                .map(MessageMapper.INSTANCE::toDto)
                 .toList();
     }
 
     @Override
-    public FindMessageResponseDto updateContent(UpdateMessageRequestDto updateMessageRequestDto) {
+    public MessageDto updateContent(UpdateMessageRequestDto updateMessageRequestDto) {
 
-        messageIsExist(updateMessageRequestDto.id());
-
-        Message message = messageRepository.load().get(updateMessageRequestDto.id());
+        Message message = messageRepository.findById(updateMessageRequestDto.id()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 메시지입니다."));
 
         message.updateContent(updateMessageRequestDto.context());
 
         messageRepository.save(message);
 
-        return FindMessageResponseDto.fromEntity(message);
+        return MessageMapper.INSTANCE.toDto(message);
     }
 
     @Override
     public void delete(UUID id) {
 
-        messageIsExist(id);
+        Message message = messageRepository.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 메시지입니다."));
 
-        Message message = messageRepository.load().get(id);
-
-        messageRepository.delete(id);
+        messageRepository.deleteById(id);
 
         // 메시지 삭제 이벤트 발생
         eventPublisher.publishEvent(new MessageDeletedEvent(message));
-    }
-
-    // 메시지 존재 여부 확인
-    @Override
-    public void messageIsExist(UUID id) {
-
-        Map<UUID, Message> messages = messageRepository.load();
-
-        if (!messages.containsKey(id)) {
-            throw new NoSuchElementException("존재하지 않는 메시지입니다.");
-        }
     }
 }

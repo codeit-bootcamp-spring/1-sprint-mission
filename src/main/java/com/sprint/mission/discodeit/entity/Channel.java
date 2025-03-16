@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.util.ChannelType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
@@ -12,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -21,6 +23,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
+@Entity
+@NoArgsConstructor
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity implements Serializable {      // 채널 (게시판)
 
@@ -29,7 +33,7 @@ public class Channel extends BaseUpdatableEntity implements Serializable {      
 
     @ManyToOne
     @JoinColumn(name = "owner_id")
-    private final User owner;       // 채널 주인
+    private User owner;       // 채널 주인
 
     @Column(name = "category")
     private String category;          // 채널 카테고리
@@ -42,7 +46,7 @@ public class Channel extends BaseUpdatableEntity implements Serializable {      
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    private final ChannelType type; // 공개 채널 여부
+    private ChannelType type; // 공개 채널 여부
 
     @ManyToMany
     @JoinTable( // 조인 테이블 정의
@@ -50,7 +54,7 @@ public class Channel extends BaseUpdatableEntity implements Serializable {      
             joinColumns = @JoinColumn(name = "channel_id"), // 외래키: 채널 ID
             inverseJoinColumns = @JoinColumn(name = "user_id")    // 외래키: 멤버 ID
     )
-    private final List<User> members; // 멤버 목록
+    private List<User> members; // 멤버 목록
 
     @Transient  // DB에 저장되지 않게 함
     private Instant lastMessageTime;    // 마지막 메시지 시간

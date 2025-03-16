@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentResponseDto;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -17,6 +19,8 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Getter
+@Entity
+@NoArgsConstructor(force = true)
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity implements Serializable {
 

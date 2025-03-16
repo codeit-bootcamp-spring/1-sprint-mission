@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +26,7 @@ public interface UserApi {
             description = "User가 성공적으로 생성됨",
             content = @Content(
                     mediaType = "*/*",
-                    schema = @Schema(implementation = FindUserResponseDto.class)
+                    schema = @Schema(implementation = UserDto.class)
             )
     )
     @ApiResponse(
@@ -36,7 +37,7 @@ public interface UserApi {
                     schema = @Schema(type = "string", example = "이미 가입된 이메일입니다.")
             )
     )
-    ResponseEntity<FindUserResponseDto> create(CreateUserRequestDto createUserRequestDto) throws IOException;
+    ResponseEntity<UserDto> create(CreateUserRequestDto createUserRequestDto, MultipartFile profileImageFile) throws IOException;
 
     @Operation(
             summary = "전체 User 목록 조회",
@@ -48,10 +49,10 @@ public interface UserApi {
             description = "User 목록 조회 성공",
             content = @Content(
                     mediaType = "*/*",
-                    schema = @Schema(implementation = FindUserResponseDto.class)
+                    schema = @Schema(implementation = UserDto.class)
             )
     )
-    ResponseEntity<List<FindUserResponseDto>> findAll();
+    ResponseEntity<List<UserDto>> findAll();
 
     @Operation(summary = "유저 수정", description = "유저의 정보를 수정합니다.")
     @ApiResponse(
@@ -59,14 +60,14 @@ public interface UserApi {
             description = "유저 수정 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = FindUserResponseDto.class)
+                    schema = @Schema(implementation = UserDto.class)
             )
     )
     @ApiResponse(
             responseCode = "404",
             description = "유저 수정 실패 - 존재하지 않는 유저"
     )
-    ResponseEntity<FindUserResponseDto> updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto) throws IOException;
+    ResponseEntity<UserDto> updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto, MultipartFile profileImageFile) throws IOException;
 
     @Operation(summary = "유저 삭제", description = "유저를 삭제합니다.")
     @ApiResponse(
@@ -85,12 +86,12 @@ public interface UserApi {
             description = "유저 온라인 상태 수정 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = FindUserResponseDto.class)
+                    schema = @Schema(implementation = UserDto.class)
             )
     )
     @ApiResponse(
             responseCode = "404",
             description = "유저 수정 실패 - 존재하지 않는 유저"
     )
-    ResponseEntity<FindUserResponseDto> updateOnline(UUID id);
+    ResponseEntity<UserDto> updateOnline(UUID id);
 }

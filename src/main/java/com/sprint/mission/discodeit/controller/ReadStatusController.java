@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusRequestDto;
-import com.sprint.mission.discodeit.dto.readStatus.FindReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,23 +26,23 @@ public class ReadStatusController implements ReadStatusApi {
     private final ReadStatusService readStatusService;
 
     @PostMapping
-    public ResponseEntity<FindReadStatusResponseDto> create(@RequestBody CreateReadStatusRequestDto createReadStatusRequestDto) {
-        FindReadStatusResponseDto findReadStatusResponseDto = readStatusService.create(createReadStatusRequestDto);
+    public ResponseEntity<ReadStatusDto> create(@RequestBody CreateReadStatusRequestDto createReadStatusRequestDto) {
+        ReadStatusDto readStatusDto = readStatusService.create(createReadStatusRequestDto);
 
-        return ResponseEntity.created(URI.create("/api/readStatus/" + findReadStatusResponseDto.getId())).body(findReadStatusResponseDto);
+        return ResponseEntity.created(URI.create("/api/readStatus/" + readStatusDto.getId())).body(readStatusDto);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<FindReadStatusResponseDto>> findAllByUserId(@PathVariable UUID userId) {
-        List<FindReadStatusResponseDto> findReadStatusResponseDtoList = readStatusService.findAllByUserId(userId);
+    public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@PathVariable UUID userId) {
+        List<ReadStatusDto> readStatusDtoList = readStatusService.findAllByUserId(userId);
 
-        return ResponseEntity.ok(findReadStatusResponseDtoList);
+        return ResponseEntity.ok(readStatusDtoList);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FindReadStatusResponseDto> updateReadStatus(@PathVariable UUID id) {
-        FindReadStatusResponseDto findReadStatusResponseDto = readStatusService.update(id);
+    public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable UUID id) {
+        ReadStatusDto readStatusDto = readStatusService.update(id);
 
-        return ResponseEntity.ok(findReadStatusResponseDto);
+        return ResponseEntity.ok(readStatusDto);
     }
 }

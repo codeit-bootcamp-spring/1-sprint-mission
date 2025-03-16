@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.binarycontent.FindBinaryContentResponseDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -21,6 +21,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
 
+    // 파일 생성
     @Override
     public BinaryContent create(CreateBinaryContentRequestDto createBinaryContentRequestDto) throws IOException {
 
@@ -34,20 +35,21 @@ public class BasicBinaryContentService implements BinaryContentService {
         return binaryContent;
     }
 
+    // 파일 단건 조회
     @Override
-    public FindBinaryContentResponseDto find(UUID id) {
+    public BinaryContentDto find(UUID id) {
 
-        binaryContentIsExist(id);
-        BinaryContent binaryContent = binaryContentRepository.load().get(id);
+        BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 파일이 존재하지 않습니다."));
 
-        return FindBinaryContentResponseDto.fromEntity(binaryContent);
+        return BinaryContentMapper.INSTANCE.toDto(binaryContent);
     }
 
+    // 파일 다건 조회
     @Override
-    public List<FindBinaryContentResponseDto> findAll() {
+    public List<BinaryContentDto> findAll() {
 
-        List<FindBinaryContentResponseDto> list = binaryContentRepository.load().values().stream()
-                .map(FindBinaryContentResponseDto::fromEntity)
+        List<BinaryContentDto> list= binaryContentRepository.findAll().stream()
+                .map(BinaryContentMapper.INSTANCE::toDto)
                 .toList();
 
         if (list.isEmpty()) {
@@ -57,10 +59,11 @@ public class BasicBinaryContentService implements BinaryContentService {
         return list;
     }
 
+    // 파일 다건 조회 - id list로 반환
     @Override
     public List<UUID> findAllByIdIn() {
 
-        List<UUID> list = binaryContentRepository.load().values().stream()
+        List<UUID> list = binaryContentRepository.findAll().stream()
                 .map(BinaryContent::getId)
                 .toList();
 
@@ -71,20 +74,13 @@ public class BasicBinaryContentService implements BinaryContentService {
         return list;
     }
 
+    // 파일 삭제
     @Override
     public void delete(UUID id) {
         
-        BinaryContent binaryContent = binaryContentRepository.load().get(id);
+        BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow();
         binaryContent.deleteFile();     // 로컬에 저장된 사진 파일 삭제
 
-        binaryContentRepository.delete(id); // 저장된 객체 삭제
-    }
-
-    private void binaryContentIsExist(UUID id) {
-        Map<UUID, BinaryContent> list = binaryContentRepository.load();
-
-        if (!list.containsKey(id)) {
-            throw new NoSuchElementException("해당 파일이 존재하지 않습니다.");
-        }
+        binaryContentRepository.deleteById(id); // 저장된 객체 삭제
     }
 }

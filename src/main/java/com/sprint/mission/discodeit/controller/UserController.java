@@ -3,9 +3,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,27 +35,29 @@ public class UserController implements UserApi {
 
     // 사용자 등록
     @PostMapping
-    public ResponseEntity<FindUserResponseDto> create(@RequestBody CreateUserRequestDto createUserRequestDto) throws IOException {
+    public ResponseEntity<UserDto> create(@RequestPart(value = "user") CreateUserRequestDto createUserRequestDto,
+                                          @RequestPart(value = "profile") MultipartFile profileImageFile) throws IOException {
 
-        UUID id = userService.create(createUserRequestDto);
+        UUID id = userService.create(createUserRequestDto, profileImageFile);
 
-        return ResponseEntity.created(URI.create("/api/user/" + id)).body(FindUserResponseDto.fromEntity(userService.find(id)));
+        return ResponseEntity.created(URI.create("/api/user/" + id)).body(UserDto.fromEntity(userService.find(id)));
     }
 
     // 사용자 다건 조회
     @GetMapping
-    public ResponseEntity<List<FindUserResponseDto>> findAll() {
+    public ResponseEntity<List<UserDto>> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
     // 사용자 수정
     @PutMapping("/{id}")
-    public ResponseEntity<FindUserResponseDto> updateUser(@PathVariable UUID id,
-                                                          @RequestBody UpdateUserRequestDto updateUserRequestDto) throws IOException {
+    public ResponseEntity<UserDto> updateUser(@PathVariable UUID id,
+                                              @RequestPart(value = "user") UpdateUserRequestDto updateUserRequestDto,
+                                              @RequestPart(value = "profile") MultipartFile profileImageFile) throws IOException {
 
-        userService.updateUser(id, updateUserRequestDto);
+        userService.updateUser(id, updateUserRequestDto, profileImageFile);
 
-        return ResponseEntity.ok(FindUserResponseDto.fromEntity(userService.find(id)));
+        return ResponseEntity.ok(UserDto.fromEntity(userService.find(id)));
     }
 
     // 사용자 삭제
@@ -67,8 +69,8 @@ public class UserController implements UserApi {
 
     // 유저 온라인 상태 업데이트
     @PutMapping("/{id}/online")
-    public ResponseEntity<FindUserResponseDto> updateOnline(@PathVariable UUID id) {
-        FindUserResponseDto findUserResponseDto = userStatusService.updateByUserId(id);
-        return ResponseEntity.ok(findUserResponseDto);
+    public ResponseEntity<UserDto> updateOnline(@PathVariable UUID id) {
+        UserDto userDto = userStatusService.updateByUserId(id);
+        return ResponseEntity.ok(userDto);
     }
 }
