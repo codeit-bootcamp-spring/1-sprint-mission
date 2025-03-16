@@ -18,8 +18,7 @@ CREATE TABLE binary_contents
     created_at   TIMESTAMPTZ  NOT NULL,
     file_name    VARCHAR(255) NOT NULL,
     size         BIGINT       NOT NULL,
-    content_type VARCHAR(100) NOT NULL,
-    bytes        BYTEA
+    content_type VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE channels
@@ -74,3 +73,4 @@ CREATE TABLE message_attachments
     CONSTRAINT fk_message_attachments_message FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
     CONSTRAINT fk_message_attachments_attachment FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
 );
+
