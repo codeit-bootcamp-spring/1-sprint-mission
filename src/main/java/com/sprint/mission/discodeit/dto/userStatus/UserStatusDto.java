@@ -8,5 +8,4 @@ public record UserStatusDto(
     UUID userId,
     Instant lastActiveAt
 ) {
-
 }

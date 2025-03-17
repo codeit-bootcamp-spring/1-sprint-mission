@@ -9,5 +9,4 @@ public record BinaryContentDto(
     String contentType,
     byte[] bytes
 ) {
-
 }

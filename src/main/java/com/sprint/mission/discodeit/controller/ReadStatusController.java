@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -26,14 +27,14 @@ public class ReadStatusController {
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
+  public ResponseEntity<ReadStatusDto> create(@RequestBody ReadStatusCreateRequest request) {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(readStatusService.create(request));
   }
 
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId,
+  public ResponseEntity<ReadStatusDto> update(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -41,7 +42,7 @@ public class ReadStatusController {
   }
 
   @GetMapping()
-  public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam("userId") UUID userId) {
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(readStatusService.findAllByUserId(userId));

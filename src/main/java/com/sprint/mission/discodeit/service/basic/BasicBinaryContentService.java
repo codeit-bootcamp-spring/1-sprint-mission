@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -16,47 +18,51 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    @Transactional
-    public BinaryContent create(BinaryContentRequest binaryContentRequest) {
-        return binaryContentRepository.save(new BinaryContent(
-                binaryContentRequest.fileName(),
-                (long) binaryContentRequest.bytes().length,
-                binaryContentRequest.contentType(),
-                binaryContentRequest.bytes()
-                ));
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentMapper binaryContentMapper;
+
+  @Override
+  @Transactional
+  public BinaryContentDto create(BinaryContentRequest request) {
+    return binaryContentMapper.toDto(
+        binaryContentRepository.save(new BinaryContent(
+            request.fileName(),
+            (long) request.bytes().length,
+            request.contentType(),
+            request.bytes()
+        ))
+    );
+  }
+
+  @Override
+  public BinaryContentDto find(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .map(binaryContentMapper::toDto)
+        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
+  }
+
+  @Override
+  public List<BinaryContentDto> findAll() {
+    return binaryContentRepository.findAll().stream()
+        .map(binaryContentMapper::toDto)
+        .toList();
+  }
+
+  @Override
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllById(binaryContentIds).stream()
+        .map(binaryContentMapper::toDto)
+        .toList();
+  }
+
+  @Override
+  @Transactional
+  public void delete(UUID binaryContentId) {
+    if (!binaryContentRepository.existsById(binaryContentId)) {
+      throw new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다.");
     }
 
-    @Override
-    public BinaryContent find(UUID binaryContentId) {
-        return binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
-    }
-
-    @Override
-    public List<BinaryContent> findAll() {
-        return binaryContentRepository.findAll();
-    }
-
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-        return Optional.of(findAll().stream()
-                .filter(binaryContent -> binaryContent.containsId(binaryContentIds))
-                .toList())
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
-    }
-
-    @Override
-    @Transactional
-    public void delete(UUID binaryContentId) {
-        if (binaryContentId == null) {
-            return;
-        }
-        if (!binaryContentRepository.existsById(binaryContentId)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다.");
-        }
-        binaryContentRepository.deleteById(binaryContentId);
-    }
+    binaryContentRepository.deleteById(binaryContentId);
+  }
 }

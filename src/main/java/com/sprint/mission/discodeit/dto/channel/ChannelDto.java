@@ -14,5 +14,4 @@ public record ChannelDto(
     List<UserDto> participants,
     Instant lastMessageAt
 ) {
-
 }

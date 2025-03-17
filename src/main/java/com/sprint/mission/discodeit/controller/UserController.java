@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.io.IOException;
@@ -36,7 +35,7 @@ public class UserController {
   private final UserStatusService userStatusService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<User> create(@RequestPart UserCreateRequest userCreateRequest,
+  public ResponseEntity<UserDto> create(@RequestPart UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
     Optional<BinaryContentRequest> binaryContentRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
@@ -47,7 +46,7 @@ public class UserController {
   }
 
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<User> update(@PathVariable UUID userId,
+  public ResponseEntity<UserDto> update(@PathVariable UUID userId,
       @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile) {
     Optional<BinaryContentRequest> binaryContentRequest = Optional.ofNullable(profile)
@@ -67,14 +66,14 @@ public class UserController {
   }
 
   @GetMapping
-  public ResponseEntity<List<UserResponse>> findAll() {
+  public ResponseEntity<List<UserDto>> findAll() {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userService.findAll());
   }
 
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -82,7 +81,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
+  public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userService.find(id));

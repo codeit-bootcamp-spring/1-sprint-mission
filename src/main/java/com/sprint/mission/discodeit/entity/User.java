@@ -37,7 +37,7 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id")
     private BinaryContent profile;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private UserStatus status;
 
     public User(String username, String email, String password, BinaryContent profile) {
@@ -47,6 +47,7 @@ public class User extends BaseUpdatableEntity {
         this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
 
         this.profile = profile;
+        this.status = new UserStatus(this, Instant.now());
     }
 
     public void update(BinaryContent profile, String name, String email, String password) {

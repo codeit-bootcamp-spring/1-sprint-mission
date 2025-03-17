@@ -2,11 +2,14 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -24,74 +27,88 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private final MessageRepository messageRepository;
-    private final MessageValidator validator;
 
-    private final BinaryContentService binaryContentService;
+  private final MessageRepository messageRepository;
+  private final MessageValidator validator;
+  private final MessageMapper messageMapper;
 
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
+  private final BinaryContentService binaryContentService;
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    @Transactional
-    public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> binaryContentRequests) {
-        User author = userRepository.findById(messageCreateRequest.authorId())
-            .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
 
-        Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-            .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
+  @Override
+  @Transactional
+  public MessageDto create(MessageCreateRequest messageCreateRequest,
+      List<BinaryContentRequest> binaryContentRequests) {
+    User author = userRepository.findById(messageCreateRequest.authorId())
+        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
-        validator.validate(messageCreateRequest.content());
+    Channel channel = channelRepository.findById(messageCreateRequest.channelId())
+        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
-        List<BinaryContent> attachments = binaryContentRequests.stream()
-                .map(binaryContentService::create)
-                .toList();
+    validator.validate(messageCreateRequest.content());
 
-        return messageRepository.save(new Message(messageCreateRequest.content(), channel, author, attachments));
+    List<BinaryContent> attachments = binaryContentRequests.stream()
+        .map(binaryContentService::create)
+        .map(dto -> binaryContentRepository.findById(dto.id()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .toList();
+
+    return messageMapper.toDto(
+        messageRepository.save(
+            new Message(messageCreateRequest.content(), channel, author, attachments))
+    );
+  }
+
+  @Override
+  public MessageDto find(UUID messageId) {
+    return messageRepository.findById(messageId)
+        .map(messageMapper::toDto)
+        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
+  }
+
+  @Override
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
+    if (!channelRepository.existsById(channelId)) {
+      throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
     }
 
-    @Override
-    public Message find(UUID messageId) {
-      return messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
+    return messageRepository.findByChannelId(channelId).stream()
+        .map(messageMapper::toDto)
+        .toList();
+  }
+
+  @Override
+  public List<MessageDto> findAllByAuthorId(UUID authorId) {
+    if (!userRepository.existsById(authorId)) {
+      throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
     }
 
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
-        }
+    return messageRepository.findByAuthorId(authorId).stream()
+        .map(messageMapper::toDto)
+        .toList();
+  }
 
-        return messageRepository.findByChannelId(channelId).stream()
-                .toList();
+  @Override
+  @Transactional
+  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
+    message.updateContent(request.newContent());
+
+    return messageMapper.toDto(message);
+  }
+
+  @Override
+  @Transactional
+  public void delete(UUID messageId) {
+    if (!messageRepository.existsById(messageId)) {
+      throw new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다.");
     }
 
-    @Override
-    public List<Message> findAllByAuthorId(UUID authorId) {
-        if (!userRepository.existsById(authorId)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
-        }
-
-        return messageRepository.findByAuthorId(authorId).stream()
-                .toList();
-    }
-
-    @Override
-    @Transactional
-    public Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
-        Message message = find(messageId);
-        message.updateContent(messageUpdateRequest.newContent());
-
-        return messageRepository.save(message);
-    }
-
-    @Override
-    @Transactional
-    public void delete(UUID messageId) {
-        if (!messageRepository.existsById(messageId)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다.");
-        }
-
-        messageRepository.deleteById(messageId);
-    }
+    messageRepository.deleteById(messageId);
+  }
 }

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -34,7 +35,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Message> create(@RequestPart("messageCreateRequest")MessageCreateRequest messageCreateRequest,
+    public ResponseEntity<MessageDto> create(@RequestPart("messageCreateRequest")MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
         List<BinaryContentRequest> binaryContentRequests = Optional.ofNullable(attachments)
             .map(files -> files.stream()
@@ -58,7 +59,7 @@ public class MessageController {
     }
 
     @PatchMapping("/{messageId}")
-    public ResponseEntity<Message> update(@PathVariable UUID messageId, @RequestBody MessageUpdateRequest request) {
+    public ResponseEntity<MessageDto> update(@PathVariable UUID messageId, @RequestBody MessageUpdateRequest request) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(messageService.update(messageId, request));
@@ -73,14 +74,14 @@ public class MessageController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Message>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
+    public ResponseEntity<List<MessageDto>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(messageService.findAllByChannelId(channelId));
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<List<Message>> getAllMessagesByUserId(@PathVariable UUID id) {
+    public ResponseEntity<List<MessageDto>> getAllMessagesByUserId(@PathVariable UUID id) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(messageService.findAllByAuthorId(id));

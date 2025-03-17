@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.util.List;
@@ -20,15 +21,15 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
 
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
+  public ResponseEntity<BinaryContentDto> find(@PathVariable UUID binaryContentId) {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContentService.find(binaryContentId));
   }
 
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> findAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
-    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+  public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
+    List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContents);
