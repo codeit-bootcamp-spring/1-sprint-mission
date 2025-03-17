@@ -4,14 +4,19 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -74,16 +79,17 @@ public class MessageController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<MessageDto>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+        @RequestParam("channelId") UUID channelId,
+        @RequestParam(value = "cursor", required = false) Instant cursor,
+        @PageableDefault(
+            size = 50,
+            page = 0,
+            sort = "createdAt",
+            direction = Direction.DESC
+        )Pageable pageable) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(messageService.findAllByChannelId(channelId));
-    }
-
-    @GetMapping("/users/{id}")
-    public ResponseEntity<List<MessageDto>> getAllMessagesByUserId(@PathVariable UUID id) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(messageService.findAllByAuthorId(id));
+            .body(messageService.findAllByChannelId(channelId, cursor, pageable));
     }
 }

@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -16,11 +18,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validator.MessageValidator;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +42,8 @@ public class BasicMessageService implements MessageService {
 
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
+
+  private final PageResponseMapper pageResponseMapper;
 
   @Override
   @Transactional
@@ -71,25 +78,23 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt, Pageable pageable) {
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
     }
 
-    return messageRepository.findByChannelId(channelId).stream()
-        .map(messageMapper::toDto)
-        .toList();
-  }
+    Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+        Optional.ofNullable(createAt).orElse(Instant.now()),
+        pageable)
+        .map(messageMapper::toDto);
 
-  @Override
-  public List<MessageDto> findAllByAuthorId(UUID authorId) {
-    if (!userRepository.existsById(authorId)) {
-      throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
+    Instant nextCursor = null;
+    if (!slice.getContent().isEmpty()) {
+      nextCursor = slice.getContent().get(slice.getContent().size() - 1)
+          .createdAt();
     }
 
-    return messageRepository.findByAuthorId(authorId).stream()
-        .map(messageMapper::toDto)
-        .toList();
+    return pageResponseMapper.fromSlice(slice, nextCursor);
   }
 
   @Override
