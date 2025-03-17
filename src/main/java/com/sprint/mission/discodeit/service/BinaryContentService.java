@@ -9,21 +9,11 @@ import java.util.UUID;
 
 public interface BinaryContentService {
 
-  BinaryContentResponse createUserProfileFile(MultipartFile file, UUID userId);
-
-  BinaryContentResponse createMessageFile(MultipartFile file, UUID messageId);
-
-  BinaryContentResponse updateUserProfileFile(MultipartFile file, UUID userId);
+  BinaryContentResponse create(MultipartFile file);
 
   BinaryContentResponse findByIdOrThrow(UUID id);
-
-  BinaryContentResponse findByUserId(UUID userId);
 
   List<BinaryContentResponse> findAllByIdIn(List<UUID> ids);
 
   void deleteById(UUID id);
-
-  void deleteByUserId(UUID userId);
-
-  void deleteAllByMessageId(UUID messageId);
 }

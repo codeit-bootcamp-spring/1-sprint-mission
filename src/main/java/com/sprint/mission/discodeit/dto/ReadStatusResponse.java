@@ -7,24 +7,20 @@ import lombok.Builder;
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public record ReadStatusResponse(
     UUID id,
-    Instant createdAt,
-    Instant updatedAt,
     UUID userId,
     UUID channelId,
     Instant lastReadAt
 ) {
 
-  public static ReadStatusResponse EntityToDto(ReadStatus readStatus) {
-    return ReadStatusResponse.builder()
-        .id(readStatus.getId())
-        .userId(readStatus.getUserId())
-        .channelId(readStatus.getChannelId())
-        .createdAt(readStatus.getCreatedAt())
-        .updatedAt(readStatus.getUpdatedAt())
-        .lastReadAt(readStatus.getLastReadAt())
-        .build();
-  }
+//  public static ReadStatusResponse entityToDto(ReadStatus readStatus) {
+//    return ReadStatusResponse.builder()
+//        .id(readStatus.getId())
+//        .userId(readStatus.getUser().getId())
+//        .channelId(readStatus.getChannel().getId())
+//        .lastReadAt(readStatus.getLastReadAt())
+//        .build();
+//  }
 }

@@ -1,20 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
-import com.sprint.mission.discodeit.dto.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validation.UserValidator;
+import jakarta.transaction.Transactional;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,28 +31,33 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserValidator userValidator;
-  private final UserStatusService userStatusService;
-  private final BinaryContentService binaryContentService;
+  private final UserMapper userMapper;
+  private final UserStatusRepository userStatusRepository;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
+  @Transactional
   public UserResponse createUser(UserRequest request, MultipartFile userProfileImage) {
     if (userValidator.isValidName(request.name()) && userValidator.isValidEmail(request.email())
         && userValidator.isValidPassword(request.password())) {
 
-      User newUser = User.createUser(request.name(), request.email(), request.password());
-      userRepository.save(newUser);
-
-      UserStatusResponse newUserStatus = userStatusService.create(newUser.getId());
-
-      UUID newBinaryContentId = null;
-      if (userProfileImage != null) {
-        BinaryContentResponse newBinaryContent = binaryContentService.createUserProfileFile(
-            userProfileImage, newUser.getId());
-        newBinaryContentId = newBinaryContent.id();
+      BinaryContent newProfile = null;
+      if (userProfileImage != null && !userProfileImage.isEmpty()) {
+        newProfile = binaryContentRepository.save(BinaryContent.createBinaryContent(
+            userProfileImage.getOriginalFilename(),
+            userProfileImage.getSize(),
+            userProfileImage.getContentType()));
+        binaryContentStorage.put(newProfile.getId(), convertToBytes(userProfileImage));
       }
 
+      User newUser = userRepository.save(User.createUser(
+          request.name(), request.email(), request.password(), newProfile));
+      UserStatus newUserStatus = userStatusRepository.save(UserStatus.createUserStatus(newUser));
+      newUser.updateStatus(newUserStatus);
+
       log.info("Create User: {}", newUser);
-      return UserResponse.entityToDto(newUser, newUserStatus.online(), newBinaryContentId);
+      return userMapper.entityToDto(newUser);
     }
     return null;
   }
@@ -59,56 +65,60 @@ public class BasicUserService implements UserService {
   @Override
   public List<UserResponse> findAll() {
     return userRepository.findAll().stream()
-        .map(this::entityToUserResponse
-        )
+        .map(userMapper::entityToDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public UserResponse findById(UUID id) {
-    User user = findByIdOrThrow(id);
-    return entityToUserResponse(user);
+    return userMapper.entityToDto(findByIdOrThrow(id));
   }
 
   @Override
+  @Transactional
   public UserResponse update(UUID id, UserRequest request, MultipartFile userProfileImage) {
     User user = findByIdOrThrow(id);
 
     if (userValidator.isValidName(request.name()) && userValidator.isValidEmail(request.email())
         && userValidator.isValidPassword(request.password())) {
-      user.update(request.name(), request.email(), request.password());
-      userRepository.save(user);
 
-      if (userProfileImage != null) {
-        binaryContentService.updateUserProfileFile(userProfileImage, id);
-      }
+      Optional.ofNullable(request.name()).ifPresent(user::updateName);
+      Optional.ofNullable(request.email()).ifPresent(user::updateEmail);
+      Optional.ofNullable(request.password()).ifPresent(user::updatePassword);
+      Optional.ofNullable(userProfileImage)
+          .ifPresent(profile -> {
+            if (!profile.isEmpty()) { // 파라미터는 있는데, 파일이 안 들어올 때
+              BinaryContent binaryContent = binaryContentRepository.save(
+                  BinaryContent.createBinaryContent(
+                      profile.getOriginalFilename(),
+                      profile.getSize(),
+                      profile.getContentType()));
+              binaryContentStorage.put(binaryContent.getId(), convertToBytes(profile));
+              user.updateProfile(binaryContent);
+            }
+          });
     }
     log.info("Update User :{}", user);
-    return entityToUserResponse(user);
+    return userMapper.entityToDto(user);
   }
 
   @Override
   public void deleteById(UUID id) {
-    findByIdOrThrow(id);
-    binaryContentService.deleteByUserId(id);
-    userStatusService.deleteByUserId(id);
+    User user = findByIdOrThrow(id);
     userRepository.deleteById(id);
   }
 
-  @Override
-  public User findByIdOrThrow(UUID id) {
+  private User findByIdOrThrow(UUID id) {
     return userRepository.findById(id)
         .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "id : " + id));
   }
 
-  private UserResponse entityToUserResponse(User user) {
-    boolean isOnline = userStatusService.findByUserId(user.getId()).online();
-    UUID binaryContentId = null;
-    BinaryContentResponse binaryContentResponse = binaryContentService.findByUserId(user.getId());
-    if (binaryContentResponse != null) {
-      binaryContentId = binaryContentResponse.id();
+  private byte[] convertToBytes(MultipartFile imageFile) {
+    try {
+      return imageFile.getBytes();
+    } catch (IOException e) {
+      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "변환 실패");
     }
-    return UserResponse.entityToDto(user, isOnline, binaryContentId);
   }
 
 }

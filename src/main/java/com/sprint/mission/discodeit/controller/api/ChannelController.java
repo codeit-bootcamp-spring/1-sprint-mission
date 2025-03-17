@@ -3,8 +3,11 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.controller.docs.ChannelApiDocs;
 import com.sprint.mission.discodeit.dto.ChannelRequest;
 import com.sprint.mission.discodeit.dto.ChannelResponse;
+import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,37 +22,43 @@ public class ChannelController implements ChannelApiDocs {
 
   @PostMapping("/public")
   @Override
-  public ChannelResponse createPublicChannel(
+  public ResponseEntity<CustomApiResponse<ChannelResponse>> createPublicChannel(
       @RequestBody ChannelRequest.CreatePublic publicChannelRequest) {
-    return channelService.createPublicChannel(publicChannelRequest);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(CustomApiResponse.created(channelService.createPublicChannel(publicChannelRequest)));
   }
 
   @PostMapping("/private")
   @Override
-  public ChannelResponse createPrivateChannel(
+  public ResponseEntity<CustomApiResponse<ChannelResponse>> createPrivateChannel(
       @RequestBody ChannelRequest.CreatePrivate privateChannelRequest) {
-    return channelService.createPrivateChannel(privateChannelRequest);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            CustomApiResponse.created(channelService.createPrivateChannel(privateChannelRequest)));
   }
 
   @PutMapping("/public/{channelId}")
   @Override
-  public ChannelResponse updatePublicChannel(
+  public ResponseEntity<CustomApiResponse<ChannelResponse>> updatePublicChannel(
       @PathVariable UUID channelId,
       @RequestBody ChannelRequest.Update publicChannelRequest
   ) {
-    return channelService.update(channelId, publicChannelRequest);
+    return ResponseEntity.ok(
+        CustomApiResponse.success(channelService.update(channelId, publicChannelRequest))
+    );
   }
 
   @DeleteMapping("/{channelId}")
   @Override
-  public String deleteChannel(@PathVariable UUID channelId) {
+  public ResponseEntity<CustomApiResponse<Void>> deleteChannel(@PathVariable UUID channelId) {
     channelService.deleteById(channelId);
-    return "delete ok";
+    return ResponseEntity.ok(CustomApiResponse.success("Channel deleted successfully"));
   }
 
   @GetMapping
   @Override
-  public List<ChannelResponse> getChannelListByUser(@RequestParam("userId") UUID userId) {
-    return channelService.findAllByUserId(userId);
+  public ResponseEntity<CustomApiResponse<List<ChannelResponse>>> getChannelListByUser(
+      @RequestParam("userId") UUID userId) {
+    return ResponseEntity.ok(CustomApiResponse.success(channelService.findAllByUserId(userId)));
   }
 }

@@ -1,50 +1,68 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+@Entity
+@Table(name = "messages")
 @Getter
-public class Message implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private final UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
+  @Column(columnDefinition = "TEXT")
   private String content;
-  private UUID channelId;
-  private UUID userId;
 
-  public static Message createMessage(String content, UUID channelId, UUID userId) {
-    return new Message(content, channelId, userId);
+  @ManyToOne
+  @JoinColumn(name = "channel_id", nullable = false)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  private Channel channel;
+
+  @ManyToOne
+  @JoinColumn(name = "author_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
+  private User author;
+
+  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @JoinTable(name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+  private List<BinaryContent> attachments;
+
+  public static Message createMessage(String content, Channel channel, User user) {
+    return new Message(content, channel, user, new ArrayList<>());
   }
 
-  private Message(String content, UUID channelId, UUID userId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
+  private Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
     this.content = content;
-    this.channelId = channelId;
-    this.userId = userId;
+    this.channel = channel;
+    this.author = author;
+    this.attachments = attachments;
   }
 
-  public void update(String newContent) {
-    boolean isChanged = false;
-    if (!newContent.equals(this.content)) {
-      this.content = newContent;
-      isChanged = true;
-    }
-
-    if (isChanged) {
-      this.updatedAt = Instant.now();
-    }
+  public void updateContent(String content) {
+    this.content = content;
   }
 
-  @Override
-  public String toString() {
-    return "Message{id:" + id + ",channel:" + channelId + ",user:" + userId + ",content:" + content
-        + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
+  public void insertAttachments(BinaryContent binaryContent) {
+    this.attachments.add(binaryContent);
   }
-  
+
+  public void removeAttachments(BinaryContent binaryContent) {
+    this.attachments.remove(binaryContent);
+  }
 }

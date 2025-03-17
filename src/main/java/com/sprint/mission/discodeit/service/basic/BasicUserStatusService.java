@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
+  private final UserStatusMapper userStatusMapper;
   private final UserRepository userRepository;
 
   @Override
@@ -35,39 +37,43 @@ public class BasicUserStatusService implements UserStatusService {
     if (userStatusRepository.existsByUserId(userId)) {
       throw new DuplicateRequestException("UserStatus already exists");
     }
-    UserStatus newUserStatus = UserStatus.createUserStatus(userId);
+    UserStatus newUserStatus = UserStatus.createUserStatus(user);
     log.info("Create UserStatus: {}", newUserStatus);
-    return UserStatusResponse.entityToDto(userStatusRepository.save(newUserStatus));
+    return userStatusMapper.entityToDto(userStatusRepository.save(newUserStatus));
   }
 
   @Override
   public UserStatusResponse findById(UUID id) {
     UserStatus userStatus = userStatusRepository.findById(id)
         .orElseThrow(() -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "id : " + id));
-    return UserStatusResponse.entityToDto(userStatus);
+    return userStatusMapper.entityToDto(userStatus);
   }
 
   @Override
   public UserStatusResponse findByUserId(UUID userId) {
+    User user = userRepository.findById(userId).orElseThrow(() ->
+        new RestApiException(ErrorCode.USER_NOT_FOUND, "id :" + userId));
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(
             () -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
-    return UserStatusResponse.entityToDto(userStatus);
+    return userStatusMapper.entityToDto(userStatus);
   }
 
   @Override
   public UserStatusResponse updateByUserId(UUID userId, UserStatusRequest.Update request) {
+    User user = userRepository.findById(userId).orElseThrow(() ->
+        new RestApiException(ErrorCode.USER_NOT_FOUND, "id :" + userId));
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(
             () -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
-    userStatus.update(request.newLastActiveAt());
-    return UserStatusResponse.entityToDto(userStatusRepository.save(userStatus));
+    userStatus.updateLastActiveAt(request.newLastActiveAt());
+    return userStatusMapper.entityToDto(userStatusRepository.save(userStatus));
   }
 
   @Override
   public List<UserStatusResponse> findAll() {
     return userStatusRepository.findAll().stream()
-        .map(UserStatusResponse::entityToDto)
+        .map(userStatusMapper::entityToDto)
         .collect(Collectors.toList());
   }
 

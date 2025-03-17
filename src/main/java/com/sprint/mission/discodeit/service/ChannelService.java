@@ -17,8 +17,6 @@ public interface ChannelService {
 
   ChannelResponse findById(UUID id);
 
-  Channel findByIdOrThrow(UUID id);
-
   ChannelResponse update(UUID id, ChannelRequest.Update request);
 
   void deleteById(UUID id);

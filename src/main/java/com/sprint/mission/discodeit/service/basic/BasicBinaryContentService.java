@@ -4,9 +4,10 @@ import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,71 +24,39 @@ import java.util.stream.Collectors;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  public BinaryContentResponse createUserProfileFile(MultipartFile file, UUID userId) {
+  public BinaryContentResponse create(MultipartFile file) {
     BinaryContent newFile = BinaryContent.createBinaryContent(
-        file.getName(), file.getContentType(), convertToBytes(file),
-        BinaryContent.ParentType.USER, userId
-    );
-    log.info("Create User Profile : {}", newFile);
-    BinaryContent newBinaryContent = binaryContentRepository.save(newFile);
-    return BinaryContentResponse.entityToDto(newBinaryContent);
-  }
+        file.getName(), file.getSize(), file.getContentType());
 
-  @Override
-  public BinaryContentResponse createMessageFile(MultipartFile file, UUID messageId) {
-    BinaryContent newFile = BinaryContent.createBinaryContent(
-        file.getName(), file.getContentType(), convertToBytes(file),
-        BinaryContent.ParentType.MESSAGE, messageId
-    );
-    log.info("Create Message Files : {}", newFile);
     BinaryContent newBinaryContent = binaryContentRepository.save(newFile);
-    return BinaryContentResponse.entityToDto(newBinaryContent);
-  }
-
-  @Override
-  public BinaryContentResponse updateUserProfileFile(MultipartFile file, UUID userId) {
-    binaryContentRepository.deleteByUserId(userId);
-    return createUserProfileFile(file, userId);
+    binaryContentStorage.put(newBinaryContent.getId(), convertToBytes(file));
+    log.info("Create User Profile : {}", newBinaryContent);
+    return binaryContentMapper.entityToDto(newBinaryContent);
   }
 
   @Override
   public BinaryContentResponse findByIdOrThrow(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id)
         .orElseThrow(() -> new RestApiException(ErrorCode.BINARY_CONTENT_NOT_FOUND, "id :" + id));
-    return BinaryContentResponse.entityToDto(binaryContent);
-  }
-
-  @Override
-  public BinaryContentResponse findByUserId(UUID userId) {
-    BinaryContent binaryContent = binaryContentRepository.findByUserId(userId).orElse(null);
-    if (binaryContent != null) {
-      return BinaryContentResponse.entityToDto(binaryContent);
-    }
-    return null;
+    return binaryContentMapper.entityToDto(binaryContent);
   }
 
   @Override
   public List<BinaryContentResponse> findAllByIdIn(List<UUID> ids) {
     return binaryContentRepository.findAllByIdIn(ids).stream()
-        .map(BinaryContentResponse::entityToDto)
+        .map(binaryContentMapper::entityToDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public void deleteById(UUID id) {
+    binaryContentRepository.findById(id).orElseThrow(() ->
+        new RestApiException(ErrorCode.BINARY_CONTENT_NOT_FOUND, "id :" + id));
     binaryContentRepository.deleteById(id);
-  }
-
-  @Override
-  public void deleteByUserId(UUID userId) {
-    binaryContentRepository.deleteByUserId(userId);
-  }
-
-  @Override
-  public void deleteAllByMessageId(UUID messageId) {
-    binaryContentRepository.deleteAllByMessageId(messageId);
   }
 
   private byte[] convertToBytes(MultipartFile imageFile) {

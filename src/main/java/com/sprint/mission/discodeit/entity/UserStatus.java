@@ -1,56 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+  @Transient
   private final long ADDITIONAL_TIME_SECONDS = 60 * 5;
-  private final UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private UUID userId;
+
+  @OneToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
+
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastActiveAt;
-  private Boolean isOnline;
 
-  public static UserStatus createUserStatus(UUID userId) {
-    return new UserStatus(userId, true);
+  public static UserStatus createUserStatus(User user) {
+    return new UserStatus(user);
   }
 
-  private UserStatus(UUID userId, Boolean online) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    this.updatedAt = this.createdAt;
-    this.userId = userId;
+  private UserStatus(User user) {
+    this.user = user;
     this.lastActiveAt = Instant.now();
-    this.isOnline = online;
   }
 
-  public void update(Instant lastActiveAt) {
+  public void updateLastActiveAt(Instant lastActiveAt) {
     this.lastActiveAt = lastActiveAt;
+  }
+
+  public boolean isOnline() {
     Instant ValidTime = this.lastActiveAt.plusSeconds(ADDITIONAL_TIME_SECONDS);
-    if (ValidTime.compareTo(Instant.now()) > 0) {
-      this.isOnline = true;
-    } else {
-      this.isOnline = false;
-    }
-    this.updatedAt = Instant.now();
+    return ValidTime.compareTo(Instant.now()) > 0;
   }
-
-  @Override
-  public String toString() {
-    return "UserStatus{id:" + id
-        + ",userId:" + userId
-        + ",online:" + isOnline
-        + ",lastActiveAt:" + lastActiveAt
-        + ",createdAt:" + createdAt
-        + ",updateAt:" + updatedAt
-        + "}";
-  }
-
 }

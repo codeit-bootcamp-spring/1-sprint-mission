@@ -1,61 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "binary_contents")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class BinaryContent implements Serializable {
+public class BinaryContent extends BaseEntity {
 
-  private static final long serialVersionUID = 1L;
-  private final UUID id;
-  private Instant createdAt;
+  @Column(nullable = false)
   private String fileName;
+
+  @Column(nullable = false)
+  private Long size;
+
+  @Column(length = 100, nullable = false)
   private String contentType;
-  private byte[] bytes;
-  private ParentType parentType;
-  private UUID userId;
-  private UUID messageId;
 
-  public enum ParentType {
-    USER,
-    MESSAGE
+  public static BinaryContent createBinaryContent(String fileName, Long size, String contentType) {
+    return new BinaryContent(fileName, size, contentType);
   }
 
-  public static BinaryContent createBinaryContent(String fileName, String contentType, byte[] bytes,
-      ParentType parentType, UUID parentId) {
-    if (parentType == ParentType.USER) {
-      return new BinaryContent(fileName, contentType, bytes, parentType, parentId, null);
-    } else {
-      return new BinaryContent(fileName, contentType, bytes, parentType, null, parentId);
-    }
-  }
-
-  private BinaryContent(String fileName, String contentType, byte[] bytes, ParentType parentType,
-      UUID userId, UUID messageId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
+  private BinaryContent(String fileName, Long size, String contentType) {
     this.fileName = fileName;
-    this.bytes = bytes;
+    this.size = size;
     this.contentType = contentType;
-    this.parentType = parentType;
-    this.userId = userId;
-    this.messageId = messageId;
-  }
-
-  @Override
-  public String toString() {
-    return "BinaryContent{id:" + id
-        + ",userId:" + userId
-        + ",createdAt:" + createdAt
-        + ",fileName:" + fileName
-        + ",contentType:" + contentType
-        + ",parentType:" + parentType
-        + ",userId:" + userId
-        + ",messageId:" + messageId
-        + "}";
   }
 
 }

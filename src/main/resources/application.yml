@@ -1,14 +1,27 @@
 spring:
   application:
     name: Discodeit
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
 
 server:
   port: 8080
 
 discodeit:
-  repository:
-    type: jcf
-    file-directory: tmp
+  storage:
+    type: local
+    local:
+      root-path: ${user.dir}/binaryContents
 
 logging:
   #  file:

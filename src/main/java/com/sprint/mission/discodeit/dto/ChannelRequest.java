@@ -7,20 +7,20 @@ public record ChannelRequest(
 ) {
 
   public record CreatePublic(
-      String title,
+      String name,
       String description
   ) {
 
   }
 
   public record CreatePrivate(
-      List<UUID> joinUsers
+      List<UUID> participantIds
   ) {
 
   }
 
   public record Update(
-      String title,
+      String name,
       String description
   ) {
 
