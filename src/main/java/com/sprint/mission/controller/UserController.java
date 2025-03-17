@@ -118,11 +118,6 @@ public class UserController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class))))
     @GetMapping
     public ResponseEntity<CommonResponse> findAll() {
-//        Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
-//        List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
-//                .map(user -> new FindUserDto(user, statusMapByUser.get(user)))
-//                .toList();
-
         List<UserDto> userDtoList = userService.findAll().stream()
                 .map(userMapper::toDto)
                 .toList();

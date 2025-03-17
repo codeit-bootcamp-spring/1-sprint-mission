@@ -20,8 +20,5 @@ public interface UserMapper {
 //    User update(UserDtoForUpdate updateUserDto, @MappingTarget User user);
 
     User toEntityWithoutProfile(UserDtoForCreate userDto);
-
     User toEntityWithProfile(UserDtoForCreate userDto, BinaryContent profile);
-
-    User toEntityWithProfileAndStatus(UserDtoForCreate userDto, BinaryContent profile, UserStatus status);
 }
