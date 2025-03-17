@@ -84,9 +84,6 @@ public class ReadStatusController {
     @GetMapping
     public ResponseEntity<CommonResponse> findAllByUserId(
             @Parameter(description = "조회할 User ID", required = true) @RequestParam("userId") UUID userId) {
-//        List<ReadStatus> readStatusList = userRepository.findById(userId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER))
-//                .getReadStatus();
         List<ReadStatus> readStatusList = readStatusService.findAllByUserId(userId);
         // 나중에 dto
         return CommonResponse.toResponseEntity

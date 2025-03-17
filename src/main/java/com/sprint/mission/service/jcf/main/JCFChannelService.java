@@ -6,6 +6,7 @@ import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.ChannelMapper;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
+import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.User;
@@ -20,7 +21,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.UUID;
 
 import static com.sprint.mission.entity.main.ChannelType.PRIVATE;
@@ -37,6 +41,8 @@ public class JCFChannelService implements ChannelService {
     private final MessageService messageService;
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
+    private final JCFUserService userService;
+
 
     @Override
     public Channel createPublicChannel(PublicChannelCreateDTO request) {
@@ -68,41 +74,41 @@ public class JCFChannelService implements ChannelService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
     }
 
-//    // 카피
-//    @Override
-//    public List<ChannelDto> findAllByUserId(UUID userId) {
-//        // USER -> READSATUS 가져오고 이거 아이디에 맞는 CHANNEL들 가져오게 하고
-//        // PublicChannel도 추가
-//
-//        return n
-//        User participatingUser = userRepository.findWithStatusById(userId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
-//
-//        List<ReadStatus> userReadStatusList = participatingUser.getReadStatus();
-//
-//        List<Channel> privateChannels = userReadStatusList.stream().map(ReadStatus::getChannel).toList();
-//        return new ArrayList<>(
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
-//
-//        List<ReadStatus> readStatusList = readStatusRepository.findAllByUser(user);
-//        List<UUID> subscribedChannelIdList = readStatusList.stream().map(readStatus -> {
-//            return readStatus.getChannel().getId();
-//        }).toList();
-//
-//        return channelRepository.findAll().stream()
-//                .filter(channel ->
-//                        channel.getChannelType().equals(ChannelType.PUBLIC)
-//                                || subscribedChannelIdList.contains(channel.getId())
-//                )
-//                .map(this::toDto)
-//                .toList();
-
-
     @Override
     public List<Channel> findAll() {
         return channelRepository.findAll();
     }
+
+    @Override
+    public List<ChannelDto> findAllByUserId(UUID userId) {
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByUser_Id(userId);
+        // 유저가 참여한 Private 채널 리스트
+        List<Channel> participatingPrivateChannel = readStatusList.stream().map(ReadStatus::getChannel).toList();
+
+        // 채널별 유저 리스트 뽑기
+        List<ChannelDto> channelDtoList = new ArrayList<>();
+        participatingPrivateChannel.forEach((channel)->{
+            // 한 채널의 ReadStauts들 가져오기
+            List<ReadStatus> channelReadStatus = readStatusRepository.findAllByChannel_Id(channel.getId());
+            List<User> userList = channelReadStatus.stream().map(ReadStatus::getUser).toList();
+            userList.forEach(user -> channelDtoList.add(channelMapper.toDto(channel, user)));
+        });
+
+        List<Channel> publicChannel = channelRepository.findAllByChannelType(PUBLIC);
+        publicChannel.forEach((channel) -> channelDtoList.add(channelMapper.toDto(channel)));
+
+        return channelDtoList;
+    }
+
+
+    //public record ChannelDto(
+    //        UUID id,
+    //        ChannelType channelType,
+    //        String name,
+    //        String description,
+    //        List<UserDto> participants,
+    //        Instant lastMessageAt) {
+    //}
 
     @Override
     public Channel update(UUID channelId, ChannelDtoForUpdate dto) {

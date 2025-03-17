@@ -1,6 +1,7 @@
 package com.sprint.mission.repository;
 
 import com.sprint.mission.entity.main.Message;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.KeysetScrollPosition;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +24,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     void deleteAllByChannel_Id(UUID channelId);
 
     @EntityGraph(attributePaths = {"channel", "messageAttachments", "author"})
-    Optional<Message> findById(UUID id);
+    @NonNull
+    Optional<Message> findById(@NonNull UUID id);
     // 가져올 것 : CHANNEL이랑 BINARY
 
     @EntityGraph(attributePaths = {"channel", "messageAttachments", "author", "author.status"})

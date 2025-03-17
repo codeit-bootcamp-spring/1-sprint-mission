@@ -3,6 +3,7 @@ package com.sprint.mission.service;
 
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
+import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 
@@ -22,6 +23,8 @@ public interface ChannelService {
   Channel createPrivateChannel(PrivateChannelCreateDTO request);
 
   Channel findById(UUID id);
+
+  List<ChannelDto> findAllByUserId(UUID userId);
 
   Channel update(UUID channelId, ChannelDtoForUpdate dto);
 

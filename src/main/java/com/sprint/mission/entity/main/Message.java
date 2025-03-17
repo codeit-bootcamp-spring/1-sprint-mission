@@ -53,10 +53,11 @@ public class Message extends BaseUpdatableEntity{
         this.author = user;
     }
 
-    public void update(String newContent) {
+    public Message update(String newContent) {
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
         }
+        return this;
     }
 
 //    public void addAttachment(BinaryContent attachment) {

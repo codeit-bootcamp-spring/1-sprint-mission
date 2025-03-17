@@ -49,21 +49,17 @@ dependencies {
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
 	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-	//
-	//    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-	//    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
 	compileOnly 'org.projectlombok:lombok'
 
-	// Lombok 관련 애노테이션 프로세서를 먼저 등록하여 Lombok이 먼저 동작하도록 함
-	annotationProcessor 'org.projectlombok:lombok'
 	// Lombok과 MapStruct 충돌 해결을 위한 라이브러리라는데 안해도 문제 없어서 주석처리
-	//  annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
 	runtimeOnly 'org.postgresql:postgresql'
 
 	// 테스트 코드에서도 MapStruct를 사용할 경우 추가
-	testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
+	testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

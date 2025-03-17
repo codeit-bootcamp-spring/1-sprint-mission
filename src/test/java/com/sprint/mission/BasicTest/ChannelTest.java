@@ -7,6 +7,8 @@ import com.sprint.mission.service.ChannelService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest
 public class ChannelTest {
 
+    private static final Logger log = LoggerFactory.getLogger(ChannelTest.class);
     @Autowired
     private ChannelService channelService;
 
@@ -33,6 +36,7 @@ public class ChannelTest {
         assertThat(publicChannel).isNotNull();
 
         Channel findedChannel = channelService.findById(publicChannel.getId());
+        log.info("id : {}", findedChannel.getId());
         assertThat(findedChannel).isNotNull();
         assertThat(findedChannel.getName()).isEqualTo(publicChannelCreateDTO.name());
         assertThat(findedChannel.getDescription()).isEqualTo(publicChannelCreateDTO.description());

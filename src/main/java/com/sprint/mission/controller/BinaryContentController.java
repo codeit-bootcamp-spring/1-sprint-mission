@@ -48,8 +48,7 @@ public class BinaryContentController {
     public ResponseEntity<CommonResponse> find(
             @Parameter(description = "조회할 첨부 파일 ID") @PathVariable("id") UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
-        // 이 때도 다운로드?
-        //return (ResponseEntity<Resource>) binaryContentStorage.download(binaryContentMapper.toDto(binaryContent));
+        // 이 때는 byte 공백으로 처리하도록
         return CommonResponse.toResponseEntity
                 (OK, "BinaryContent 조회 성공", binaryContentMapper.toDto(binaryContent));
     }

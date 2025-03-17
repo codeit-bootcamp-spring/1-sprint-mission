@@ -48,14 +48,6 @@ public class ReadStatusService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_READ_STATUS));
     }
 
-//    public List<ReadStatus> findAllByUserId(UUID userId) {
-//        return readStatusRepository.findAllByUserId(userId);
-//    }  // 안써도 될 듯한데 user에서 꺼내면 될 것 같은데
-//
-//    public List<ReadStatus> findAllByChannelId(UUID channelId) {
-//        return readStatusRepository.findAllByChannelId(channelId);
-//    }
-
     public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
         ReadStatus readStatus = this.findById(readStatusId);
         readStatus.update(request.newLastReadAt());

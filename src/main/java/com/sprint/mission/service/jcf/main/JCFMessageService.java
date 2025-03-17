@@ -46,7 +46,6 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> binaryContentDtoForCreateList) {
-
         User author = userRepository.findById(responseDto.userId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
@@ -54,16 +53,14 @@ public class JCFMessageService implements MessageService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
         Message createdMessage = messageMapper.toEntity(writtenPlace, author, responseDto.content());
-        //Message createdMessage = new Message(writtenPlace, author, responseDto.content());
 
         log.info("attachmentsDto: {}", binaryContentDtoForCreateList);
         if (!binaryContentDtoForCreateList.isEmpty()) {
-            for (BinaryContentDtoForCreate bcd : binaryContentDtoForCreateList) {
+            binaryContentDtoForCreateList.forEach(bcd -> {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
-                log.info("메시지의 생성된 BinaryContent: {}", createdBinaryContent);
                 binaryContentStorage.put(createdBinaryContent.getId(), bcd.bytes());
-                //createdMessage.addAttachment(createdBinaryContent);???
-            }
+                log.info("메시지의 생성된 BinaryContent: {}", createdBinaryContent);
+            });
         }
         return messageRepository.save(createdMessage);
     }
@@ -71,8 +68,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message update(UUID messageId, MessageDtoForUpdate updateDto) {
         Message updatingMessage = this.findById(messageId);
-        updatingMessage.update(updateDto.content());
-        return updatingMessage;
+        return updatingMessage.update(updateDto.content());
     }
 
 
@@ -82,48 +78,17 @@ public class JCFMessageService implements MessageService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
     }
 
-    @Override
-    public List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        }
-
-        Page<Message> pageMessages;
-        List<PageResponse<MessageDto>> messageDtoList = new ArrayList<>();
-        do {
-            pageMessages = messageRepository.findPagingAllByChannel_Id(channelId, pageable);
-            log.info("현재 페이지 : {}", pageMessages.getNumber());
-            log.info("dto 변환 전 channel 정보 : {}", pageMessages.getContent().get(0).getChannel());
-            pageMessages.map((message) -> {
-                System.out.println("message.getAuthor().getStatus() = " + message.getAuthor().getStatus());
-                MessageDto dtoMessage = messageMapper.toDto(message);
-                System.out.println("dtoMessage.author().online() = " + dtoMessage.author().online());
-                return message;
-            });
-            PageResponse<MessageDto> messagePageResponse = pageResponseMapper.fromPage(pageMessages.map(messageMapper::toDto));
-            messageDtoList.add(messagePageResponse);
-            log.info("생성한 DTO : {}", pageMessages);
-            log.info("다음 페이지 여부 : {}", pageMessages.hasNext());
-            pageable = pageMessages.nextPageable();
-        } while (pageMessages.hasNext());
-
-        return messageDtoList;
-    }
-
     // 스크롤링
-    // CREATED_AT이 겹칠 경우 어떻게 해결해야하는지 (쿼리보면 spring data jpa가 id기준 정렬도 자동 추가해주나?)
     @Override
     public List<ScrollPageResponse<MessageDto>> findAllByChannelId(UUID channelId) {
         if (!channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
 
-        List<ScrollPageResponse<MessageDto>> messageDtoList = new ArrayList<>();
-
         // 매번 새 페이지마다 요청할지 아니면 한번에 다 가져올지 고민 (중간에 총개수가 바뀔 수 있으니)
         Long totalMessageCount = messageRepository.countByChannel_Id(channelId);
         ScrollPosition position = ScrollPosition.keyset();
-
+        List<ScrollPageResponse<MessageDto>> messageDtoList = new ArrayList<>();
         while (true){
             Window<MessageDto> messageDtoWindow = messageRepository
                     .findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, (KeysetScrollPosition) position)
@@ -137,6 +102,28 @@ public class JCFMessageService implements MessageService {
                 break;
             }
         }
+        return messageDtoList;
+    }
+
+    // Page 버전
+    @Override
+    public List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+        }
+
+        Page<Message> pageMessages;
+        List<PageResponse<MessageDto>> messageDtoList = new ArrayList<>();
+        do {
+            pageMessages = messageRepository.findPagingAllByChannel_Id(channelId, pageable);
+
+            Page<MessageDto> dtoPage = pageMessages.map(messageMapper::toDto);
+            PageResponse<MessageDto> messagePageResponse = pageResponseMapper.fromPage(dtoPage);
+            messageDtoList.add(messagePageResponse);
+
+            pageable = pageMessages.nextPageable();
+        } while (pageMessages.hasNext());
+        log.info("messageDtoList: {}", messageDtoList);
         return messageDtoList;
     }
 
