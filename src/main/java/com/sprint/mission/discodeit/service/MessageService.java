@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface MessageService {
 
@@ -14,7 +16,7 @@ public interface MessageService {
 
   Message find(UUID messageId);
 
-  List<Message> findAllByChannelId(UUID channelId);
+  Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
 
   Message update(UUID messageId, MessageUpdateRequest request);
 

@@ -11,6 +11,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<String> handleException(IllegalArgumentException e) {
+    e.printStackTrace();
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .body(e.getMessage());
@@ -18,6 +19,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(NoSuchElementException.class)
   public ResponseEntity<String> handleException(NoSuchElementException e) {
+    e.printStackTrace();
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(e.getMessage());
@@ -25,6 +27,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<String> handleException(Exception e) {
+    e.printStackTrace();
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(e.getMessage());

@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.docs.BinaryContentSwagger;
-import com.sprint.mission.discodeit.dto.response.BinaryContentListResponse;
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,40 +18,38 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/binaryContents") //binary-contents로 변경, 요구사항 맞추기위해 Camel 로 수정
+@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 public class BinaryContentController implements BinaryContentSwagger {
 
-  // implements BinaryContentSwagger
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
 
   @GetMapping(value = "/{binaryContentId}")
-  public ResponseEntity<BinaryContentResponse> find(
+  public ResponseEntity<BinaryContentDto> find(
       @PathVariable UUID binaryContentId
   ) {
     BinaryContent binaryContent = binaryContentService.find(binaryContentId);
-    return ResponseEntity.ok(BinaryContentResponse.from(binaryContent));
-  }
-
-
-  //    @GetMapping("/batch")  요구사항 맞추기위해 일단 보류
-//  @GetMapping
-  public ResponseEntity<BinaryContentListResponse> batchV0(
-      @RequestParam List<UUID> ids
-  ) {
-    List<BinaryContent> contents = binaryContentService.findAllByIdIn(ids);
-    return ResponseEntity.ok()
-        .contentType(MediaType.APPLICATION_JSON)
-        .body(BinaryContentListResponse.from(contents));
+    return ResponseEntity.ok(binaryContentMapper.toDto(binaryContent));
   }
 
   @GetMapping
-  public ResponseEntity<List<BinaryContentResponse>> batch(
+  public ResponseEntity<List<BinaryContentDto>> batch(
       @RequestParam("binaryContentIds") List<UUID> ids
   ) {
-    List<BinaryContentResponse> contents = binaryContentService.findAllByIdIn(ids)
-        .stream().map(BinaryContentResponse::from).toList();
+    List<BinaryContentDto> contents = binaryContentMapper.toDtoList(
+        binaryContentService.findAllByIdIn(ids));
+
     return ResponseEntity.ok()
         .body(contents);
+  }
+
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<Resource> download(
+      @PathVariable("binaryContentId") UUID binaryContentId
+  ) {
+    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+    return binaryContentStorage.download(binaryContentMapper.toDto(binaryContent));
   }
 }

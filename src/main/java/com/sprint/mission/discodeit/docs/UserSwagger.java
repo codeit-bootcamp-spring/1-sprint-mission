@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.docs;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.UserCreateResponse;
-import com.sprint.mission.discodeit.dto.response.UserUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -15,7 +14,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "User", description = "User API")
@@ -28,7 +28,7 @@ public interface UserSwagger {
           examples = @ExampleObject(value = "User with email {email} already exists")
       ))
   })
-  ResponseEntity<UserCreateResponse> create(
+  ResponseEntity<UserDto> create(
       UserCreateRequest request,
       MultipartFile profile
   );
@@ -43,7 +43,7 @@ public interface UserSwagger {
           examples = @ExampleObject(value = "User with id {userId} not found")
       ))
   })
-  ResponseEntity<UserUpdateResponse> update(
+  ResponseEntity<UserDto> update(
       UUID userId,
       UserUpdateRequest request,
       MultipartFile profile
@@ -71,9 +71,9 @@ public interface UserSwagger {
           examples = @ExampleObject(value = "UserStatus with userId {userId} not found")
       ))
   })
-  ResponseEntity<UserStatusUpdateRequest> updateUserStatus(
-      UUID userId,
-      UserStatusUpdateRequest request
+  ResponseEntity<UserStatusDto> updateUserStatus(
+      @PathVariable UUID userId,
+      @RequestBody UserStatusUpdateRequest request
   );
 
 }

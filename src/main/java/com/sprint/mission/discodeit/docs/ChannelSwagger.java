@@ -4,9 +4,6 @@ import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.PrivateChannelCreateResponse;
-import com.sprint.mission.discodeit.dto.response.PublicChannelCreateResponse;
-import com.sprint.mission.discodeit.dto.response.PublicChannelUpdateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -24,13 +21,13 @@ public interface ChannelSwagger {
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Public Channel이 성공적으로 생성됨")
   })
-  ResponseEntity<PublicChannelCreateResponse> createPublic(PublicChannelCreateRequest request);
+  ResponseEntity<ChannelDto> createPublic(PublicChannelCreateRequest request);
 
   @Operation(operationId = "create_4", summary = "Private Channel 생성")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Private Channel이 성공적으로 생성됨")
   })
-  ResponseEntity<PrivateChannelCreateResponse> createPrivate(PrivateChannelCreateRequest request);
+  ResponseEntity<ChannelDto> createPrivate(PrivateChannelCreateRequest request);
 
   @Operation(operationId = "update_3", summary = "Channel 정보 수정")
   @ApiResponses(value = {
@@ -42,7 +39,7 @@ public interface ChannelSwagger {
           examples = @ExampleObject(value = "Channel with id {channelId} not found")
       ))
   })
-  ResponseEntity<PublicChannelUpdateResponse> update(UUID channelId,
+  ResponseEntity<ChannelDto> update(UUID channelId,
       PublicChannelUpdateRequest request);
 
   @Operation(operationId = "delete_2", summary = "Channel 삭제")
