@@ -1,70 +1,88 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.global.error.execption.bianryContent.BinaryContentNotNullException;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.global.error.execption.channel.ChannelNotNullException;
 import com.sprint.mission.discodeit.global.error.execption.user.UserNotNullException;
-import lombok.Getter;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "messages")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Message extends BaseEntity {
+public class Message extends BaseUpdatableEntity {
 
-    private final User sender;
-    private final Channel channel;
-    private String content;
-    private final List<BinaryContent> binaryContentList = new ArrayList<>();
+  @ManyToOne(fetch = FetchType.LAZY) // on delete set null을 기능적으로 지원하지 않는 듯 하다.
+  @JoinColumn(name = "author_id")
+  private User sender;
 
-    private Message(User sender, Channel channel, String content) {
-        super();
-        this.sender = sender;
-        this.channel = channel;
-        this.content = content;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @Column(columnDefinition = "TEXT")
+  private String content;
+
+  @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachmentsList = new ArrayList<>();
+
+  private Message(User sender, Channel channel, String content) {
+    super();
+    this.sender = sender;
+    this.channel = channel;
+    this.content = content;
+  }
+
+  public static Message of(User sender, Channel channel, String content) {
+    if (sender == null) {
+      throw new UserNotNullException();
     }
-
-    public static Message of(User sender, Channel channel, String content) {
-        if (sender == null) {
-            throw new UserNotNullException();
-        }
-        if (channel == null) {
-            throw new ChannelNotNullException();
-        }
-        return new Message(sender, channel, content);
+    if (channel == null) {
+      throw new ChannelNotNullException();
     }
+    return new Message(sender, channel, content);
+  }
 
-    public void updateContent(String content) {
-        this.content = content;
-        this.updateUpdatedAt();
-    }
+  public void updateContent(String content) {
+    this.content = content;
+    this.updateUpdatedAt();
+  }
 
-    public boolean isNotOwner(UUID senderId) {
-        return !(this.sender.getId().equals(senderId));
-    }
+  public boolean isNotOwner(UUID senderId) {
+    return !(this.sender.getId().equals(senderId));
+  }
 
-    public void addBinaryContent(BinaryContent binaryContent) {
-        if (binaryContent == null) {
-            throw new BinaryContentNotNullException();
-        }
-        this.binaryContentList.add(binaryContent);
-        this.updateUpdatedAt();
+  public void addAttachment(BinaryContent attachment) {
+    if (attachment == null) {
+      throw new IllegalArgumentException(); // custom exception
     }
+    this.attachmentsList.add(attachment);
+    this.updateUpdatedAt();
+  }
 
-    public void deleteBinaryContent(BinaryContent binaryContent) {
-        if (binaryContent == null) {
-            throw new BinaryContentNotNullException();
-        }
-        this.binaryContentList.remove(binaryContent);
-        this.updateUpdatedAt();
+  public void deleteAttachment(BinaryContent attachment) {
+    if (attachment == null) {
+      throw new IllegalArgumentException();
     }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "sender=" + sender +
-                ", channel=" + channel +
-                ", content='" + content + '\'' +
-                '}';
-    }
+    this.attachmentsList.remove(attachment);
+    this.updateUpdatedAt();
+  }
 }

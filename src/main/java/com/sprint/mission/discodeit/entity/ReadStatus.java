@@ -1,17 +1,34 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "read_statuses")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ReadStatus extends BaseEntity {
+public class ReadStatus extends BaseUpdatableEntity {
 
-  private final User user;
-  private final Channel channel;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
-  // 메세지를 읽을 때 updatedAt이 변경됨으로 updatedAt을 통해 메세지를 마지막으로 읽은 시간을 알아낼 수 있다.
-  // 변경 가능한 필드가 updatedAt 하나이기에 가능하다.
 
   private ReadStatus(User user, Channel channel, Instant lastReadAt) {
     super();

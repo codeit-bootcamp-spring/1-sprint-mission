@@ -9,9 +9,9 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserValidator;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +22,7 @@ public class BasicAuthService implements AuthService {
   private final UserMapper userMapper;
 
   @Override
+  @Transactional
   public UserDto login(LoginRequest loginRequest) {
     User user = userValidator.validateUserExistsByNameAndPassword(loginRequest.username(),
         loginRequest.password());
@@ -31,11 +32,6 @@ public class BasicAuthService implements AuthService {
         new UpdateUserStatusByUserIdRequest(TimeUtil.getCurrentTime());
     userStatusService.updateUserStatusByUserId(user.getId(), updateUserStatusByUserIdRequest);
 
-    UUID profileId = null;
-    if (user.getProfileImage() != null) {
-      profileId = user.getProfileImage().getId();
-    }
-
-    return userMapper.toUserDto(user, profileId);
+    return userMapper.toUserDto(user);
   }
 }

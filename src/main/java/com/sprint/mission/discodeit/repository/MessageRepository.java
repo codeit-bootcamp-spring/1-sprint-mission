@@ -2,21 +2,26 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-
-import java.util.List;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface MessageRepository {
-    Message saveMessage(Message message);
 
-    Message findMessageById(UUID messageId);
+  Message saveMessage(Message message);
 
-    List<Message> findAllMessages();
+  Optional<Message> findMessageById(UUID messageId);
 
-    List<Message> findAllMessagesByChannel(Channel channel);
+  Page<Message> findPagedMessagesByChannel(Channel channel, Pageable pageable);
 
-    Optional<Message> findLastMessage();
+  Slice<Message> findSlicedMessagesByChannel(Channel channel, Pageable pageable);
 
-    void removeMessage(UUID messageId);
+  Slice<Message> findSlicedMessagesByChannel(Channel channel, Instant cursor, Pageable pageable);
+
+  Optional<Message> findLastMessage();
+
+  void removeMessage(UUID messageId);
 }

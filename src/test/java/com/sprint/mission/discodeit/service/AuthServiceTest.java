@@ -52,7 +52,7 @@ class AuthServiceTest {
   @DisplayName("로그인 테스트")
   void loginTest() {
     // given
-    User user = User.of("test1", "nickname1", "email1", "password1");
+    User user = User.of("test1", "email1", "password1");
     userRepository.saveUser(user);
     UserStatus userStatus = userStatusRepository.saveUserStatus(UserStatus.of(user));
 
@@ -64,8 +64,8 @@ class AuthServiceTest {
     // then
     assertEquals(loginResponse.id(), user.getId());
 
-    UserStatus foundUserStatus = userStatusRepository.findUserStatusById(userStatus.getId());
-    assertTrue(foundUserStatus.isOnline());
+    UserStatus foundUserStatus = userStatusRepository.findUserStatusById(userStatus.getId()).get();
+    assertTrue(foundUserStatus.isRecentLogin());
   }
 
 }

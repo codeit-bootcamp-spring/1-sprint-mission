@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequest;
-import com.sprint.mission.discodeit.dto.channel.response.FindChannelResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import com.sprint.mission.discodeit.global.error.execption.channel.CannotUpdatePrivateChannelException;
@@ -71,7 +70,7 @@ class ChannelServiceTest {
     channelMapper = new ChannelMapper();
     channelService = new BasicChannelService(channelRepository, readStatusRepository,
         messageRepository,
-        channelValidator, userValidator, readStatusValidator, channelMapper, randomStringGenerator);
+        channelValidator, userValidator, channelMapper);
   }
 
   @AfterEach
@@ -97,7 +96,7 @@ class ChannelServiceTest {
   }
 
   private User createUser(int num) {
-    User user = User.of("test" + num, "nickname" + num, "email" + num, "password" + num);
+    User user = User.of("test" + num, "email" + num, "password" + num);
     return userRepository.saveUser(user);
   }
 
@@ -172,9 +171,6 @@ class ChannelServiceTest {
       assertEquals("test", channel.name());
       assertEquals("description", channel.description());
 
-      channelUserList.forEach(user ->
-          assertNotNull(readStatusRepository.findReadStatusByUserId(user.getId())));
-
       assertNotNull(channelRepository.findChannelById(channel.id()));
     }
   }
@@ -190,11 +186,11 @@ class ChannelServiceTest {
       ChannelDto channel = createPublicChannel("channel1", "description");
 
       // when
-      FindChannelResponse findChannelResponse =
+      ChannelDto channelDto =
           channelService.findChannelByIdOrThrow(channel.id());
       // then
-      assertEquals("channel1", findChannelResponse.name());
-      assertEquals("description", findChannelResponse.description());
+      assertEquals("channel1", channelDto.name());
+      assertEquals("description", channelDto.description());
     }
 
     @Test
@@ -204,12 +200,12 @@ class ChannelServiceTest {
       ChannelDto channel = createPrivateChannel();
 
       // when
-      FindChannelResponse findChannelResponse =
+      ChannelDto channelDto =
           channelService.findChannelByIdOrThrow(channel.id());
 
       // then
-      assertEquals("test", findChannelResponse.name());
-      assertEquals("description", findChannelResponse.description());
+      assertEquals("test", channelDto.name());
+      assertEquals("description", channelDto.description());
     }
 
     @Test
@@ -235,12 +231,12 @@ class ChannelServiceTest {
       createPrivateChannel();
 
       // when
-      List<FindChannelResponse> findChannelResponseList =
+      List<ChannelDto> channelDtoList =
           channelService.findAllChannelsByUserId(channelOwner.getId());
 
       // then
       // channelOwner는 Private channel에 참가하지 않았기에 2개 중 1개만 포함된다.
-      assertEquals(1, findChannelResponseList.size());
+      assertEquals(1, channelDtoList.size());
     }
 
 //    @Test

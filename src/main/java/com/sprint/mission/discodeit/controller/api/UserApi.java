@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.user.response.FindUserResponse;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusByUserIdRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +43,7 @@ public interface UserApi {
   );
 
   @Operation(summary = "전체 User 목록 조회")
-  ResponseEntity<List<FindUserResponse>> findAllUsers();
+  ResponseEntity<List<UserDto>> findAllUsers();
 
   @Operation(summary = "User 온라인 상태 업데이트")
   ResponseEntity<UserStatusDto> updateUserStatusByUserId(

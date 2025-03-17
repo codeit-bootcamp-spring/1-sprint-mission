@@ -10,10 +10,12 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserStatusValidator;
 import com.sprint.mission.discodeit.validator.UserValidator;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserStatusMapper userStatusMapper;
 
   @Override
+  @Transactional
   public UserStatus createUserStatus(UUID userId) {
     User user = userValidator.validateUserExistsByUserId(userId);
 
@@ -44,17 +47,19 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public UserStatus updateUserStatusById(UpdateUserStatusByIdRequest updateUserStatusByIdRequest) {
     UserStatus userStatus =
         userStatusValidator.validateUserStatusExistsById(
             updateUserStatusByIdRequest.userStatusId());
 
-//        userStatus.updateUserStatusInfo(updateUserStatusByIdRequest);
+    userStatus.updateUserStatusInfo(Instant.now());
 
-    return userStatusRepository.saveUserStatus(userStatus);
+    return userStatus;
   }
 
   @Override
+  @Transactional
   public UserStatusDto updateUserStatusByUserId(UUID userid,
       UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
     User user = userValidator.validateUserExistsByUserId(userid);
@@ -62,7 +67,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     userStatus.updateUserStatusInfo(updateUserStatusByUserIdRequest.newLastActiveAt());
 
-    return userStatusMapper.toUserStatusDto(userStatusRepository.saveUserStatus(userStatus));
+    return userStatusMapper.toUserStatusDto(userStatus);
   }
 
   @Override

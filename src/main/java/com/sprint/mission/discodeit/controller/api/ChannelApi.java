@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequest;
-import com.sprint.mission.discodeit.dto.channel.response.FindChannelResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +36,7 @@ public interface ChannelApi {
   );
 
   @Operation(summary = "User가 참여 중인 Channel 목록 조회")
-  ResponseEntity<List<FindChannelResponse>> findUserAccessibleChannels(
+  ResponseEntity<List<ChannelDto>> findUserAccessibleChannels(
       @Parameter(description = "조회할 User ID") UUID userId
   );
 }

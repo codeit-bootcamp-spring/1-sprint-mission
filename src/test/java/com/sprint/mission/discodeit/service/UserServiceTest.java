@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.user.response.FindUserResponse;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import com.sprint.mission.discodeit.global.error.execption.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.global.error.execption.user.UserNotFoundException;
@@ -146,7 +145,7 @@ class UserServiceTest {
       UserDto user = createUser(0);
 
       // when
-      FindUserResponse findUserResponse = userService.findUserByIdOrThrow(user.id());
+      UserDto findUserResponse = userService.findUserByIdOrThrow(user.id());
 
       // then
       assertEquals(user.username(), findUserResponse.username());
@@ -180,7 +179,7 @@ class UserServiceTest {
       }
 
       // when
-      List<FindUserResponse> findUserResponseList = userService.findAllUsers();
+      List<UserDto> findUserResponseList = userService.findAllUsers();
 
       // then
       assertEquals(4, findUserResponseList.size());

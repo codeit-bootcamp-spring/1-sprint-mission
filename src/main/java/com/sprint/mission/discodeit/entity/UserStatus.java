@@ -1,23 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
+import com.sprint.mission.discodeit.global.util.TimeUtil;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus extends BaseEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-  private final User user;
+  @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,
+      CascadeType.REMOVE}, orphanRemoval = true)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
+
+  @Column(name = "last_active_at", nullable = false)
   private Instant loginAt;
-  private boolean isOnline = false;
 
   private static final long LOGIN_EXPIRATION_MINUTES = 5;
 
   private UserStatus(User user) {
     super();
     this.user = user;
-    this.loginAt = this.getCreatedAt();
+    this.loginAt = TimeUtil.getCurrentTime();
   }
 
   public static UserStatus of(User user) {
@@ -27,26 +45,19 @@ public class UserStatus extends BaseEntity {
     return new UserStatus(user);
   }
 
-  public boolean isOnline() {
-    return this.isOnline;
-  }
-
   public void updateLoginAt(Instant newLastActiveAt) {
     this.loginAt = newLastActiveAt;
     this.updateUpdatedAt();
   }
 
   public boolean isRecentLogin() {
+    if (this.getUpdatedAt().equals(this.getCreatedAt())) {
+      return false;
+    }
     return ChronoUnit.MINUTES.between(Instant.now(), this.loginAt) < LOGIN_EXPIRATION_MINUTES;
-  }
-
-  public void updateOnline() {
-    this.isOnline = isRecentLogin();
-    this.updateUpdatedAt();
   }
 
   public void updateUserStatusInfo(Instant newLastActiveAt) {
     this.updateLoginAt(newLastActiveAt);
-    this.updateOnline();
   }
 }
