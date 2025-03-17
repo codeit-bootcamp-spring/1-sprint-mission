@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -7,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import lombok.Getter;
@@ -20,6 +22,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
+@Table(name = "users")
 @Getter
 @NoArgsConstructor
 public class User extends BaseUpdatableEntity {
@@ -37,6 +40,7 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id")
     private BinaryContent profile;
 
+    @JsonManagedReference
     @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private UserStatus status;
 

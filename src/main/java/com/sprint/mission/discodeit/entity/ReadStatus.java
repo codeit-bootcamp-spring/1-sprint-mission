@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(uniqueConstraints = {
+@Table(name = "read_statuses",
+    uniqueConstraints = {
     @UniqueConstraint(columnNames = {"user_id", "channel_id"})
 })
 @NoArgsConstructor

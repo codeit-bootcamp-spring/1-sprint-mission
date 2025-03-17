@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumns;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -17,10 +18,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
+@Table(name = "messages")
 @Getter
 @NoArgsConstructor
 public class Message extends BaseUpdatableEntity {
@@ -34,10 +37,11 @@ public class Message extends BaseUpdatableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     private User author;
 
-    @OneToMany
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @BatchSize(size = 100)
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
     @JoinTable(
         name = "message_attachments",
         joinColumns = @JoinColumn(name = "message_id"),
