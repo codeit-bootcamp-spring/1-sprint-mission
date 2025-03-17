@@ -36,7 +36,10 @@ public class Message extends BaseUpdatableEntity{
     @OnDelete(action = OnDeleteAction.SET_NULL) // profile이 삭제되면 user의 profile은 null로 변경
     private User author;
 
-    @OneToMany(cascade = REMOVE)
+    // 설계도에서 OneToMany 관계를 JoinTable로 설계하도록 되어있어서...
+    // 이런 구조에서 Message삭제 시 binaryContent자동 삭제는 구현 못했습니다(수동으로 메서드 만들어서 해야될까요)
+    // MessageCascadeTest 파일에서 테스트 실패
+    @OneToMany(fetch = LAZY, cascade = REMOVE, orphanRemoval = true)
     @JoinTable(
             name = "message_attachments",
             joinColumns = @JoinColumn(name = "message_id"),
@@ -59,5 +62,5 @@ public class Message extends BaseUpdatableEntity{
 //    public void addAttachment(BinaryContent attachment) {
 //        attachments.add(attachment);
 //        //일단은 단방향이니
-//    }
+//   }
 }

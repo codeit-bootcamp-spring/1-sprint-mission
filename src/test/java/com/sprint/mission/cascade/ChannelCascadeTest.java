@@ -53,6 +53,7 @@ public class ChannelCascadeTest {
     private UserService userService;
     @Autowired
     private MessageRepository messageRepository;
+
     @Autowired
     private ReadStatusRepository readStatusRepository;
 
@@ -69,7 +70,7 @@ public class ChannelCascadeTest {
     @DisplayName("채널 삭제 시 메시지와 읽음 상태도 삭제되는지")
     @Test
     void deleteChannel() {
-        // Given
+        // Given1
         var deletingChannel = channelService.findAll().get(0);
         var channelId = deletingChannel.getId();
         UUID writerId = userService.findAll().get(0).getId();
@@ -80,39 +81,31 @@ public class ChannelCascadeTest {
         em.flush();
         em.clear();
 
+        // When1
         Message findedMessage = messageService.findById(createdMessage.getId());
         List<ReadStatus> readStatuses = readStatusService.findAllByChannelId(channelId);
+
+        // Then1
         assertThat(findedMessage).isNotNull();
         assertThat(findedMessage.getChannel()).isEqualTo(deletingChannel);
         assertThat(readStatuses).hasSize(1);
 
-        //public record ReadStatusCreateRequest(
-        //        @NotNull(message = "유저 ID는 필수입니다.")
-        //        UUID userId,
-        //        @NotNull(message = "채널 ID는 필수입니다.")
-        //        UUID channelId,
-        //        @NotNull(message = "마지막 읽은 시간은 필수입니다.")
-        //        Instant lastReadAt) {
-
         em.flush();
         em.clear();
 
-//        var readStatusList = readStatusService.findAllByChannelId(channelId);
-//        var messageList = messageService.findAllByChannelId(channelId);
-
-        // When
+        // Given2
         channelService.delete(channelId);
+
+        // When2
         List<Message> allMessage = messageRepository.findAll();
         List<ReadStatus> readStatusList = readStatusRepository.findAll();
 
 
-        // Then
+        // Then2
         log.info("Message가 삭제됐을까? {}", allMessage);  // []
         log.info("ReadStatus가 삭제됐을까? {}", readStatusList); // []
         assertThat(allMessage).hasSize(0);
         assertThat(readStatusList).hasSize(0);
-
-
     }
 
 

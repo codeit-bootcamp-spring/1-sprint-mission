@@ -25,18 +25,18 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     Optional<Message> findById(UUID id);
     // 가져올 것 : CHANNEL이랑 BINARY
 
-    @EntityGraph(attributePaths = {"channel", "attachments", "author", "author.status"})
+    @EntityGraph(attributePaths = {"channel", "messageAttachments", "author", "author.status"})
     Page<Message> findPagingAllByChannel_Id(UUID channelId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"channel", "attachments", "author", "author.status"})
+    @EntityGraph(attributePaths = {"channel", "messageAttachments", "author", "author.status"})
     Window<Message> findFirst50ByChannel_IdOrderByCreatedAtDesc(UUID channelId, KeysetScrollPosition position);
+
+    Long countByChannel_Id(UUID channelId);
 
     // 테스트 용
     List<Message> findAllByChannel_Id(UUID channelId);
 
-    Long countByChannel_Id(UUID channelId);
-
-    //Slice<Message> findSliceAll(Pageable pageable);
+    // 테스트용
 }
 //Message save(Message message);
 //

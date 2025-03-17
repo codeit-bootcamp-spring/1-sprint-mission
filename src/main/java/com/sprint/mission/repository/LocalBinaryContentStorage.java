@@ -87,6 +87,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
         Path path = resolvePath(binaryContentId);
         try {
+            Files.deleteIfExists(path); // 테스트용
             Files.createFile(path);
             Files.write(path, content);
         } catch (IOException e) {
