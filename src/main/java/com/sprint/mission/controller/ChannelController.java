@@ -89,9 +89,9 @@ public class ChannelController {
     public ResponseEntity<CommonResponse> findAllByUserId(
             @Parameter(description = "조회할 User ID") @RequestParam("userId") UUID userId) {
 
-        List<Channel> channelDtoList = channelService.findAllByUserId(userId);
+        List<ChannelDto> channelDtoList = channelService.findAllByUserId(userId);
         return CommonResponse.toResponseEntity
-                (OK, "성공적으로 조회되었습니다", null);
+                (OK, "성공적으로 조회되었습니다", channelDtoList);
     }
 
     @Operation(summary = "Channel 삭제")

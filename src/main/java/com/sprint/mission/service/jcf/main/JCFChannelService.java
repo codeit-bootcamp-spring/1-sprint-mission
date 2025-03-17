@@ -8,9 +8,12 @@ import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.entity.main.BaseEntity;
 import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.ChannelRepository;
+import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.ChannelService;
@@ -21,11 +24,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 import static com.sprint.mission.entity.main.ChannelType.PRIVATE;
 import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
@@ -42,6 +42,7 @@ public class JCFChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
     private final JCFUserService userService;
+    private final MessageRepository messageRepository;
 
 
     @Override
@@ -79,21 +80,28 @@ public class JCFChannelService implements ChannelService {
         return channelRepository.findAll();
     }
 
+    //
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
+        // 쿼리1
         List<ReadStatus> readStatusList = readStatusRepository.findAllByUser_Id(userId);
         // 유저가 참여한 Private 채널 리스트
         List<Channel> participatingPrivateChannel = readStatusList.stream().map(ReadStatus::getChannel).toList();
 
-        // 채널별 유저 리스트 뽑기
         List<ChannelDto> channelDtoList = new ArrayList<>();
         participatingPrivateChannel.forEach((channel)->{
             // 한 채널의 ReadStauts들 가져오기
+            // 쿼리2
             List<ReadStatus> channelReadStatus = readStatusRepository.findAllByChannel_Id(channel.getId());
+            // 쿼리3
+            Instant lastMessageAt = messageRepository.findTop1ByChannel_IdOrderByCreatedAtDesc(channel.getId())
+                    .map(BaseEntity::getCreatedAt)
+                    .orElseGet(null);
             List<User> userList = channelReadStatus.stream().map(ReadStatus::getUser).toList();
-            userList.forEach(user -> channelDtoList.add(channelMapper.toDto(channel, user)));
+            channelDtoList.add(channelMapper.toDto(channel, userList, lastMessageAt));
         });
 
+        // 쿼리4
         List<Channel> publicChannel = channelRepository.findAllByChannelType(PUBLIC);
         publicChannel.forEach((channel) -> channelDtoList.add(channelMapper.toDto(channel)));
 

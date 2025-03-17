@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,6 +39,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     // 테스트 용
     List<Message> findAllByChannel_Id(UUID channelId);
+
+    Optional<Message> findTop1ByChannel_IdOrderByCreatedAtDesc(UUID channelId);
 
     // 테스트용
 }
