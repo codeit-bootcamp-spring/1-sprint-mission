@@ -2,13 +2,16 @@ package com.sprint.mission.BasicTest;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.dto.UserMapper;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
+import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.repository.UserStatusRepository;
 import com.sprint.mission.service.UserService;
+import com.sprint.mission.service.jcf.addOn.BinaryService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
@@ -146,33 +149,15 @@ public class UserTest {
                 .isInstanceOf(CustomException.class);
     }
 
-    @Test
-    void findStatusMap() {
-        for (int i = 0; i < 3; i++) {
-            UserDtoForCreate userDtoForCreate = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
-            userService.create(userDtoForCreate, null);
-        }
-        em.flush();
-        em.clear();
-//        Map<User, Boolean> statusMapByUserList = userStatusService.findStatusMapByUserList();
-//        assertThat(statusMapByUserList.size()).isEqualTo(3);
-//        for (Map.Entry<User, Boolean> entry : statusMapByUserList.entrySet()) {
-//            User user = entry.getKey();
-//            Boolean status = entry.getValue();
-//            assertThat(user).isNotNull();
-//            assertThat(status).isNotNull();
-//        }
-    }
 
-    @Test
-    void findAllWithStatusTest() {
-        for (int i = 0; i < 3; i++) {
-            UserDtoForCreate userDtoForCreate = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
-            userService.create(userDtoForCreate, null);
-        }
-        em.flush();
-        em.clear();
-
-        List<User> all = userRepository.findAllWithRelations();
+    @Autowired
+    private BinaryService binaryService;
+    private User createUser(BinaryContentDtoForCreate dto, UserDtoForCreate userDto) {
+        Optional<BinaryContentDtoForCreate> profileDto = Optional.of(dto);
+        User createdUser = profileDto.map((binaryDto) -> {
+            BinaryContent createdBinaryContent = binaryService.create(binaryDto);
+            return userMapper.toEntityWithProfile(userDto, createdBinaryContent);
+        }).orElseGet(() -> userMapper.toEntityWithoutProfile(userDto));
+        return createdUser;
     }
 }

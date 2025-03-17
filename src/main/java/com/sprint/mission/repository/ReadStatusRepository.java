@@ -4,7 +4,6 @@ import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.User;
 import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,12 +19,14 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
     List<ReadStatus> findAllByChannelId(UUID channelId);
     List<ReadStatus> findAllByUser(User user);
 
-    //@Query("SELECT rs FROM ReadStatus rs join fetch rs.user u WHERE rs.user.id = :userId")
-    @Query("SELECT rs FROM ReadStatus rs join fetch rs.user join fetch rs.channel WHERE rs.user.id = :userId") // 이렇게하면 한번에 조회 But 페이징 불가?
-    List<ReadStatus> findAllByUserId(@Param("userId") UUID userId);
-
     @EntityGraph(attributePaths = {"user", "channel"})
-    List<ReadStatus> findPagingAllByUser_Id(UUID userId);
+    List<ReadStatus> findAllByUser_Id(UUID userId);
+
+    @EntityGraph(attributePaths = {"user", "channel"}) // 이건 나중에 요구사항 보고 수정
+    List<ReadStatus> findAllByChannel_Id(UUID channelId);
+
+//    @EntityGraph(attributePaths = {"user", "channel"})
+//    List<ReadStatus> findPagingAllByUser_Id(UUID userId);
 
 
 

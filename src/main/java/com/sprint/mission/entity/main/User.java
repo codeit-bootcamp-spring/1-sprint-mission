@@ -54,10 +54,11 @@ public class User extends BaseUpdatableEntity{
         return this;
     }
 
-    public void update(String newName, String newPassword, String newEmail) {
+    public User update(String newName, String newPassword, String newEmail) {
         this.username = newName;
         this.password = newPassword;
         this.email = newEmail;
+        return this;
     }
 
 //    public Optional<BinaryContent> getProfile() { // mapping은 null 체크 해줌

@@ -74,6 +74,7 @@ public class UserUserStatusCascadeTest {
     private BinaryService binaryService;
 
 
+    @DisplayName("BinaryContent 생성 테스트")
     @Test
     void binaryTest(){
         // Given
@@ -84,6 +85,8 @@ public class UserUserStatusCascadeTest {
         assertThat(binaryContent).isNotNull();
     }
 
+
+    @DisplayName("Profile이 사라지면 User의 profile 필드가 null로 세팅되는지 테스트")
     @Test
     void userAndProfile(){
         // Given
@@ -106,20 +109,20 @@ public class UserUserStatusCascadeTest {
         assertThat(fProfile).isPresent();
         log.info("================초기화 전================");
 
-        // Then 2. cascade 확인 : binaryContent 삭제되도 User의 profile필드는 null로 유지됨
         em.flush();
         em.clear();
+
+        // WHen 2. BinaryContent 삭제 for cascade 확인
         BinaryContent deletedBinary = binaryService.findById(profile.getId());
         binaryService.deleteById(deletedBinary.getId());
         // EntityGraph로 연관된거 다 가져와서 flush 해야 함
         em.flush();
         em.clear();
 
-        //User testUser = userService.findById(savedUser.getId());
+        // Then 2. cascade 확인 : binaryContent 삭제되도 User의 profile필드는 null로 유지되어야 한다.
         User testUser = userService.findAll().get(0);
         log.info("testUser = {}", testUser.getProfile());
-        assertThat(testUser.getProfile()).isNotNull();
-
+        assertThat(testUser.getProfile()).isNull();
     }
 
     private User createUser(BinaryContentDtoForCreate dto, UserDtoForCreate userDto) {

@@ -17,9 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 @Slf4j
 @Service
@@ -77,6 +75,10 @@ public class ReadStatusService {
     }
 
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
+        return readStatusRepository.findAllByUser_Id(userId);
+    }
+
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return readStatusRepository.findAllByChannel_Id(channelId);
     }
 }

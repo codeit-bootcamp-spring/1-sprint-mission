@@ -42,33 +42,33 @@ public class JCFUserService implements UserService {
     @Override
     public User create(UserDtoForCreate requestDTO, MultipartFile profile) {
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
-        Optional<BinaryContentDtoForCreate> profileDto = binaryContentMapper.convertFileToBinaryContentDto(profile);
 
         // 선택적 프로필 생성
+        Optional<BinaryContentDtoForCreate> profileDto = binaryContentMapper.convertFileToBinaryContentDto(profile);
         User createdUser = profileDto.map((binaryDto) -> {
             BinaryContent createdBinaryContent = profileService.create(binaryDto);
             return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
         }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
         log.info("Create user의 profile : {}", createdUser.getProfile());
 
-        //User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
-        userRepository.save(createdUser);// SAVE해야 UUID 생성
-        return createdUser.assignStatus(userStatusService.create(createdUser));
+        User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
+        UserStatus userStatus = userStatusService.create(savedUser);
+        return savedUser.assignStatus(userStatus);
     }
 
-    // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
-    // 패스워드 정보 제외
+
     @Override
     public User update(UUID userId, UserDtoForUpdate requestDTO) {
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
         User updatingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        updatingUser.update(requestDTO.username(), requestDTO.password(), requestDTO.email());
+        return updatingUser.update(requestDTO.username(), requestDTO.password(), requestDTO.email());
         //return userMapper.update(requestDTO, updatingUser);
-        return updatingUser;
     }
 
+    // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
+    // 패스워드 정보 제외
     @Override
     public User findById(UUID userId) {
         return userRepository.findById(userId)
@@ -80,7 +80,7 @@ public class JCFUserService implements UserService {
         return userRepository.findAllWithRelations();
     }
 
-    //관련된 도메인도 같이 삭제 -> BinaryContent(프로필), Userstatus
+    //관련된 도메인(userstatus)도 같이 삭제 테스트 in UserUserStatusCascadeTest
     @Override
     public void delete(UUID userId) {
         //if (!userRepository.existsById(userId)) throw new NotFoundId();

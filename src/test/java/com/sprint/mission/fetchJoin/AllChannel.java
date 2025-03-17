@@ -69,7 +69,7 @@ public class AllChannel {
         System.out.println("찾은 userList = " + userList);
 
         UUID userId = userList.get(0).getId();
-        List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByUser_Id(userId);
         readStatusList.stream().forEach(readStatus -> {
             System.out.println("readStatus = " + readStatus);
             System.out.println("readStatus.getUser() = " + readStatus.getUser());
@@ -95,7 +95,7 @@ public class AllChannel {
         System.out.println("찾은 userList = " + userList);
         UUID userId = userList.get(0).getId();
         //List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
-        List<ReadStatus> readStatusList = readStatusRepository.findPagingAllByUser_Id(userId);
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByChannel_Id(userId);
         readStatusList.stream().forEach(readStatus -> {
             System.out.println("readStatus = " + readStatus);
             System.out.println("readStatus.getUser() = " + readStatus.getUser());

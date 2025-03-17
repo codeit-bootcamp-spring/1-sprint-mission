@@ -21,7 +21,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     void deleteAllByChannel_Id(UUID channelId);
 
-    @EntityGraph(attributePaths = {"channel", "attachments", "author"})
+    @EntityGraph(attributePaths = {"channel", "messageAttachments", "author"})
     Optional<Message> findById(UUID id);
     // 가져올 것 : CHANNEL이랑 BINARY
 
