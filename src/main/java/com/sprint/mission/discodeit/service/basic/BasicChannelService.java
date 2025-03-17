@@ -62,6 +62,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ChannelDto find(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
@@ -70,6 +71,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> joinedChannels = readStatusRepository.findByUserId(userId).stream()
         .map(ReadStatus::getChannel)
