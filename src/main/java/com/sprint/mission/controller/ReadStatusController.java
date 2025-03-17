@@ -4,8 +4,10 @@ import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
+import com.sprint.mission.dto.ReadStatusMapper;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.dto.response.ReadStatusDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
@@ -44,6 +46,8 @@ public class ReadStatusController {
     // 카피
     private final ReadStatusService readStatusService;
     private final UserRepository userRepository;
+    private final ReadStatusMapper readStatusMapper;
+
 
     @Operation(summary = "Message 읽음 상태 생성")
     @ApiResponses({
@@ -57,9 +61,9 @@ public class ReadStatusController {
     @PostMapping
     public ResponseEntity<CommonResponse> create(@RequestBody @Valid ReadStatusCreateRequest request) {
         log.info("컨트롤러 생성 userId : {}", request.userId());
-        ReadStatus createdReadStatus = readStatusService.create(request);
+        ReadStatusDto readStatusDto = readStatusMapper.toDto(readStatusService.create(request));
         return CommonResponse.toResponseEntity
-                (CREATED, "읽음 상태가 생성되었습니다.", createdReadStatus);
+                (CREATED, "읽음 상태가 생성되었습니다.", readStatusDto);
     }
 
     @Operation(summary = "Message 읽음 상태 수정")
@@ -73,9 +77,9 @@ public class ReadStatusController {
     public ResponseEntity<CommonResponse> update(
             @Parameter(description = "수정할 읽음 상태 ID") @PathVariable("id") UUID readStatusId,
             @RequestBody @Valid ReadStatusUpdateRequest request) {
-        ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
+        ReadStatusDto updatedReadStatusDto = readStatusMapper.toDto(readStatusService.update(readStatusId, request));
         return CommonResponse.toResponseEntity
-                (OK, "읽음 상태가 업데이트되었습니다.", updatedReadStatus);
+                (OK, "읽음 상태가 업데이트되었습니다.", updatedReadStatusDto);
     }
 
     @Operation(summary = "User의 Message 읽음 상태 목록 조회")
@@ -84,9 +88,10 @@ public class ReadStatusController {
     @GetMapping
     public ResponseEntity<CommonResponse> findAllByUserId(
             @Parameter(description = "조회할 User ID", required = true) @RequestParam("userId") UUID userId) {
-        List<ReadStatus> readStatusList = readStatusService.findAllByUserId(userId);
-        // 나중에 dto
+        List<ReadStatusDto> readStatusDtoList = readStatusService.findAllByUserId(userId).stream()
+                .map(readStatusMapper::toDto)
+                .toList();
         return CommonResponse.toResponseEntity
-                (OK, "읽음 상태 목록이 조회되었습니다.", readStatusList);
+                (OK, "읽음 상태 목록이 조회되었습니다.", readStatusDtoList);
     }
 }

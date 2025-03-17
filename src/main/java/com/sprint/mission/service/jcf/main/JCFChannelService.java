@@ -90,20 +90,22 @@ public class JCFChannelService implements ChannelService {
 
         List<ChannelDto> channelDtoList = new ArrayList<>();
         participatingPrivateChannel.forEach((channel)->{
-            // 한 채널의 ReadStauts들 가져오기
+            // 채널별 ReadStauts들 가져오기
             // 쿼리2
-            List<ReadStatus> channelReadStatus = readStatusRepository.findAllByChannel_Id(channel.getId());
-            // 쿼리3
             Instant lastMessageAt = messageRepository.findTop1ByChannel_IdOrderByCreatedAtDesc(channel.getId())
                     .map(BaseEntity::getCreatedAt)
                     .orElseGet(null);
-            List<User> userList = channelReadStatus.stream().map(ReadStatus::getUser).toList();
+
+            // 쿼리3
+            List<User> userList = readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
+                    .map(ReadStatus::getUser).toList();
             channelDtoList.add(channelMapper.toDto(channel, userList, lastMessageAt));
         });
 
         // 쿼리4
-        List<Channel> publicChannel = channelRepository.findAllByChannelType(PUBLIC);
-        publicChannel.forEach((channel) -> channelDtoList.add(channelMapper.toDto(channel)));
+        channelDtoList.addAll(channelRepository.findAllByChannelType(PUBLIC)
+                .stream().map(channelMapper::toDto)
+                .toList());
 
         return channelDtoList;
     }
