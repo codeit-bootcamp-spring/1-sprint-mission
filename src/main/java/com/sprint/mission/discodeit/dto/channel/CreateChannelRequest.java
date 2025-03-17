@@ -1,4 +1,7 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-public record CreateChannelRequest(String channelName) {
+import java.util.UUID;
+
+public record CreateChannelRequest(String channelName, UUID userId) {
+
 }

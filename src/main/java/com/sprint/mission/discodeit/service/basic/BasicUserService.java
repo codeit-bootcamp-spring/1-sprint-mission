@@ -7,17 +7,22 @@ import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import lombok.RequiredArgsConstructor;
-
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,76 +31,90 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
+  @Transactional
   public UserResponse createUser(CreateUserRequest request,
       Optional<CreateBinaryContentRequest> optionalRequest) {
-    if (userRepository.existsByUsername(request.username()) || userRepository.existsByEmail(
+    if (userRepository.existsUserByUsername(request.username()) || userRepository.existsUserByEmail(
         request.email())) {
       throw new IllegalArgumentException("이미 사용 중인 username 또는 email입니다.");
     }
 
     User user = new User(request.username(), request.password(), request.email());
-    optionalRequest
-        .map(this::saveBinaryContent)
-        .ifPresent(user::updateProfileImage);
+    optionalRequest.map(this::saveBinaryContent).ifPresent(user::setProfileImage);
 
-    UserStatus userStatus = new UserStatus(user.getId());
-    userStatus.updateStatus();
-    user.updateUserStatus(userStatus);
-
-    return UserResponse.fromEntity(userRepository.save(user));
+    UserStatus userStatus = new UserStatus(Instant.now());
+    user.setUserStatus(userStatus);
+    userStatus.setUser(user);
+    return UserMapper.INSTANCE.userToUserResponse(userRepository.save(user));
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserResponse> findAllUsers() {
-    return userRepository.getAllUsers().stream()
-        .map(UserResponse::fromEntity)
-        .collect(Collectors.toList());
+    return userRepository.findWithStatusAndProfile().stream()
+        .map(UserMapper.INSTANCE::userToUserResponse)
+        .toList();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<UserResponse> findUserById(UUID userId) {
-    return Optional.ofNullable(userRepository.getUserById(userId))
-        .map(UserResponse::fromEntity);
+    User user = getUserById(userId);
+    return Optional.ofNullable(UserMapper.INSTANCE.userToUserResponse(user));
   }
 
   @Override
+  @Transactional
   public Optional<UserResponse> updateUser(UUID userId, UpdateUserRequest request,
       Optional<CreateBinaryContentRequest> optionalRequest) {
-    return Optional.ofNullable(userRepository.getUserById(userId))
-        .map(user -> {
-          if (request.username() != null) {
-            user.updateUsername(request.username());
-          }
-          optionalRequest
-              .map(this::saveBinaryContent)
-              .ifPresent(user::updateProfileImage);
-          userRepository.save(user);
+    return userRepository.findById(userId).map(user -> {
+      if (request.username() != null) {
+        user.setUsername(request.username());
+      }
+      optionalRequest.map(this::saveBinaryContent).ifPresent(user::setProfileImage);
+      userRepository.save(user);
 
-          return UserResponse.fromEntity(user);
-        });
+      return UserMapper.INSTANCE.userToUserResponse(user);
+    });
   }
 
   @Override
+  @Transactional
   public void deleteUser(UUID userId) {
-    Optional.ofNullable(userRepository.getUserById(userId)).ifPresent(user -> {
+    userRepository.findById(userId).ifPresent(user -> {
       if (user.getProfileImage() != null) {
-        binaryContentRepository.deleteById(user.getProfileImage());
+        binaryContentRepository.deleteById(user.getProfileImage().getId());
       }
-      if (user.getStatus() != null) {
-        userStatusRepository.deleteById(user.getStatus().getId());
+      if (user.getUserStatus() != null) {
+        userStatusRepository.deleteById(user.getUserStatus().getId());
       }
       userRepository.deleteById(user.getId());
     });
   }
 
-  private UUID saveBinaryContent(CreateBinaryContentRequest profileRequest) {
+  @Override
+  @Transactional
+  public User getUserById(UUID uuid) {
+    if (uuid == null) {
+      throw new IllegalArgumentException("Need to specify a valid user id");
+    }
+    return userRepository.findById(uuid)
+        .orElseThrow(() -> new EntityNotFoundException("User with ID " + uuid + " not found"));
+  }
+
+  private BinaryContent saveBinaryContent(CreateBinaryContentRequest profileRequest) {
     String fileName = profileRequest.fileName();
     String contentType = profileRequest.contentType();
     byte[] bytes = profileRequest.bytes();
-    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-        contentType, bytes);
-    return binaryContentRepository.save(binaryContent).getId();
+    BinaryContent binaryContent = new BinaryContent(fileName, contentType);
+    try {
+      UUID fileUUID = binaryContentStorage.put(binaryContent.getId(), bytes);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return binaryContentRepository.save(binaryContent);
   }
 }

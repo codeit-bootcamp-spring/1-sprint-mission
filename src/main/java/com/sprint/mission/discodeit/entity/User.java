@@ -1,48 +1,58 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
-import java.io.Serial;
-import java.io.Serializable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-public class User implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
-    private String username;
-    private String email;
-    private String password;
-    private UserStatus status;
-    private Map<UUID, ReadStatus> readStatuses;
-    private UUID profileImage;
+@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "users")
+public class User extends BaseUpdateEntity {
 
-    public User(String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.createdAt = Instant.now();
-        this.updatedAt = createdAt;
-    }
+  @Column(unique = true, nullable = false)
+  private String username;
 
-    public void updateUsername(String username) {
-        this.username = username;
-        this.updatedAt = Instant.now();
-    }
+  @Column(nullable = false)
+  private String email;
 
-    public void updateProfileImage(UUID newProfileImage) {
-        this.profileImage = newProfileImage;
-        this.updatedAt = Instant.now();
-    }
+  @Column(nullable = false)
+  private String password;
 
-    public void updateUserStatus(UserStatus newStatus) {
-        this.status = newStatus;
-        this.updatedAt = Instant.now();
-    }
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "profile_image_id")
+  private BinaryContent profileImage;
+
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ReadStatus> readStatuses = new ArrayList<>();
+
+  @ManyToMany(mappedBy = "users")
+  private List<Channel> channels = new ArrayList<>();
+
+  @Setter
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "status_id")
+  private UserStatus userStatus;
+
+  public User(String username, String email, String password) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.createdAt = Instant.now();
+    this.updatedAt = createdAt;
+  }
 }

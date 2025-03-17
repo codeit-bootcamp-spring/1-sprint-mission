@@ -1,17 +1,15 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
-import java.util.List;
-import java.util.Optional;
+import java.time.Instant;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface MessageRepository {
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  Message save(Message message);
-
-  List<Message> getAllMessages();
-
-  Optional<Message> getMessageById(UUID uuid);
-
-  void deleteById(UUID uuid);
+  @Query("SELECT m FROM Message m WHERE (:createdAt is null or m.createdAt < :createdAt) ORDER BY m.createdAt DESC, m.id DESC")
+  Page<Message> findAllByCursor(Instant createdAt, Pageable pageable);
 }
