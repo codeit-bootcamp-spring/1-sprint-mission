@@ -21,9 +21,10 @@ spring:
       org.hibernate.SQL: DEBUG
 
 discodeit:
-  repository:
-    type: jcf
-    file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: ./discodeit/storage
 
 springdoc:
   api-docs:
