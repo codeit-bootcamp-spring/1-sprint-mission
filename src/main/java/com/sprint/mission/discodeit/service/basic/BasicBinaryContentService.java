@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -69,5 +71,23 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     binaryContentRepository.deleteById(binaryContentId);
+  }
+
+  @Override
+  public Optional<BinaryContentRequest> resolveProfileRequest(MultipartFile file) {
+    if (file.isEmpty()) {
+      return Optional.empty();
+    } else {
+      try {
+        BinaryContentRequest binaryContentCreateRequest = new BinaryContentRequest(
+            file.getOriginalFilename(),
+            file.getContentType(),
+            file.getBytes()
+        );
+        return Optional.of(binaryContentCreateRequest);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 }

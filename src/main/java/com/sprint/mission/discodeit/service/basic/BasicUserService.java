@@ -19,6 +19,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -33,13 +34,13 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public UserDto create(UserCreateRequest userRequest,
-      Optional<BinaryContentRequest> binaryContentRequest) {
+  public UserDto create(UserCreateRequest userRequest, MultipartFile file) {
     validator.validate(userRequest.username(), userRequest.email());
     validateDuplicateName(userRequest.username());
     validateDuplicateEmail(userRequest.email());
 
-    BinaryContent profile = binaryContentRequest
+    BinaryContent profile = Optional.ofNullable(file)
+        .flatMap(binaryContentService::resolveProfileRequest)
         .map(binaryContentService::create)
         .flatMap(dto -> binaryContentRepository.findById(dto.id()))
         .orElse(null);
@@ -71,15 +72,15 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
-      Optional<BinaryContentRequest> binaryContentRequest) {
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile file) {
     validator.checkEmailFormat(userUpdateRequest.newEmail());
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
     validateDuplicateName(userUpdateRequest.newUsername());
     validateDuplicateEmail(userUpdateRequest.newEmail());
 
-    BinaryContent profile = binaryContentRequest
+    BinaryContent profile = Optional.ofNullable(file)
+        .flatMap(binaryContentService::resolveProfileRequest)
         .map(binaryContentService::create)
         .flatMap(dto -> binaryContentRepository.findById(dto.id()))
         .orElse(null);

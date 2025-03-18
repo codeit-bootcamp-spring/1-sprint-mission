@@ -42,25 +42,9 @@ public class MessageController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<MessageDto> create(@RequestPart("messageCreateRequest")MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
-        List<BinaryContentRequest> binaryContentRequests = Optional.ofNullable(attachments)
-            .map(files -> files.stream()
-                .map(file -> {
-                    try {
-                        return new BinaryContentRequest(
-                            file.getOriginalFilename(),
-                            file.getContentType(),
-                            file.getBytes()
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList())
-            .orElse(new ArrayList<>());
-
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(messageService.create(messageCreateRequest, binaryContentRequests));
+            .body(messageService.create(messageCreateRequest, attachments));
     }
 
     @PatchMapping("/{id}")

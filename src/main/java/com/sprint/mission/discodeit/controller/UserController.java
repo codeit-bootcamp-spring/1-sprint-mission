@@ -37,24 +37,18 @@ public class UserController {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(@RequestPart UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
-    Optional<BinaryContentRequest> binaryContentRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
-
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(userService.create(userCreateRequest, binaryContentRequest));
+        .body(userService.create(userCreateRequest, profile));
   }
 
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> update(@PathVariable UUID userId,
       @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile) {
-    Optional<BinaryContentRequest> binaryContentRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
-
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(userService.update(userId, userUpdateRequest, binaryContentRequest));
+        .body(userService.update(userId, userUpdateRequest, profile));
   }
 
   @DeleteMapping("/{id}")
@@ -78,22 +72,5 @@ public class UserController {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userStatusService.updateByUserId(userId, request));
-  }
-
-  private Optional<BinaryContentRequest> resolveProfileRequest(MultipartFile profileFile) {
-    if (profileFile.isEmpty()) {
-      return Optional.empty();
-    } else {
-      try {
-        BinaryContentRequest binaryContentCreateRequest = new BinaryContentRequest(
-            profileFile.getOriginalFilename(),
-            profileFile.getContentType(),
-            profileFile.getBytes()
-        );
-        return Optional.of(binaryContentCreateRequest);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
   }
 }

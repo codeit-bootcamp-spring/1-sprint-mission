@@ -18,7 +18,10 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validator.MessageValidator;
+import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -28,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +52,7 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageDto create(MessageCreateRequest messageCreateRequest,
-      List<BinaryContentRequest> binaryContentRequests) {
+      List<MultipartFile> fileAttachments) {
     User author = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
@@ -57,12 +61,15 @@ public class BasicMessageService implements MessageService {
 
     validator.validate(messageCreateRequest.content());
 
-    List<BinaryContent> attachments = binaryContentRequests.stream()
-        .map(binaryContentService::create)
-        .map(dto -> binaryContentRepository.findById(dto.id()))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .toList();
+    List<BinaryContent> attachments = Optional.ofNullable(fileAttachments)
+        .map(files -> files.stream()
+            .map(binaryContentService::resolveProfileRequest)
+            .flatMap(Optional::stream)
+            .map(binaryContentService::create)
+            .map(dto -> binaryContentRepository.findById(dto.id()))
+            .flatMap(Optional::stream)
+            .toList()
+        ).orElseGet(Collections::emptyList);
 
     return messageMapper.toDto(
         messageRepository.save(
