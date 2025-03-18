@@ -63,16 +63,16 @@ public class MessageController {
             .body(messageService.create(messageCreateRequest, binaryContentRequests));
     }
 
-    @PatchMapping("/{messageId}")
-    public ResponseEntity<MessageDto> update(@PathVariable UUID messageId, @RequestBody MessageUpdateRequest request) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<MessageDto> update(@PathVariable UUID id, @RequestBody MessageUpdateRequest request) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(messageService.update(messageId, request));
+            .body(messageService.update(id, request));
     }
 
-    @DeleteMapping("/{messageId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
-        messageService.delete(messageId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        messageService.delete(id);
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .build();

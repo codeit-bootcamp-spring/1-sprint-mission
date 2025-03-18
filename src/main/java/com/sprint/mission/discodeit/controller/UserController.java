@@ -57,9 +57,9 @@ public class UserController {
         .body(userService.update(userId, userUpdateRequest, binaryContentRequest));
   }
 
-  @DeleteMapping("/{userId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
-    userService.delete(userId);
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    userService.delete(id);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
@@ -78,13 +78,6 @@ public class UserController {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userStatusService.updateByUserId(userId, request));
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(userService.find(id));
   }
 
   private Optional<BinaryContentRequest> resolveProfileRequest(MultipartFile profileFile) {

@@ -22,11 +22,11 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
 
-  @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentDto> find(@PathVariable UUID binaryContentId) {
+  @GetMapping("/{id}")
+  public ResponseEntity<BinaryContentDto> find(@PathVariable UUID id) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(binaryContentService.find(binaryContentId));
+        .body(binaryContentService.find(id));
   }
 
   @GetMapping
@@ -37,10 +37,10 @@ public class BinaryContentController {
         .body(binaryContents);
   }
 
-  @GetMapping("/{binaryContentId}/download")
-  public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
+  @GetMapping("/{id}/download")
+  public ResponseEntity<?> download(@PathVariable UUID id) {
     return binaryContentStorage.download(
-        binaryContentService.find(binaryContentId)
+        binaryContentService.find(id)
     );
   }
 }

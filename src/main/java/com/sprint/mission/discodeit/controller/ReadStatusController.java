@@ -33,12 +33,12 @@ public class ReadStatusController {
         .body(readStatusService.create(request));
   }
 
-  @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatusDto> update(@PathVariable UUID readStatusId,
+  @PatchMapping("/{id}")
+  public ResponseEntity<ReadStatusDto> update(@PathVariable UUID id,
       @RequestBody ReadStatusUpdateRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(readStatusService.update(readStatusId, request));
+        .body(readStatusService.update(id, request));
   }
 
   @GetMapping()
