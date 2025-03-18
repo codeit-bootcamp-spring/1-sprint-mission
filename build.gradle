@@ -29,23 +29,37 @@ repositories {
 }
 
 dependencies {
-    implementation platform('org.junit:junit-bom:5.10.0') // JUnit BOM 사용
-    implementation 'org.junit.jupiter:junit-jupiter' // JUnit API를 전체적으로 포함
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    //
-    implementation "org.mockito:mockito-core:4.6.1"
-    //
+    // JUnit 5 의존성
+    implementation platform('org.junit:junit-bom:5.10.0')  // JUnit BOM 사용 (버전 관리)
+    implementation 'org.junit.jupiter:junit-jupiter'      // JUnit Jupiter API
+
+    // Spring Boot Data JPA 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    // Spring Boot Web 의존성 (Spring MVC, REST 등)
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    //
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    //
+
+    // Lombok 의존성 (간결한 코드 작성)
+    compileOnly 'org.projectlombok:lombok'             // 컴파일 타임에만 Lombok을 사용
+    annotationProcessor 'org.projectlombok:lombok'    // Lombok 애노테이션 프로세서
+
+    // mapstruct 의존성 (간결한 코드 작성) - lombok에 의존성이 있어서 뒤에 선언
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    // PostgreSQL 의존성
+    runtimeOnly 'org.postgresql:postgresql'            // 런타임에만 PostgreSQL 드라이버
+
+    // Spring Boot Test 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'   // 테스트 관련 의존성
+
+    // JUnit 플랫폼 런처 (JUnit 테스트 실행)
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    // springdoc-openapi 라이브러리 추가
+
+    // Springdoc OpenAPI 의존성 (Swagger UI를 위한 OpenAPI 지원)
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()

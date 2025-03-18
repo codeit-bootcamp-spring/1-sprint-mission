@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -29,7 +31,7 @@ public class UserController {
   private final UserStatusService userStatusService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<User> createUser(
+  public ResponseEntity<UserDto> createUser(
       @RequestPart(value = "userCreateRequest") UserCreateRequest userCreateRequest,
       // multipart/form-data 형식으로 요청보낼 때 파일의 키 이름을 "binaryContent"
       @RequestPart(value = "binaryContent", required = false) MultipartFile file) throws Exception {
@@ -41,21 +43,19 @@ public class UserController {
       binaryContentCreateRequest = null;
     }
 
-    User user = userService.createUser(userCreateRequest, binaryContentCreateRequest);
+    UserDto userDto = userService.createUser(userCreateRequest, binaryContentCreateRequest);
 
-//    UserCreateResponse userCreateResponse = userService.createUser(userCreateRequest,
-//        binaryContentCreateRequest);  // 스프린트 미션 5 심화 조건 중 API 스펙을 준수
-    return ResponseEntity.status(HttpStatus.CREATED).body(user); // 201
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto); // 201
   }
 
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<User> updateUser(@PathVariable UUID userId,
+  public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
       @RequestPart(value = "userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "binaryContent", required = false) MultipartFile file) throws Exception {
+      @RequestPart(value = "profile", required = false) MultipartFile profile) throws Exception {
 
     BinaryContentCreateRequest binaryContentCreateRequest;
-    if (file != null) {
-      binaryContentCreateRequest = new BinaryContentCreateRequest(file);
+    if (profile != null) {
+      binaryContentCreateRequest = new BinaryContentCreateRequest(profile);
     } else {
       binaryContentCreateRequest = null;
     }
@@ -66,7 +66,7 @@ public class UserController {
   }
 
   @PatchMapping(value = "/{userId}/userStatus") // 스프린트 미션 5 심화 조건 중 API 스펙을 준수
-  public ResponseEntity<UserStatus> updateUserStateByUserId(@PathVariable UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStateByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
     return ResponseEntity.ok(
         userStatusService.updateUserStatusByUserId(userId, userStatusUpdateByUserIdRequest)); // 200
@@ -80,7 +80,7 @@ public class UserController {
   }
 
   @GetMapping
-  public ResponseEntity<List<UserFindResponse>> findAllUsers() {
+  public ResponseEntity<List<UserDto>> findAllUsers() {
     return ResponseEntity.ok(userService.showAllUsers()); // 200
   }
 

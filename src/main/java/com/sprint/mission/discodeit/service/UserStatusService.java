@@ -1,24 +1,37 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public interface UserStatusService {
-    UserStatus createUserStatus(UserStatusCreateRequest userStatusCreateRequest);
 
-    UserStatus findUserStatusById(UUID userStatusId);
-    UserStatus findUserStatusByUserId(UUID userId);
-    List<UserStatus> findAllUserStatus();
+  @Transactional
+  UserStatusDto createUserStatus(UserStatusCreateRequest userStatusCreateRequest);
 
-    UserStatus updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest);
-    UserStatus updateUserStatusByUserId(UUID userId, UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest);
+  UserStatusDto findUserStatusById(UUID userStatusId);
 
-    void deleteUserStatusById(UUID userStatusId);
-    void delteUserStatusByUserId(UUID userId);
+  UserStatusDto findUserStatusByUserId(UUID userId);
+
+  List<UserStatusDto> findAllUserStatus();
+
+  @Transactional
+  UserStatusDto updateUserStatus(UserStatusUpdateRequest userStatusUpdateRequest);
+
+  @Transactional
+  UserStatusDto updateUserStatusByUserId(UUID userId,
+      UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest);
+
+  @Transactional
+  void deleteUserStatusById(UUID userStatusId);
+
+  @Transactional
+  void delteUserStatusByUserId(UUID userId);
 }
