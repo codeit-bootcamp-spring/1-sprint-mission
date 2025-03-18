@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -21,7 +22,7 @@ import org.mindrot.jbcrypt.BCrypt;
 @Entity
 @Table(name = "users")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String username;

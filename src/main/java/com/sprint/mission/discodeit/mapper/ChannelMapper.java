@@ -29,19 +29,20 @@ public abstract class ChannelMapper {
   @Mapping(target = "lastMessageAt", expression = "java(resolveLastMessageAt(channel))")
   abstract public ChannelDto toDto(Channel channel);
 
+
+  protected Instant resolveLastMessageAt(Channel channel) {
+    return messageRepository.findByChannelId(channel.getId())
+        .stream()
+        .max(Comparator.comparing(BaseEntity::getCreatedAt))
+        .map(BaseEntity::getCreatedAt)
+        .orElse(Instant.MIN);
+  }
+
   protected List<UserDto> resolveParticipants(Channel channel) {
     return readStatusRepository.findByChannelId(channel.getId())
         .stream()
         .map(ReadStatus::getUser)
         .map(userMapper::toDto)
         .toList();
-  }
-
-  protected Instant resolvesLastMessageAt(Channel channel) {
-    return messageRepository.findByChannelId(channel.getId())
-        .stream()
-        .max(Comparator.comparing(BaseEntity::getCreatedAt))
-        .map(BaseEntity::getCreatedAt)
-        .orElse(Instant.MIN);
   }
 }
