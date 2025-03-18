@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import java.time.Instant;
+
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 
-public record UserDto(
-    UUID id,
-    Instant createdAt,
-    Instant updatedAt,
-    String username,
-    String email,
-    UUID profileId,
-    Boolean online
-) {
+@Getter
+@Setter
+public class UserDto {
 
+  private UUID id;
+  private String username;
+  private String email;
+  private BinaryContentDto profile;
+  private boolean isOnline;
 }
