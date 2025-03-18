@@ -4,16 +4,13 @@ import com.sprint.mission.discodeit.entity.Channel;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface ChannelRepository {
+public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-  Channel save(Channel channel);
+  List<Channel> findByNameIsNotNull();
 
-  Optional<Channel> findById(UUID channelId);
-
-  List<Channel> findAll();
-
-  boolean existsById(UUID id);
-
-  void deleteById(UUID Id);
+  List<Channel> findByIdIn(List<UUID> channelIds);
 }
