@@ -1,29 +1,22 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.ChannelValidator;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,14 +38,14 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto create(PublicChannelCreateRequest request) {
     return channelMapper.toDto(
         channelRepository.save(
-            new Channel(ChannelType.PUBLIC, request.name(), request.description()))
+            new Channel(Channel.ChannelType.PUBLIC, request.name(), request.description()))
     );
   }
 
   @Override
   @Transactional
   public ChannelDto create(PrivateChannelCreateRequest request) {
-    Channel channel = channelRepository.save(new Channel(ChannelType.PRIVATE, null, null));
+    Channel channel = channelRepository.save(new Channel(Channel.ChannelType.PRIVATE, null, null));
 
     request.participantsIds().stream()
         .map(userId -> ReadStatusCreateRequest.from(channel.getId(), userId, Instant.MIN))
@@ -79,7 +72,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
 
     return channelRepository.findAll().stream()
-        .filter(channel -> channel.getType() == ChannelType.PUBLIC || joinedChannels.contains(
+        .filter(channel -> channel.getType() == Channel.ChannelType.PUBLIC || joinedChannels.contains(
             channel.getId()))
         .map(channelMapper::toDto)
         .toList();

@@ -10,16 +10,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Base64;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.mindrot.jbcrypt.BCrypt;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")

@@ -7,11 +7,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -29,6 +24,10 @@ public class Channel extends BaseUpdatableEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ChannelType type;
+
+    public enum ChannelType {
+        PUBLIC, PRIVATE
+    }
 
     public Channel(ChannelType type, String name, String description) {
         this.type = type;
