@@ -7,9 +7,4 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BinaryContentRepository extends JpaRepository<BinaryContent, UUID> {
-//    BinaryContent save(BinaryContent binaryContent);
-//    BinaryContent find(UUID binaryContentId);
-//    List<BinaryContent> findAll();
-//    void delete(UUID binaryContentId);
-//    boolean existsById(UUID binaryContentId);
 }
