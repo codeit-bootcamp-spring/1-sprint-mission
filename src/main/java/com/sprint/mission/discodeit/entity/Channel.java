@@ -36,23 +36,16 @@ public class Channel extends BaseUpdatableEntity {
         this.description = description;
     }
 
-    public void update(String name, String description) {
-        updateName(name);
-        updateDescription(description);
-    }
-
     public void updateName(String name) {
-        if (this.name.equals(name)) {
-            return;
+        if (!this.name.equals(name)) {
+            this.name = name;
         }
-        this.name = name;
     }
 
     public void updateDescription(String description) {
-        if (this.description.equals(description)) {
-            return;
+        if (!this.description.equals(description)) {
+            this.description = description;
         }
-        this.description = description;
     }
 
     @Override

@@ -73,19 +73,31 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile file) {
-    validator.checkEmailFormat(userUpdateRequest.newEmail());
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
-    validateDuplicateName(userUpdateRequest.newUsername());
-    validateDuplicateEmail(userUpdateRequest.newEmail());
 
     BinaryContent profile = Optional.ofNullable(file)
         .flatMap(binaryContentService::resolveProfileRequest)
         .map(binaryContentService::create)
         .flatMap(dto -> binaryContentRepository.findById(dto.id()))
         .orElse(null);
-    user.update(profile, userUpdateRequest.newUsername(), userUpdateRequest.newEmail(),
-        userUpdateRequest.newPassword());
+
+    if (userUpdateRequest.newUsername() != null) {
+      validateDuplicateName(userUpdateRequest.newUsername());
+      validator.validateName(userUpdateRequest.newUsername());
+      user.updateName(userUpdateRequest.newUsername());
+    }
+    if (userUpdateRequest.newEmail() != null) {
+      validateDuplicateEmail(userUpdateRequest.newEmail());
+      validator.validateEmail(userUpdateRequest.newEmail());
+      user.updateEmail(userUpdateRequest.newEmail());
+    }
+    if (userUpdateRequest.newPassword() != null && !userUpdateRequest.newPassword().isBlank()) {
+      user.updatePassword(userUpdateRequest.newPassword());
+    }
+    if (profile != null) {
+      user.updateProfile(profile);
+    }
 
     return userMapper.toDto(user);
   }

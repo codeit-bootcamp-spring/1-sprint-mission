@@ -59,12 +59,4 @@ public class Message extends BaseUpdatableEntity {
             this.content = content;
         }
     }
-
-    public boolean isSameChannelById(UUID channelId) {
-        return this.channel.getId().equals(channelId);
-    }
-
-    public boolean isSameAuthorById(UUID authorId) {
-        return this.author.getId().equals(authorId);
-    }
 }

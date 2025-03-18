@@ -70,7 +70,10 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
-    readStatus.update(request.newLastReadAt());
+    if (request.newLastReadAt() != null) {
+      readStatus.update(request.newLastReadAt());
+    }
+
     return readStatusMapper.toDto(readStatus);
   }
 

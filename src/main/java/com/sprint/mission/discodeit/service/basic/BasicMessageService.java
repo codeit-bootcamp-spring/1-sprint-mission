@@ -87,14 +87,15 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt, Pageable pageable) {
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
+      Pageable pageable) {
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
     }
 
     Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
-        Optional.ofNullable(createAt).orElse(Instant.now()),
-        pageable)
+            Optional.ofNullable(createAt).orElse(Instant.now()),
+            pageable)
         .map(messageMapper::toDto);
 
     Instant nextCursor = null;
@@ -111,7 +112,9 @@ public class BasicMessageService implements MessageService {
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
-    message.updateContent(request.newContent());
+    if (request.newContent() != null) {
+      message.updateContent(request.newContent());
+    }
 
     return messageMapper.toDto(message);
   }

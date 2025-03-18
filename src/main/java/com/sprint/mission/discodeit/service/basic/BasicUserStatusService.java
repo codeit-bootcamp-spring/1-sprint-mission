@@ -62,7 +62,9 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatusDto update(UUID userStatusId, UserStatusUpdateRequest request) {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
-    userStatus.update(request.newLastActiveAt());
+    if (request.newLastActiveAt() != null ){
+      userStatus.update(request.newLastActiveAt());
+    }
 
     return userStatusMapper.toDto(userStatus);
   }

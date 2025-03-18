@@ -1,10 +1,17 @@
 package com.sprint.mission.discodeit.dto.message;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record MessageCreateRequest(
-        String content,
-        UUID authorId,
-        UUID channelId
+
+    String content,
+
+    @NotNull
+    UUID authorId,
+
+    @NotNull
+    UUID channelId
 ) {
+
 }

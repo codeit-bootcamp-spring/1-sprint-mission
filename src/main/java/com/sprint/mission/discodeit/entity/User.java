@@ -24,98 +24,89 @@ import org.mindrot.jbcrypt.BCrypt;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity {
-    @Column(nullable = false, unique = true, length = 50)
-    private String username;
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String email;
+  @Column(nullable = false, unique = true, length = 50)
+  private String username;
 
-    @Column(nullable = false)
-    private String password;
+  @Column(nullable = false, unique = true, length = 100)
+  private String email;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
-    @JoinColumn(name = "profile_id")
-    private BinaryContent profile;
+  @Column(nullable = false)
+  private String password;
 
-    @JsonManagedReference
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
-    private UserStatus status;
+  @OneToOne(fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.SET_NULL)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
 
-    public User(String username, String email, String password, BinaryContent profile) {
-        this.username = username;
-        this.email = email;
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+  @JsonManagedReference
+  @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+  private UserStatus status;
 
-        this.profile = profile;
-        this.status = new UserStatus(this, Instant.now());
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.username = username;
+    this.email = email;
+    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+    this.password = Base64.getEncoder()
+        .encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+
+    this.profile = profile;
+    this.status = new UserStatus(this, Instant.now());
+  }
+
+  public void updateProfile(BinaryContent profile) {
+    if (!this.profile.getId().equals(profile.getId())) {
+      this.profile = profile;
     }
+  }
 
-    public void update(BinaryContent profile, String name, String email, String password) {
-        updateProfile(profile);
-        updateName(name);
-        updateEmail(email);
-        updatePassword(password);
+  public void updateName(String username) {
+    if (!this.username.equals(username)) {
+      this.username = username;
     }
+  }
 
-    public void updateProfile(BinaryContent profile) {
-        if (profile.getId() == null || this.profile.getId().equals(profile.getId())) {
-            return;
-        }
-        this.profile = profile;
+  public void updateEmail(String email) {
+    if (!this.email.equals(email)) {
+      this.email = email;
     }
+  }
 
-    public void updateName(String username) {
-        if (username.isBlank() || this.username.equals(username)) {
-            return;
-        }
-        this.username = username;
+  public void updatePassword(String newPassword) {
+    String decodedPassword = new String(Base64.getDecoder().decode(this.password),
+        StandardCharsets.UTF_8);
+    if (BCrypt.checkpw(newPassword, decodedPassword)) {
+      return;
     }
+    String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+    this.password = Base64.getEncoder()
+        .encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+  }
 
-    public void updateEmail(String email) {
-        if (email.isBlank() || this.email.equals(email)) {
-            return;
-        }
-        this.email = email;
-    }
+  public boolean isSamePassword(String password) {
+    String decodedPassword = new String(Base64.getDecoder().decode(this.password),
+        StandardCharsets.UTF_8);
+    return BCrypt.checkpw(password, decodedPassword);
+  }
 
-    public void updatePassword(String newPassword) {
-        String decodedPassword = new String(Base64.getDecoder().decode(this.password), StandardCharsets.UTF_8);
-        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, decodedPassword)) {
-            return;
-        }
-        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-        this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+  public void validateDuplicateName(String name) {
+    if (this.username.equals(name)) {
+      throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름입니다.");
     }
+  }
 
-    public boolean isSameName(String name) {
-        return this.username.equals(name);
+  public void validateDuplicateEmail(String email) {
+    if (this.email.equals(email)) {
+      throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일입니다.");
     }
+  }
 
-    public boolean isSamePassword(String password) {
-        String decodedPassword = new String(Base64.getDecoder().decode(this.password), StandardCharsets.UTF_8);
-        return BCrypt.checkpw(password, decodedPassword);
-    }
-
-    public void validateDuplicateName(String name) {
-        if (this.username.equals(name)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름입니다.");
-        }
-    }
-
-    public void validateDuplicateEmail(String email) {
-        if (this.email.equals(email)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일입니다.");
-        }
-    }
-
-    @Override
-    public String toString() {
-        return String.format(
-                username + "님의 정보입니다." + System.lineSeparator()
-                        + "Name: " + username + System.lineSeparator()
-                        + "Email: " + email + System.lineSeparator()
-        );
-    }
+  @Override
+  public String toString() {
+    return String.format(
+        username + "님의 정보입니다." + System.lineSeparator()
+            + "Name: " + username + System.lineSeparator()
+            + "Email: " + email + System.lineSeparator()
+    );
+  }
 }

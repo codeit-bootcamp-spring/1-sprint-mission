@@ -81,10 +81,16 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
-    validator.validate(request.newName(), request.newDescription());
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
-    channel.update(request.newName(), request.newDescription());
+    if (request.newName() != null) {
+      validator.validateName(request.newName());
+      channel.updateName(request.newName());
+    }
+    if (request.newDescription() != null) {
+      validator.validateName(request.newDescription());
+      channel.updateDescription(request.newDescription());
+    }
 
     return channelMapper.toDto(channel);
   }

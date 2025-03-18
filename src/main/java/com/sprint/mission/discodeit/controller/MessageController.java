@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<MessageDto> create(@RequestPart("messageCreateRequest")MessageCreateRequest messageCreateRequest,
+    public ResponseEntity<MessageDto> create(@Valid @RequestPart("messageCreateRequest")MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
         return ResponseEntity
             .status(HttpStatus.CREATED)

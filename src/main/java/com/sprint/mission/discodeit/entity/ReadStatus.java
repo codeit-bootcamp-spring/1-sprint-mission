@@ -41,16 +41,12 @@ public class ReadStatus extends BaseUpdatableEntity {
   }
 
   public void update(Instant lastReadAt) {
-    if (lastReadAt != null && !lastReadAt.equals(this.lastReadAt)) {
+    if (!lastReadAt.equals(this.lastReadAt)) {
       this.lastReadAt = lastReadAt;
     }
   }
 
   public boolean isSameChannelById(UUID channelId) {
     return this.channel.getId().equals(channelId);
-  }
-
-  public boolean isSameUserById(UUID userId) {
-    return this.user.getId().equals(userId);
   }
 }
