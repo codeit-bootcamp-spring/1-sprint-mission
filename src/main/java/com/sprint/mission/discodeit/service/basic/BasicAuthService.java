@@ -15,7 +15,7 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public boolean login(String email, String password) {
-        List<User> users = userRepository.readAll();
+        List<User> users = userRepository.findAll();
 
         boolean login = users.stream()
                         .anyMatch(user -> user.getEmail().equals(email) && user.getPassword().equals(password));

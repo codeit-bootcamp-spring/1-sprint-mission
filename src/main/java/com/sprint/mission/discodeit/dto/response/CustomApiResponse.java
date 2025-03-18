@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sprint.mission.discodeit.dto.ExceptionDto;
 import com.sprint.mission.discodeit.exception.CustomException;
 import io.micrometer.common.lang.Nullable;
 import org.springframework.http.HttpStatus;

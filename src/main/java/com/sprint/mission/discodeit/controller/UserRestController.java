@@ -2,20 +2,19 @@ package com.sprint.mission.discodeit.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.sprint.mission.discodeit.dto.UserRequest;
-import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.dto.request.UserRequest;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
-import org.antlr.v4.runtime.misc.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +28,7 @@ public class UserRestController {
     @Operation(summary = "User create", description = "유저 등록시 사용")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public UserResponse userCreate(@Valid @RequestPart(value = "request", required = true) @NotNull @JsonProperty UserRequest request,
-                                   @RequestPart(value = "file", required = false) MultipartFile file){
+                                   @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
 
         return userService.create(request, file);
     }

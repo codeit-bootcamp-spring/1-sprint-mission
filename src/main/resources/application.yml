@@ -1,23 +1,41 @@
 spring:
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  application:
+    name: discodeit
   servlet:
     multipart:
-      enabled: true
-      max-file-size: 10MB
-      max-request-size: 10MB
-  jackson:
-    deserialization:
-      fail-on-unknown-properties: false
-  mvc:
-    contentnegotiation:
-      favor-path-extension: false
-      favor-parameter: false
-      media-types:
-        json: application/json
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+      jdbc:
+        lob:
+          non_contextual_creation: true
+    properties:
+      hibernate:
+        format_sql: true
+    #        default_batch_fetch_size: 100
+        show_sql: true
+    open-in-view: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-repository:
-  type : jcf  # jcf or file
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: file-byte
+
 
 springdoc:
   swagger-ui:
