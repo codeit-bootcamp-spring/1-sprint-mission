@@ -6,7 +6,7 @@ import java.util.UUID;
 @Schema(description = "Message 생성 정보")
 public record MessageCreateRequest(
     String content,
-    UUID userId,
+    UUID authorId,
     UUID channelId
 ) {
 

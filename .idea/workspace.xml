@@ -10,10 +10,12 @@
       <change beforePath="$PROJECT_DIR$/_1-sprint-mission/.gradle/8.12.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/.gradle/8.12.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_1-sprint-mission/.gradle/8.12.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/.gradle/8.12.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_1-sprint-mission/.gradle/8.12.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/.gradle/8.12.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_1-sprint-mission/.gradle/8.12.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/.gradle/8.12.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_1-sprint-mission/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_1-sprint-mission/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_1-sprint-mission/src/main/java/com/sprint/mission/discodeit/apidocs/UserApiDocs.java" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/src/main/java/com/sprint/mission/discodeit/apidocs/UserApiDocs.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_1-sprint-mission/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_1-sprint-mission/build/resources/main/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/build/resources/main/application.yaml" afterDir="false" />
+    </list>
+    <list id="c3cb6b49-8fd5-4a19-8432-fd4e39d5594c" name="Changes by iuhoo" comment="">
+      <change beforePath="$PROJECT_DIR$/_1-sprint-mission/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/_1-sprint-mission/src/main/resources/application.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,10 +48,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="package-info" />
-        <option value="Class" />
-        <option value="Interface" />
-        <option value="Record" />
         <option value="Enum" />
+        <option value="Record" />
+        <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -59,7 +61,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="19d666760168da639f1196c47ff7dccbe9ba8b4c" />
+        <entry key="$PROJECT_DIR$" value="part2-손동혁-sprint6" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -83,6 +85,8 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;Gradle.Build _1-sprint-mission.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.PostgreSQLConnectionTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.UserCreateTest.executor&quot;: &quot;Run&quot;,
     &quot;Gradle._1-sprint-mission [:Main.main()].executor&quot;: &quot;Run&quot;,
     &quot;Gradle._1-sprint-mission [:com.sprint.mission.Main.main()].executor&quot;: &quot;Run&quot;,
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
@@ -93,9 +97,9 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;Spring Boot.DiscodeitApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;part2-손동혁-sprint5&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;part2-손동혁-sprint6&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/coding/WeatherBoard&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/coding/codeit-bootcamp-spring/1-sprint-mission/_1-sprint-mission/src/main/resources/static&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -104,12 +108,21 @@
     &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;actions.on.save&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
   }
 }</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\coding\codeit-bootcamp-spring\1-sprint-mission\_1-sprint-mission\src\main\resources\static" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\coding\codeit-bootcamp-spring\1-sprint-mission\_1-sprint-mission\src\main\resources" />
       <recent name="C:\coding\codeit-bootcamp-spring\1-sprint-mission\_1-sprint-mission\src\main\resources\static\css" />
       <recent name="C:\coding\codeit-bootcamp-spring\1-sprint-mission\_1-sprint-mission\src\main\resources\templates\user" />
       <recent name="C:\coding\codeit-bootcamp-spring\1-sprint-mission\_1-sprint-mission\src\main\resources\templates" />
@@ -130,6 +143,54 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="PostgreSQLConnectionTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_1-sprint-mission" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;com.sprint.mission.discodeit.PostgreSQLConnectionTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="UserCreateTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/_1-sprint-mission" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+            <option value="--tests" />
+            <option value="&quot;com.sprint.mission.discodeit.UserCreateTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
     <configuration name="DiscodeitApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="discodeit.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.sprint.mission.discodeit.DiscodeitApplication" />
@@ -139,6 +200,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.UserCreateTest" />
+        <item itemvalue="Gradle.PostgreSQLConnectionTest" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
@@ -197,7 +260,21 @@
       <workItem from="1740560519324" duration="1479000" />
       <workItem from="1740576903034" duration="437000" />
       <workItem from="1740802459034" duration="13812000" />
-      <workItem from="1740842743070" duration="2079000" />
+      <workItem from="1740842743070" duration="2367000" />
+      <workItem from="1741052085854" duration="624000" />
+      <workItem from="1741076941253" duration="65000" />
+      <workItem from="1741148659211" duration="12572000" />
+      <workItem from="1741237545956" duration="2061000" />
+      <workItem from="1741240847178" duration="532000" />
+      <workItem from="1741306391926" duration="18631000" />
+      <workItem from="1741575002096" duration="20861000" />
+      <workItem from="1741651462920" duration="26403000" />
+      <workItem from="1741737601835" duration="6295000" />
+      <workItem from="1741744274111" duration="9446000" />
+      <workItem from="1741758161284" duration="5104000" />
+      <workItem from="1741763689516" duration="7881000" />
+      <workItem from="1741776442610" duration="2040000" />
+      <workItem from="1741785853652" duration="3649000" />
     </task>
     <servers />
   </component>

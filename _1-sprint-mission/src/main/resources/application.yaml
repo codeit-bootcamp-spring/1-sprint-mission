@@ -12,3 +12,32 @@ spring:
       path: /api-docs
     swagger-ui:
       path: /swagger-ui.html
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+
+  jpa:
+    open-in-view: false #OSIV 비활성화
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true #SQL을 가독성 있게 출력
+          highlight_sql: true #SQL 하이라이트
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  logging:
+    level:
+      org.hibernate.SQL: DEBUG  # SQL 실행 로그를 DEBUG 레벨로 출력
+      org.springframework.context: DEBUG
+      com.zaxxer.hikari: DEBUG
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: C:/storage/binaryContent

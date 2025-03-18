@@ -6,9 +6,7 @@ import java.util.UUID;
 
 @Schema(description = "수정할 읽음 상태 정보")
 public record ReadStatusUpdateRequest(
-    UUID userId,
-    UUID channelId,
-    Instant lastRead
+    Instant newLastReadAt
 ) {
 
 }

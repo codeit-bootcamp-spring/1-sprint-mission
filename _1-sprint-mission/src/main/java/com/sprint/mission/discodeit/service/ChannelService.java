@@ -11,15 +11,15 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-  Channel create(PublicChannelCreateRequest publicChannelCreateRequest); //채널 생성
+  ChannelDto create(PublicChannelCreateRequest publicChannelCreateRequest); //채널 생성
 
-  Channel create(PrivateChannelCreateRequest privateChannelCreateRequest); //채널 생성
+  ChannelDto create(PrivateChannelCreateRequest privateChannelCreateRequest); //채널 생성
 
   ChannelDto findById(UUID channelId); // 채널 단일 조회
 
   List<ChannelDto> findAllByUserId(UUID userId); // 모든 채널 조회
 
-  Channel update(UUID channelId, PublicChannelUpdateRequest publicChannelUpdateRequest); // 채널 수정
+  ChannelDto update(UUID channelId, PublicChannelUpdateRequest publicChannelUpdateRequest); // 채널 수정
 
   void deleteById(UUID channelId); // 채널 삭제
 }
