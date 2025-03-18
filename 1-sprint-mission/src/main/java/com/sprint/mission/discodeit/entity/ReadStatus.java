@@ -1,33 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "read_statuses")
 @Getter
-@NoArgsConstructor(force = true)
-public class ReadStatus {
-    //직렬화..?
-    private UUID id;
-    private User user;
-    private Channel channel;
-    private Instant lastReadAt;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends BaseUpdatableEntity {
 
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
-        this.user = user;
-        this.channel = channel;
-        this.lastReadAt = lastReadAt;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @Column(nullable = false)
+  private Instant lastReadAt;
+
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
+    this.lastReadAt = lastReadAt;
+  }
+
+  public void updateLastRead(Instant newLastReadAt) {
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
     }
-
-    public void updateReadTime(Instant newLastReadAt) {
-        if(newLastReadAt.isAfter(this.lastReadAt)) {
-            this.lastReadAt = newLastReadAt;
-        }
-
-    }
-
+  }
 }
