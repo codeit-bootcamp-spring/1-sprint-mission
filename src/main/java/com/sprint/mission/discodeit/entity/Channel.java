@@ -1,108 +1,52 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.*;
+import com.sprint.mission.discodeit.entity.status.ReadStatus;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-public class Channel implements Serializable {
+@Setter
+@Entity
+@Table(name = "channels")
+@NoArgsConstructor
+public class Channel extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  //객체 식별 id
-  private final String id;
   //채널명
-  private String channelName;
-  //생성 날짜 - 유닉스 타임스탬프
-  private final Instant createdAt;
-  //수정 시간
-  private Instant updatedAt;
+  private String name;
 
   //채널 종류 - 음성, 텍스트
-  private final ChannelCategory channelCategory;
+  private ChannelCategory channelCategory;
 
   //채널 공개 여부
-  private ChannelType channelType;
+  @Enumerated(EnumType.STRING)
+  private ChannelType type;
 
+  //채널 설명
   private String description;
 
-  //채널에 속한 유저 목록
-  private final Set<String> userSet;
+  @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Message> messages = new ArrayList<>();
 
-  //채널에 속한 메세지 목록
-  private final Set<String> messageSet;
+  @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ReadStatus> users = new ArrayList<>();
 
-  public Channel(String channelName, ChannelType channelType, ChannelCategory channelCategory,
+
+  public Channel(String name, ChannelType type, ChannelCategory channelCategory,
       String description) {
-    //id, createdAt, updateAt은 생성자에서 초기화
-    this.id = UUID.randomUUID().toString();
-    this.createdAt = Instant.now();
-    this.updatedAt = createdAt;
-    this.channelName = channelName;
+    this.name = name;
     this.channelCategory = channelCategory;
-    this.channelType = channelType;
-    this.description = description;
-    this.userSet = new HashSet<>();
-    this.messageSet = new HashSet<>();
-  }
-
-  public void setChannelName(String channelName) {
-    this.channelName = channelName;
-  }
-
-  //채널 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
-
-  public void setUpdatedAt(Instant updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public void setChannelType(ChannelType channelType) {
-    this.channelType = channelType;
-  }
-
-  public void setDescription(String description) {
+    this.type = type;
     this.description = description;
   }
-
-  public String toShortString() {
-    return "[Channel] id: " + id + " / name: " + channelName + " / type: " + channelType
-        + " / total users: " + userSet.size();
-  }
-
-  public String toFullString() {
-    return toShortString() + " / channelSort: " + channelCategory + " / description: " + description
-        + " / createdAt: " + createdAt + " / updatedAt: " + updatedAt;
-  }
-
-  public void displayFullInfo() {
-    System.out.println(toFullString());
-  }
-
-  public void displayShortInfo() {
-    System.out.println(toShortString());
-  }
-
-  public boolean isUpdated(UpdateChannelDto updateChannelDto) {
-    //변경 여부 체크
-    boolean isUpdated = false;
-
-    String newChannelName = updateChannelDto.channelName();
-    if (newChannelName != null && !newChannelName.isEmpty() && !newChannelName.equals(
-        channelName)) {
-      channelName = newChannelName;
-      isUpdated = true;
-    }
-
-    String newDescription = updateChannelDto.description();
-    if (newDescription != null && !newDescription.isEmpty() && !newDescription.equals(
-        description)) {
-      description = newDescription;
-      isUpdated = true;
-    }
-
-    return isUpdated;
-  }
-
 }

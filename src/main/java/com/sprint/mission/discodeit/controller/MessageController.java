@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.controller;
 
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.awt.print.Pageable;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,20 +24,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController {
 
   private final MessageService messageService;
-  private final ChannelService channelService;
-
-  @GetMapping("/all")
-  public List<MessageResponseDto> getAllMessages() {
-    return messageService.findAll();
-  }
 
   //특정 채널 메세지 생성
   @PostMapping
-  public ResponseEntity<MessageResponseDto> createMessage(
+  public ResponseEntity<MessageDto> createMessage(
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments,
       @RequestPart(value = "messageCreateRequest") CreateMessageDto createMessageDto) {
 
-    MessageResponseDto messageDto;
+    MessageDto messageDto;
 
     if (attachments != null && !attachments.isEmpty()) {
       messageDto = messageService.create(createMessageDto, attachments);
@@ -48,43 +44,31 @@ public class MessageController {
 
   //특정 채널 메세지 수정
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId,
+  public ResponseEntity<MessageDto> updateMessage(@PathVariable String messageId,
       @RequestBody UpdateMessageDto updateMessageDto) {
     return ResponseEntity.ok(messageService.updateMessage(messageId, updateMessageDto));
   }
 
-  //특정 사용자의 모든 메세지 목록 조회
-  //todo - 고민: UserController로 옮기는게 나을까?
-  @GetMapping("/users")
-  public ResponseEntity<List<MessageResponseDto>> getMessagesByUserId(@RequestParam String userId) {
-    //@RequestHeader(value = "If-None-Match") String ifNoneMatch) {
-    List<MessageResponseDto> allBySenderId = messageService.findAllBySenderId(userId);
+  /*  //특정 채널의 최근 50개 메세지 조회
+    @GetMapping
+    public ResponseEntity<List<MessageDto>> getAllMessages(@RequestParam String channelId,
+        @RequestParam Pageable pageable) {
+      PageResponse<MessageDto> allByChannelIdWithPaging = messageService.findAllByChannelIdWithPaging(
+          channelId, pageable);
 
-    String etag = "\"" + allBySenderId + "\"";
+      return ResponseEntity.ok().body(allByChannelIdWithPaging.getContents());
+    }*/
 
-//    if (etag.equals(ifNoneMatch)) {
-//      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-//    }
-//
-//    return ResponseEntity.ok().eTag(etag).cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
-//        .body(allBySenderId);
-    return ResponseEntity.ok().body(allBySenderId);
-  }
-
-
-  //특정 채널의 모든 메세지 조회
   @GetMapping
-  public ResponseEntity<List<MessageResponseDto>> getAllMessages(@RequestParam String channelId) {
-    //   @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch) {
-    List<MessageResponseDto> allMessages = channelService.findAllMessagesByChannelId(channelId);
-    String etag = "\"" + allMessages.hashCode() + "\"";
-//    if (etag.equals(ifNoneMatch)) {
-//      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-//    }
-//    return ResponseEntity.ok().eTag(etag).cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
-//        .body(allMessages);
+  public ResponseEntity<PageResponse<MessageDto>> getMessagesWithCursor(
+      @RequestParam String channelId,
+      @RequestParam(required = false) Instant cursor,
+      @RequestParam(defaultValue = "50") int size) {
 
-    return ResponseEntity.ok().body(allMessages);
+    PageResponse<MessageDto> response = messageService.findAllByChannelIdWithCursor(
+        channelId, cursor, size);
+
+    return ResponseEntity.ok().body(response);
   }
 
   //메세지 삭제

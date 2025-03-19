@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 
+import com.sprint.mission.discodeit.dto.response.PageResponse;
+import java.awt.print.Pageable;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,30 +14,33 @@ public interface MessageService {
 
 
   //생성
-  MessageResponseDto create(CreateMessageDto createMessageDto);
+  MessageDto create(CreateMessageDto createMessageDto);
 
-  MessageResponseDto create(CreateMessageDto createMessageDto, List<MultipartFile> files);
+  MessageDto create(CreateMessageDto createMessageDto, List<MultipartFile> files);
 
   //모두 읽기
-  List<MessageResponseDto> findAll();
+  List<MessageDto> findAll();
 
   //읽기
-  MessageResponseDto findById(String messageId);
+  MessageDto findById(String messageId);
 
   //다건 조회 - 내용
-  List<MessageResponseDto> findAllContainsContent(String content);
+  List<MessageDto> findAllContainsContent(String content);
 
   //다건 조회 - 작성자
-  List<MessageResponseDto> findAllBySenderId(String senderId);
+  List<MessageDto> findAllByAuthorId(String senderId);
 
   //다건 조회 - 날짜
-  List<MessageResponseDto> findAllByCreatedAt(Instant createdAt);
+  List<MessageDto> findAllByCreatedAt(Instant createdAt);
 
-  //다건 조회 - 특정 채널
-  List<MessageResponseDto> findAllByChannelId(String channelId);
+  //페이징 - 오프셋 기반
+  //PageResponse<MessageDto> findAllByChannelIdWithPaging(String channelId, Pageable pageable);
+
+  //페이징 - 커서 기반
+  PageResponse<MessageDto> findAllByChannelIdWithCursor(String channelId, Instant cursor, int size);
 
   //수정
-  MessageResponseDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);
+  MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);
 
   //삭제
   boolean delete(String messageId, String userId);

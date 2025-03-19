@@ -1,75 +1,58 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Getter;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-public class Message implements Serializable {
+@Entity
+@Setter
+@Table(name = "messages")
+@NoArgsConstructor
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  //객체 식별 id
-  private final String id;
-  //생성 날짜 - 유닉스 타임스탬프
-  private final Instant createdAt;
-  //수정 시간
-  private Instant updatedAt;
+  // entity는 지연로딩 때문에 final 키워드를 가지고 갈 수 없다!
   //메세지 작성자
-  private final String senderId;
+
+  @ManyToOne
+  @JoinColumn(name = "author_id")
+  private User author;
   //메세지 내용
   private String content;
   //메세지가 생성된 채널
-  private final String channelId;
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
   //첨부 이미지 목록
-  private final List<String> attachmentImageIds;
+  //다대다 -> 다:1 1:다 로 중간 테이블을 놓아서 풀어사용해야한다.
+  //일대다 단방향은 사용하지 않는 편이 좋고, 일대다 양방향으로 사용하거나, 다대일 단방향으로 사용하자!!!
+  @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<MessageAttachments> attachments = new HashSet<>();
 
-  public Message(String senderId, String content, String channelId) {
-    this.id = UUID.randomUUID().toString();
-    this.createdAt = Instant.now();
-    this.updatedAt = createdAt;
-    this.senderId = senderId;
+  public Message(User author, String content, Channel channel) {
+    this.author = author;
     this.content = content;
-    this.channelId = channelId;
-    this.attachmentImageIds = new ArrayList<>();
+    this.channel = channel;
   }
 
-  public void setContent(String content) {
-    this.content = content;
+  public void addFile(BinaryContent binaryContent) {
+    if (binaryContent != null) {
+      MessageAttachments attachment = new MessageAttachments();
+      attachment.setContent(binaryContent);
+      attachment.setMessage(this);
+      attachments.add(attachment);
+    }
   }
-
-  //메세지가 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
-
-  public void setUpdatedAt(Instant updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  //메세지가 생성된 이후, 메세지를 보낸 채널을 변경할 수 없으므로 update 미구현
-
-  public void addImages(String imageId) {
-    this.attachmentImageIds.add(imageId);
-  }
-
   //추후에 추가할 것
   //멘션, 답장(reply)
-
-  public String toShortString() {
-    return "[Message] id: " + id + " / sender: " + senderId + " / content: " + content
-        + " / channelId: " + channelId;
-  }
-
-  public String toFullString() {
-    return toShortString() + " / createdAt: " + createdAt + " / updatedAt: " + updatedAt;
-  }
-
-  public void displayFullInfo() {
-    System.out.println(toFullString());
-  }
-
-  public void displayShortInfo() {
-    System.out.println(toShortString());
-  }
 
 }

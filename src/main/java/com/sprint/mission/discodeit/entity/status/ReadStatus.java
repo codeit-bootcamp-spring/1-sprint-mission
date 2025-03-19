@@ -1,41 +1,46 @@
 package com.sprint.mission.discodeit.entity.status;
 
-import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusDto;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-public class ReadStatus implements Serializable {
+@Entity
+@Setter
+@Table(name = "read_statuses")
+@NoArgsConstructor
+public class ReadStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private String id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private String channelId;
-  private String userId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private UUID id;
+
+  @ManyToOne
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
+
+  @ManyToOne
+  @JoinColumn(name = "user_id")
+  private User user;
+
   private Instant lastReadAt;
 
-  public ReadStatus(String channelId, String userId, Instant lastReadAt) {
-    this.id = UUID.randomUUID().toString();
-    this.createdAt = Instant.now();
-    this.updatedAt = createdAt;
-    this.channelId = channelId;
-    this.userId = userId;
-    this.lastReadAt = createdAt;
-  }
-
-  public boolean isNewMessage() {
-    return lastReadAt.isBefore(updatedAt);
-  }
-
-  public void setUpdatedAt(Instant updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
-  public void setLastReadAt(Instant lastReadAt) {
+  public ReadStatus(Channel channel, User user, Instant lastReadAt) {
+    this.channel = channel;
+    this.user = user;
     this.lastReadAt = lastReadAt;
   }
 }

@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.ResponseBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +21,13 @@ import java.util.List;
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
 
   @GetMapping("/{contentId}")
-  public ResponseEntity<ResponseBinaryContentDto> getBinaryContent(@PathVariable String contentId,
+  public ResponseEntity<BinaryContentDto> getBinaryContent(@PathVariable String contentId,
       @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch) {
 
-    ResponseBinaryContentDto binaryContentDto = binaryContentService.findById(contentId);
+    BinaryContentDto binaryContentDto = binaryContentService.findById(contentId);
     String etag = "\"" + binaryContentDto.hashCode() + "\""; // 해시값을 ETag로 사용
 
     if (etag.equals(ifNoneMatch)) {
@@ -38,11 +40,11 @@ public class BinaryContentController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ResponseBinaryContentDto>> getBinaryContents(
+  public ResponseEntity<List<BinaryContentDto>> getBinaryContents(
       @RequestParam List<String> contentIds,
       @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch) {
 
-    List<ResponseBinaryContentDto> contentList = binaryContentService.findAllByIdIn(contentIds);
+    List<BinaryContentDto> contentList = binaryContentService.findAllByIdIn(contentIds);
     String etag = "\"" + contentList.hashCode() + "\"";
 
     if (etag.equals(ifNoneMatch)) {
@@ -54,8 +56,14 @@ public class BinaryContentController {
   }
 
   @PostMapping
-  public ResponseEntity<ResponseBinaryContentDto> uploadBinaryContent(
+  public ResponseEntity<BinaryContentDto> uploadBinaryContent(
       @RequestParam("file") MultipartFile file) {
     return ResponseEntity.status(HttpStatus.CREATED).body(binaryContentService.create(file));
+  }
+
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<?> downloadBinaryContent(@PathVariable String binaryContentId) {
+    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+    return binaryContentStorage.download(binaryContentDto);
   }
 }

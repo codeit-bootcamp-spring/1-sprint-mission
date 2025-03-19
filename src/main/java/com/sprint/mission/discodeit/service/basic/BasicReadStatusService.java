@@ -2,25 +2,24 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,87 +28,64 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusRepository readStatusRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
-  private final MessageRepository messageRepository;
+  private final ReadStatusMapper readStatusMapper;
 
   @Override
-  public ReadStatusResponseDto create(CreateReadStatusDto createReadStatusDto)
+  @Transactional
+  public ReadStatusDto create(CreateReadStatusDto createReadStatusDto)
       throws CustomException {
 
     if (createReadStatusDto == null || createReadStatusDto.channelId() == null
         || createReadStatusDto.userId() == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
-    Channel channel = channelRepository.findById(createReadStatusDto.channelId());
+    Channel channel = channelRepository.findById(UUID.fromString(createReadStatusDto.channelId()))
+        .orElse(null);
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
-    User user = userRepository.findById(createReadStatusDto.userId());
+    User user = userRepository.findById(UUID.fromString(createReadStatusDto.userId())).orElse(null);
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
 
-    if (readStatusRepository.findByChannelIdWithUserId(createReadStatusDto.channelId(),
-        createReadStatusDto.userId()) != null) {
+    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
+        UUID.fromString(createReadStatusDto.channelId()),
+        UUID.fromString(createReadStatusDto.userId())).orElse(null);
+
+    if (readStatus != null) {
       throw new CustomException(ErrorCode.READ_STATUS_ALREADY_EXIST);
     }
 
-    ReadStatus readStatus = new ReadStatus(channel.getId(), user.getId(),
-        createReadStatusDto.lastReadAt());
+    readStatus = new ReadStatus(channel, user, createReadStatusDto.lastReadAt());
     ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
 
-    return ReadStatusResponseDto.from(savedReadStatus, isNewMessage(readStatus));
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
-  public List<ReadStatusResponseDto> createByChannelId(String channelId) throws CustomException {
-    Channel channel = channelRepository.findById(channelId);
-    if (channel == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+  @Transactional(readOnly = true)
+  public ReadStatusDto findById(String readStatusId) {
+    ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
+        .orElse(null);
+    if (readStatus == null) {
+      throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
-
-    //todo - 새로들어온 유저만 해당 채널의 수신 정보를 생성하는 일이 있을까?
-    if (!findAllByChannelId(channelId).isEmpty()) {
-      throw new CustomException(ErrorCode.READ_STATUS_ALREADY_EXIST);
-    }
-
-    //todo - 리팩토링
-    List<String> userIds = List.of();
-
-    if (channel.getChannelType() == ChannelType.PUBLIC) {
-      userIds = userRepository.findAll().stream().map(User::getId).toList();
-    } else if (channel.getChannelType() == ChannelType.PRIVATE) {
-      userIds = channel.getUserSet().stream().toList();
-    }
-
-    List<ReadStatusResponseDto> readStatusResponseDtos = new ArrayList<>();
-
-    for (String userId : userIds) {
-      ReadStatus readStatus = new ReadStatus(channelId, userId, Instant.now());
-      ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
-
-      readStatusResponseDtos.add(
-          ReadStatusResponseDto.from(savedReadStatus, isNewMessage(readStatus)));
-    }
-
-    return readStatusResponseDtos;
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
-  public ReadStatusResponseDto findById(String readStatusId) {
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId);
-    return ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus));
-  }
-
-  @Override
-  public ReadStatusResponseDto update(String readStatusId,
+  @Transactional
+  public ReadStatusDto update(String readStatusId,
       UpdateReadStatusDto updateReadStatusDto) {
 
     if (updateReadStatusDto == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
 
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId);
+    ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
+        .orElse(null);
     if (readStatus == null) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
@@ -117,20 +93,21 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatus.setLastReadAt(updateReadStatusDto.newLastReadAt());
     readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
 
-    return ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus));
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
-  public List<ReadStatusResponseDto> updateByUserId(String userId,
+  @Transactional
+  public List<ReadStatusDto> updateByUserId(String userId,
       UpdateReadStatusDto updateReadStatusDto) {
 
-    List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
+    List<ReadStatus> readStatuses = readStatusRepository.findByUserId(UUID.fromString(userId));
 
     if (readStatuses == null || readStatuses.isEmpty()) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
-    List<ReadStatusResponseDto> readStatusResponseDtos = new ArrayList<>();
+    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
 
     //기능 미사용으로 임시 주석처리
 //    for (ReadStatus readStatus : readStatuses) {
@@ -142,69 +119,66 @@ public class BasicReadStatusService implements ReadStatusService {
 //            ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus)));
 //      }
 //    }
-    return readStatusResponseDtos;
+    return readStatusDtos;
   }
 
   @Override
-  public List<ReadStatusResponseDto> updateByChannelId(String channelId,
+  @Transactional
+  public List<ReadStatusDto> updateByChannelId(String channelId,
       UpdateReadStatusDto updateReadStatusDto) {
 
-    Channel channel = channelRepository.findById(channelId);
+    Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
-    List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+    List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(
+        UUID.fromString(channelId));
     if (readStatuses == null || readStatuses.isEmpty()) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
-    List<ReadStatusResponseDto> readStatusResponseDtos = new ArrayList<>();
+    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
     for (ReadStatus readStatus : readStatuses) {
       readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
-      readStatusResponseDtos.add(ReadStatusResponseDto.from(readStatusRepository.save(readStatus),
-          isNewMessage(readStatus)));
+      readStatusDtos.add(readStatusMapper.toDto(readStatus));
     }
-    return readStatusResponseDtos;
+    return readStatusDtos;
   }
 
-  public List<ReadStatusResponseDto> findAllByUserId(String userId) {
+  public List<ReadStatusDto> findAllByUserId(String userId) {
 
-    List<ReadStatus> allReadStatusByUserId = readStatusRepository.findAllByUserId(userId);
+    List<ReadStatus> allReadStatusByUserId = readStatusRepository.findByUserId(
+        UUID.fromString(userId));
 
     if (allReadStatusByUserId == null) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
-    List<ReadStatusResponseDto> readStatusResponseDtos = new ArrayList<>();
+    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
 
     for (ReadStatus readStatus : allReadStatusByUserId) {
-      readStatusResponseDtos.add(ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus)));
+      readStatusDtos.add(readStatusMapper.toDto(readStatus));
     }
-    return readStatusResponseDtos;
+    return readStatusDtos;
   }
 
   @Override
-  public List<ReadStatusResponseDto> findAllByChannelId(String channelId) {
-    return readStatusRepository.findAllByChannelId(channelId).stream()
-        .map(r -> ReadStatusResponseDto.from(r, isNewMessage(r))).toList();
+  @Transactional(readOnly = true)
+  public List<ReadStatusDto> findAllByChannelId(String channelId) {
+    return readStatusRepository.findByChannelId(UUID.fromString(channelId)).stream()
+        .map(readStatusMapper::toDto).toList();
   }
 
   @Override
+  @Transactional
   public boolean delete(String readStatusId) {
-    return readStatusRepository.delete(readStatusId);
-  }
-
-  public boolean isNewMessage(ReadStatus readStatus) throws CustomException {
-    Instant lastMessageTimestamp = messageRepository.findAllByChannelId(readStatus.getChannelId())
-        .stream()
-        .map(Message::getCreatedAt)
-        .max(Instant::compareTo).orElse(null);
-
-    if (lastMessageTimestamp == null) {
-      return false;
+    ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
+        .orElse(null);
+    if (readStatus == null) {
+      throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
-    return lastMessageTimestamp.isAfter(readStatus.getLastReadAt());
+    readStatusRepository.delete(readStatus);
+    return true;
   }
-
 }

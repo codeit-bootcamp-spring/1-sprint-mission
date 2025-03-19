@@ -1,6 +1,15 @@
 spring:
   application:
     name: discodeit
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
 
 springdoc:
   api-docs:
@@ -14,4 +23,15 @@ discodeit:
     base-directory: user.dir
     file-directory: .discodeit/data/
     extension: .ser
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/data
 
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE

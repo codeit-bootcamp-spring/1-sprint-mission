@@ -1,30 +1,26 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusDto;
-import com.sprint.mission.discodeit.entity.status.ReadStatus;
 
 import java.util.List;
 
 public interface ReadStatusService {
 
-    ReadStatusResponseDto create(CreateReadStatusDto createReadStatusDto);
+  ReadStatusDto create(CreateReadStatusDto createReadStatusDto);
 
-    List<ReadStatusResponseDto> createByChannelId(String channelId);
+  ReadStatusDto findById(String userStatusId);
 
-    ReadStatusResponseDto findById(String userStatusId);
+  List<ReadStatusDto> findAllByUserId(String userId);
 
-    List<ReadStatusResponseDto> findAllByUserId(String userId);
+  List<ReadStatusDto> findAllByChannelId(String channelId);
 
-    List<ReadStatusResponseDto> findAllByChannelId(String channelId);
+  ReadStatusDto update(String id, UpdateReadStatusDto updateReadStatusDto);
 
-    ReadStatusResponseDto update(String id, UpdateReadStatusDto updateReadStatusDto);
+  List<ReadStatusDto> updateByUserId(String userId, UpdateReadStatusDto updateReadStatusDto);
 
-    List<ReadStatusResponseDto> updateByUserId(String userId, UpdateReadStatusDto updateReadStatusDto);
+  List<ReadStatusDto> updateByChannelId(String channelId, UpdateReadStatusDto updateReadStatusDto);
 
-    List<ReadStatusResponseDto> updateByChannelId(String channelId, UpdateReadStatusDto updateReadStatusDto);
-
-
-    boolean delete(String userStatusId);
+  boolean delete(String userStatusId);
 }

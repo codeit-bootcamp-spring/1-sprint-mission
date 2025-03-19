@@ -1,23 +1,27 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
-import com.sprint.mission.discodeit.dto.binaryContent.ResponseBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
-import java.time.Instant;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.TypeMismatchException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -27,18 +31,26 @@ import java.util.List;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
+  private final BinaryContentRepository binaryContentRepository;
+  private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
 
   @Override
-  public UserResponseDto create(CreateUserDto createUserDto) {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  //todo - 고민
+  // 자기자신의 메서드 호출을 가로채지 않아서 내부 메서드의 transactional이 무시된다...
+  // 그럼 밑의 동일 이름의 create에서 이 create를 호출하면 무시되나?
+  public UserDto create(CreateUserDto createUserDto) {
 
-    boolean userEmailExists = userRepository.findByEmail(createUserDto.email()) != null;
+    boolean userEmailExists =
+        userRepository.findByEmail(createUserDto.email()).orElse(null) != null;
     if (userEmailExists) {
       throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
     }
 
-    boolean userNameExists = userRepository.findByUsername(createUserDto.username()) != null;
+    boolean userNameExists =
+        userRepository.findByUsername(createUserDto.username()).orElse(null) != null;
     if (userNameExists) {
       throw new CustomException(ErrorCode.USER_NAME_ALREADY_REGISTERED);
     }
@@ -50,107 +62,124 @@ public class BasicUserService implements UserService {
 
     User user = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(),
         createUserDto.password(), null, AccountStatus.UNVERIFIED, null);
+
+    UserStatus userStatus = new UserStatus(user);
+    userStatusRepository.save(userStatus);
+    user.setUserStatus(userStatus);
+
     userRepository.save(user);
 
-    UserStatusResponseDto userStatusDto = userStatusService.create(
-        new CreateUserStatusDto(user.getId()));
-
-    return UserResponseDto.from(user, userStatusDto.isOnline());
+    return userMapper.toDto(user);
   }
 
   @Override
-  public UserResponseDto create(CreateUserDto createUserDto, MultipartFile file)
+  @Transactional
+  public UserDto create(CreateUserDto createUserDto, MultipartFile file)
       throws CustomException {
-    UserResponseDto userDto = create(createUserDto);
-    User user = userRepository.findById(userDto.id());
+    UserDto userDto = create(createUserDto);
+    User user = userRepository.findById(userDto.id()).orElse(null);
 
-    ResponseBinaryContentDto responseBinaryContentDto = binaryContentService.create(file);
-    user.setProfileImageId(responseBinaryContentDto.id());
+    if (!file.getContentType().equals("image/png") && !file.getContentType().equals("image/jpeg") &&
+        !file.getContentType().equals("image/gif") && !file.getContentType().equals("image/jpg")) {
+      throw new TypeMismatchException("Image type only supported");
+    }
+    BinaryContentDto binaryContentDto = binaryContentService.create(file);
+    BinaryContent profile = binaryContentRepository.findById(binaryContentDto.id()).orElse(null);
+    user.setProfile(profile);
     userRepository.save(user);
 
-    return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
+    return userMapper.toDto(user);
   }
 
   @Override
-  public List<UserResponseDto> findAll() {
-    return userRepository.findAll().stream()
-        .map(u -> UserResponseDto.from(u, userStatusService.findById(u.getId()).isOnline()))
-        .toList();
+  @Transactional(readOnly = true)
+  public List<UserDto> findAll() {
+    return userRepository.findAll().stream().map(userMapper::toDto).toList();
   }
 
   @Override
-  public UserResponseDto findById(String userId) throws CustomException {
+  @Transactional(readOnly = true)
+  public UserDto findById(String userId) throws CustomException {
     if (userId == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "USER ID is null");
     }
-    User user = userRepository.findById(userId);
+    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
+
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with id %s not found", userId));
     }
-    return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
+    return userMapper.toDto(user);
   }
 
   @Override
-  public UserResponseDto findByEmail(String email) throws CustomException {
+  @Transactional(readOnly = true)
+  public UserDto findByEmail(String email) throws CustomException {
     User user = userRepository.findAll().stream().filter(u -> u.getEmail().equals(email))
         .findFirst().orElse(null);
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with email %s not found", email));
     }
-    return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
+    return userMapper.toDto(user);
   }
 
   @Override
-  public List<UserResponseDto> findAllContainsNickname(String nickname) {
+  @Transactional(readOnly = true)
+  public List<UserDto> findAllContainsNickname(String nickname) {
     return userRepository.findAll().stream()
         .filter(user -> user.getNickname().contains(nickname))
-        .map(
-            user -> UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()))
-        .toList();
+        .map(userMapper::toDto).toList();
   }
 
   @Override
-  public List<UserResponseDto> findAllByAccountStatus(AccountStatus accountStatus) {
-    return userRepository.findAll().stream()
-        .filter(user -> user.getAccountStatus().equals(accountStatus))
-        .map(
-            user -> UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()))
-        .toList();
+  @Transactional(readOnly = true)
+  public List<UserDto> findAllByAccountStatus(AccountStatus accountStatus) {
+    return userRepository.findByAccountStatus(accountStatus)
+        .stream()
+        .map(userMapper::toDto).toList();
   }
 
   @Override
-  public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto)
+  @Transactional
+  public UserDto updateUser(String userId, UpdateUserDto updateUserDto)
       throws CustomException {
 
     if (updateUserDto == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "USER DTO is null");
     }
 
-    User user = userRepository.findById(userId);
+    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
 
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with id %s not found", userId));
     }
 
-    if (user.isUpdated(updateUserDto)) {
-      user.setUpdatedAt(updateUserDto.updatedAt());
-    }
+    user.setUsername(updateUserDto.newUsername());
+    user.setNickname(updateUserDto.newNickname());
+    user.setEmail(updateUserDto.newEmail());
+    user.setPassword(updateUserDto.newPassword());
+    user.setUpdatedAt(updateUserDto.updatedAt());
+    user.setAccountStatus(updateUserDto.accountStatus());
+    user.setStatusMessage(updateUserDto.newStatusMessage());
 
     User savedUser = userRepository.save(user);
-    UserStatusResponseDto userStatusResponseDto = userStatusService.updateByUserId(userId,
-        new UpdateUserStatusDto(Instant.now()));
+    UserStatus userStatus = userStatusRepository.findByUser(savedUser).orElse(null);
+    if (userStatus == null) {
+      throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
+    }
+    user.setUserStatus(userStatus);
 
-    return UserResponseDto.from(savedUser, userStatusResponseDto.isOnline());
+    return userMapper.toDto(savedUser);
   }
 
   // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
   @Override
-  public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
+  @Transactional
+  public UserDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
       throws CustomException {
-    User user = userRepository.findById(userId);
+    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
     //todo - 유저 조회를 두 번 한다. 수정 필요
     updateUser(userId, updateUserDto);
 
@@ -158,33 +187,37 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
 
-    if (user.getProfileImageId() != null && !user.getProfileImageId().isEmpty()) {
-      binaryContentService.deleteById(user.getProfileImageId());
-    }
+    if (user.getProfile() != null) {
 
-    user.setProfileImageId(binaryContentService.create(file).id());
+      binaryContentRepository.delete(user.getProfile());
+    }
+    BinaryContentDto binaryContentDto = binaryContentService.create(file);
+
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentDto.id())
+        .orElse(null);
+
+    user.setProfile(binaryContent);
     user.setUpdatedAt(updateUserDto.updatedAt());
 
-    User savedUser = userRepository.save(user);
-    UserStatusResponseDto userStatusResponseDto = userStatusService.updateByUserId(userId,
-        new UpdateUserStatusDto(Instant.now()));
+    UserStatus userStatus = user.getUserStatus();
+    userStatus.setUpdatedAt(updateUserDto.updatedAt());
 
-    return UserResponseDto.from(savedUser, userStatusResponseDto.isOnline());
+    userStatusRepository.save(userStatus);
+    userRepository.save(user);
+
+    return userMapper.toDto(user);
   }
 
-
   @Override
+  @Transactional
   public boolean deleteUser(String userId) throws CustomException {
-    User user = userRepository.findById(userId);
+    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
 
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with id %s not found", userId));
     }
-
-    //todo - userStatus가 삭제되지 않았다면?
-    userStatusService.delete(user.getId());
-
-    return userRepository.delete(userId);
+    userRepository.delete(user);
+    return true;
   }
 }
