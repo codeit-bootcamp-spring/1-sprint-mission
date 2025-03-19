@@ -1,54 +1,52 @@
 package com.sprint.mission.discodeit.entity;
 
-import io.swagger.v3.oas.models.security.SecurityScheme.In;
-import lombok.Getter;
-
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
 @Getter
-public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Table(name = "read_statuses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    })
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends BaseUpdatableEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    private UUID channelId;
-    private UUID userId;
-    private Instant lastReadAt;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
 
-    public ReadStatus(UUID channelId, UUID userId, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+  @Column(nullable = false)
+  private Instant lastReadAt;
 
-        this.channelId = channelId;
-        this.userId = userId;
-        this.lastReadAt = lastReadAt;
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
+    this.lastReadAt = lastReadAt;
+  }
+
+  public void update(Instant lastReadAt) {
+    if (!lastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = lastReadAt;
     }
+  }
 
-    public void updateUpdatedAt() {
-        this.updatedAt = Instant.now();
-    }
-
-    public void update(Instant lastReadAt) {
-        boolean updated = false;
-        if (lastReadAt != null && !lastReadAt.equals(this.lastReadAt)) {
-            this.lastReadAt = lastReadAt;
-            updated = true;
-        }
-
-        if (updated) {
-            updateUpdatedAt();
-        }
-    }
-
-    public boolean isSameChannelId(UUID channelId) {
-        return this.channelId.equals(channelId);
-    }
-
-    public boolean isSameUserId(UUID userId) {
-        return this.userId.equals(userId);
-    }
+  public boolean isSameChannelById(UUID channelId) {
+    return this.channel.getId().equals(channelId);
+  }
 }

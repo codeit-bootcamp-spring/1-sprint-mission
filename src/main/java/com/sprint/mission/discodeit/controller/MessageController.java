@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
-import java.io.IOException;
-import java.util.ArrayList;
+import jakarta.validation.Valid;
+import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,55 +35,40 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Message> create(@RequestPart("messageCreateRequest")MessageCreateRequest messageCreateRequest,
+    public ResponseEntity<MessageDto> create(@Valid @RequestPart("messageCreateRequest")MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
-        List<BinaryContentRequest> binaryContentRequests = Optional.ofNullable(attachments)
-            .map(files -> files.stream()
-                .map(file -> {
-                    try {
-                        return new BinaryContentRequest(
-                            file.getOriginalFilename(),
-                            file.getContentType(),
-                            file.getBytes()
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList())
-            .orElse(new ArrayList<>());
-
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(messageService.create(messageCreateRequest, binaryContentRequests));
+            .body(messageService.create(messageCreateRequest, attachments));
     }
 
-    @PatchMapping("/{messageId}")
-    public ResponseEntity<Message> update(@PathVariable UUID messageId, @RequestBody MessageUpdateRequest request) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<MessageDto> update(@PathVariable UUID id, @RequestBody MessageUpdateRequest request) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(messageService.update(messageId, request));
+            .body(messageService.update(id, request));
     }
 
-    @DeleteMapping("/{messageId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
-        messageService.delete(messageId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        messageService.delete(id);
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .build();
     }
 
     @GetMapping()
-    public ResponseEntity<List<Message>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+        @RequestParam("channelId") UUID channelId,
+        @RequestParam(value = "cursor", required = false) Instant cursor,
+        @PageableDefault(
+            size = 50,
+            page = 0,
+            sort = "createdAt",
+            direction = Direction.DESC
+        )Pageable pageable) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(messageService.findAllByChannelId(channelId));
-    }
-
-    @GetMapping("/users/{id}")
-    public ResponseEntity<List<Message>> getAllMessagesByUserId(@PathVariable UUID id) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(messageService.findAllByAuthorId(id));
+            .body(messageService.findAllByChannelId(channelId, cursor, pageable));
     }
 }

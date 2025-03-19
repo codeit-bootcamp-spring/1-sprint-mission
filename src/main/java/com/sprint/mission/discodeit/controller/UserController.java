@@ -1,17 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import java.io.IOException;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,72 +33,42 @@ public class UserController {
   private final UserStatusService userStatusService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<User> create(@RequestPart UserCreateRequest userCreateRequest,
+  public ResponseEntity<UserDto> create(@Valid @RequestPart UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
-    Optional<BinaryContentRequest> binaryContentRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
-
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(userService.create(userCreateRequest, binaryContentRequest));
+        .body(userService.create(userCreateRequest, profile));
   }
 
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<User> update(@PathVariable UUID userId,
+  public ResponseEntity<UserDto> update(@PathVariable UUID userId,
       @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile) {
-    Optional<BinaryContentRequest> binaryContentRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
-
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(userService.update(userId, userUpdateRequest, binaryContentRequest));
+        .body(userService.update(userId, userUpdateRequest, profile));
   }
 
-  @DeleteMapping("/{userId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
-    userService.delete(userId);
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    userService.delete(id);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
   }
 
   @GetMapping
-  public ResponseEntity<List<UserResponse>> findAll() {
+  public ResponseEntity<List<UserDto>> findAll() {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userService.findAll());
   }
 
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(userStatusService.updateByUserUd(userId, request));
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(userService.find(id));
-  }
-
-  private Optional<BinaryContentRequest> resolveProfileRequest(MultipartFile profileFile) {
-    if (profileFile.isEmpty()) {
-      return Optional.empty();
-    } else {
-      try {
-        BinaryContentRequest binaryContentCreateRequest = new BinaryContentRequest(
-            profileFile.getOriginalFilename(),
-            profileFile.getContentType(),
-            profileFile.getBytes()
-        );
-        return Optional.of(binaryContentCreateRequest);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
+        .body(userStatusService.updateByUserId(userId, request));
   }
 }

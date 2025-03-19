@@ -1,123 +1,112 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Base64;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
+@Table(name = "users")
 @Getter
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseUpdatableEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+  @Column(nullable = false, unique = true, length = 50)
+  private String username;
 
-    private UUID profileId;
-    private String username;
-    private String email;
-    private String password;
+  @Column(nullable = false, unique = true, length = 100)
+  private String email;
 
-    public User(UUID profileId, String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+  @Column(nullable = false)
+  private String password;
 
-        this.profileId = profileId;
-        this.username = username;
-        this.email = email;
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+  @OneToOne(fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.SET_NULL)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
+
+  @JsonManagedReference
+  @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+  private UserStatus status;
+
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.username = username;
+    this.email = email;
+    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+    this.password = Base64.getEncoder()
+        .encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+
+    this.profile = profile;
+    this.status = new UserStatus(this, Instant.now());
+  }
+
+  public void updateProfile(BinaryContent profile) {
+    if (!this.profile.getId().equals(profile.getId())) {
+      this.profile = profile;
     }
+  }
 
-    public void updateUpdatedAt() {
-        this.updatedAt = Instant.now();
+  public void updateName(String username) {
+    if (!this.username.equals(username)) {
+      this.username = username;
     }
+  }
 
-    public void update(UUID binaryContentId, String name, String email, String password) {
-        boolean updated = false;
-        if (updateBinaryContentId(binaryContentId)) {
-            updated = true;
-        }
-        if (updateName(name)) {
-            updated = true;
-        }
-        if (updateEmail(email)) {
-            updated = true;
-        }
-        if (updatePassword(password)) {
-            updated = true;
-        }
-
-        if (updated) {
-            updateUpdatedAt();
-        }
+  public void updateEmail(String email) {
+    if (!this.email.equals(email)) {
+      this.email = email;
     }
+  }
 
-    public boolean updateBinaryContentId(UUID profileId) {
-        if (profileId == null || this.profileId.equals(profileId)) {
-            return false;
-        }
-        this.profileId = profileId;
-        return true;
+  public void updatePassword(String newPassword) {
+    String decodedPassword = new String(Base64.getDecoder().decode(this.password),
+        StandardCharsets.UTF_8);
+    if (BCrypt.checkpw(newPassword, decodedPassword)) {
+      return;
     }
+    String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+    this.password = Base64.getEncoder()
+        .encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+  }
 
-    public boolean updateName(String username) {
-        if (username.isBlank() || this.username.equals(username)) {
-            return false;
-        }
-        this.username = username;
-        return true;
-    }
+  public boolean isSamePassword(String password) {
+    String decodedPassword = new String(Base64.getDecoder().decode(this.password),
+        StandardCharsets.UTF_8);
+    return BCrypt.checkpw(password, decodedPassword);
+  }
 
-    public boolean updateEmail(String email) {
-        if (email.isBlank() || this.email.equals(email)) {
-            return false;
-        }
-        this.email = email;
-        return true;
+  public void validateDuplicateName(String name) {
+    if (this.username.equals(name)) {
+      throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름입니다.");
     }
+  }
 
-    public boolean updatePassword(String newPassword) {
-        String decodedPassword = new String(Base64.getDecoder().decode(this.password), StandardCharsets.UTF_8);
-        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, decodedPassword)) {
-            return false;
-        }
-        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-        this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
-        return true;
+  public void validateDuplicateEmail(String email) {
+    if (this.email.equals(email)) {
+      throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일입니다.");
     }
+  }
 
-    public boolean isSameName(String name) {
-        return this.username.equals(name);
-    }
-
-    public boolean isSamePassword(String password) {
-        String decodedPassword = new String(Base64.getDecoder().decode(this.password), StandardCharsets.UTF_8);
-        return BCrypt.checkpw(password, decodedPassword);
-    }
-
-    public void validateDuplicateName(String name) {
-        if (this.username.equals(name)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름입니다.");
-        }
-    }
-
-    public void validateDuplicateEmail(String email) {
-        if (this.email.equals(email)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일입니다.");
-        }
-    }
-
-    @Override
-    public String toString() {
-        return String.format(
-                username + "님의 정보입니다." + System.lineSeparator()
-                        + "Name: " + username + System.lineSeparator()
-                        + "Email: " + email + System.lineSeparator()
-        );
-    }
+  @Override
+  public String toString() {
+    return String.format(
+        username + "님의 정보입니다." + System.lineSeparator()
+            + "Name: " + username + System.lineSeparator()
+            + "Email: " + email + System.lineSeparator()
+    );
+  }
 }

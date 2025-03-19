@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;

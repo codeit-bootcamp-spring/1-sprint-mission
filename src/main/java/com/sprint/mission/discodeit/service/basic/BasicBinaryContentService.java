@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,49 +15,79 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent create(BinaryContentRequest binaryContentRequest) {
-        return binaryContentRepository.save(new BinaryContent(
-                binaryContentRequest.fileName(),
-                (long) binaryContentRequest.bytes().length,
-                binaryContentRequest.contentType(),
-                binaryContentRequest.bytes()
-                ));
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage binaryContentStorage;
+
+  @Override
+  @Transactional
+  public BinaryContentDto create(BinaryContentRequest request) {
+    BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent(
+        request.fileName(),
+        (long) request.bytes().length,
+        request.contentType()
+    ));
+    binaryContentStorage.put(binaryContent.getId(), request.bytes());
+
+    return binaryContentMapper.toDto(binaryContent);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public BinaryContentDto find(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .map(binaryContentMapper::toDto)
+        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<BinaryContentDto> findAll() {
+    return binaryContentRepository.findAll().stream()
+        .map(binaryContentMapper::toDto)
+        .toList();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllById(binaryContentIds).stream()
+        .map(binaryContentMapper::toDto)
+        .toList();
+  }
+
+  @Override
+  @Transactional
+  public void delete(UUID binaryContentId) {
+    if (!binaryContentRepository.existsById(binaryContentId)) {
+      throw new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다.");
     }
 
-    @Override
-    public BinaryContent find(UUID binaryContentId) {
-        return Optional.ofNullable(binaryContentRepository.find(binaryContentId))
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
-    }
+    binaryContentRepository.deleteById(binaryContentId);
+  }
 
-    @Override
-    public List<BinaryContent> findAll() {
-        return binaryContentRepository.findAll();
+  @Override
+  public Optional<BinaryContentRequest> resolveProfileRequest(MultipartFile file) {
+    if (file.isEmpty()) {
+      return Optional.empty();
+    } else {
+      try {
+        BinaryContentRequest binaryContentCreateRequest = new BinaryContentRequest(
+            file.getOriginalFilename(),
+            file.getContentType(),
+            file.getBytes()
+        );
+        return Optional.of(binaryContentCreateRequest);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
-
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-        return Optional.of(findAll().stream()
-                .filter(binaryContent -> binaryContent.containsId(binaryContentIds))
-                .toList())
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
-    }
-
-    @Override
-    public void delete(UUID binaryContentId) {
-        if (binaryContentId == null) {
-            return;
-        }
-        if (!binaryContentRepository.existsById(binaryContentId)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다.");
-        }
-        binaryContentRepository.delete(binaryContentId);
-    }
+  }
 }

@@ -1,43 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    private UUID userId;
+    @JsonBackReference
+    @OneToOne(orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
+
+    @Column(nullable = false)
     private Instant lastActiveAt;
 
-    public UserStatus(UUID userId) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.createdAt = Instant.now();
-
-        this.lastActiveAt = Instant.now();
-    }
-
-    public void updateUpdatedAt() {
-        this.updatedAt = Instant.now();
+    public UserStatus(User user, Instant lastActiveAt) {
+        this.user = user;
+        this.lastActiveAt = lastActiveAt;
     }
 
     public void update(Instant lastActiveAt) {
-        boolean updated = false;
-        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+        if (!lastActiveAt.equals(this.lastActiveAt)) {
             this.lastActiveAt = lastActiveAt;
-            updated = true;
-        }
-        if (updated) {
-            updateUpdatedAt();
         }
     }
 
@@ -47,7 +46,7 @@ public class UserStatus implements Serializable {
         return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
 
-    public boolean isSameUserId(UUID userId) {
-        return this.userId.equals(userId);
+    public boolean isSameUserById(UUID userId) {
+        return this.user.getId().equals(userId);
     }
 }

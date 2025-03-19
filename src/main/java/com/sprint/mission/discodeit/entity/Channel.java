@@ -1,65 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
+@Entity
+@Table(name = "channels")
 @Getter
-public class Channel implements Serializable {
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-
-    private ChannelType type;
+    @Column(length = 100)
     private String name;
+
+    @Column(length = 500)
     private String description;
 
-    public Channel(ChannelType type, String name, String description) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ChannelType type;
 
+    public enum ChannelType {
+        PUBLIC, PRIVATE
+    }
+
+    public Channel(ChannelType type, String name, String description) {
         this.type = type;
         this.name = name;
         this.description = description;
     }
 
-    public void updateUpdatedAt() {
-        updatedAt = Instant.now();
-    }
-
-    public void update(String name, String description) {
-        boolean updated = false;
-        if (updateName(name)) {
-            updated = true;
-        }
-        if (updatedescription(description)) {
-            updated = true;
-        }
-
-        if (updated) {
-            updateUpdatedAt();
+    public void updateName(String name) {
+        if (!this.name.equals(name)) {
+            this.name = name;
         }
     }
 
-    public boolean updateName(String name) {
-        if (this.name.equals(name)) {
-            return false;
+    public void updateDescription(String description) {
+        if (!this.description.equals(description)) {
+            this.description = description;
         }
-        this.name = name;
-        return true;
-    }
-
-    public boolean updatedescription(String description) {
-        if (this.description.equals(description)) {
-            return false;
-        }
-        this.description = description;
-        return true;
     }
 
     @Override
