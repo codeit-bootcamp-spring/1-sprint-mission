@@ -1,27 +1,25 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponse;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponse createUser(UserCreateRequest request);
 
-    UserResponse createUserWithProfileImage(UserCreateRequest userRequest, BinaryContentCreateRequest imageRequest);
+  User create(UserCreateRequest userCreateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-    UserResponse getUserById(UUID userId);
+  UserDto find(UUID userId);
 
-    List<UserResponse> getAllUsers();
+  List<UserDto> findAll();
 
-    UserResponse updateUser(UUID userId, UserUpdateRequest request);
+  User update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-    UserResponse updateUserWithProfileImage(UUID userId, UserUpdateRequest userRequest, BinaryContentCreateRequest imageRequest);
-
-    boolean deleteUser(UUID userId);
+  void delete(UUID userId);
 }
-
-

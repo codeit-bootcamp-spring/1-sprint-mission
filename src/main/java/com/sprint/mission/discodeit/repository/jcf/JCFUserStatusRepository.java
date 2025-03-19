@@ -1,66 +1,61 @@
-package com.sprint.mission.discodeit.repository.jcf;
-
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-@Repository
-@ConditionalOnProperty(name = "sprint-mission.repository.type", havingValue = "jcf")
-public class JCFUserStatusRepository implements UserStatusRepository {
-    private final Map<UUID, UserStatus> userStatuses = new HashMap<>();
-
-    @Override
-    public UserStatus save(UserStatus userStatus) {
-        userStatuses.put(userStatus.getId(), userStatus);
-        return userStatus;
-    }
-
-    @Override
-    public UserStatus findById(UUID id) {
-        return userStatuses.get(id);
-    }
-
-    @Override
-    public List<UserStatus> findAll() {
-        return new ArrayList<>(userStatuses.values());
-    }
-
-    @Override
-    public UserStatus findByUserId(UUID userId) {
-        for (UserStatus status : userStatuses.values()) {
-            if (status.getUserId().equals(userId)) {
-                return status;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return userStatuses.containsKey(id);
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        userStatuses.remove(id);
-    }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        List<UUID> toDelete = new ArrayList<>();
-        for (Map.Entry<UUID, UserStatus> entry : userStatuses.entrySet()) {
-            if (entry.getValue().getUserId().equals(userId)) {
-                toDelete.add(entry.getKey());
-            }
-        }
-        for (UUID id : toDelete) {
-            userStatuses.remove(id);
-        }
-    }
-}
+//package com.sprint.mission.discodeit.repository.jcf;
+//
+//import com.sprint.mission.discodeit.entity.UserStatus;
+//import com.sprint.mission.discodeit.repository.UserStatusRepository;
+//import java.util.HashMap;
+//import java.util.List;
+//import java.util.Map;
+//import java.util.Optional;
+//import java.util.UUID;
+//import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+//import org.springframework.stereotype.Repository;
+//
+//@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+//@Repository
+//public class JCFUserStatusRepository implements UserStatusRepository {
+//
+//  private final Map<UUID, UserStatus> data;
+//
+//  public JCFUserStatusRepository() {
+//    this.data = new HashMap<>();
+//  }
+//
+//  @Override
+//  public UserStatus save(UserStatus userStatus) {
+//    this.data.put(userStatus.getId(), userStatus);
+//    return userStatus;
+//  }
+//
+//  @Override
+//  public Optional<UserStatus> findById(UUID id) {
+//    return Optional.ofNullable(this.data.get(id));
+//  }
+//
+//  @Override
+//  public Optional<UserStatus> findByUserId(UUID userId) {
+//    return this.findAll().stream()
+//        .filter(userStatus -> userStatus.getUser().getId().equals(userId))
+//        .findFirst();
+//  }
+//
+//  @Override
+//  public List<UserStatus> findAll() {
+//    return this.data.values().stream().toList();
+//  }
+//
+//  @Override
+//  public boolean existsById(UUID id) {
+//    return this.data.containsKey(id);
+//  }
+//
+//  @Override
+//  public void deleteById(UUID id) {
+//    this.data.remove(id);
+//  }
+//
+//  @Override
+//  public void deleteByUserId(UUID userId) {
+//    this.findByUserId(userId)
+//        .ifPresent(userStatus -> this.deleteByUserId(userStatus.getId()));
+//  }
+//}
