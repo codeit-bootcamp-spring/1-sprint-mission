@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.api;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +19,7 @@ public interface BinaryContentApiDocs {
       @ApiResponse(responseCode = "200", description = "첨부 파일 조회 성공"),
       @ApiResponse(responseCode = "404", description = "첨부 파일을 찾을 수 없음")
   })
-  ResponseEntity<BinaryContent> find(UUID binaryContentId);
+  ResponseEntity<BinaryContentDto> find(UUID binaryContentId);
 
   @Operation(summary = "여러 첨부 파일 조회", description = "여러 개의 첨부 파일을 조회합니다.")
   @ApiResponses(value = {

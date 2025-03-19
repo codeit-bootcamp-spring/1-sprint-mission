@@ -1,31 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdateableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class ReadStatus implements Serializable {
+@Entity
+@Table(name = "read_status")
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReadStatus extends BaseUpdateableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
-  private UUID userId;
-  private UUID channelId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
+
+  @Column(nullable = false)
   private Instant lastReadAt;
 
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
-    this.userId = userId;
-    this.channelId = channelId;
-    this.lastReadAt = lastReadAt;
-  }
 
   public void update(Instant newLastReadAt) {
     boolean anyValueUpdated = false;
@@ -37,5 +44,11 @@ public class ReadStatus implements Serializable {
     if (anyValueUpdated) {
       this.updatedAt = Instant.now();
     }
+  }
+
+  @Override
+  public String toString() {
+    return "ReadStatus{" + "user=" + user + ", channel=" + channel + ", lastReadAt=" + lastReadAt
+        + ", updatedAt=" + updatedAt + ", id=" + id + ", createdAt=" + createdAt + '}';
   }
 }

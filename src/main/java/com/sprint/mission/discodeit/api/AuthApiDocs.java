@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.api;
 
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.request.UserLoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,5 +19,5 @@ public interface AuthApiDocs {
       @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음"),
       @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않음")
   })
-  ResponseEntity<User> login(LoginRequest loginRequest);
+  ResponseEntity<UserDto> login(LoginRequest loginRequest);
 }

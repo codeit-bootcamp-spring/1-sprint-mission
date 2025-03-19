@@ -25,8 +25,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public ReadStatus create(ReadStatusCreateRequest request) {
-    UUID userId = request.userId();
-    UUID channelId = request.channelId();
+    UUID userId = request.user().getId();
+    UUID channelId = request.channel().getId();
 
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException("User with id " + userId + " does not exist");
@@ -35,13 +35,13 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
     }
     if (readStatusRepository.findAllByUserId(userId).stream()
-        .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
+        .anyMatch(readStatus -> readStatus.getChannel().getId().equals(channelId))) {
       throw new IllegalArgumentException(
           "ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
     }
 
     Instant lastReadAt = request.lastReadAt();
-    ReadStatus readStatus = new ReadStatus(userId, channelId, lastReadAt);
+    ReadStatus readStatus = new ReadStatus(request.user(), request.channel(), lastReadAt);
     return readStatusRepository.save(readStatus);
   }
 

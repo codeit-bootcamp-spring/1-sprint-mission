@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.api.AuthApiDocs;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.request.UserLoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +17,10 @@ public class AuthController implements AuthApiDocs {
 
   private final AuthService authService;
 
-  // 사용자 로그인 (POST)
   @PostMapping("/login")
-  public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
-    User user = authService.login(loginRequest);
+  public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest) {
+    UserDto user = authService.login(loginRequest);
+    System.out.println("login_user = " + user);
     return ResponseEntity.ok(user);
   }
 }

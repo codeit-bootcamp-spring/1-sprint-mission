@@ -10,9 +10,9 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,30 +24,30 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-//@Controller
 @RequestMapping("/api/users")
 public class UserController implements UserApiDocs {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
 
+  @SneakyThrows
   @PostMapping(consumes = {"multipart/form-data"})
   public ResponseEntity<UserDto> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
-  ) {
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    UserDto createdUser = userService.create(userCreateRequest, profileRequest);
+    UserDto createdUser = userService.create(userCreateRequest,
+        profileRequest); //binarycontentstorage에 저장 추후 생각
+    System.out.println("createdUser = " + createdUser);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
   }
 
+  @SneakyThrows
   @PatchMapping(value = "/{userId}", consumes = {"multipart/form-data"})
-  public ResponseEntity<UserDto> update(
-      @PathVariable UUID userId,
+  public ResponseEntity<UserDto> update(@PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
-  ) {
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
@@ -68,27 +68,22 @@ public class UserController implements UserApiDocs {
   }
 
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatus> updateUserStatus(
-      @PathVariable UUID userId,
-      @RequestBody UserStatusUpdateRequest request
-  ) {
+  public ResponseEntity<UserStatus> updateUserStatus(@PathVariable UUID userId,
+      @RequestBody UserStatusUpdateRequest request) {
     UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
     return ResponseEntity.ok(updatedUserStatus);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
-    if (profileFile.isEmpty()) {
-      return Optional.empty();
-    } else {
-      try {
-        return Optional.of(new BinaryContentCreateRequest(
-            profileFile.getOriginalFilename(),
-            profileFile.getContentType(),
-            profileFile.getBytes()
-        ));
-      } catch (IOException e) {
-        throw new RuntimeException("Failed to process profile file", e);
+    try {
+      if (profileFile.isEmpty()) {
+        return Optional.empty();
+      } else {
+        return Optional.of(new BinaryContentCreateRequest(null, profileFile.getOriginalFilename(),
+            profileFile.getSize(), profileFile.getContentType(), profileFile.getBytes()));
       }
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to process profile file", e);
     }
   }
 }

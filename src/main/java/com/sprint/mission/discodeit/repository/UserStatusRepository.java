@@ -5,16 +5,16 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
-public interface UserStatusRepository {
+public interface UserStatusRepository  extends JpaRepository<UserStatus, UUID> {
 
-  UserStatus save(UserStatus userStatus);
-
-  Optional<UserStatus> findById(UUID id);
-
-  Optional<UserStatus> findByUserId(UUID userId);
-
-  List<UserStatus> findAll();
+  @Query("select m from ReadStatus m join fetch m.user u where u.id =: userId")
+  Optional<UserStatus> findByUserId(@Param("userId") UUID userId);
 
   boolean existsById(UUID id);
 

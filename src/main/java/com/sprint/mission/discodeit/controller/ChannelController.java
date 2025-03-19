@@ -23,14 +23,14 @@ public class ChannelController implements ChannelApiDocs {
   private final ChannelService channelService;
 
   @PostMapping("/public")
-  public ResponseEntity<Channel> createPublic(@RequestBody PublicChannelCreateRequest request) {
-    Channel createdChannel = channelService.create(request);
+  public ResponseEntity<ChannelDto> createPublic(@RequestBody PublicChannelCreateRequest request) {
+    ChannelDto createdChannel = channelService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
   }
 
   @PostMapping("/private")
-  public ResponseEntity<Channel> createPrivate(@RequestBody PrivateChannelCreateRequest request) {
-    Channel createdChannel = channelService.create(request);
+  public ResponseEntity<ChannelDto> createPrivate(@RequestBody PrivateChannelCreateRequest request) {
+    ChannelDto createdChannel = channelService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
   }
 

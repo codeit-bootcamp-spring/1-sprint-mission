@@ -1,22 +1,20 @@
 package com.sprint.mission.discodeit.dto.data;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.UUID;
 
 public record UserDto(
     UUID id,
-    Instant createdAt,
-    Instant updatedAt,
-    String username,
+    @NotBlank String username,
     String email,
-    UUID profileId,
+    BinaryContent profile,
     Boolean online
 ) {
-
-  public UserDto(User createdUser) {
-    this(createdUser.getId(), createdUser.getCreatedAt(), createdUser.getUpdatedAt(),
-        createdUser.getUsername(), createdUser.getEmail(), createdUser.getProfileId(), null);
+  public UserDto(User user){
+    this(user.getId(), user.getUsername(), user.getEmail(), user.getProfile(), user.getUserStatus().isOnline());
   }
 
 }
