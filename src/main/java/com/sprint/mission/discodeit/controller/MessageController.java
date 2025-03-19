@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.MessageApi;
+import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,16 +20,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/messages")
-@RequiredArgsConstructor
-public class MessageController implements MessageApiDocs {
+public class MessageController implements MessageApi {
 
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  @Override
-  public ResponseEntity<Message> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
@@ -37,8 +38,8 @@ public class MessageController implements MessageApiDocs {
               try {
                 return new BinaryContentCreateRequest(
                     file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getBytes()
+                    file.getBytes(),
+                    file.getContentType()
                 );
               } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -46,26 +47,22 @@ public class MessageController implements MessageApiDocs {
             })
             .toList())
         .orElse(new ArrayList<>());
-    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);
   }
 
-  @PatchMapping("/{messageId}") // PUT → PATCH로 변경
-  @Override
-  public ResponseEntity<Message> update(
-      @PathVariable("messageId") UUID messageId,
-      @RequestBody MessageUpdateRequest request
-  ) {
-    Message updatedMessage = messageService.update(messageId, request);
+  @PatchMapping(path = "{messageId}")
+  public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
+      @RequestBody MessageUpdateRequest request) {
+    MessageDto updatedMessage = messageService.update(messageId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedMessage);
   }
 
-  @DeleteMapping("/{messageId}")
-  @Override
+  @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity
@@ -74,12 +71,14 @@ public class MessageController implements MessageApiDocs {
   }
 
   @GetMapping
-  @Override
-  public ResponseEntity<List<Message>> getAllByChannelId(
-      @RequestParam("channelId") UUID channelId) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(messages);
+  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+      @RequestParam("channelId") UUID channelId,
+      @RequestParam(value = "cursor", required = false) String cursor,
+      @RequestParam(value = "size", defaultValue = "50") int size,
+      @RequestParam(value = "sort", defaultValue = "createdAt,desc") String sort
+  ) {
+    PageResponse<MessageDto> pageResponse = messageService.findAllByChannelId(channelId, cursor,
+        size, sort);
+    return ResponseEntity.ok(pageResponse);
   }
 }

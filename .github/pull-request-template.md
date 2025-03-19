@@ -1,164 +1,147 @@
-Spring 프로젝트 초기화
+데이터베이스
 
-- [x] Spring Initializr를 통해 zip 파일을 다운로드하세요.
-- [x] 빌드 시스템은 Gradle - Groovy를 사용합니다.
-- [x] 언어는 Java 17를 사용합니다.
-- [x] Spring Boot의 버전은 3.4.0입니다.
-- [x] GroupId는 com.sprint.mission입니다.
-- [x] ArtifactId와 Name은 discodeit입니다.
-- [x] packaging 형식은 Jar입니다
-- [x] Dependency를 추가합니다.
-- [x] Lombok
-- [x] Spring Web
-- [x] zip 파일을 압축해제하고 원래 진행 중이던 프로젝트에 붙여넣기하세요. 일부 파일은 덮어쓰기할 수 있습니다.
-- [x] application.properties 파일을 yaml 형식으로 변경하세요.
-- [x] DiscodeitApplication의 main 메서드를 실행하고 로그를 확인해보세요.
-  Bean 선언 및 테스트
-- [x] File*Repository 구현체를 Repository 인터페이스의 Bean으로 등록하세요.
-- [x] Basic*Service 구현체를 Service 인터페이스의 Bean으로 등록하세요.
-- [x] JavaApplication에서 테스트했던 코드를 DiscodeitApplication에서 테스트해보세요.
-- [x]  JavaApplication 의 main 메소드를 제외한 모든 메소드를 DiscodeitApplication클래스로 복사하세요.
+- [x] 아래와 같이 데이터베이스 환경을 설정하세요.
+  데이터베이스: discodeit
+  유저: discodeit_user
+  패스워드: discodeit1234
+- [x] ERD를 참고하여 DDL을 작성하고, 테이블을 생성하세요.
+  작성한 DDL 파일은 /src/main/resources/schema.sql 경로에 포함하세요
+  Spring Data JPA 적용하기
+- [x] Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
+- [x] 앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
+- [x] 디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
+  엔티티 정의하기
+- [x]  클래스 다이어그램을 참고해 도메인 모델의 공통 속성을 추상 클래스로 정의하고 상속 관계를 구현하세요.
 
-- [x]  JavaApplication의 main 메소드에서 Service를 초기화하는 코드를 Spring Context를 활용하여 대체하세요.
-- [x]  JavaApplication의 main 메소드의 셋업, 테스트 부분의 코드를 DiscodeitApplication클래스로 복사하세요.
+이때 Serializable 인터페이스는 제외합니다.
 
-Spring 핵심 개념 이해하기
+패키지명: com.sprint.mission.discodeit.entity.base
 
-- [x] JavaApplication과 DiscodeitApplication에서 Service를 초기화하는 방식의 차이에 대해 다음의 키워드를 중심으로 정리해보세요.
-  IoC Container
-  Dependency Injection
-  Bean
-  Lombok 적용
-- [x] 도메인 모델의 getter 메소드를 @Getter로 대체해보세요.
-- [x] Basic*Service의 생성자를 @RequiredArgsConstructor로 대체해보세요.
-  비즈니스 로직 고도화
-- [x]  다음의 기능 요구 사항을 구현하세요.
-  추가 기능 요구사항
-  시간 타입 변경하기
-- [x] 시간을 다루는 필드의 타입은 Instant로 통일합니다.
-  기존에 사용하던 Long보다 가독성이 뛰어나며, 시간대(Time Zone) 변환과 정밀한 시간 연산이 가능해 확장성이 높습니다.
-  새로운 도메인 추가하기
-- [x] 공통: 앞서 정의한 도메인 모델과 동일하게 공통 필드(id, createdAt, updatedAt)를 포함합니다.
-- [x] ReadStatus
-  사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현하는 도메인 모델입니다. 사용자별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용합니다.
-- [x] UserStatus
-  사용자 별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델입니다. 사용자의 온라인 상태를 확인하기 위해 활용합니다.
-- [x] 마지막 접속 시간을 기준으로 현재 로그인한 유저로 판단할 수 있는 메소드를 정의하세요.
-  마지막 접속 시간이 현재 시간으로부터 5분 이내이면 현재 접속 중인 유저로 간주합니다.
-- [x] BinaryContent
-  이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델입니다. 사용자의 프로필 이미지, 메시지에 첨부된 파일을 저장하기 위해 활용합니다.
-- [x] 수정 불가능한 도메인 모델로 간주합니다. 따라서 updatedAt 필드는 정의하지 않습니다.
-- [x] User, Message 도메인 모델과의 의존 관계 방향성을 잘 고려하여 id 참조 필드를 추가하세요.
-- [x] 각 도메인 모델 별 레포지토리 인터페이스를 선언하세요.
-  레포지토리 구현체(File, JCF)는 아직 구현하지 마세요. 이어지는 서비스 고도화 요구사항에 따라 레포지토리 인터페이스에 메소드가 추가될 수 있어요.
-  DTO 활용하기
-  DTO란?
+- [x]  JPA의 어노테이션을 활용해 createdAt, updatedAt 속성이 자동으로 설정되도록 구현하세요.
 
-UserService 고도화
-고도화
-create
+@CreatedDate, @LastModifiedDate
 
-- [x] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
-- [x] username과 email은 다른 유저와 같으면 안됩니다.
-- [x] UserStatus를 같이 생성합니다.
-  find, findAll
-  DTO를 활용하여:
-- [x] 사용자의 온라인 상태 정보를 같이 포함하세요.
-- [x] 패스워드 정보는 제외하세요.
-  update
-- [x] 선택적으로 프로필 이미지를 대체할 수 있습니다.
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  수정 대상 객체의 id 파라미터, 수정할 값 파라미터
-  delete
-- [x] 관련된 도메인도 같이 삭제합니다.
-  BinaryContent(프로필), UserStatus
-  AuthService 구현
-  login
-- [x] username, password과 일치하는 유저가 있는지 확인합니다.
-- [x] 일치하는 유저가 있는 경우: 유저 정보 반환
-- [x] 일치하는 유저가 없는 경우: 예외 발생
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  ChannelService 고도화
-  고도화
-  create
-  PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
-- [x] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
-  PRIVATE 채널을 생성할 때:
-- [x] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
-- [x] name과 description 속성은 생략합니다.
-  PUBLIC 채널을 생성할 때에는 기존 로직을 유지합니다.
-  find
-  DTO를 활용하여:
-- [x] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
-- [x] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
-  findAll
-  DTO를 활용하여:
-- [x] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
-- [x] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
-- [x] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
-- [x] PUBLIC 채널 목록은 전체 조회합니다.
-- [x] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
-  update
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  수정 대상 객체의 id 파라미터, 수정할 값 파라미터
-- [x] PRIVATE 채널은 수정할 수 없습니다.
-  delete
-- [x] 관련된 도메인도 같이 삭제합니다.
-  Message, ReadStatus
-  MessageService 고도화
-  고도화
-  create
-- [x] 선택적으로 여러 개의 첨부파일을 같이 등록할 수 있습니다.
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  findAll
-- [x] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
-  update
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  수정 대상 객체의 id 파라미터, 수정할 값 파라미터
-  delete
-- [x] 관련된 도메인도 같이 삭제합니다.
-  첨부파일(BinaryContent)
-  ReadStatusService 구현
-  create
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-- [x] 관련된 Channel이나 User가 존재하지 않으면 예외를 발생시킵니다.
-- [x] 같은 Channel과 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
-  find
-- [x] id로 조회합니다.
-  findAllByUserId
-- [x] userId를 조건으로 조회합니다.
-  update
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  수정 대상 객체의 id 파라미터, 수정할 값 파라미터
-  delete
-- [x] id로 삭제합니다.
-  UserStatusService 고도화
-  create
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-- [x] 관련된 User가 존재하지 않으면 예외를 발생시킵니다.
-- [x] 같은 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
-  find
-- [x] id로 조회합니다.
-  findAll
-- [x] 모든 객체를 조회합니다.
-  update
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  수정 대상 객체의 id 파라미터, 수정할 값 파라미터
-  updateByUserId
-- [x] userId 로 특정 User의 객체를 업데이트합니다.
-  delete
-- [x] id로 삭제합니다.
-  BinaryContentService 구현
-  create
-- [x] DTO를 활용해 파라미터를 그룹화합니다.
-  find
-- [x] id로 조회합니다.
-  findAllByIdIn
-- [x] id 목록으로 조회합니다.
-  delete
-- [x] id로 삭제합니다.
-  새로운 도메인 Repository 구현체 구현
--[ ] 지금까지 인터페이스로 설계한 각각의 Repository를 JCF, File로 각각 구현하세요.
-- dfdf
+- [x]  클래스 다이어그램을 참고해 클래스 참조 관계를 수정하세요. 필요한 경우 생성자, update 메소드를 수정할 수 있습니다. 단, 아직 JPA Entity와 관련된
+  어노테이션은 작성하지 마세요.
+  화살표의 방향과 화살표 유무에 유의하세요.
+
+- [x]  ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보를 표로 정리해보세요.(이 내용은 PR에 첨부해주세요.)
+
+- [x] JPA 주요 어노테이션을 활용해 ERD, 연관관계 매핑 정보를 도메인 모델에 반영해보세요.
+  @Entity, @Table
+  @Column, @Enumerated
+  @OneToMany, @OneToOne, @ManyToOne
+  @JoinColumn, @JoinTable
+- [x] ERD의 외래키 제약 조건과 연관관계 매핑 정보의 부모-자식 관계를 고려해 영속성 전이와 고아 객체를 정의하세요.
+  cascade, orphanRemoval
+  레포지토리와 서비스에 JPA 도입하기
+- [x] 기존의 Repository 인터페이스를 JPARepository로 정의하고 쿼리메소드로 대체하세요.
+  FileRepository와 JCFRepository 구현체는 삭제합니다.
+- [x] 영속성 컨텍스트의 특징에 맞추어 서비스 레이어를 수정해보세요.
+  힌트: 트랜잭션, 영속성 전이, 변경 감지, 지연로딩
+  DTO 적극 도입하기
+- [x] Entity를 Controller 까지 그대로 노출했을 때 발생할 수 있는 문제점에 대해 정리해보세요. DTO를 적극 도입했을 때 보일러플레이트 코드가 많아지지만,
+  그럼에도
+  불구하고 어떤 이점이 있는지 알 수 있을거에요.(이 내용은 PR에 첨부해주세요.)
+  힌트
+  Entity와 API의 결합
+  프로덕션 환경에서는 성능을 고려해 OSIV를 false로 설정하는 경우가 대부분
+  양방향 연관관계 시 순환 참조
+  민감한 데이터
+- [x] 다음의 클래스 다이어그램을 참고하여 DTO를 정의하세요.
+
+- [x]  Entity를 DTO로 매핑하는 로직을 책임지는 Mapper 컴포넌트를 정의해 반복되는 코드를 줄여보세요.
+
+패키지명: com.sprint.mission.discodeit.mapper
+
+BinaryContent 저장 로직 고도화
+데이터베이스에 이미지와 같은 파일을 저장하면 성능 상 불리한 점이 많습니다. 따라서 실제 바이너리 데이터는 별도의 공간에 저장하고, 데이터베이스에는 바이너리 데이터에 대한 메타
+정보(파일명, 크기, 유형 등)만 저장하는 것이 좋습니다.
+
+- [x]  BinaryContent 엔티티는 파일의 메타 정보(fileName, size, contentType)만 표현하도록 bytes 속성을 제거하세요.
+
+- [x]  BinaryContent의 byte[] 데이터 저장을 담당하는 인터페이스를 설계하세요.
+
+BinaryContentStorage
+
+바이너리 데이터의 저장/로드를 담당하는 컴포넌트입니다.
+UUID put(UUID, byte[])
+UUID 키 정보를 바탕으로 byte[] 데이터를 저장합니다.
+UUID는 BinaryContent의 Id 입니다.
+InputStream get(UUID)
+키 정보를 바탕으로 byte[] 데이터를 읽어 InputStream 타입으로 반환합니다.
+UUID는 BinaryContent의 Id 입니다.
+ResponseEntity<?> download(BinaryContentDto)
+HTTP API로 다운로드 기능을 제공합니다.
+BinaryContentDto 정보를 바탕으로 파일을 다운로드할 수 있는 응답을 반환합니다.
+
+- [x]  서비스 레이어에서 기존에 BinaryContent를 저장하던 로직을 BinaryContentStorage를 활용하도록 리팩토링하세요.
+
+- [x]  BinaryContentController에 파일을 다운로드하는 API를 추가하고, BinaryContentStorage에 로직을 위임하세요.
+
+엔드포인트: GET /api/binaryContents/{binaryContentId}/download
+
+요청
+
+값: BinaryContentId
+방식: Query Parameter
+응답: ResponseEntity<?>
+
+- [x]  로컬 디스크 저장 방식으로 BinaryContentStorage 구현체를 구현하세요.
+
+클래스 다이어그램
+
+- [x]  discodeit.storage.type 값이 local 인 경우에만 Bean으로 등록되어야 합니다.
+
+Path root
+로컬 디스크의 루트 경로입니다.
+discodeit.storage.local.root-path 설정값을 정의하고, 이 값을 통해 주입합니다.
+void init()
+루트 디렉토리를 초기화합니다.
+Bean이 생성되면 자동으로 호출되도록 합니다.
+Path resolvePath(UUID)
+파일의 실제 저장 위치에 대한 규칙을 정의합니다.
+파일 저장 위치 규칙 예시: {root}/{UUID}
+put, get 메소드에서 호출해 일관된 파일 경로 규칙을 유지합니다.
+ResponseEntity<Resource> donwload(BinaryContentDto)
+get 메소드를 통해 파일의 바이너리 데이터를 조회합니다.
+BinaryContentDto와 바이너리 데이터를 활용해 ResponseEntity<Resource> 응답을 생성 후 반환합니다.
+페이징과 정렬
+
+- [x] 메시지 목록을 조회할 때 다음의 조건에 따라 페이지네이션 처리를 해보세요.
+  50개씩 최근 메시지 순으로 조회합니다.
+  총 메시지가 몇개인지 알 필요는 없습니다.
+- [x] 일관된 페이지네이션 응답을 위해 제네릭을 활용해 DTO로 구현하세요.
+  패키지명: com.sprint.mission.discodeit.dto.response
+
+클래스 다이어그램
+
+content: 실제 데이터입니다.
+
+number: 페이지 번호입니다.
+
+size: 페이지의 크기입니다.
+
+totalElements: T 데이터의 총 갯수를 의미하며, null일 수 있습니다.
+
+- [x] Slice 또는 Page 객체로부터 DTO를 생성하는 Mapper를 구현하세요.
+  패키지명: com.sprint.mission.discodeit.mapper
+  확장성을 위해 제네릭 메소드로 구현하세요.
+
+심화 요구사항
+N+1 문제
+
+- [x] N+1 문제가 발생하는 쿼리를 찾고 해결해보세요.
+  읽기전용 트랜잭션 활용
+- [x] 프로덕션 환경에서는 OSIV를 비활성화하는 경우가 많습니다. 이때 서비스 레이어의 조회 메소드에서 발생할 수 있는 문제를 식별하고, 읽기 전용 트랜잭션을 활용해 문제를
+  해결해보세요.
+  OSIV 비활성화하기
+
+페이지네이션 최적화
+
+- [x] 오프셋 페이지네이션과 커서 페이지네이션 방식의 차이에 대해 정리해보세요.
+  이 내용은 PR에 첨부해주세요.
+- [x] 기존에 구현한 오프셋 페이지네이션을 커서 페이지네이션으로 리팩토링하세요.
+  PageResponse는 다음과 같이 변경하세요.
+  MapStruct 적용
+- [x] Entity와 DTO를 매핑하는 보일러플레이트 코드를 MapStruct 라이브러리를 활용해 간소화해보세요.

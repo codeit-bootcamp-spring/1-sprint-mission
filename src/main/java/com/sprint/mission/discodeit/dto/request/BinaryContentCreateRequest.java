@@ -1,17 +1,15 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-@Schema(description = "첨부 파일 생성 정보")
 public record BinaryContentCreateRequest(
-    @Schema(description = "파일 이름", example = "example.jpg")
+    @NotBlank(message = "File name is required")
     String fileName,
-
-    @Schema(description = "콘텐츠 타입", example = "image/jpeg")
-    String contentType,
-
-    @Schema(description = "파일 바이트 데이터", example = "U3dhZ2dlciByb2Nrcw==") // Base64 예시
-    byte[] bytes
+    @NotNull(message = "Bytes are required")
+    byte[] bytes,
+    @NotBlank(message = "Content type is required")
+    String contentType
 ) {
 
 }
