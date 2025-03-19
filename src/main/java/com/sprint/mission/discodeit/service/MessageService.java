@@ -1,27 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.PageResponse;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
 
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
 
 
-  //서비스 로직
-  Message create(MessageCreateDTO dto, List<MultipartFile> files);
+  MessageDto create(MessageCreateDTO dto,
+      List<BinaryContentCreateRequest> binaryContentCreateRequests);
 
-  Message find(UUID id);
+  MessageDto find(UUID id);
 
-  List<Message> findAll();
+  PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable);
 
-  List<Message> findAllByChannelId(UUID ChannelId);
+  MessageDto update(UUID id, MessageUpdateDTO messageUpdateDTO);
 
-  Message update(UUID id, MessageUpdateDTO messageUpdateDTO);
-
-  UUID delete(UUID id);
+  void delete(UUID id);
 }

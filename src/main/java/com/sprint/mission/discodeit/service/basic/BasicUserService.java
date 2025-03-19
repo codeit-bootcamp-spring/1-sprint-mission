@@ -1,114 +1,114 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserFindDTO;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validator.UserValidator;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
 
-  private final BinaryContentService binaryContentService;
   private final UserValidator userValidator;
+  private final UserMapper userMapper;
+
+  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentRepository binaryContentRepository;
 
 
   @Override
-  public User create(UserCreateDTO dto, MultipartFile file) {
-    userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
-    User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
+  @Transactional
+  public UserDto create(UserCreateDTO dto,
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    //userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
 
-    if (file != null) {
-      BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(file);
-      BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDTO);
-      user.updateBinaryContentId(binaryContent.getId());
-    }
+    BinaryContent nullableProfile = saveBinaryFile(optionalProfileCreateRequest);
+
+    User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword(), nullableProfile);
+
+    //cascade persist
+    user.addUserStatus(new UserStatus(Instant.now()));
     User saveUser = userRepository.save(user);
-    userStatusRepository.save(new UserStatus(saveUser.getId()));
-    return saveUser;
+    return userMapper.toDto(saveUser);
   }
 
   @Override
-  public UserFindDTO find(UUID id) {
-    User findUser = userRepository.findOne(id);
-    Optional.ofNullable(findUser)
+  @Transactional(readOnly = true)
+  public UserDto find(UUID id) {
+    User findUser = userRepository.findById(id)
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-    return toDTO(findUser);
+    return userMapper.toDto(findUser);
   }
 
   @Override
-  public List<UserFindDTO> findAll() {
-    List<User> users = userRepository.findAll();
-    return users.stream()
-        .map(this::toDTO).toList();
+  @Transactional(readOnly = true)
+  public List<UserDto> findAll() {
+    return userRepository.findAll().stream()
+        .map(userMapper::toDto)
+        .toList();
   }
 
   @Override
-  public User update(UUID id, UserUpdateDTO dto, MultipartFile file) {
+  @Transactional
+  public UserDto update(UUID id, UserUpdateDTO dto,
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     userValidator.validateUpdateUser(id, dto.getNewUsername(), dto.getNewEmail(),
         dto.getNewPassword());
-    User findUser = userRepository.findOne(id);
-    findUser.setUser(dto.getNewUsername(), dto.getNewEmail(), dto.getNewPassword());
+    User findUser = userRepository.findById(id)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    //기존 사진이 있다면 삭제하고 만들기
-    if (file != null) {
-      if (findUser.getBinaryContentId() != null) {
-        binaryContentService.delete(findUser.getBinaryContentId());
-      }
-      BinaryContent binaryContent = binaryContentService.create(
-          new BinaryContentCreateDTO(file));
-      findUser.updateBinaryContentId(binaryContent.getId());
-    }
-    userRepository.update(findUser);
-    return findUser;
+    BinaryContent nullableProfile = saveBinaryFile(optionalProfileCreateRequest);
+
+    findUser.updateUser(dto.getNewUsername(), dto.getNewEmail(), dto.getNewPassword(),
+        nullableProfile);
+
+    return userMapper.toDto(findUser);
   }
 
   @Override
-  public UUID delete(UUID id) {
-    User findUser = userRepository.findOne(id);
-    Optional.ofNullable(findUser)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+  @Transactional
+  public void delete(UUID id) {
 
-    userStatusRepository.deleteByUserId(id);
-
-    Optional.ofNullable(findUser.getBinaryContentId())
-        .ifPresent(binaryContentService::delete);
-
-    return userRepository.delete(findUser.getId());
+    //userStatus ddl on delete cascade, profile jpa delete cascade
+    userRepository.deleteById(id);
   }
 
-  private UserFindDTO toDTO(User user) {
-    Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
-        .orElse(null);
+  @Transactional
+  public BinaryContent saveBinaryFile(
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    return optionalProfileCreateRequest
+        .map(profileRequest -> {
+          String fileName = profileRequest.getFileName();
+          String contentType = profileRequest.getContentType();
+          byte[] bytes = profileRequest.getBytes();
 
-    return new UserFindDTO(
-        user.getId(),
-        user.getUsername(),
-        user.getEmail(),
-        online,
-        user.getBinaryContentId(),
-        user.getCreatedAt(),
-        user.getUpdatedAt()
-    );
+          BinaryContent binaryContent = binaryContentRepository.save(
+              new BinaryContent(fileName, contentType, (long) bytes.length));
+
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        })
+        .orElse(null);
   }
 
 }

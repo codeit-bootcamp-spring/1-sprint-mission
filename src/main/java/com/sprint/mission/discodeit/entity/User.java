@@ -1,90 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  @Column(nullable = false)
+  private String username;
 
-    private String username;
-    private String email;
-    private String password;
-    private UUID binaryContentId;
+  @Column(nullable = false)
+  private String email;
 
-    public User(String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+  @Column(nullable = false)
+  private String password;
 
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private UserStatus status;
 
-    public void updateBinaryContentId(UUID binaryContentId) {
-        this.binaryContentId = binaryContentId;
-    }
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
 
-    public void setUpdatedAt() {
-        this.updatedAt = Instant.now();
-    }
+  public User(String username, String email, String password, BinaryContent profile) {
 
-    //validator 에서 중복 검사 했으니 그냥 set만 하면 될듯
-    public void setUser(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        setUpdatedAt();
-    }
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
+  }
 
-    public void setUsername(String username) {
-        if(username ==null && username.equals(this.username)){
-            throw new IllegalArgumentException("입력한 값이 null 혹은 중복입니다.");
-        }
-        this.username = username;
-        setUpdatedAt();
-    }
+  public void addUserStatus(UserStatus status) {
+    this.status = status;
+    status.addUser(this);
+  }
 
-    public void setEmail(String email) {
-        if(email ==null && email.equals(this.email)){
-            throw new IllegalArgumentException("입력한 값이 null 혹은 중복입니다.");
-        }
-        this.email = email;
-        setUpdatedAt();
-    }
-
-    public void setPassword(String password) {
-        if(password ==null && password.equals(this.password)){
-            throw new IllegalArgumentException("입력한 값이 null 혹은 중복입니다.");
-        }
-        this.password = password;
-        setUpdatedAt();
-    }
-
-    public boolean userCompare(UUID id){
-        if(id.equals(this.id)) return true;
-        else return false;
-    }
+  public void updateProfile(BinaryContent profile) {
+    this.profile = profile;
+  }
 
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
+  public void updateUser(String username, String email, String password, BinaryContent profile) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
+    //this.profileId = profileId;
+  }
+
 }
 

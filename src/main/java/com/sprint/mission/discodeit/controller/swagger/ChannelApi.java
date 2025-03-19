@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.swagger;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -28,7 +29,7 @@ public interface ChannelApi {
           content = @Content(schema = @Schema(implementation = Channel.class))
       )
   })
-  ResponseEntity<Channel> createPublic(
+  ResponseEntity<ChannelDto> createPublic(
       @Parameter(description = "Public Channel 생성 정보") ChannelCreatePublicDTO request
   );
 
@@ -40,7 +41,7 @@ public interface ChannelApi {
           content = @Content(schema = @Schema(implementation = Channel.class))
       )
   })
-  ResponseEntity<Channel> createPrivate(
+  ResponseEntity<ChannelDto> createPrivate(
       @Parameter(description = "Private Channel 생성 정보") ChannelCreatePrivateDTO request
   );
 
@@ -60,7 +61,7 @@ public interface ChannelApi {
           content = @Content(examples = @ExampleObject(value = "Private channel cannot be updated"))
       )
   })
-  ResponseEntity<Channel> update(
+  ResponseEntity<ChannelDto> update(
       @Parameter(description = "수정할 Channel ID") UUID channelId,
       @Parameter(description = "수정할 Channel 정보") ChannelUpdateDTO request
   );
@@ -89,7 +90,7 @@ public interface ChannelApi {
           content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChannelFindDTO.class)))
       )
   })
-  ResponseEntity<List<ChannelFindDTO>> findAllByUserId(
+  ResponseEntity<List<ChannelDto>> findAllByUserId(
       @Parameter(description = "조회할 User ID") UUID userId
   );
 } 

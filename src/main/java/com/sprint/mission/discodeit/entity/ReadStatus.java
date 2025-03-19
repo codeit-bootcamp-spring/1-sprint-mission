@@ -1,53 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
-import io.swagger.v3.oas.models.security.SecurityScheme.In;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 
 @Getter
-public class ReadStatus implements Serializable {
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "read_statuses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    }
+)
+public class ReadStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-  private final UUID id;
-  private final Instant createdAt;
-  private Instant updatedAt;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
 
-  private UUID userId;
-  private UUID channelId;
+
+  @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
 
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    this.userId = userId;
-    this.channelId = channelId;
-    this.lastReadAt = lastReadAt;
-  }
 
   //lastReadAt 시간 수정.
-  public void updateReadStatus(Instant time) {
+  public void updateLastReadAt(Instant time) {
     lastReadAt = time;
-    setUpdatedAt();
   }
 
-  public void setUpdatedAt() {
-    this.updatedAt = Instant.now();
-  }
-
-  @Override
-  public String toString() {
-    return "ReadStatus{" +
-        "id=" + id +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
-        ", userId=" + userId +
-        ", channelId=" + channelId +
-        ", lastReadAt=" + lastReadAt +
-        '}';
-  }
 }

@@ -19,15 +19,16 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-
+@EnableJpaAuditing
 @SpringBootApplication
 public class DiscodeitApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(DiscodeitApplication.class, args);
 
+  public static void main(String[] args) {
+    SpringApplication.run(DiscodeitApplication.class, args);
 
-        //ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class);
+    //ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class);
 
 /*        UserService userService = context.getBean(UserService.class);
         UserStatusService userStatusService = context.getBean(UserStatusService.class);
@@ -94,6 +95,6 @@ public class DiscodeitApplication {
         System.out.println("ReadStatus 조회");
         for(ReadStatus readStatus : readStatusService.findAll()) System.out.println(readStatus);*/
 
-    }
+  }
 }
 

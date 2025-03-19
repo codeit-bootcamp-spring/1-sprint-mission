@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jpa.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -25,25 +25,16 @@ public class ReadStatusValidator {
   public void validateReadStatus(UUID userId, UUID channelId) {
     validateUserId(userId);
     validateChannelId(channelId);
-    checkDuplicateReadStatus(userId, channelId);
   }
 
   public void validateUserId(UUID userId) {
-    User findUser = userRepository.findOne(userId);
-    Optional.ofNullable(findUser)
+    User findUser = userRepository.findById(userId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
   }
 
   public void validateChannelId(UUID channelId) {
-    Channel findChannel = channelRepository.findOne(channelId);
-    Optional.ofNullable(findChannel)
+    Channel findChannel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
-  }
-
-  private void checkDuplicateReadStatus(UUID userId, UUID channelId) {
-    if (readStatusRepository.findByUserIdAndChannelId(userId, channelId).isPresent()) {
-      throw new BadRequestException(ErrorCode.READ_STATUS_DUPLICATE);
-    }
   }
 
 }
