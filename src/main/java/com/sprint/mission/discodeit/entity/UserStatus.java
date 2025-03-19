@@ -1,50 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
-/**
- * - 사용자 별 마지막으로 확인된 접속 시간을 표현
- * - 사용자의 온라인 상태를 확인하기 위함
- */
-
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus implements Serializable {
-    private UUID id;
-    private UUID userId;
-    private Instant accessedAt; // 접속 시간
-    private Instant createdAt;
-    private Instant updatedAt;  // 엔티티가 변경되었을 때
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    public UserStatus(UUID userId, Instant accessedAt) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.accessedAt = accessedAt;
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+    @Column(name = "last_active_at", nullable = false, columnDefinition = "timestampz default now()")
+    private Instant lastActiveAt; // 접속 시간
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user"), nullable = false)
+    private User user;
+
+    public UserStatus(Instant lastActiveAt, User user) {
+        this.lastActiveAt = lastActiveAt;
+        this.user = user;
     }
 
-    public void updateAccessedAt() {
-        this.accessedAt = Instant.now();
-        this.updatedAt = Instant.now();
+    public void updateLastActiveAt(Instant lastActiveAt) {
+        this.lastActiveAt = lastActiveAt;
+    }
+
+    public void updateLastActiveAt() {
+        this.lastActiveAt = Instant.now();
+    }
+
+    public void updateUser(User user) {
+        this.user = user;
     }
 
     public boolean isOnline() {
-        return Duration.between(Instant.now(), accessedAt).toMinutes() <= 5L;
+        return Duration.between(Instant.now(), lastActiveAt).toMinutes() <= 5L;
     }
 
     @Override
     public String toString() {
         return "UserStatus{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", accessedAt=" + accessedAt +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
+                "lastActiveAt=" + lastActiveAt +
                 '}';
     }
 }

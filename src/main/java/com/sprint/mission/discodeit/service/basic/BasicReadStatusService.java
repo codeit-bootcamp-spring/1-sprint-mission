@@ -1,19 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.CommonDTO;
-import com.sprint.mission.discodeit.dto.ReadStatusDTO;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.util.EntryUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -21,64 +21,47 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
+    private final ReadStatusMapper readStatusMapper;
 
+    @Transactional
     @Override
-    public CommonDTO.idResponse create(ReadStatusDTO.request readStatusReqDto) {
-        try {
-            Long statusId = readStatusRepository.save(new ReadStatus(readStatusReqDto.userId(), readStatusReqDto.channelId(), readStatusReqDto.lastReadAt()));
-            return CommonDTO.idResponse.from(statusId, readStatusRepository.load(statusId).getId());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public ReadStatusResponseDto create(ReadStatusRequestDto readStatusReqDto) {
+        ReadStatus readStatus = readStatusMapper.toEntity(readStatusReqDto);
+        readStatusRepository.save(readStatus);
+        return readStatusMapper.toResponseDto(readStatus);
     }
 
     @Override
-    public ReadStatusDTO.response find(Long id) {
-        ReadStatus readStatus = readStatusRepository.load(id);
-        return ReadStatusDTO.response.from(EntryUtils.of(id, readStatus));
+    public ReadStatusResponseDto find(UUID readStatusId) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new CustomException(ErrorCode.FAILED_TO_LOAD_DATA));
+        return readStatusMapper.toResponseDto(readStatus);
     }
 
     @Override
-    public ReadStatusDTO.response find(UUID uuid) {
-        Map.Entry<Long, ReadStatus> readStatus = readStatusRepository.load(uuid);
-        return ReadStatusDTO.response.from(readStatus);
-    }
-
-    @Override
-    public List<ReadStatusDTO.response> findAllByUserId(UUID userId) {
-        Map<Long, ReadStatus> allReadStatus = readStatusRepository.findAllByUserId(userId);
-        return allReadStatus.entrySet().stream()
-                .map(ReadStatusDTO.response::from)
+    public List<ReadStatusResponseDto> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAll().stream()
+                .filter(readStatus -> readStatus.getUser().getId().equals(userId))
+                .map(readStatusMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
-    public CommonDTO.idResponse update(Long readStatusId, Instant lastReadAt) {
-        ReadStatusDTO.update updateDTO = ReadStatusDTO.update.of(readStatusId, lastReadAt);
-        ReadStatus readStatus = readStatusRepository.load(updateDTO.id());
-
+    public ReadStatusResponseDto update(UUID readStatusId, Instant lastReadAt) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new CustomException(ErrorCode.FAILED_TO_LOAD_DATA));
         if (readStatus == null) {
             throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
         }
-
-        if (updateDTO.lastReadAt() != null) {
-            // 마지막에 읽은 것만 업데이트 하면 됨
-            readStatus.updateLastReadAt(updateDTO.lastReadAt());
-            readStatusRepository.update(updateDTO.id(), readStatus);
-        }
-        return CommonDTO.idResponse.from(updateDTO.id(), readStatus.getId());
+        // 마지막에 읽은 것만 업데이트 하면 됨
+        readStatus.updateLastReadAt(lastReadAt);
+        return readStatusMapper.toResponseDto(readStatus);
     }
 
+    @Transactional
     @Override
-    public CommonDTO.idResponse delete(Long id) {
-        readStatusRepository.delete(id);
-        return CommonDTO.idResponse.from(id, readStatusRepository.load(id).getId());
-    }
-
-    @Override
-    public CommonDTO.idResponse delete(UUID uuid) {
-        Map.Entry<Long, ReadStatus> readStatus = readStatusRepository.load(uuid);
-        readStatusRepository.delete(readStatus.getKey());
-        return CommonDTO.idResponse.from(readStatus.getKey(), uuid);
+    public ReadStatusResponseDto delete(UUID readStatusId) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new CustomException(ErrorCode.FAILED_TO_LOAD_DATA));
+        readStatusRepository.delete(readStatus);
+        return readStatusMapper.toResponseDto(readStatus);
     }
 }

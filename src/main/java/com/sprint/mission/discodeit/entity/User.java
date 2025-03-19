@@ -1,57 +1,117 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.common.Email;
-import com.sprint.mission.discodeit.common.Name;
-import com.sprint.mission.discodeit.common.Password;
 import com.sprint.mission.discodeit.common.Phone;
 import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
-/* # User
- * - 사용자 객체
- * -- 객체 생성의 책임
- */
-
+@Entity
+@Table(name = "users")
 @Getter
-public class User implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private UUID id;    // 고유 번호
-    private Name userName;  // ID와 같은 역할
-    private Name nickname;  // 별명 (사용자)
-    private Email email;    // 이메일
-    private transient Password password;    // 비밀번호 -> 추후에는 암호화 되어 저장된다고 생각하기
-    private Phone phone;    // 전화 번호
-    private UserType userType;  // 기본은 Common
-    private boolean status; // 활성화(1)/비활성화(0) 상태 -> 생성 시 default로 1
-    private String introduce;   // 자기 소개 (Nullable)
-    private Instant createdAt; // 생성 시간
-    private Instant updatedAt; // 업데이트 시간
-    // 닉네임 등 서버 내 설정은 Profile로 따로 빼야 함
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseUpdatableEntity {
+
+    @Column(name = "username", length = 50, unique = true, nullable = false)
+    private String username;
+
+    @Column(name = "nickname", length = 50, nullable = false)
+    private String nickname;
+
+    @Column(name = "email", length = 100, unique = true, nullable = false)
+    private String email;
+
+    @Column(name = "password", length = 200, nullable = false)
+    private String password;
+
+    @Embedded
+    private Phone phone;
+
+    @Column(name = "user_type", length = 10, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean status = true;
+
+    @Column(name = "introduce")
+    private String introduce;
+
+    // TODO: 이거 OneToOne으로 바꾼거  (ManyToOne에서) BinaryContent도 수정해야 할 것 같음
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_profile"), nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private UserStatus userStatus;  // OneToOne은 fetchType이 Eager였다
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChannelMember> joinedChannels = new ArrayList<>();
 
     // 생성자
     public User(
             String username, String nickname, String email, String password,
-            String phone, Phone.RegionCode regionCode, UserType userType, String introduce
+            Phone phone, UserType userType, String introduce, BinaryContent profile
     ) {
-        this.id = UUID.randomUUID();
-        this.userName = new Name(username);
-        this.nickname = new Name(nickname);
-        this.email = new Email(email);
-        this.password = new Password(password);
-        this.phone = new Phone(phone, regionCode);
-        this.userType = userType;    // BOT은 어떻게 생성되는지 모른다.. 일단 COMMON으로 정해둠
-        this.status = true;
-        this.createdAt = Instant.now();
-        refreshUpdatedAt();
+        this.username = username;
+        this.nickname = nickname;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.userType = userType;
+        this.introduce = introduce;
+        this.profile = profile;
+    }
+
+    // Update
+    public void updateUsername(String username) {
+        this.username = username;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
+
+    public void updatePhone(Phone phone) {
+        this.phone = phone;
+    }
+
+    public void updateUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    public void updateStatus(boolean status) {
+        this.status = status;
+    }
+
+    public void updateIntroduce(String introduce) {
         this.introduce = introduce;
     }
 
+    public void updateProfile(BinaryContent profile) {
+        this.profile = profile;
+    }
+
+    public void updateUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    // Enum: UserType
     public enum UserType {
         COMMON, // 일반 유저 (Default)
         BOT,    // 봇
@@ -69,50 +129,17 @@ public class User implements Serializable {
         }
     }
 
-    // Update (뭐 Setter이긴 한데 Update라는 의미를 강조하고 싶음)
-    public void updateUserName(String userName) {
-        // 사용자명(userName) 업데이트 - 고유한 값이기 때문에 불변 객체로 설정
-        this.userName = new Name(userName);
-        refreshUpdatedAt();
-    }
-
-    public void updateNickname(String nickname) {
-        this.nickname.setName(nickname);
-        refreshUpdatedAt();
-    }
-
-    public void updateEmail(String email) {
-        this.email.changeEmailAddr(email);
-        refreshUpdatedAt();
-    }
-
-    public void updatePhone(String phone, String regionCode) {
-        this.phone.setPhone(phone);
-        this.phone.setRegionCode(Phone.RegionCode.fromString(regionCode));
-        refreshUpdatedAt();
-    }
-
-    public void updateUserType(UserType userType) {
-        this.userType = userType;
-        refreshUpdatedAt();
-    }
-
-    public void updateStatus(boolean status) {
-        this.status = status;
-        refreshUpdatedAt();
-    }
-
-    public void updateIntroduce(String introduce) {
-        this.introduce = introduce;
-        refreshUpdatedAt();
-    }
-
-    void refreshUpdatedAt() {
-        this.updatedAt = Instant.now();
-    }
-
     @Override
     public String toString() {
-        return "ID: " + this.getId().toString() + "\n Username: " + this.getUserName().getName();
+        return "User{" +
+                "username='" + username + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", email=" + email +
+                ", phone=" + phone +
+                ", userType=" + userType +
+                ", status=" + status +
+                ", introduce='" + introduce + '\'' +
+                ", createdAt='" + getCreatedAt() + '\'' +
+                '}';
     }
 }

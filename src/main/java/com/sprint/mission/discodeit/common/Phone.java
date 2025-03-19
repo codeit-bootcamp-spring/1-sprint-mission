@@ -2,25 +2,38 @@ package com.sprint.mission.discodeit.common;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.micrometer.common.util.StringUtils;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.*;
 
-import java.io.Serializable;
-
-// TODO: libphonenumber 라이브러리가 존재한다는 점
+@Embeddable
 @Getter
 @Setter
 @AllArgsConstructor
-public class Phone implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Phone {
     @JsonValue
+    @Column(name = "phone_num", length = 20, nullable = false)
     private String phone;
+
+    @Column(name = "phone_region", length = 10, nullable = false)
+    @Enumerated(EnumType.STRING)
     private RegionCode regionCode;
 
+    @Override
+    public String toString() {
+        return phone;
+    }
+
+    @AllArgsConstructor
     public enum RegionCode {
-        KR(),
-        US(),
+        KR("82"),
+        US("1"),
         ;
+
+        private final String regionNum;
 
         public static RegionCode fromString(String value) {
             if (StringUtils.isBlank(value)) {
@@ -33,10 +46,4 @@ public class Phone implements Serializable {
             }
         }
     }
-
-    @Override
-    public String toString() {
-        return phone;
-    }
-
 }

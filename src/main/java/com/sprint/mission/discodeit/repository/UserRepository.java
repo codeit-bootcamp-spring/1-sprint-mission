@@ -1,32 +1,32 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository {
+@Repository
+public interface UserRepository extends JpaRepository<User, UUID> {
+    boolean existsUserByEmail(String email);
 
-    Long save(User user);
+    boolean existsUserByUsername(String username);
 
-    User load(Long id);
+    User findByUsername(String username);
 
-    Map.Entry<Long, User> load(UUID uuid);
+    boolean existsUserByUsernameAndPassword(String username, String password);
+    
+    //    @Query("select u from User u left join fetch u.userStatus left join fetch u.profile")
+    @EntityGraph(attributePaths = {"userStatus", "profile"})
+    @Query("select u from User u")
+    List<User> findAllWithDetails();
 
-    Map<Long, User> loadAll();
-
-    void delete(Long id);
-
-    void update(Long id, User user);
-
-    // 검색 조건 달린 거 (index Id 제외)
-    Map.Entry<Long, User> findUserByUserName(String userName);
-
-    // 사용자 존재 여부 확인
-    boolean isExistByUserName(String userName);
-
-    boolean isExistByEmail(String email);
-
-    boolean confirmLogin(String userName, String password);
-
+    @EntityGraph(attributePaths = {"userStatus", "profile"})
+    @Query("select u from User u where u.id = :id")
+    Optional<User> findByIdWithDetails(@Param("id") UUID id);
 }

@@ -1,25 +1,18 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
-public interface ChannelRepository {
-
-    Long save(Channel channel);
-
-    Channel load(Long id);
-
-    Map.Entry<Long, Channel> load(UUID uuid);
-
-    Map<Long, Channel> loadAll();
-
-    void update(Long id, Channel channel);
-
-    void delete(Long id);
-
-    // 조건 달린 조회
-    Map<Long, Channel> findChannelsByUserId(UUID userId);
-
+@Repository
+public interface ChannelRepository extends JpaRepository<Channel, UUID> {
+    @EntityGraph(attributePaths = {"owner", "members"})
+    @Query("select c from Channel c where c.owner.id = :userId")
+    List<Channel> findAllByUserId(@Param("userId") UUID userId);
 }

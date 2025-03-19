@@ -1,16 +1,19 @@
 package com.sprint.mission.discodeit.util.validation;
 
 import com.sprint.mission.discodeit.common.Phone;
-import com.sprint.mission.discodeit.dto.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserSignupRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import io.micrometer.common.util.StringUtils;
+import org.springframework.stereotype.Component;
 
-public class UserValidator implements Validator<User, UserDTO.request> {
+@Component("userValidator")
+public class UserValidator implements Validator<User, UserSignupRequestDto, UserUpdateDto> {
     @Override
-    public void validateCreate(UserDTO.request entity) {
-        if (!ValidatorExp.USERNAME.matches(entity.userName())) {
+    public void validateCreate(UserSignupRequestDto entity) {
+        if (!ValidatorExp.USERNAME.matches(entity.username())) {
             throw new CustomException(ErrorCode.INVALID_USERNAME);
         }
 
@@ -36,19 +39,19 @@ public class UserValidator implements Validator<User, UserDTO.request> {
     }
 
     @Override
-    public User validateUpdate(User current, UserDTO.request update) {
+    public User validateUpdate(User current, UserUpdateDto update) {
         boolean isUpdated = false;
-        if (update.userName() != null && !update.userName().equals(current.getUserName().getName()) && ValidatorExp.USERNAME.matches(update.userName())) {
-            current.updateUserName(update.userName());
+        if (update.username() != null && !update.username().equals(current.getUsername()) && ValidatorExp.USERNAME.matches(update.username())) {
+            current.updateUsername(update.username());
             isUpdated = true;
         }
 
-        if (update.nickname() != null && !update.nickname().equals(current.getNickname().getName()) && ValidatorExp.NICKNAME.matches(update.nickname())) {
+        if (update.nickname() != null && !update.nickname().equals(current.getNickname()) && ValidatorExp.NICKNAME.matches(update.nickname())) {
             current.updateNickname(update.nickname());
             isUpdated = true;
         }
 
-        if (update.email() != null && !update.email().equals(current.getEmail().getEmail()) && ValidatorExp.EMAIL.matches(update.email())) {
+        if (update.email() != null && !update.email().equals(current.getEmail()) && ValidatorExp.EMAIL.matches(update.email())) {
             current.updateEmail(update.email());
             isUpdated = true;
         }
@@ -62,7 +65,7 @@ public class UserValidator implements Validator<User, UserDTO.request> {
         if ((update.regionCode() != null && update.phone() != null)
                 && (!update.phone().equals(current.getPhone().getPhone()) || update.regionCode() != Phone.RegionCode.fromString(current.getPhone().getRegionCode().toString().toUpperCase()))
                 && ValidatorExp.PHONE.matches(update.phone())) {
-            current.updatePhone(update.phone(), update.regionCode().toString().toUpperCase());
+            current.updatePhone(new Phone(update.phone(), update.regionCode()));
             isUpdated = true;
         }
 

@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionDto;
 import jakarta.annotation.Nullable;
 import org.springframework.http.HttpStatus;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record CustomApiResponse<T>(
         @JsonIgnore
         HttpStatus httpStatus,

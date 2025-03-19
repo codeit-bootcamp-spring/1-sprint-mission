@@ -1,37 +1,32 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.AuthDTO;
-import com.sprint.mission.discodeit.dto.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserSignInDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+    private final UserMapper userMapper;
 
+    @Transactional
     @Override
-    public UserDTO.response login(AuthDTO.loginReq loginDTO) {
-        if (userRepository.confirmLogin(loginDTO.username(), loginDTO.password())) {
+    public UserResponseDto login(UserSignInDto loginDTO) {
+        if (userRepository.existsUserByUsernameAndPassword(loginDTO.username(), loginDTO.password())) {
             // 유저가 존재하는지 찾기
-            Map.Entry<Long, User> user = userRepository.findUserByUserName(loginDTO.username());
-            Map.Entry<Long, UserStatus> userStatus = userStatusRepository.findUserStatusByUserId(user.getValue().getId());
-
+            User user = userRepository.findByUsername(loginDTO.username());
             // 로그인 했으니 시간 업데이트
-            userStatus.getValue().updateAccessedAt();
-            userStatusRepository.update(userStatus.getKey(), userStatus.getValue());
-
-            return UserDTO.response.from(user, userStatus.getValue().isOnline());
+            user.getUserStatus().updateLastActiveAt();  // 변경 감지
+            return userMapper.toResponseDto(user);
         }
         throw new CustomException(ErrorCode.LOGIN_FAILED);
     }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ public class UserViewController {
 
     @GetMapping("/list")
     public String getUserList(Model model) {
-        List<UserDTO.response> users = userService.findAll();
+        List<UserResponseDto> users = userService.findAll();
         model.addAttribute("users", users);
         return "user-list"; // user-list.html 렌더링
     }
