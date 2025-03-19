@@ -1,24 +1,28 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 
-@Getter
-@RequiredArgsConstructor
-public class UserStatus implements Serializable {
-    private String userId;
-    private Instant lastSeen;
-    private Instant createdAt;
+@Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdatableEntity {
 
-    public UserStatus(String userId, Instant lastSeen) {
-        this.userId = userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    private Instant lastSeen;
+
+    public UserStatus(Instant lastSeen) {
         this.lastSeen = lastSeen;
-        this.createdAt = Instant.now();
     }
 
     public Instant getLastSeen() {

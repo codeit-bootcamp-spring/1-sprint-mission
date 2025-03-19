@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -11,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @RestController
@@ -27,7 +27,7 @@ public class ChannelController {
     }
 
 
-    @Operation(summary = "채널 생성", description = "채널 생성 / 공개/비공개 구현x")
+    @Operation(summary = "채널 생성", description = "채널 생성 / 공개(PUBLIC)/비공개(PRIVATE) 타입 지정 가능")
     @PostMapping
     public ResponseEntity<ChannelDto> createChannel(@Valid @RequestBody ChannelDto channelDTO) {
         ChannelDto channel = channelService.create(channelDTO);
@@ -37,7 +37,7 @@ public class ChannelController {
     @Operation(summary = "채널 수정", description = "채널 수정")
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> updateChannel(
-            @PathVariable String channelId,
+            @PathVariable UUID channelId,
             @Valid @RequestBody ChannelDto channelDto) {
 
         ChannelDto updateChannel = channelService.update(channelId, channelDto);
@@ -46,7 +46,7 @@ public class ChannelController {
 
     @Operation(summary = "채널 삭제", description = "채널 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteChannel(@PathVariable String id) {
+    public ResponseEntity<Void> deleteChannel(@PathVariable UUID id) {
         channelService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -26,20 +27,6 @@ public class MessageController {
             return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
-    /*
-    @PostMapping
-    public ResponseEntity<MessageDto> create(@Valid @RequestBody MessageDto messageDTO) {
-        try {
-         MessageDto message = messageService.createMessage(messageDTO);
-         return ResponseEntity.status(HttpStatus.CREATED).body(message);
-         } catch (Exception e) {
-             log.error("메시지 생성 중 오류 발생: {}", e.getMessage(), e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-     */
-
-
     @Operation(summary = "메시지 목록 조회", description = "전체 메시지 조회")
     @GetMapping
     public ResponseEntity<List<MessageDto>> channelMessages() {
@@ -50,7 +37,7 @@ public class MessageController {
 
     @Operation(summary = "메시지 삭제", description = "메시지 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable String id) {
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID id) {
         messageService.deleteMessage(id);
         return ResponseEntity.noContent().build();
     }
@@ -58,7 +45,7 @@ public class MessageController {
     @Operation(summary = "메시지 수정", description = "메시지 수정")
     @PatchMapping("/{id}")
     public ResponseEntity<MessageDto> updateMessage(
-            @PathVariable String id,
+            @PathVariable UUID id,
             @Valid @RequestBody MessageDto messageDto) {
         try {
             MessageDto updateMessage = messageService.updateMessage(id, messageDto);

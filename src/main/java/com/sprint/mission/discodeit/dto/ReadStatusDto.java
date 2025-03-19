@@ -1,19 +1,17 @@
 package com.sprint.mission.discodeit.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
-@Getter
+@Getter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class ReadStatusDto {
-    private String id;
-    private String userId;
-    private String channelId;
-    private Instant lastReadTime;
+    private UUID id;
+    private UUID userId;
+    private UUID channelId;
+    private Instant lastReadAt;
 }

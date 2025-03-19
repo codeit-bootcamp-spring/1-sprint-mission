@@ -1,56 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-@Getter
-@Setter
-@Entity
+@Getter @Setter
+@Entity @Builder
 @Table(name = "channels")
-@RequiredArgsConstructor
-public class Channel{
-
-    @Id
-    private String id;
-    private Instant createdAt;
-    private Instant updatedAt;
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
     private String name;
     private String description;
+
+    @Enumerated(EnumType.STRING)
     private ChannelType type;
 
-    public Channel(String name, String description, ChannelType channelType) {
-        this.id = UUID.randomUUID().toString();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    private List<Message> messages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    private List<ReadStatus> readStatuses = new ArrayList<>();
+
+    public Channel(String name, String description, ChannelType type) {
         this.name = name;
         this.description = description;
-        this.type = channelType;
+        this.type = type;
     }
 
     public void update(String name, String description, ChannelType channelType) {
         this.name = name;
         this.description = description;
-        this.updatedAt = Instant.now();
         this.type = channelType;
-    }
-    @ManyToMany
-    @JoinTable(
-            name = "channel_members",
-            joinColumns = @JoinColumn(name = "channel_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> members = new HashSet<>();
-
-    public void addMember(User user) {
-        this.members.add(user);
     }
 }

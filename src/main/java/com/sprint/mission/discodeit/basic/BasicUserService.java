@@ -4,58 +4,52 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UsersDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Primary
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserMapper userMapper;
 
+    @Transactional
     @Override
-    public UsersDto create(UsersDto dto, byte[] profileImage) {
-        User user = new User();
-        user.setId(UUID.randomUUID().toString());
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setOnline(true);
+    public UserDto create(UserDto dto, byte[] profileImage) {
+
+        User user = User.builder()
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .online(dto.isOnline())
+                .build();
+
         if (profileImage != null && profileImage.length > 0) {
             user.setProfileImage(profileImage);
         }
         User saved = userRepository.save(user);
-        return convertToDTO(saved);  // User 엔티티를 UsersDTO로 변환해서 반환
-    }
-
-    private UsersDto convertToDTO(User user) {
-        UsersDto dto = new UsersDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setOnline(user.isOnline());
-        if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
-            dto.setProfileImage(Base64.getEncoder().encodeToString(user.getProfileImage()));
-        } else {
-            dto.setProfileImage("");
-        }
-        return dto;
+        return userMapper.toDto(saved);
     }
 
     @Transactional
     @Override
-    public UsersDto update(String id, UsersDto usersDTO, byte[] profileImage) {
+    public UsersDto update(UUID id, UsersDto usersDTO, byte[] profileImage) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -67,63 +61,59 @@ public class BasicUserService implements UserService {
             String fileName = "profile_" + user.getId();
             Long size = (long) profileImage.length;
             String contentType = "image/jpeg";
-            BinaryContent newProfile = new BinaryContent(fileName, size, contentType, profileImage);
+            BinaryContent newProfile = new BinaryContent(fileName, size, contentType);
             binaryContentRepository.save(newProfile);
         }
 
         return usersDTO;
     }
 
+    @Transactional
     @Override
-    public void delete(String id) {
+    public void delete(UUID id) {
         userRepository.deleteById(id);
-        UUID userUUID = UUID.fromString(id);
-        if (binaryContentRepository.existsById(userUUID)) {
-            binaryContentRepository.deleteById(userUUID);
+        if (binaryContentRepository.existsById(id)) {
+            binaryContentRepository.deleteById(id);
         }
     }
 
     @Override
-    public UserDto find(String id) {
+    public UserDto find(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return new UserDto(user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 
-    private UsersDto toDTO(User user) {
-        UsersDto dto = new UsersDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setOnline(user.isOnline());
-
-        if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
-            String base64Str = Base64.getEncoder().encodeToString(user.getProfileImage());
-            dto.setProfileImage(base64Str);
-        } else {
-            dto.setProfileImage("");
-        }
-        return dto;
+    @Override
+    public UserDto findByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found for email: " + email));
+        return new UserDto(user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 
     @Override
     public List<UsersDto> findAll() {
         try {
-            List<UsersDto> users = userRepository.findAll();
+            List<User> users = userRepository.findAll();
+
             if (users == null) {
-               log.warn("경고: userRepository.findAll()이 null을 반환했습니다.");
+                log.warn("경고: userRepository.findAll()이 null을 반환했습니다.");
                 return new ArrayList<>();
             }
-            return users;
+
+            return users.stream()
+                    .map(userMapper::toDtos)
+                    .collect(Collectors.toList());
+
         } catch (Exception e) {
             log.error("사용자 목록 조회 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
+            ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             return new ArrayList<>();
         }
     }
 
-    public void updateOnlineStatus(String userId, boolean online) {
+    @Transactional
+    public void updateOnlineStatus(UUID userId, boolean online) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
