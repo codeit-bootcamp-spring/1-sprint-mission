@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +39,7 @@ public interface ReadStatusApi {
       )
   })
   @PostMapping
-  ResponseEntity<ReadStatus> createReadStatus(
+  ResponseEntity<ReadStatusDto> createReadStatus(
       @Parameter(description = "Message 읽음 상태 생성 정보") CreateReadStatusRequestDto request
   );
 
@@ -54,7 +55,7 @@ public interface ReadStatusApi {
       )
   })
   @PatchMapping("/{readStatusId}")
-  ResponseEntity<ReadStatus> updateReadStatus(
+  ResponseEntity<ReadStatusDto> updateReadStatus(
       @Parameter(description = "수정할 읽음 상태 ID") UUID readStatusId,
       @Parameter(description = "수정할 읽음 상태 정보") UpdateReadStatusRequestDto request
   );
@@ -68,7 +69,7 @@ public interface ReadStatusApi {
   })
 
   @GetMapping
-  ResponseEntity<List<ReadStatus>> findAllByUserId(
+  ResponseEntity<List<ReadStatusDto>> findAllByUserId(
       @Parameter(description = "조회할 User ID") UUID userId
   );
 } 

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+
 
 @Tag(name = "Channel", description = "Channel API")
 public interface ChannelApi {
@@ -34,7 +34,7 @@ public interface ChannelApi {
       )
   })
   @PostMapping("/public")
-  ResponseEntity<Channel> createChannel(
+  ResponseEntity<ChannelDto> createChannel(
       @Parameter(description = "Public Channel 생성 정보") PublicChannelCreateRequestDto request
   );
 
@@ -46,7 +46,7 @@ public interface ChannelApi {
       )
   })
   @PostMapping("/private")
-  ResponseEntity<Channel> createChannel(
+  ResponseEntity<ChannelDto> createChannel(
       @Parameter(description = "Private Channel 생성 정보") PrivateChannelCreateRequestDto request
   );
 
@@ -65,8 +65,8 @@ public interface ChannelApi {
           content = @Content(examples = @ExampleObject(value = "Private channel cannot be updated"))
       )
   })
-  @PatchMapping("/{ChannelId}")
-  ResponseEntity<Channel> updateChannel(
+  @PatchMapping("/{channelId}")
+  ResponseEntity<ChannelDto> updateChannel(
       @Parameter(description = "수정할 Channel ID") UUID channelId,
       @Parameter(description = "수정할 Channel 정보") ChannelUpdateRequestDto request
   );
@@ -81,7 +81,7 @@ public interface ChannelApi {
           content = @Content(examples = @ExampleObject(value = "Channel with id {channelId} not found"))
       )
   })
-  @DeleteMapping("/{ChannelId}")
+  @DeleteMapping("/{channelId}")
   ResponseEntity<Void> deleteChannel(
       @Parameter(description = "삭제할 Channel ID") UUID channelId
   );

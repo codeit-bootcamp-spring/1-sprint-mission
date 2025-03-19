@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.Interface.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,7 +23,7 @@ public class ChannelController implements ChannelApi {
 
   @Override
   @PostMapping("/public")
-  public ResponseEntity<Channel> createChannel(
+  public ResponseEntity<ChannelDto> createChannel(
       @RequestBody PublicChannelCreateRequestDto request) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelService.createPublicChannel(request));
@@ -32,7 +31,7 @@ public class ChannelController implements ChannelApi {
 
   @Override
   @PostMapping("/private")
-  public ResponseEntity<Channel> createChannel(
+  public ResponseEntity<ChannelDto> createChannel(
       @RequestBody PrivateChannelCreateRequestDto request) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelService.createPrivateChannel(request));
@@ -40,7 +39,7 @@ public class ChannelController implements ChannelApi {
 
   @Override
   @PatchMapping("/{channelId}")
-  public ResponseEntity<Channel> updateChannel(@PathVariable UUID channelId,
+  public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateRequestDto request) {
     return ResponseEntity.ok(channelService.updateChannel(channelId, request));
   }

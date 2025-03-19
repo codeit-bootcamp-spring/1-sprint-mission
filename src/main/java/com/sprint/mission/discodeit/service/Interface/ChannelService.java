@@ -12,15 +12,15 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-  Channel createPublicChannel(PublicChannelCreateRequestDto request);
+  ChannelDto createPublicChannel(PublicChannelCreateRequestDto request);
 
-  Channel createPrivateChannel(PrivateChannelCreateRequestDto request);
+  ChannelDto createPrivateChannel(PrivateChannelCreateRequestDto request);
 
   ChannelDto getChannelById(UUID id);
 
   List<ChannelDto> findAllByUserId(UUID userid);
 
-  Channel updateChannel(UUID channelId, ChannelUpdateRequestDto request);
+  ChannelDto updateChannel(UUID channelId, ChannelUpdateRequestDto request);
 
   void deleteChannel(UUID id);
 }

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.dto.user;
 
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 public class UserCreateRequestDto {

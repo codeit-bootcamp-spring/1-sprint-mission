@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "User", description = "User API")
+@RequestMapping("/api/users")
 public interface UserApi {
 
   /**
@@ -41,16 +41,12 @@ public interface UserApi {
           content = @Content(examples = @ExampleObject(value = "User with email {email} already exists"))
       )
   })
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  ResponseEntity<User> createUser(
-      @Parameter(
-          description = "User 생성 정보",
-          content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
-      ) UserCreateRequestDto userCreateRequest,
-      @Parameter(
-          description = "User 프로필 이미지",
-          content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
-      ) MultipartFile profile
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  ResponseEntity<UserDto> createUser(
+      @Parameter(description = "User 생성 정보")
+      @RequestPart("userCreateRequest") UserCreateRequestDto userCreateRequest,
+      @Parameter(description = "User 프로필 이미지")
+      @RequestPart(value = "profile", required = false) MultipartFile profile
   );
 
 
@@ -86,10 +82,15 @@ public interface UserApi {
       )
   })
   @PatchMapping("/{userId}")
-  ResponseEntity<User> updateUser(
+  ResponseEntity<UserDto> updateUser(
       @Parameter(description = "수정할 User ID") UUID userId,
-      @Parameter(description = "수정할 User 정보") UserUpdateRequestDto userUpdateRequest,
-      @Parameter(description = "수정할 User 프로필 이미지") MultipartFile profile
+
+      @Parameter(description = "수정할 User 정보")
+      @RequestPart("userUpdateRequest") UserUpdateRequestDto userUpdateRequest,
+
+      @Parameter(description = "수정할 User 프로필 이미지")
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+
   );
 
 
@@ -128,6 +129,8 @@ public interface UserApi {
   @PatchMapping("/{userId}/userStatus")
   ResponseEntity<UserStatus> updateUserStatusByUserId(
       @Parameter(description = "상태를 변경할 User ID") UUID userId,
-      @Parameter(description = "변경할 User 온라인 상태 정보") UserStatusUpdateRequest request
+
+      @Parameter(description = "변경할 User 온라인 상태 정보")
+      @RequestBody UserStatusUpdateRequest request
   );
 }
