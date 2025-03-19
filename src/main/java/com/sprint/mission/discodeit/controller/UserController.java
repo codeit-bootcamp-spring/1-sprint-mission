@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
@@ -23,50 +24,65 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/user")
-public class UserController {
+@RequestMapping("/api/users")
+public class UserController implements UserApi {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<User> createUser(
+  @Override
+  public ResponseEntity<User> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
 
   ) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-        .filter(p -> !p.isEmpty())
         .flatMap(this::resolveProfileRequest);
+    User createdUser = userService.create(userCreateRequest, profileRequest);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(userService.createUser(userCreateRequest, profileRequest));
+        .body(createdUser);
   }
 
-  @PatchMapping("/{userId}")
-  public ResponseEntity<User> updateUser(@PathVariable UUID userId,
+  @PatchMapping(value = "/{userId}",
+  consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @Override
+  public ResponseEntity<User> update(@PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    return ResponseEntity.ok(userService.updateUser(userId, userUpdateRequest, profileRequest));
+    User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedUser);
   }
 
   @DeleteMapping("/{userId}")
-  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
-    userService.deleteUser(userId);
+  @Override
+  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+    userService.delete(userId);
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping
-  public ResponseEntity<List<UserDto>> getAllUsers() {
-    return ResponseEntity.ok(userService.findAll());
+  @Override
+  public ResponseEntity<List<UserDto>> findAll() {
+    List<UserDto> users = userService.findAll();
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(users);
   }
 
-  @PatchMapping("/{userId}/status")
-  public ResponseEntity<UserStatus> updateUserStatus(@PathVariable("userId") UUID userId,
+  @PatchMapping("/{userId}/userStatus")
+  @Override
+  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
-    return ResponseEntity.ok(userStatusService.updateByUserId(userId, request));
+    UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedUserStatus);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
@@ -74,11 +90,12 @@ public class UserController {
       return Optional.empty();
     }
     try {
-      return Optional.of(new BinaryContentCreateRequest(
+      BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
           profileFile.getOriginalFilename(),
           profileFile.getContentType(),
           profileFile.getBytes()
-      ));
+      );
+      return Optional.of(binaryContentCreateRequest);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

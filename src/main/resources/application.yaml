@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: discodeit
-
-discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory: .discodeit

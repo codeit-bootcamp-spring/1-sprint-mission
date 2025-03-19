@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -14,26 +15,35 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/read-status")
-public class ReadStatusController {
+@RequestMapping("/api/readStatuses")
+public class ReadStatusController implements ReadStatusApi {
 
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatus> createReadStatus(@RequestBody ReadStatusCreateRequest request) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(readStatusService.create(request));
+  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
+    ReadStatus createdReadStatus = readStatusService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdReadStatus);
   }
 
-  @PutMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatus> updateReadStatus(
+  @PatchMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatus> update(
       @PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest request) {
-    return ResponseEntity.ok(readStatusService.update(readStatusId, request));
+    ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedReadStatus);
   }
 
-  @GetMapping("/user/{userId}")
-  public ResponseEntity<List<ReadStatus>> getReadStatusesByUser(
-      @PathVariable UUID userId) {
-    return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
+  @GetMapping
+  public ResponseEntity<List<ReadStatus>> findAllByUserId(
+      @RequestParam UUID userId) {
+    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(readStatuses);
   }
 }
