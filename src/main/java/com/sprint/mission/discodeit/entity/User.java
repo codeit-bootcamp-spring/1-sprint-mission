@@ -1,89 +1,59 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
+@Entity
+@Table(name = "users")
 @Getter
 @Setter
-public class User implements Serializable {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity implements Serializable {
 
-    private static final Long serialVersionUID = 1L;
-    private UUID id ;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  private static final Long serialVersionUID = 1L;
 
-    private String userName;
-    private String password;
-    private String email;
+  @Column(name = "username")
+  private String username;
 
-    //고유한 UserStatus, BinaryContent 생성
-    private UserStatus userStatus;
-    private BinaryContent binaryContent;
+  @Column(name = "email")
+  private String email;
 
-    public User(UserCreateDTO userCreateDTO){
-        this.id = UUID.randomUUID();
-        this.createdAt =  Instant.now();
-        this.updatedAt=createdAt;
+  @Column(name = "password")
+  private String password;
 
-        this.userName = userCreateDTO.name();
-        this.password=userCreateDTO.password();
-        this.email=userCreateDTO.email();
-        this.userStatus = new UserStatus(this.id);
-        updateBinaryContent(userCreateDTO.filePath());
-    }
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
 
-    //update
-    public void updateUpdatedAt(){
-        this.updatedAt=Instant.now(); //업데이트 시간
-    }
+  //update
 
-    public void updateUser(UserUpdateDTO userUpdateDTO) {
-        updateUserName(userUpdateDTO.newName());
-        updatePassword(userUpdateDTO.newPassword());
-        updateEmail(userUpdateDTO.newEmail());
-        updateBinaryContent(userUpdateDTO.newFilePAth());
-        updateUpdatedAt();
-    }
+  public void updateUser(String username, String email, String password) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    update();
+  }
 
-    private void updateUserName(String newName) {
-        this.userName = Objects.requireNonNullElse(newName, this.userName);
-    }
-
-    private void updatePassword(String newPassword) {
-        this.password = Objects.requireNonNullElse(newPassword, this.password);
-    }
-
-    private void updateEmail(String newEmail) {
-        this.email = Objects.requireNonNullElse(newEmail, this.email);
-    }
-
-    //새로운 이미지가 들어오면, 완전히 새로운 이미지 객체로 간주 ?
-    private void updateBinaryContent(String newFilePath) {
-        if (newFilePath != null) {
-            this.binaryContent = new BinaryContent(new BinaryContentCreateDTO(newFilePath));
-        }
-    }
-
-
-    //delete
-
-    public void deleteUserStatus(){
-        this.userStatus=null;
-    }
-    public void deleteBinaryContent(){
-        this.binaryContent=null;
-    }
-
-
+  //새로운 이미지가 들어오면, 완전히 새로운 이미지 객체로 간주 ?
+  private void updateBinaryContent(BinaryContent newBinaryContent) {
+    this.profile = newBinaryContent;
+  }
 
 
 }

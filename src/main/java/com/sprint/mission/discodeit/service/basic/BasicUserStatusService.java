@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -17,67 +18,67 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
 
-    @Override
-    public UserStatus create(UserStatusCreateDTO userStatusCreateDTO) {
-        //해당 User 존재 검증
-        if(!userRepository.existByUserId(userStatusCreateDTO.userId())) {
-            throw new NoSuchElementException("해당 사용자가 존재하지 않습니다. ");
-        }
+  private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
 
-        //해당 User에 대한 UserStatus 객체 존재 검증
-        if(userStatusRepository.existsByUserId(userStatusCreateDTO.userId())) {
-            throw new NoSuchElementException("해당 사용자에 대한 UserStatus가 이미 존재합니다.");
-        }
+  @Override
+  public UserStatus create(UserStatusCreateDTO userStatusCreateDTO) {
+    User user = userRepository.findById(userStatusCreateDTO.userId()).orElseThrow(
+        () -> new NoSuchElementException("User not found"));
 
-        UserStatus userStatus = new UserStatus(userStatusCreateDTO);
-        userStatusRepository.save(userStatus);
-        return userStatus;
+    //해당 User에 대한 UserStatus 객체 존재 검증
+    if (userStatusRepository.existsByUserId(userStatusCreateDTO.userId())) {
+      throw new NoSuchElementException("해당 사용자에 대한 UserStatus가 이미 존재합니다.");
     }
 
-    @Override
-    public void saveExist(UserStatus userStatus) {
-        userStatusRepository.save(userStatus);
-    }
+    UserStatus userStatus = UserStatus.builder()
+        .user(user)
+        .build();
+    
+    userStatusRepository.save(userStatus);
+    return userStatus;
+  }
 
-    @Override
-    public UserStatus find(UUID uuid) {
-        UserStatus userStatus = userStatusRepository.findById(uuid);
-        return userStatus;
-    }
+  @Override
+  public void saveExist(UserStatus userStatus) {
+    userStatusRepository.save(userStatus);
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        List<UserStatus> userStatusList = new ArrayList<>(userStatusRepository.load().values());
-        return userStatusList;
-    }
+  @Override
+  public UserStatus find(UUID uuid) {
+    return userStatusRepository.findById(uuid).orElseThrow(
+        () -> new NoSuchElementException("userStatus not found"));
+  }
 
-    private UserStatus findByUserId(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findById(userId);
-        return userStatus;
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    return userStatusRepository.findAll();
+  }
+
+  private UserStatus findByUserId(UUID userId) {
+    return userStatusRepository.findByUserId(userId);
+  }
 
 
-    @Override
-    public UserStatus update(UUID id, UserStatusUpdateDTO userStatusUpdateDTO) {
-        UserStatus userStatus = find(id);
-        userStatus.update(userStatusUpdateDTO);
-        userStatusRepository.save(userStatus);
-        return userStatus;
-    }
+  @Override
+  public UserStatus update(UUID id, UserStatusUpdateDTO userStatusUpdateDTO) {
+    UserStatus userStatus = find(id);
+    userStatus.update(userStatusUpdateDTO);
+    userStatusRepository.save(userStatus);
+    return userStatus;
+  }
 
-    @Override
-    public UserStatus updateByUserId(UUID userID, UserStatusUpdateDTO userStatusUpdateDTO) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userID);
-        userStatus.update(userStatusUpdateDTO);
-        userStatusRepository.save(userStatus);
-        return userStatus;
-    }
+  @Override
+  public UserStatus updateByUserId(UUID userID, UserStatusUpdateDTO userStatusUpdateDTO) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userID);
+    userStatus.update(userStatusUpdateDTO);
+    userStatusRepository.save(userStatus);
+    return userStatus;
+  }
 
-    @Override
-    public void delete(UUID uuid) {
-        userStatusRepository.delete(uuid);
-    }
+  @Override
+  public void delete(UUID uuid) {
+    userStatusRepository.deleteById(uuid);
+  }
 }

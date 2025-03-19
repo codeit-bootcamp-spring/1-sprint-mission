@@ -4,14 +4,13 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserStatusRepository {
+public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
 
-    UserStatus save(UserStatus userStatus);
-    UserStatus findById(UUID id);
-    UserStatus findByUserId(UUID userId);
-    Map<UUID, UserStatus> load();
 
-    Boolean existsByUserId(UUID userId);
-    void delete(UUID id);
+  UserStatus findByUserId(UUID userId);
+
+  Boolean existsByUserId(UUID userId);
+
 }

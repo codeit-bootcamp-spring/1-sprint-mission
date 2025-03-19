@@ -3,24 +3,25 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReadStatusRepository {
+public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-    ReadStatus save(ReadStatus readStatus);
-    ReadStatus findById(UUID id);
-    Map<UUID, ReadStatus> load();
-    void delete(UUID id);
+  //한 userId의 모든 readStatus반환
+  List<ReadStatus> findAllByUserId(UUID userId);
 
-    List<ReadStatus> findAllByUserId(UUID userId); //한 id의 모든 readStatus반환
+  //LatestTime을 ChannelId에 대하여 반환
+  Instant findLatestTimeByChannelId(UUID channeId);
 
-    Instant findLatestTimeByChannelId(UUID channeId);
+  void deleteByChannelId(UUID id);
 
-    void deleteByChannelId(UUID id);
+  List<UUID> findAllUserIdByChannelId(UUID uuid);
 
-    List<UUID> findAllUserIdByChannelId(UUID uuid);
+  boolean existsByChannelId(UUID uuid);
+  
 
-  boolean existByChannelId(UUID uuid);
 }

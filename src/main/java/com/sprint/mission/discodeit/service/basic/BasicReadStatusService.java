@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusFindDTO;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateDTO;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.UserService;
+import jakarta.persistence.EntityExistsException;
+import java.time.Instant;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,55 +24,57 @@ public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
 
+  //PRIVATE 채널시에만 수행
   @Override
   public ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO) {
-    //TODO: PRIVATE 채널인 경우만 수행하는 로직 필요
-//    if (readStatusCreateDTO.!readStatusRepository.existByChannelId(readStatusCreateDTO.channelId())) {
-//      throw new IllegalArgumentException(String.format("존재하지 않는 채널이므로 ReadStatus를 생성할 수 없습니다. %s",
-//          readStatusCreateDTO.channelId()));
-//    }
 
-    if (!userRepository.existByUserId(readStatusCreateDTO.userId())) {
-      throw new IllegalArgumentException(
-          String.format("존재하지 않는 사용자이므로 ReadStatus를 생성할 수 없습니다. %s", readStatusCreateDTO.userId()));
+    User user = userRepository.findById(readStatusCreateDTO.userId()).orElseThrow(
+        () -> new NoSuchElementException("user not found"));
+
+    Channel channel = channelRepository.findById(readStatusCreateDTO.channelId()).orElseThrow(
+        () -> new NoSuchElementException("channel not found"));
+
+    //TODO: lastReadAt의 전달시점 고려
+    ReadStatus readStatus = ReadStatus.builder()
+        .user(user)
+        .channel(channel)
+        .lastReadAt(Instant.now())
+        .build();
+
+    // 이미 채널id와 userId 쌍이 동일한 readStatus가 존재할시 예외
+    if (readStatusRepository.findAll().stream()
+        .anyMatch(
+            readStatus1 -> readStatus1.getChannel().getId().equals(readStatus.getChannel().getId())
+                && readStatus1.getUser().getId().equals(readStatus.getUser().getId()))) {
+      throw new EntityExistsException("해당 Channel과 User에 대한 ReadStatus가 이미 존재합니다.");
     }
 
-    ReadStatus readStatus = new ReadStatus(readStatusCreateDTO.channelId(),
-        readStatusCreateDTO.userId());
-
-    // 이미 채널id와 userId가 동일한 readStatus 존재시 예외
-    if (readStatusRepository.load().values().stream()
-        .anyMatch(readStatus1 -> readStatus1.getChannelId().equals(readStatus.getChannelId())
-            && readStatus1.getUserId().equals(readStatus.getUserId()))) {
-      throw new IllegalArgumentException("이미 존재하는 ReadStatus입니다.");
-    }
-
-    readStatusRepository.save(readStatus);
-    return readStatus;
+    return readStatusRepository.save(readStatus);
   }
 
   @Override
   public ReadStatus findbyId(UUID uuid) {
-    return readStatusRepository.findById(uuid);//repo구현필요
+    return readStatusRepository.findById(uuid).orElseThrow(
+        () -> new NoSuchElementException("ReadStatus not found"));
   }
 
   @Override
   public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);//repo구현필요
+    return readStatusRepository.findAllByUserId(userId);
   }
 
   @Override
   public ReadStatus update(ReadStatusUpdateDTO readStatusUpdateDTO) {
     ReadStatus readStatus = findbyId(readStatusUpdateDTO.id());
     readStatus.update();
-    readStatusRepository.save(readStatus);
-    return null;
+    return readStatusRepository.save(readStatus);
   }
 
   @Override
   public void delete(UUID uuid) {
-    readStatusRepository.delete(uuid);
+    readStatusRepository.deleteById(uuid);
   }
 
   @Override
