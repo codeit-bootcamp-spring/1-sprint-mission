@@ -1,19 +1,17 @@
 package com.sprint.mission.discodeit.dto;
 
-
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
+import com.sprint.mission.discodeit.entity.ChannelType;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
-public class ChannelDto {
-    Boolean channelPrivate;
-    String channelName;
-    UUID userId;
-    String userName;
-    UUID channelId;
-    String newChannelName;
+public record ChannelDto(
+    UUID id,
+    ChannelType type,
+    String name,
+    String description,
+    List<UserDto> participants,
+    Instant lastMessageAt
+) {
+
 }

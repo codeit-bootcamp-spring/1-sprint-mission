@@ -1,54 +1,46 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/message/status")
-@Tag(name = "ReadStatusController", description = "ReadStatusController API 목록")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController {
 
-  private final BasicReadStatusService readStatusService;
+  private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<Void> create(@RequestBody MessageDto messageDto) {
-    try {
-      readStatusService.saveMessage(messageDto);
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
+  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
+    ReadStatus createdReadStatus = readStatusService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdReadStatus);
   }
 
-  @PutMapping
-  public ResponseEntity<Void> update(@RequestBody MessageDto messageDto) {
-    try {
-      System.out.println(readStatusService.findMessageStatus(messageDto));
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
+  @PatchMapping(path = "{readStatusId}")
+  public ResponseEntity<ReadStatus> update(@PathVariable("readStatusId") UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest request) {
+    ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedReadStatus);
   }
 
-  @GetMapping("{userId}")
-  public ResponseEntity<Void> getUserStatus(@PathVariable UUID userId) {
-    try {
-      System.out.println(readStatusService.findAllByUserId(userId));
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
+  @GetMapping
+  public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam("userId") UUID userId) {
+    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(readStatuses);
   }
 }

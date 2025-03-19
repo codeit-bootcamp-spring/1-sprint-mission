@@ -1,45 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.*;
+import java.util.UUID;
 
-
+@Entity
+@Table(name = "channels")
 @Getter
-@Setter
-public class Channel implements Serializable {
-    @Serial
-    private static final long serialVersionUID = -5943403271027267293L;
-    private UUID channelId = UUID.randomUUID();
-    private String name;
-    private final Instant createdAt = Instant.now();
-    private Instant updatedAt = Instant.now();
-    private final Map<UUID, String> users = new HashMap<>();
-    private List<UUID> privateUsers = new ArrayList<>();
-    private Boolean checkPrivateChannel;
+public class Channel extends BaseUpdatableEntity {
 
-    public void setUsers(UUID userId, String name){
-        users.put(userId,name);
+  @Column
+  private ChannelType type;
+
+  @Column
+  private String name;
+
+  @Column
+  private String description;
+
+
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
+
+  public Channel() {
+
+  }
+
+  public void update(String newName, String newDescription) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+      anyValueUpdated = true;
     }
 
-    public void setPrivateUsers(UUID userId){
-        privateUsers.add(userId);
+    if (anyValueUpdated) {
+      setUpdatedAt(Instant.now());
     }
-
-    SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 hh:mm:ss");
-    @Override
-    public String toString() {
-        return "Channel\n" +
-                "channel id = " + channelId + '\n' +
-                "name = " + name + '\n' +
-                "createdAt = " + (createdAt) + '\n' +
-                "updatedAt = " + (updatedAt) +'\n' +
-                "users = " + users.values();
-    }
-
+  }
 }

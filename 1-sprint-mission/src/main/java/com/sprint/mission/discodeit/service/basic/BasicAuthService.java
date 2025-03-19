@@ -1,33 +1,35 @@
 package com.sprint.mission.discodeit.service.basic;
-import com.sprint.mission.discodeit.dto.UserDto;
+
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserStatusRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.util.NoSuchElementException;
 
+@RequiredArgsConstructor
 @Service
-public class BasicAuthService{
+@Transactional
+public class BasicAuthService implements AuthService {
 
-    FileUserRepository userRepository;
-    FileUserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
 
-    @Autowired
-    public BasicAuthService(FileUserRepository userRepository, FileUserStatusRepository userStatusRepository) {
-        this.userRepository = userRepository;
-        this.userStatusRepository = userStatusRepository;
+  @Override
+  public User login(LoginRequest loginRequest) {
+    String username = loginRequest.username();
+    String password = loginRequest.password();
+
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(
+            () -> new NoSuchElementException("User with username " + username + " not found"));
+
+    if (!user.getPassword().equals(password)) {
+      throw new IllegalArgumentException("Wrong password");
     }
 
-    public void login(UserDto userDto) throws IOException, ClassNotFoundException {
-       if(userRepository.find(userDto) == null || userStatusRepository.findByUserId(userDto) == null){
-           throw new RuntimeException();
-       }
-
-       userStatusRepository.updateStatus(userDto);
-    }
+    return user;
+  }
 }

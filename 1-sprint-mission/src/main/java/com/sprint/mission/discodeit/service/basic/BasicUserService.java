@@ -1,85 +1,143 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.service.interfaces.UserService;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
-
+@RequiredArgsConstructor
 @Service
+@Transactional
 public class BasicUserService implements UserService {
-    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 hh:mm:ss");
-    private final BasicUserStatusService statusService;
-    private final BasicBinaryContentService contentService;
-    private final FileUserRepository userRepository;
-    private final FileChannelRepository channelRepository;
-    private final FileMessageRepository messageRepository;
 
-    @Autowired
-    public BasicUserService(BasicUserStatusService statusService, BasicBinaryContentService contentService, FileUserRepository userRepository, FileChannelRepository channelRepository, FileMessageRepository messageRepository) {
-        this.statusService = statusService;
-        this.contentService = contentService;
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
+  private final UserRepository userRepository;
+  private final UserMapper mapper;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
+  private final UserStatusRepository userStatusRepository;
+
+  @Override
+  public User create(UserCreateRequest userCreateRequest,
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    String username = userCreateRequest.username();
+    String email = userCreateRequest.email();
+
+    if (userRepository.existsByEmail(email)) {
+      throw new IllegalArgumentException("User with email " + email + " already exists");
+    }
+    if (userRepository.existsByUsername(username)) {
+      throw new IllegalArgumentException("User with username " + username + " already exists");
     }
 
-    @Override
-    public void creatUser(UserDto userDto) throws IOException, ClassNotFoundException {
-        userRepository.createUser(userDto);
-        userDto.setId(userRepository.find(userDto).getId());
-        statusService.create(userDto);
-        if(userDto.getContainContent()) {
-            contentService.createUserContent(userDto);
-        }
+    UUID nullableProfileId = optionalProfileCreateRequest
+        .map(profileRequest -> {
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContentRepository.save(binaryContent).getId();
+        })
+        .orElse(null);
+    String password = userCreateRequest.password();
+
+    User user = new User(username, email, password, nullableProfileId);
+    User createdUser = userRepository.save(user);
+
+    Instant now = Instant.now();
+    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+    userStatusRepository.save(userStatus);
+
+    return createdUser;
+  }
+
+  @Override
+  public UserDto find(UUID userId) {
+    return userRepository.findById(userId)
+        .map(this::toDto)
+        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+  }
+
+  @Override
+  public List<UserDto> findAll() {
+    return userRepository.findAll()
+        .stream()
+        .map(this::toDto)
+        .toList();
+  }
+
+  @Override
+  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+
+    String newUsername = userUpdateRequest.newUsername();
+    String newEmail = userUpdateRequest.newEmail();
+    if (userRepository.existsByEmail(newEmail)) {
+      throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+    }
+    if (userRepository.existsByUsername(newUsername)) {
+      throw new IllegalArgumentException("User with username " + newUsername + " already exists");
     }
 
-    @Override
-    public void modifyUser(UserDto user) throws IOException, ClassNotFoundException {
-        if (userRepository.checkUserId(user.getId())) {
-            userRepository.update(user.getId(), user.getNewName());
-            UserDto dto = new UserDto();
-            dto.setId(user.getId());
-            statusService.updateByUserId(dto);
-            channelRepository.checkJoinChannel(user.getId(), user.getNewName());
-            messageRepository.modifyUserName(user.getId(), user.getNewName());
-            System.out.println("성공적으로 수정하였습니다");
-            return;
-        }
+    UUID nullableProfileId = optionalProfileCreateRequest
+        .map(profileRequest -> {
+          Optional.ofNullable(user.getProfileId())
+              .ifPresent(binaryContentRepository::deleteById);
 
-        System.out.println("존재하지 않는 계정입니다");
-    }
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContentRepository.save(binaryContent).getId();
+        })
+        .orElse(null);
 
-    @Override
-    public void deleteUser(UserDto user) throws IOException, ClassNotFoundException {
-        if (userRepository.checkUserId(user.getId())) {
-            userRepository.deleteUser(user.getId());
-            contentService.deleteUserContent(user);
-            statusService.delete(user);
-            channelRepository.deleteUser(user.getId());
-            messageRepository.modifyUserName(user.getId(),"UNDEFINED");
-            System.out.println("성공적으로 삭제하였습니다");
-            return;
-        }
+    String newPassword = userUpdateRequest.newPassword();
+    user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
-        System.out.println("존재하지 않는 계정입니다");
-    }
+    return userRepository.save(user);
+  }
 
-    @Override
-    public void showInfoUser(UserDto userDto) throws IOException, ClassNotFoundException {
-       userRepository.find(userDto);
-    }
+  @Override
+  public void delete(UUID userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    public void showAllUser() throws IOException, ClassNotFoundException {
-        userRepository.findAll();
-    }
+    Optional.ofNullable(user.getProfileId())
+        .ifPresent(binaryContentRepository::deleteById);
+    userStatusRepository.deleteByUserId(userId);
+
+    userRepository.deleteById(userId);
+  }
+
+  private UserDto toDto(User user) {
+    Boolean online = userStatusRepository.findByUserId(user.getId())
+        .map(UserStatus::isOnline)
+        .orElse(null);
+
+    return mapper.toDto(user);
+  }
 }

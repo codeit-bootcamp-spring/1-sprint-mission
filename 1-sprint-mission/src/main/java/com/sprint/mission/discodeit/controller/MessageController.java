@@ -1,90 +1,79 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/message")
-@Tag(name = "MessageController", description = "MessageController API 목록")
+@RestController
+@RequestMapping("/api/messages")
 public class MessageController {
 
-  private final BasicMessageService messageService;
+  private final MessageService messageService;
 
-  @GetMapping("/{messageId}")
-  public ResponseEntity<Void> showInfo(@PathVariable UUID messageId) {
-    MessageDto messageDto = new MessageDto();
-    messageDto.setMessageId(messageId);
-
-    try {
-      messageService.showInfoMessage(messageDto);
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
-
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<Message> create(
+      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+  ) {
+    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
+    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdMessage);
   }
 
-  @GetMapping("/channel/{channelName}")
-  public ResponseEntity<Void> showInfoOfChannelMessage(@PathVariable String channelName) {
-    MessageDto messageDto = new MessageDto();
-    messageDto.setChannelName(channelName);
-
-    try {
-      messageService.showInfoChannelMessage(messageDto);
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
-
+  @PatchMapping(path = "{messageId}")
+  public ResponseEntity<Message> update(@PathVariable("messageId") UUID messageId,
+      @RequestBody MessageUpdateRequest request) {
+    Message updatedMessage = messageService.update(messageId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedMessage);
   }
 
-  @PostMapping
-  public ResponseEntity<Void> create(@RequestBody MessageDto messageDto) {
-    try {
-      messageService.saveMessage(messageDto);
-
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
+  @DeleteMapping(path = "{messageId}")
+  public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
+    messageService.delete(messageId);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
-  @PutMapping
-  public ResponseEntity<Void> update(@RequestBody MessageDto messageDto) {
-    try {
-      messageService.modifyMessage(messageDto);
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
+  @GetMapping
+  public ResponseEntity<List<Message>> findAllByChannelId(
+      @RequestParam("channelId") UUID channelId) {
+    List<Message> messages = messageService.findAllByChannelId(channelId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(messages);
   }
-
-  @DeleteMapping("{messageId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
-    MessageDto messageDto = new MessageDto();
-    messageDto.setMessageId(messageId);
-
-    try {
-      messageService.deleteMessage(messageDto);
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
-
-  }
-
 }

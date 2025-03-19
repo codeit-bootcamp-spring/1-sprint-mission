@@ -1,56 +1,47 @@
 package com.sprint.mission.discodeit.controller;
 
-
-import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/binaryContent")
-@Tag(name = "BinaryContentController", description = "BinaryContentController API 목록")
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
 
-  private final BasicBinaryContentService service;
+  private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
 
-  @GetMapping("/{messageId}")
-  public ResponseEntity<Void> findContentByMessage(@PathVariable UUID messageId) {
-    MessageDto messageDto = new MessageDto();
-    messageDto.setMessageId(messageId);
-    try {
-      System.out.println(service.findByMessage(messageDto));
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
-
+  @GetMapping(path = "{binaryContentId}")
+  public ResponseEntity<BinaryContent> find(@PathVariable("binaryContentId") UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContent);
   }
 
-  @GetMapping("/{userId}")
-  public ResponseEntity<Void> findContentByUser(@PathVariable UUID userId) {
-    UserDto userDto = new UserDto();
-    userDto.setId(userId);
-    try {
-      System.out.println(service.findByUser(userDto));
+  @GetMapping
+  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContents);
+  }
 
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
-
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
+    BinaryContentDto dto = new BinaryContentDto();
+    dto.setId(binaryContentId);
+    return binaryContentStorage.download(dto);
   }
 }

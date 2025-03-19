@@ -1,50 +1,58 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.repository.file.FileBinaryContentRepository;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
-public class BasicBinaryContentService {
-    FileBinaryContentRepository repository;
+@Transactional
+public class BasicBinaryContentService implements BinaryContentService {
 
-    @Autowired
-    public BasicBinaryContentService(FileBinaryContentRepository repository) {
-        this.repository = repository;
-    }
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
-    public void createMessageContent(MessageDto messageDto) throws IOException, ClassNotFoundException {
-        repository.saveMessageContent(messageDto);
-    }
+  @Override
+  public BinaryContent create(BinaryContentCreateRequest request) {
+    String fileName = request.fileName();
+    String contentType = request.contentType();
+    BinaryContent binaryContent = new BinaryContent(
+        fileName,
+        (long) request.bytes().length,
+        contentType
+    );
+    binaryContentStorage.put(binaryContent.getId(), request.bytes());
+    return binaryContentRepository.save(binaryContent);
+  }
 
-    public void createUserContent(UserDto userDto) throws IOException, ClassNotFoundException {
-        repository.saveUserContent(userDto);
-    }
+  @Override
+  public BinaryContent find(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new NoSuchElementException(
+            "BinaryContent with id " + binaryContentId + " not found"));
+  }
 
-    public BinaryContent findByMessage (MessageDto messageDto) throws IOException, ClassNotFoundException {
-        return repository.findMessageContent(messageDto.getMessageId());
-    }
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+        .toList();
+  }
 
-    public BinaryContent findByUser(UserDto userDto) throws IOException, ClassNotFoundException {
-        return repository.findUserContent(userDto.getId());
+  @Override
+  public void delete(UUID binaryContentId) {
+    if (!binaryContentRepository.existsById(binaryContentId)) {
+      throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
     }
-
-    public List<BinaryContent> findAll() throws IOException, ClassNotFoundException {
-        return repository.findAll();
-    }
-
-    public void deleteUserContent(UserDto userDto) throws IOException, ClassNotFoundException {
-        repository.deleteUser(userDto.getId());
-    }
-
-    public void deleteMessageContent(MessageDto messageDto) throws IOException, ClassNotFoundException {
-        repository.deleteMessage(messageDto.getMessageId());
-    }
+    binaryContentRepository.deleteById(binaryContentId);
+  }
 }

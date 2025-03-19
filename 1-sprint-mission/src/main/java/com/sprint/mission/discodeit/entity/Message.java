@@ -1,37 +1,66 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Entity
+@Table(name = "messages")
 @Getter
-@Setter
-public class Message implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 5573544762128868590L;
-    private UUID messageId = UUID.randomUUID();
-    private String text;
-    private Instant updatedAt = Instant.now();
-    private UUID userId;
-    private String userName;
-    private UUID channelId;
-    private String channelName;
-    private Boolean isContainContent;
+public class Message extends BaseUpdatableEntity {
 
-    SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 hh:mm:ss");
-    @Override
-    public String toString() {
-        return "Message\n" +
-                "messageId = " + messageId + '\n' +
-                "text = " + text + '\n' +
-                "channel = " + channelName + "\n" +
-                "name = " + userName + '\n' +
-                "updatedAt = " + (updatedAt) + '\n';
+  @Column
+  private String content;
+
+  @Column(name = "channel_id")
+  private UUID channelId;
+
+  @Column(name = "author_id")
+  private UUID authorId;
+
+  @ElementCollection
+  @CollectionTable(name = "message_attachments", joinColumns = @JoinColumn(name = "message_id"))
+  @Column(name = "attachment_id")
+  private List<UUID> attachmentIds;
+
+  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+    this.content = content;
+    this.channelId = channelId;
+    this.authorId = authorId;
+    this.attachmentIds = attachmentIds;
+  }
+
+  public Message() {
+
+  }
+
+  public void update(String newContent) {
+    boolean anyValueUpdated = false;
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
+      anyValueUpdated = true;
     }
+
+    if (anyValueUpdated) {
+      setUpdatedAt(Instant.now());
+    }
+  }
+
+  public List<UUID> getAttachmentIds() {
+    return attachmentIds;
+  }
 }

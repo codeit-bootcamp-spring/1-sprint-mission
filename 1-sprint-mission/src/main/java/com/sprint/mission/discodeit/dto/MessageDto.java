@@ -1,21 +1,20 @@
 package com.sprint.mission.discodeit.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import com.sprint.mission.discodeit.dto.UserDto;
+import lombok.Getter;
 
-@Getter
-@Setter
-public class MessageDto {
-    Boolean haveContent;
-    String text;
-    UUID channelId;
-    String channelName;
-    UUID messageId;
-    UUID userId;
-    String userName;
-    String newContent;
-    List<String> contentUrl;
+public record MessageDto(
+
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    String content,
+    UUID channelId,
+    UserDto author,
+    List<BinaryContentDto> attachments
+) {
+
 }

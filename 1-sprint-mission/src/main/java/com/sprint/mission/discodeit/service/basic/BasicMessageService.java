@@ -1,76 +1,105 @@
 package com.sprint.mission.discodeit.service.basic;
 
-
-import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.service.interfaces.MessageService;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
+@Transactional
 public class BasicMessageService implements MessageService {
 
-    private final FileMessageRepository messageRepository;
-    private final BasicBinaryContentService binaryContentService;
-    private final BasicReadStatusService statusService;
+  private final MessageRepository messageRepository;
+  //
+  private final ChannelRepository channelRepository;
+  private final UserRepository userRepository;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
-    @Autowired
-    public BasicMessageService(FileMessageRepository messageRepository, BasicBinaryContentService binaryContentService, BasicReadStatusService statusService) {
-        this.messageRepository = messageRepository;
-        this.binaryContentService = binaryContentService;
-        this.statusService = statusService;
+  @Override
+  public Message create(MessageCreateRequest messageCreateRequest,
+      List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    UUID channelId = messageCreateRequest.channelId();
+    UUID authorId = messageCreateRequest.authorId();
+
+    if (!channelRepository.existsById(channelId)) {
+      throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
+    }
+    if (!userRepository.existsById(authorId)) {
+      throw new NoSuchElementException("Author with id " + authorId + " does not exist");
     }
 
-    @Override
-    public void saveMessage(MessageDto messageDto) throws IOException, ClassNotFoundException {
-        messageRepository.createMessage(messageDto);
-        if(messageDto.getHaveContent()) binaryContentService.createMessageContent(messageDto);
-        statusService.saveMessage(messageDto);
-    }
+    List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+        .map(attachmentRequest -> {
+          String fileName = attachmentRequest.fileName();
+          String contentType = attachmentRequest.contentType();
+          byte[] bytes = attachmentRequest.bytes();
 
-    @Override
-    public void deleteMessage(MessageDto messageDto) throws IOException, ClassNotFoundException {
-        if(messageRepository.checkMessageContains(messageDto.getMessageId())){
-            Message message = messageRepository.getMessage(messageDto);
-            messageRepository.deleteMessage(messageDto.getMessageId());
-            if(message.getIsContainContent()) binaryContentService.deleteMessageContent(messageDto);
-            messageDto.setChannelId(message.getChannelId());
-            statusService.deleteMessage(messageDto);
-            System.out.println("메세지 삭제 성공!");
-        }
-        else System.out.println("메세지 삭제에 실패하였습니다");
-    }
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType);
+          BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(createdBinaryContent.getId(), bytes);
+          return createdBinaryContent.getId();
+        })
+        .toList();
 
-    @Override
-    public void modifyMessage(MessageDto messageDto) throws IOException, ClassNotFoundException {
-        if(messageRepository.checkMessageContains(messageDto.getMessageId())){
-            MessageDto dto = new MessageDto();
-            dto.setText(messageDto.getNewContent());
-            dto.setUserId(messageDto.getUserId());
-            dto.setMessageId(messageDto.getMessageId());
-            messageRepository.modifyMessage(dto);
+    String content = messageCreateRequest.content();
+    Message message = new Message(
+        content,
+        channelId,
+        authorId,
+        attachmentIds
+    );
+    return messageRepository.save(message);
+  }
 
-            System.out.println("메세지 수정 성공!");
-            return;
-        }
+  @Override
+  public Message find(UUID messageId) {
+    return messageRepository.findById(messageId)
+        .orElseThrow(
+            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+  }
 
-        System.out.println("메세지 수정에 실패하였습니다");
-    }
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannelId(channelId).stream()
+        .toList();
+  }
 
-    @Override
-    public void showInfoMessage(MessageDto messagedto) throws IOException, ClassNotFoundException {
-        Message message = messageRepository.getMessage(messagedto);
-        System.out.println(message.getText() + " (" + message.getUserName() + ") [" +
-                (message.getUpdatedAt()) + "]" + " - " + message.getChannelName());
-    }
+  @Override
+  public Message update(UUID messageId, MessageUpdateRequest request) {
+    String newContent = request.newContent();
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(
+            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    message.update(newContent);
+    return messageRepository.save(message);
+  }
 
-    public void showInfoChannelMessage(MessageDto messageDto) throws IOException, ClassNotFoundException {
-        System.out.println(messageRepository.getMessagesInChannel(messageDto));
-    }
+  @Override
+  public void delete(UUID messageId) {
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(
+            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
+    message.getAttachmentIds()
+        .forEach(binaryContentRepository::deleteById);
+
+    messageRepository.deleteById(messageId);
+  }
 }

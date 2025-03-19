@@ -1,97 +1,64 @@
 package com.sprint.mission.discodeit.controller;
 
-
 import com.sprint.mission.discodeit.dto.ChannelDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/channel")
-@Tag(name = "ChannelController", description = "ChannelController API 목록")
+@RequestMapping("/api/channels")
 public class ChannelController {
 
-  private final BasicChannelService channelService;
+  private final ChannelService channelService;
 
-  @GetMapping("/{channelName}")
-  public ResponseEntity<Void> showInfo(@PathVariable String channelName) {
-    ChannelDto channelDto = new ChannelDto();
-    channelDto.setChannelName(channelName);
-
-    try {
-      channelService.showInfoChannel(channelDto);
-    } catch (IOException | ClassNotFoundException e) {
-      e.printStackTrace();
-      System.out.println("존재하지 않는 채널입니다");
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
-
+  @PostMapping(path = "public")
+  public ResponseEntity<Channel> create(@RequestBody PublicChannelCreateRequest request) {
+    Channel createdChannel = channelService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
   }
 
-  @GetMapping("/user/{userId}")
-  public ResponseEntity<Void> showInfoOfUser(@PathVariable UUID userId) {
-    ChannelDto channelDto = new ChannelDto();
-    channelDto.setUserId(userId);
-
-    try {
-      channelService.showInfoChannelOfChannel(channelDto);
-    } catch (IOException | ClassNotFoundException e) {
-      e.printStackTrace();
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
-
+  @PostMapping(path = "private")
+  public ResponseEntity<Channel> create(@RequestBody PrivateChannelCreateRequest request) {
+    Channel createdChannel = channelService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
   }
 
-  @PostMapping
-  public ResponseEntity<Void> create(@RequestBody ChannelDto channelDto) {
-    try {
-      channelService.saveChannel(channelDto);
-
-    } catch (IOException | ClassNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
+  @PatchMapping(path = "{channelId}")
+  public ResponseEntity<Channel> update(@PathVariable("channelId") UUID channelId,
+      @RequestBody PublicChannelUpdateRequest request) {
+    Channel udpatedChannel = channelService.update(channelId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(udpatedChannel);
   }
 
-  @PutMapping
-  public ResponseEntity<Void> update(@RequestBody ChannelDto channelDto) {
-    try {
-      channelService.modifyChannel(channelDto);
-    } catch (IOException | ClassNotFoundException e) {
-      e.printStackTrace();
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
+  @DeleteMapping(path = "{channelId}")
+  public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
+    channelService.delete(channelId);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
-  @DeleteMapping("/{channelId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
-    ChannelDto channelDto = new ChannelDto();
-    channelDto.setChannelId(channelId);
-
-    try {
-      channelService.deleteChannel(channelDto);
-    } catch (IOException | ClassNotFoundException e) {
-      e.printStackTrace();
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    return ResponseEntity.status(HttpStatus.OK).build();
-
+  @GetMapping
+  public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
+    List<ChannelDto> channels = channelService.findAllByUserId(userId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(channels);
   }
-
 }
