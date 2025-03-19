@@ -1,62 +1,79 @@
 package com.spirnt.mission.discodeit.enity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.io.Serializable;
-import java.time.Instant;
+import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.util.Objects;
-import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
+@Entity
+@Table(name = "users")
+@NoArgsConstructor
 @Getter
-public class User extends Common implements Serializable {
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
   private String username;
+
   private String email;
+
   @JsonIgnore // 비밀번호 노출 방지
   private String password;
-  private UUID profileId;
+
+  // on delete set null 설정
+  @OneToOne(orphanRemoval = true)
+  @JoinColumn(name = "profile_id")
+  @OnDelete(action = OnDeleteAction.SET_NULL)
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "status_id")
+  private UserStatus status;
 
 
-  public User(String username, String email, String password, UUID profileId) {
+  public User(String username, String email, String password) {
     super();
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
   }
 
+  public void setProfileAndStatus(BinaryContent binaryContent, UserStatus userStatus) {
+    if (binaryContent != null) {
+      this.profile = binaryContent;
+    }
+    if (userStatus != null) {
+      this.status = userStatus;
+    }
+  }
 
-  public void update(String name, String email, String password, UUID profileImageId) {
-    boolean anyValueUpdated = false;
+  public void setProfile(BinaryContent binaryContent) {
+    this.profile = binaryContent;
+  }
+
+  public void setStatus(UserStatus userStatus) {
+    this.status = status;
+  }
+
+  public void update(String name, String email, String password, BinaryContent profile) {
     if (name != null && !name.equals(this.username)) {
       this.username = name;
-      anyValueUpdated = true;
     }
     if (email != null && !email.equals(this.email)) {
       this.email = email;
-      anyValueUpdated = true;
     }
     if (password != null && !password.equals(this.password)) {
       this.password = password;
-      anyValueUpdated = true;
     }
-    if (profileImageId != null && !profileImageId.equals(this.profileId)) {
-      this.profileId = profileImageId;
-      anyValueUpdated = true;
+    if (profile != null && !profile.equals(this.profile)) {
+      this.profile = profile;
     }
-    if (anyValueUpdated) {
-      this.updateClass(Instant.now());
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "User{" +
-        "id='" + this.getId() + '\'' +
-        ", username='" + this.username + '\'' +
-        ", email='" + this.email + '\'' +
-        '}';
   }
 
   // UUID만으로 객체를 비교하기 위해 추가

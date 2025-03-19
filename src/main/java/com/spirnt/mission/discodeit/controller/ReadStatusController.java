@@ -1,10 +1,10 @@
 package com.spirnt.mission.discodeit.controller;
 
+import com.spirnt.mission.discodeit.controller.swagger.ReadStatusApiDocs;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
+import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
-import com.spirnt.mission.discodeit.enity.ReadStatus;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
-import com.spirnt.mission.discodeit.swagger.ReadStatusApiDocs;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -28,16 +28,17 @@ public class ReadStatusController implements ReadStatusApiDocs {
 
   // 특정 채널의 메시지 수신 정보 생성
   @PostMapping("")
-  public ResponseEntity<ReadStatus> createReadStatus(@RequestBody ReadStatusCreateRequest request) {
-    ReadStatus readStatus = readStatusService.create(request);
+  public ResponseEntity<ReadStatusDto> createReadStatus(
+      @RequestBody ReadStatusCreateRequest request) {
+    ReadStatusDto readStatus = readStatusService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
   }
 
   // 특정 채널의 메시지 수신 정보 수정
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatus> updateReadStatus(@PathVariable UUID readStatusId,
+  public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest request) {
-    ReadStatus readStatus = readStatusService.update(readStatusId, request);
+    ReadStatusDto readStatus = readStatusService.update(readStatusId, request);
     return ResponseEntity.status(HttpStatus.OK).body(readStatus);
   }
 
@@ -48,8 +49,8 @@ public class ReadStatusController implements ReadStatusApiDocs {
    * 특정 userId에 대해 ReadStatus 데이터를 필터링한다고 봐야함
    * */
   @GetMapping("")
-  public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam UUID userId) {
-    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam UUID userId) {
+    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
     return ResponseEntity.ok(readStatuses);
   }
 }

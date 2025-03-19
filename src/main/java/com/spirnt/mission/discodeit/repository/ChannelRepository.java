@@ -1,21 +1,34 @@
 package com.spirnt.mission.discodeit.repository;
 
 import com.spirnt.mission.discodeit.enity.Channel;
-
-import java.util.Map;
+import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-public interface ChannelRepository {
-    // 데이터베이스 저장
-    void save(Channel channel);
+@Repository
+public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-    void delete(UUID channelId);
+  // 데이터베이스 저장
+  Channel save(Channel channel);
 
-    Optional<Channel> findById(UUID channelId);
+  void deleteById(UUID channelId);
 
-    Map<UUID, Channel> findAll();
+  Optional<Channel> findById(UUID channelId);
 
-    // 존재 검증
-    boolean existsById(UUID channelId);
+  List<Channel> findAll();
+
+  // 존재 검증
+  boolean existsById(UUID channelId);
+
+  @Transactional
+  @Modifying
+  @Query("UPDATE Channel c SET c.name = :newName, c.description = :newDescription WHERE c.id = :id")
+  int updateById(@Param("id") UUID id, @Param("newName") String newName,
+      @Param("newDescription") String newDescription);
 }

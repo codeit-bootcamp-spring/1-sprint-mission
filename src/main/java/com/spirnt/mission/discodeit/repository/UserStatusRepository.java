@@ -1,20 +1,37 @@
 package com.spirnt.mission.discodeit.repository;
 
 import com.spirnt.mission.discodeit.enity.UserStatus;
-
-import java.util.Map;
+import jakarta.transaction.Transactional;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-public interface UserStatusRepository {
-    void save(UserStatus userStatus);
+@Repository
+public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
 
-    void delete(UUID id);
+  UserStatus save(UserStatus userStatus);
 
-    Optional<UserStatus> findById(UUID id);
+  void deleteById(UUID id);
 
-    Map<UUID, UserStatus> findAll();
+  Optional<UserStatus> findById(UUID id);
 
-    // 존재 검증
-    boolean existsById(UUID id);
+  Optional<UserStatus> findByUserId(UUID userId);
+
+  List<UserStatus> findAll();
+
+  // 존재 검증
+  boolean existsById(UUID id);
+
+  boolean existsByUserId(UUID userId);
+
+  @Transactional
+  @Modifying
+  @Query("UPDATE UserStatus us SET us.lastActiveAt = :newLastActiveAt WHERE us.id =:id")
+  int updateById(@Param("id") UUID id, @Param("newLastActiveAt") Instant lastActiveAt);
 }

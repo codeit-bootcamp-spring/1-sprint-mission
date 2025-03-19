@@ -1,17 +1,18 @@
 package com.spirnt.mission.discodeit.service;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
-import com.spirnt.mission.discodeit.enity.BinaryContent;
+import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import java.util.List;
 import java.util.UUID;
 
 public interface BinaryContentService {
 
-  BinaryContent create(BinaryContentCreateRequest binaryContentCreateRequest);
+  BinaryContentDto create(BinaryContentCreateRequest binaryContentCreateRequest);
 
-  BinaryContent find(UUID id);
+  BinaryContentDto find(UUID id);
 
-  List<BinaryContent> findAllByIdIn(List<UUID> uuids);
+
+  List<BinaryContentDto> findAllByIdIn(List<UUID> uuids);
 
   void delete(UUID id);
 

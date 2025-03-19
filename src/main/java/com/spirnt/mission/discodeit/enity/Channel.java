@@ -1,16 +1,23 @@
 package com.spirnt.mission.discodeit.enity;
 
-import java.io.Serializable;
-import java.time.Instant;
+import com.spirnt.mission.discodeit.enity.base.BaseUpdatableEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import java.util.Objects;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "channels")
+@NoArgsConstructor
 @Getter
-public class Channel extends Common implements Serializable {
+public class Channel extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
   String name;
   String description;
+  @Enumerated(EnumType.STRING)
   ChannelType type;
 
   public Channel(String name, String description, ChannelType type) {
@@ -21,17 +28,11 @@ public class Channel extends Common implements Serializable {
   }
 
   public void update(String name, String description) {
-    boolean anyValueUpdated = false;
     if (name != null && !name.equals(this.name)) {
       this.name = name;
-      anyValueUpdated = true;
     }
     if (description != null && !description.equals(this.description)) {
       this.description = description;
-      anyValueUpdated = true;
-    }
-    if (anyValueUpdated) {
-      this.updateClass(Instant.now());
     }
   }
 

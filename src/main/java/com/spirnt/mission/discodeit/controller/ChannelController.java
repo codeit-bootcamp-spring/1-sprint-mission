@@ -1,12 +1,11 @@
 package com.spirnt.mission.discodeit.controller;
 
+import com.spirnt.mission.discodeit.controller.swagger.ChannelApiDocs;
 import com.spirnt.mission.discodeit.dto.channel.ChannelDto;
 import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
-import com.spirnt.mission.discodeit.enity.Channel;
 import com.spirnt.mission.discodeit.service.ChannelService;
-import com.spirnt.mission.discodeit.swagger.ChannelApiDocs;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -31,28 +30,28 @@ public class ChannelController implements ChannelApiDocs {
 
   // 공개 채널 생성
   @PostMapping("/public")
-  public ResponseEntity<Channel> creatChannelPublic(
+  public ResponseEntity<ChannelDto> creatChannelPublic(
       @RequestBody PublicChannelCreateRequest request) {
-    Channel channel = channelService.createChannelPublic(request);
+    ChannelDto channelDto = channelService.createChannelPublic(request);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(channel);
+        .body(channelDto);
   }
 
   // 비공개 채널 생성
   @PostMapping("/private")
-  public ResponseEntity<Channel> createChannelPrivate(
+  public ResponseEntity<ChannelDto> createChannelPrivate(
       @RequestBody PrivateChannelCreateRequest request) {
-    Channel channel = channelService.createChannelPrivate(request);
+    ChannelDto channelDto = channelService.createChannelPrivate(request);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(channel);
+        .body(channelDto);
   }
 
   // 공개 채널 정보 수정
   @PatchMapping("/{channelId}")
-  public ResponseEntity<Channel> updatePublicChannel(@PathVariable UUID channelId,
+  public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
-    Channel channel = channelService.update(channelId, request);
-    return ResponseEntity.ok(channel);
+    ChannelDto channelDto = channelService.update(channelId, request);
+    return ResponseEntity.ok(channelDto);
   }
 
   // 채널 삭제
@@ -66,8 +65,8 @@ public class ChannelController implements ChannelApiDocs {
   // 특정 사용자가 볼 수 있는 채널 목록 조회
   @GetMapping("")
   public ResponseEntity<List<ChannelDto>> getAllChannelsByUserId(@RequestParam UUID userId) {
-    List<ChannelDto> channelResponses = channelService.findAllByUserId(userId);
-    return ResponseEntity.ok(channelResponses);
+    List<ChannelDto> channelDtos = channelService.findAllByUserId(userId);
+    return ResponseEntity.ok(channelDtos);
   }
 
 }

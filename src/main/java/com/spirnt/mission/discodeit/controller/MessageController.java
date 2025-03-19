@@ -1,13 +1,19 @@
 package com.spirnt.mission.discodeit.controller;
 
+import com.spirnt.mission.discodeit.controller.swagger.MessageApiDocs;
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
+import com.spirnt.mission.discodeit.dto.message.MessageDto;
 import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.spirnt.mission.discodeit.dto.response.PageResponse;
 import com.spirnt.mission.discodeit.enity.Message;
 import com.spirnt.mission.discodeit.service.MessageService;
-import com.spirnt.mission.discodeit.swagger.MessageApiDocs;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,19 +38,19 @@ public class MessageController implements MessageApiDocs {
 
   // 메시지 전송
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<Message> createMessage(
+  public ResponseEntity<MessageDto> createMessage(
       @RequestPart MessageCreateRequest messageCreateRequest,
       @RequestPart(required = false) List<MultipartFile> attachments) {
-    Message message = messageService.create(messageCreateRequest, attachments);
+    MessageDto message = messageService.create(messageCreateRequest, attachments);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(message);
   }
 
   // 메시지 수정
   @PatchMapping("/{messageId}")
-  public ResponseEntity<Message> updateMessage(@PathVariable UUID messageId,
+  public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
-    Message message = messageService.update(messageId, messageUpdateRequest);
+    MessageDto message = messageService.update(messageId, messageUpdateRequest);
     return ResponseEntity.ok(message);
   }
 
@@ -58,8 +64,11 @@ public class MessageController implements MessageApiDocs {
 
   // 특정 채널의 메시지 목록 조회
   @GetMapping("")
-  public ResponseEntity<List<Message>> getAllMessagesByChannel(@RequestParam UUID channelId) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
+  public ResponseEntity<PageResponse<Message>> getAllMessagesByChannel(@RequestParam UUID channelId,
+      @RequestParam(required = false) Instant cursor,
+      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
+      Pageable pageable) {
+    PageResponse<Message> messages = messageService.findAllByChannelId(channelId, cursor, pageable);
     return ResponseEntity.ok(messages);
   }
 }
