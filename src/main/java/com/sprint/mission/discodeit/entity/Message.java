@@ -1,46 +1,54 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class Message implements Serializable {
+@Entity
+@Table(name = "messages")
+@NoArgsConstructor
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
+  @Column(name = "content")
   private String content;
-  //
-  private UUID channelId;
-  private UUID authorId;
-  private List<UUID> attachmentIds;
 
-  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
+  @ManyToOne
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;  //
+
+  @ManyToOne
+  @JoinColumn(name = "author_id")
+  private User author;  //
+
+  @OneToMany
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachments;
+
+
+  public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
     this.content = content;
-    this.channelId = channelId;
-    this.authorId = authorId;
-    this.attachmentIds = attachmentIds;
+    this.channel = channel;
+    this.author = author;
+    this.attachments = attachments;
   }
 
   public void update(String newContent) {
-    boolean anyValueUpdated = false;
     if (newContent != null && !newContent.equals(this.content)) {
       this.content = newContent;
-      anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
     }
   }
 }

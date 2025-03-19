@@ -1,56 +1,57 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class User implements Serializable {
+@Entity
+@Table(name = "users")
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
+  @Column(name = "username", length = 50, nullable = false)
   private String username;
-  private String email;
-  private String password;
-  private UUID profileId;     // BinaryContent
 
-  public User(String username, String email, String password, UUID profileId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
+  @Column(name = "email", length = 100, nullable = false)
+  private String email;
+
+  @Column(name = "password", nullable = false)
+  private String password;
+
+  @OneToOne(optional = true) // 프로필이 없어도 됨 (Nullable)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;     // BinaryContent
+
+  public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
   }
 
-  public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
-    boolean anyValueUpdated = false;
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent newProfile) {
     if (newUsername != null && !newUsername.equals(this.username)) {
       this.username = newUsername;
-      anyValueUpdated = true;
     }
     if (newEmail != null && !newEmail.equals(this.email)) {
       this.email = newEmail;
-      anyValueUpdated = true;
     }
     if (newPassword != null && !newPassword.equals(this.password)) {
       this.password = newPassword;
-      anyValueUpdated = true;
     }
-    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-      this.profileId = newProfileId;
-      anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+    if (newProfile != null && !newProfile.equals(this.profile)) {
+      this.profile = newProfile;
     }
   }
 }
