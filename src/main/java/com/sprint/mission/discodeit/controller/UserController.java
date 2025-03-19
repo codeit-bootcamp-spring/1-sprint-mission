@@ -1,25 +1,37 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.io.IOException;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @ResponseBody
@@ -29,26 +41,37 @@ public class UserController {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
+  private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
 
   @PostMapping(
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
   )
-  public ResponseEntity<User> create(
+  public ResponseEntity<UserDto> create(
       @ModelAttribute UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    Optional<BinaryContentCreateRequest> profileRequest = Optional.empty();
+    String username = userCreateRequest.username();
+    String email = userCreateRequest.email();
+
+    if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
+      throw new IllegalArgumentException("해당 회원이 이미 존재합니다.");
+    }
+
+    Optional<BinaryContentDto> profileRequest = Optional.empty();
     if (profile != null) {
       profileRequest = resolveProfileRequest(profile);
     }
 
-    User createdUser = userService.create(userCreateRequest, profileRequest);
+    UserDto createdUser = userService.create(userCreateRequest, Optional.ofNullable(profile));
+
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdUser);
   }
 
-  @PutMapping(
+  @PatchMapping(
+      value = "/{userId}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
   )
   /*
@@ -59,18 +82,17 @@ public class UserController {
     -> GET 요청이면 URL에서 (?userId=...) 값을 받지만,
     -> POST (multipart/form-data) 요청이면 바디에서 값을 받는다!
    */
-  public ResponseEntity<User> update(
-      @RequestParam UUID userId,
+  public ResponseEntity<UserDto> update(
+      @PathVariable UUID userId,
       @ModelAttribute UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    Optional<BinaryContentCreateRequest> profileRequest = Optional.empty(); // 초기화
-    if (profile != null) {
-      profileRequest = resolveProfileRequest(
-          profile); // 받은 프로필 '파일'을 BinaryContentCreateRequest DTO로 변환
+    if (!userRepository.existsById(userId)) {
+      throw new NoSuchElementException("해당 회원을 찾을 수 없습니다.");
     }
 
-    User updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+    UserDto updatedUser = userService.update(userId, userUpdateRequest,
+        Optional.ofNullable(profile));
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUser);
@@ -78,6 +100,9 @@ public class UserController {
 
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+    if (!userRepository.existsById(userId)) {
+      throw new NoSuchElementException("해당 회원을 찾을 수 없습니다.");
+    }
     userService.delete(userId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -92,41 +117,42 @@ public class UserController {
         .body(allUsers);
   }
 
-  @PostMapping("/user-status")
-  public ResponseEntity<Void> createUserStatusByUserId(
+  @PostMapping("/{userId}/userStatus")
+  public ResponseEntity<UserStatusDto> createUserStatusByUserId(
+      @PathVariable UUID userId,
       @RequestBody UserStatusCreateRequest userStatusCreateRequest
   ) {
-    userStatusService.create(userStatusCreateRequest);
+    UserStatusDto userStatusDto = userStatusService.create(userStatusCreateRequest);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .build();
+        .body(userStatusDto);
   }
 
-  @PutMapping("/{userId}/user-status")
-  public ResponseEntity<Void> updateUserStatusByUserId(
+  @PatchMapping("/{userId}/userStatus")
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest userStatusUpdateRequest
   ) {
-    userStatusService.updateByUserId(userId, userStatusUpdateRequest);
+    userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new NoSuchElementException("해당 user status를 찾을 수 없습니다."));
+
+    UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
     return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .build();
+        .status(HttpStatus.OK)
+        .body(userStatusDto); // build()는 응답 데이터 없이 상태코드만 반환할 때 사용.
   }
 
-  private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
+  private Optional<BinaryContentDto> resolveProfileRequest(MultipartFile profileFile) {
     if (profileFile.isEmpty()) {
       return Optional.empty();
     } else {
-      try {
-        BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
-            profileFile.getOriginalFilename(),
-            profileFile.getContentType(),
-            profileFile.getBytes()
-        );
-        return Optional.of(binaryContentCreateRequest);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      BinaryContentDto binaryContentCreateRequest = new BinaryContentDto(
+          UUID.randomUUID(),
+          profileFile.getOriginalFilename(),
+          (int) profileFile.getSize(), //getSize() -> long으로 반환
+          profileFile.getContentType()
+      );
+      return Optional.of(binaryContentCreateRequest);
     }
   }
 }

@@ -1,7 +1,7 @@
-discodeit:
-  repository:
-    type: file  # jcf | file
-    file-directory: .discodeit
+#discodeit:
+#  repository:
+#    type: file  # jcf | file
+#    file-directory: .discodeit
 
 springdoc:
   api-docs:
@@ -9,14 +9,32 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-#spring:
-#  application:
-#    name: discodeit
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/postgres
-#    username: postgres
-#    password: 458600
-#  jpa:
-#    hibernate:
-#      ddl-auto: update  # 테이블 자동 업데이트 (기존 데이터 유지)
-#    show-sql: true  # SQL 로그 출력
+spring:
+  application:
+    name: discodeit
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit?currentSchema=public
+    username: discodeit_user
+    password: discodeit1234
+  jpa:
+    hibernate:
+      ddl-auto: update  # 테이블 자동 업데이트 (기존 데이터 유지)
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ${user.dir}/storage
+      # ${user.dir}는 작업중인 환경의 루트 디렉토리 상대 경로 -> 배포 환경에 따라 유연한 저장경로 설정 가능. (현재 user.dir = C:\github.com\codeit-bootcamp-spring\1-sprint-mission)
+      # 예를 들어, 실행 경로가 /home/myuser/app이면 파일은 /home/myuser/app/storage 아래 저장됨
+
+
