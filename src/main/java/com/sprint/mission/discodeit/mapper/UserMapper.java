@@ -14,7 +14,6 @@ public interface UserMapper {
   // @Mapping(source = "profile", target = "profile") 에서
   // User 엔티티의 profile 필드를 BinaryContentMapper를 통해 BinaryContentDto로 변환하여 UserDto에 전달
   @Mapping(source = "profile", target = "profile")
-
   // MapStruct 문서 5.3번, 중첩된 빈 매핑 제어
   @Mapping(source = "userStatus.online", target = "online")
   UserDto toDto(User user);
