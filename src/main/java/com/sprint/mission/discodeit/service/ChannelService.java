@@ -1,73 +1,62 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.channel.ChannelListResponse;
-import com.sprint.mission.discodeit.entity.channel.ChannelResponse;
-import com.sprint.mission.discodeit.entity.channel.add.ChannelAddMessageRequest;
-import com.sprint.mission.discodeit.entity.channel.add.ChannelAddUserResponse;
-import com.sprint.mission.discodeit.entity.channel.create.ChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.entity.channel.create.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.entity.channel.create.PrivateChannelCreateResponse;
 import com.sprint.mission.discodeit.entity.channel.create.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.entity.channel.create.PublicChannelCreateResponse;
-import com.sprint.mission.discodeit.entity.channel.find.ChannelFindOfUserResponse;
-import com.sprint.mission.discodeit.entity.channel.find.ChannelFindResponse;
 import com.sprint.mission.discodeit.entity.channel.update.ChannelModifyRequest;
-import com.sprint.mission.discodeit.entity.channel.update.ChannelModifyResponse;
-import com.sprint.mission.discodeit.entity.channel.update.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.channel.update.ChannelUpdateResponse;
-import com.sprint.mission.discodeit.entity.user.User;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public interface ChannelService {
 
-  ChannelResponse createChannel(ChannelCreateRequest request);
+  // 공개 채널 생성
+  ChannelDto createPublic(PublicChannelCreateRequest request);
 
-  ChannelResponse createPublicChannel(ChannelCreateRequest request, Map<UUID, User> userList);
+  // 비공개 채널 생성
+  ChannelDto createPrivate(PrivateChannelCreateRequest request);
 
-  PublicChannelCreateResponse createPublicChannel(PublicChannelCreateRequest request);
+  // 채널 삭제
+  void remove(UUID channelId);
 
-  ChannelResponse createPrivateChannel(ChannelCreateRequest request, Map<UUID, User> userList);
+  // 채널 수정
+  ChannelDto update(UUID channelId, ChannelModifyRequest request);
 
-  PrivateChannelCreateResponse createPrivateChannel(PrivateChannelCreateRequest request);
+  // 유저가 참여 중인 모든 채널 뽑기
+  List<ChannelDto> findAllChannelsByUserId(UUID userId);
 
-//    Map<UUID, Channel> getChannelByName(String channelName);
-
-  ChannelFindResponse findChannelById(UUID channelId);
-
-  Map<UUID, ChannelFindResponse> getAllChannels(UUID userId);
-
-  default Map<UUID, ChannelListResponse> getAllChannelsOfUser(String userName) {
-    return null;
-  }
-
-  List<ChannelFindOfUserResponse> findAllChannelsFindByUserId(UUID userId);
-
-  ChannelUpdateResponse updateChannel(String channelName, ChannelUpdateRequest request);
-
-  ChannelModifyResponse modifyChannel(UUID channelId, ChannelModifyRequest request);
-
-  UUID removeChannelById(UUID channelUUID);
-
-  default UUID removeChannelByName(String channelName) {
-    return null;
-  }
-
-  ChannelAddUserResponse addUserChannel(UUID channelUUID, String username);
-
-  //
-//    void kickUserChannel(UUID channelUUID, User kickUser);
+//  ChannelResponse createChannel(ChannelCreateRequest request);
 //
-//    // 채널에 메세지 추가
-  void sendMessage(ChannelAddMessageRequest request);
+//  ChannelResponse createPublicChannel(ChannelCreateRequest request, Map<UUID, User> userList);
 //
-//    // 채널에 있는 메세지 삭제
-  //void removeMessageInCh(UUID channelId, Message removeMessage);
+//  PublicChannelCreateResponse createPublicChannel(PublicChannelCreateRequest request);
 //
-//    // 채널 메세지 조회
-//    Message findChannelMessageById(UUID channelId, UUID messageId);
+//  ChannelResponse createPrivateChannel(ChannelCreateRequest request, Map<UUID, User> userList);
 //
-//    // 채널 메세지 모든 조회
-//    Map<UUID, Message> findChannelInMessageAll(UUID channelId);
+//  PrivateChannelCreateResponse createPrivateChannel(PrivateChannelCreateRequest request);
+//
+//  Map<UUID, Channel> getChannelByName(String channelName);
+//
+//  ChannelFindResponse findChannelById(UUID channelId);
+//
+//  Map<UUID, ChannelFindResponse> getAllChannels(UUID userId);
+//
+//  default Map<UUID, ChannelListResponse> getAllChannelsOfUser(String userName) {
+//    return null;
+//  }
+//
+//  List<ChannelFindOfUserResponse> findAllChannelsFindByUserId(UUID userId);
+//
+//  ChannelUpdateResponse updateChannel(String channelName, ChannelUpdateRequest request);
+//
+//  ChannelModifyResponse modifyChannel(UUID channelId, ChannelModifyRequest request);
+//
+//  UUID removeChannelById(UUID channelUUID);
+//
+//  default UUID removeChannelByName(String channelName) {
+//    return null;
+//  }
+//
+//  ChannelAddUserResponse addUserChannel(UUID channelUUID, String username);
+//
+//  void sendMessage(ChannelAddMessageRequest request);
 }

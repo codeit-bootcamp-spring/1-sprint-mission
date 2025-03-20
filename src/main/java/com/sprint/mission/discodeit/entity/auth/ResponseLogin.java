@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.entity.auth;
 
-import java.time.Instant;
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record ResponseLogin(
     UUID id,
-    Instant createdAt,
-    Instant updatedAt,
     String username,
     String email,
-    String password,
-    String profileId
+    BinaryContentDto profile,
+    Boolean online
 ) {
 
 }

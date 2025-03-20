@@ -1,58 +1,44 @@
 package com.sprint.mission.discodeit.entity.status.read;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sprint.mission.discodeit.entity.BaseObject;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-
+import com.sprint.mission.discodeit.entity.base.baseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.user.User;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-/**
- * 사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현하는 도메인 모델입니다. 사용자별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용합니다.
- */
-
+@Entity
 @Getter
-public class ReadStatus extends BaseObject {
+@AllArgsConstructor
+@Table(name = "read_statuses")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends baseUpdatableEntity {
 
-  @NotNull
-  @JsonProperty("userId")
-  private UUID userId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-  @NotNull
-  private UUID channelId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
 
   private Instant lastReadAt;
 
-
-  public static ReadStatus createReadStatus(UUID userId, UUID channelId) {
-    return new ReadStatus(userId, channelId);
+  public static ReadStatus create(User user, Channel channel) {
+    return new ReadStatus(user, channel, Instant.now());
   }
 
-  public static ReadStatus createReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    return new ReadStatus(userId, channelId, lastReadAt);
-  }
-
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    super();
-    this.userId = userId;
-    this.channelId = channelId;
+  public ReadStatus changeLastReadAt(Instant lastReadAt) {
     this.lastReadAt = lastReadAt;
-  }
 
-  public ReadStatus() {
+    return this;
   }
-
-  public ReadStatus(UUID userId, UUID channelId) {
-    super();
-    this.userId = userId;
-    this.channelId = channelId;
-    this.lastReadAt = Instant.now();
-  }
-
-  public void updateLastReadAt() {
-    this.lastReadAt = Instant.now();
-  }
-
 }

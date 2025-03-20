@@ -1,35 +1,28 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.status.read.ReadStatus;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface ReadStatusRepository {
+public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-  // 저장
-  ReadStatus save(ReadStatus readStatus);
+  @EntityGraph(attributePaths = {"user", "channel"})
+  ReadStatus findFirstByChannelOrderByLastReadAtDesc(Channel channel);
 
-  // 유저 아이디로 검색해서 ReadStatus 얻기
-  List<ReadStatus> findAllReadStatusByUserId(UUID userId);
+  @EntityGraph(attributePaths = {"user", "user.profile", "user.status", "channel"})
+  @Query("select r from ReadStatus r join fetch r.channel where r.user.id = :userId")
+  List<ReadStatus> findAllChannelsInUser(@Param("userId") UUID userId);
 
-  // 채널 아이디로 검색해서 ReadStatus 얻기
-  ReadStatus findByChannelId(UUID channelId);
+  @EntityGraph(attributePaths = {"user.profile", "user.status", "channel"})
+  List<ReadStatus> findAllByChannel(Channel channel);
 
-  // 모든 ReadStatus 얻기
-  Map<UUID, ReadStatus> findAll();
+  List<ReadStatus> findAllByUser_Id(UUID userId);
 
-  // 삭제
-  void remove(UUID channelId);
-
-  // 채널 메세지 수신 정보 수정
-  ReadStatus update(UUID channelId);
-
-  ReadStatus find(UUID id);
-
-  // 테스트용
-
-  void clearData();
-
-  void resetData();
+  Optional<ReadStatus> findReadStatusByUser_IdAndChannel_Id(UUID userId, UUID channelId);
 }

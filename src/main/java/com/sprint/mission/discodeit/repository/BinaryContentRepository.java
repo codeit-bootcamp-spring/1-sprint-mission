@@ -1,26 +1,13 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
-
-import java.util.Map;
+import com.sprint.mission.discodeit.entity.binarycontent.dto.BinaryContentResponse;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BinaryContentRepository {
+public interface BinaryContentRepository extends JpaRepository<BinaryContent, UUID> {
 
-    // 저장
-    BinaryContent save(BinaryContent binaryContent);
-
-    // 모든 BinaryContent 찾기
-    Map<UUID, BinaryContent> findAll();
-
-    // BinaryContent의 id로 찾기
-    BinaryContent findById(UUID id);
-
-    // BinaryContent의 uuid로 삭제
-    void delete(UUID id);
-
-
-    // 테스트용
-    void clearData();
-    void resetData();
+  List<BinaryContentResponse> findAllByIdIn(Collection<UUID> ids);
 }

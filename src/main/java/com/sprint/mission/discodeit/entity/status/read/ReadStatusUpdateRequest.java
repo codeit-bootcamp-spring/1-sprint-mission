@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.entity.status.read;
 
-import java.util.UUID;
+import java.time.Instant;
 
-public record ReadStatusUpdateRequest (
-        UUID channelId
-
+public record ReadStatusUpdateRequest(
+    Instant newLastReadAt
 ) {
+
 }

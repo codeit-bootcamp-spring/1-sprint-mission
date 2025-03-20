@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.status.read.ReadStatusCreateResponse;
-import com.sprint.mission.discodeit.entity.status.read.ReadStatusModifyRequest;
-import com.sprint.mission.discodeit.entity.status.read.ReadStatusModifyResponse;
+import com.sprint.mission.discodeit.dto.response.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.status.read.ReadStatusRequest;
-import com.sprint.mission.discodeit.entity.status.read.ReadStatusResponse;
+import com.sprint.mission.discodeit.entity.status.read.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.status.ReadStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,22 +29,22 @@ public class ReadStatusController {
   private final ReadStatusService readStatusService;
 
   /**
-   * user의 메세지 읽음 상태 목록 조회
-   */
-  @Operation(summary = "유저의 메세지 읽은 상태 목록 조회")
-  @GetMapping
-  public List<ReadStatusResponse> findAllUserReadStatus(@RequestParam("userId") UUID userId) {
-    return readStatusService.findByUserId(userId);
-  }
-
-  /**
    * 읽음 상태 생성
    */
   @Operation(summary = "읽음 상태 생성")
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
-  public ReadStatusCreateResponse createReadStatus(@RequestBody ReadStatusRequest request) {
-    return readStatusService.createReadStatus(request);
+  public ReadStatusDto createReadStatus(@RequestBody ReadStatusRequest request) {
+    return readStatusService.create(request);
+  }
+
+  /**
+   * user의 메세지 읽음 상태 목록 조회
+   */
+  @Operation(summary = "유저의 메세지 읽은 상태 목록 조회")
+  @GetMapping
+  public List<ReadStatusDto> findAllUserReadStatus(@RequestParam("userId") UUID userId) {
+    return readStatusService.findByUserId(userId);
   }
 
   /**
@@ -54,9 +52,9 @@ public class ReadStatusController {
    */
   @Operation(summary = "읽음 상태 수정")
   @PatchMapping("/{readStatusId}")
-  public ReadStatusModifyResponse updateReadStatus(@PathVariable("readStatusId") UUID readStatusId,
-      @RequestBody ReadStatusModifyRequest request) {
+  public ReadStatusDto updateReadStatus(@PathVariable("readStatusId") UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest request) {
 
-    return readStatusService.updateReadStatus(readStatusId, request);
+    return readStatusService.update(readStatusId, request);
   }
 }

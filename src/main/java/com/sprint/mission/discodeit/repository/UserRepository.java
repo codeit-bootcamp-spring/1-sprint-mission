@@ -1,29 +1,33 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.user.User;
-
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import lombok.NonNull;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepository {
-    // 유저 저장
-    User userSave(User user);
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    // 유저 조회
-    User findUserById(UUID userId);
+  @EntityGraph(attributePaths = {"status", "profile"})
+  void removeUserById(UUID id);
 
-    // 모든 유저 조회
-    Map<UUID, User> findAllUser();
+  @EntityGraph(attributePaths = {"status"})
+  @NonNull
+  List<User> findAll();
 
-    // 유저 삭제
-    void removeUserById(UUID userId);
+  @EntityGraph(attributePaths = {"status", "profile"})
+  @NonNull
+  Optional<User> findById(@NonNull UUID userId);
 
-    // 유저 이메일로 찾기
-    User findUserByEmail(String email);
+  @EntityGraph(attributePaths = {"status", "profile"})
+  List<User> findByIdIn(List<UUID> participantIds);
 
-    // json 초기화
-    void clearData();
-    void resetData();
+  @Query("select u from User u left join fetch u.status left join fetch u.profile")
+  List<User> findUsers();
 
-    User findUserByName(String userName);
+  @EntityGraph(attributePaths = {"status", "profile"})
+  User findUserByUsername(String username);
 }

@@ -3,71 +3,43 @@ package com.sprint.mission.discodeit.service.auth;
 import com.sprint.mission.discodeit.entity.auth.RequestLogin;
 import com.sprint.mission.discodeit.entity.auth.ResponseLogin;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.user.UserLoginRequest;
-import com.sprint.mission.discodeit.entity.user.UserLoginResponse;
-import com.sprint.mission.discodeit.exception.user.IllegalUserException;
 import com.sprint.mission.discodeit.exception.user.UserAuthException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.entitymapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserAuthService implements AuthService {
 
   private final UserRepository userRepository;
 
   @Override
-  public UserLoginResponse login(UserLoginRequest loginInfo) {
-    Map<UUID, User> users = userRepository.findAllUser();
-
-    UserLoginResponse userLoginResponse = getUserLoginResponse(loginInfo, users);
-    log.warn("로그인 성공: {}", userLoginResponse.userName());
-
-    return userLoginResponse;
-  }
-
-
-  /**
-   * 스프린트 미션 5, 로그인
-   */
-  @Override
+  @Transactional(readOnly = true)
   public ResponseLogin login(RequestLogin request) {
-    User findUser = userRepository.findUserByName(request.username());
+    User findUser = userRepository.findUserByUsername(request.username());
 
     if (findUser == null) {
       throw new UserNotFoundException(request.username());
     }
 
-    if (!findUser.getUserName().equals(request.username()) || !findUser.getUserPassword()
+    if (!findUser.getUsername().equals(request.username()) || !findUser.getPassword()
         .equals(request.password())) {
-      throw new IllegalUserException("아이디 또는 비밀버호가 잘못 되었습니다.");
+      throw new UserAuthException("아이디 또는 비밀번호가 잘못 되었습니다.");
     }
 
-    return new ResponseLogin(findUser.getId(), findUser.getCreatedAt(), findUser.getUpdatedAt(),
-        findUser.getUserName(), findUser.getUserEmail(), findUser.getUserPassword(),
-        findUser.getProfileId());
-  }
-
-
-  private static UserLoginResponse getUserLoginResponse(UserLoginRequest loginInfo,
-      Map<UUID, User> users) {
-    return users.values().stream()
-        .filter(allusers -> allusers.getUserName().equals(loginInfo.userName()))
-        .filter(sameNameUser -> sameNameUser.getUserPassword().equals(loginInfo.userPassword()))
-        .findFirst()
-        .map(u -> new UserLoginResponse(u.getId(), u.getUserName(), Instant.now()))
-        .orElseThrow(() -> {
-          log.error("아이디 또는 비밀번호가 잘못되었습니다.");
-
-          return new UserAuthException("유저 인증 실패");
-        });
+    return ResponseLogin.builder()
+        .id(findUser.getId())
+        .username(findUser.getUsername())
+        .email(findUser.getEmail())
+        .profile(BinaryContentMapper.toDto(findUser.getProfile()))
+        .online(true)
+        .build();
   }
 }

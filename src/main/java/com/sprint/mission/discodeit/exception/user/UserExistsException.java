@@ -7,6 +7,6 @@ public class UserExistsException extends RuntimeException {
   }
 
   public UserExistsException(String email) {
-    super(String.format("User with email %s already exists", email));
+    super(String.format("User with name or email %s already exists", email));
   }
 }
