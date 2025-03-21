@@ -1,24 +1,26 @@
 package com.sprint.mission.service;
 
 
-import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.dto.response.MessageDto;
+import com.sprint.mission.dto.response.PageResponse;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
+import com.sprint.mission.dto.response.ScrollPageResponse;
 import com.sprint.mission.entity.main.Message;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 public interface MessageService {
 //    void create(MessageDtoForCreate responseDto, Optional<BinaryContentDto> attachmentsDto);
 
-    Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto);
+    Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> attachmentsDto);
 
-    void update(UUID messageId, MessageDtoForUpdate updateDto);
-    List<Message> findAllByChannelId(UUID channelId);
+    Message update(UUID messageId, MessageDtoForUpdate updateDto);
+    List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable);
+    List<ScrollPageResponse<MessageDto>> findAllByChannelId(UUID channelId);
     //List<Message> findAll();
     void delete(UUID messageId);
 

@@ -1,85 +1,76 @@
 package com.sprint.mission.service.jcf.main;
 
-import com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.dto.MessageMapper;
+import com.sprint.mission.dto.PageResponseMapper;
+import com.sprint.mission.dto.response.MessageDto;
+import com.sprint.mission.dto.response.PageResponse;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
+import com.sprint.mission.dto.response.ScrollPageResponse;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
-import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
-import com.sprint.mission.repository.jcf.main.JCFMessageRepository;
-import com.sprint.mission.repository.jcf.main.JCFUserRepository;
+import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.BinaryContentStorage;
+import com.sprint.mission.repository.ChannelRepository;
+import com.sprint.mission.repository.MessageRepository;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
 
-import java.time.Instant;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.VirtualThreadTaskExecutor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class JCFMessageService implements MessageService {
 
-    // 가상스레드
-    private final ExecutorService ves;
-
-    private final JCFMessageRepository messageRepository;
-    private final JCFChannelRepository channelRepository;
-    private final JCFUserRepository userRepository;
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
     private final BinaryService binaryService;
+    private final BinaryContentStorage binaryContentStorage;
+    private final MessageMapper messageMapper;
+    private final PageResponseMapper pageResponseMapper;
+
 
     @Override
-    public Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) {
-        UUID userId = responseDto.userId();
-        UUID channelId = responseDto.channelId();
+    public Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> binaryContentDtoForCreateList) {
+        User author = userRepository.findById(responseDto.userId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        Future<?> isExistUserF = ves.submit(() -> {
-            if (!userRepository.existsById(userId)) throw new CustomException(ErrorCode.NO_SUCH_USER);});
-        Future<?> isExistChannelF = ves.submit(() -> {
-            if (!channelRepository.existsById(channelId)) throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);});
-        try {
-            isExistUserF.get();
-            isExistChannelF.get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw e.getCause() instanceof CustomException
-                    ? (CustomException) e.getCause()
-                    : new RuntimeException(e);
-        }
+        Channel writtenPlace = channelRepository.findById(responseDto.channelId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
-        Message createdMessage = responseDto.toEntity();
+        Message createdMessage = messageMapper.toEntity(writtenPlace, author, responseDto.content());
 
-        List<BinaryContentDto> bcdList = attachmentsDto.orElse(Collections.emptyList());
-        log.info("attachmentsDto: {}", bcdList);
-        if (!bcdList.isEmpty()) {
-            for (BinaryContentDto bcd : bcdList) {
+        log.info("attachmentsDto: {}", binaryContentDtoForCreateList);
+        if (!binaryContentDtoForCreateList.isEmpty()) {
+            binaryContentDtoForCreateList.forEach(bcd -> {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
-                createdMessage.getAttachmentIdList().add(createdBinaryContent.getId());
-            }
+                binaryContentStorage.put(createdBinaryContent.getId(), bcd.bytes());
+                log.info("메시지의 생성된 BinaryContent: {}", createdBinaryContent);
+            });
         }
-        log.info("createdMessage 채널 : {}", createdMessage.getChannelId());
-        //writtenChannel.updateLastMessageTime();
-        //channelRepository.save(writtenChannel);
         return messageRepository.save(createdMessage);
     }
 
     @Override
-    public void update(UUID messageId, MessageDtoForUpdate updateDto) {
-        Message updatingMessage = messageRepository.findById(messageId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
-        updatingMessage.setContent(updateDto.newContent());
-        updatingMessage.refreshUpdateAt();
-        messageRepository.save(updatingMessage);
+    public Message update(UUID messageId, MessageDtoForUpdate updateDto) {
+        Message updatingMessage = this.findById(messageId);
+        return updatingMessage.update(updateDto.content());
     }
 
 
@@ -89,38 +80,78 @@ public class JCFMessageService implements MessageService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
     }
 
+    // 스크롤링
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        if (channelRepository.existsById(channelId)){
+    public List<ScrollPageResponse<MessageDto>> findAllByChannelId(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
-        return messageRepository.findAllByChannel(channelId);
+
+        // 매번 새 페이지마다 요청할지 아니면 한번에 다 가져올지 고민 (중간에 총개수가 바뀔 수 있으니)
+        Long totalMessageCount = messageRepository.countByChannel_Id(channelId);
+        ScrollPosition position = ScrollPosition.keyset();
+        List<ScrollPageResponse<MessageDto>> messageDtoList = new ArrayList<>();
+        while (true){
+            Window<MessageDto> messageDtoWindow = messageRepository
+                    .findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, (KeysetScrollPosition) position)
+                    .map(messageMapper::toDto);
+
+            messageDtoList.add(pageResponseMapper.toScrollPageResponse(messageDtoWindow, position, totalMessageCount));
+
+            // 포지션 초기화
+            position = getScrollPosition(messageDtoWindow);
+            if (!messageDtoWindow.hasNext()) {
+                break;
+            }
+        }
+        return messageDtoList;
     }
+
+    // Page 버전
+    @Override
+    public List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+        }
+
+        Page<Message> pageMessages;
+        List<PageResponse<MessageDto>> messageDtoList = new ArrayList<>();
+        do {
+            pageMessages = messageRepository.findPagingAllByChannel_Id(channelId, pageable);
+
+            Page<MessageDto> dtoPage = pageMessages.map(messageMapper::toDto);
+            PageResponse<MessageDto> messagePageResponse = pageResponseMapper.fromPage(dtoPage);
+            messageDtoList.add(messagePageResponse);
+
+            pageable = pageMessages.nextPageable();
+        } while (pageMessages.hasNext());
+        log.info("messageDtoList: {}", messageDtoList);
+        return messageDtoList;
+    }
+
 
     @Override
     public void delete(UUID messageId) {
-        Message deletingMessage = messageRepository.findById(messageId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
-
-        Future<?> deleteBinaryF = ves.submit(() -> {
-            deletingMessage.getAttachmentIdList()
-                    .forEach(binaryService::deleteById);
-        });
-        ves.submit(() -> messageRepository.delete(deletingMessage.getId()));
-        try {
-            deleteBinaryF.get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw e.getCause() instanceof CustomException
-                    ? (CustomException) e.getCause()
-                    : new RuntimeException(e);
+        // BinaryContent랑 cascade Remove관계라
+        if (!messageRepository.existsById(messageId)) {
+            throw new CustomException(ErrorCode.NO_SUCH_MESSAGE);
+        } else {
+            messageRepository.deleteById(messageId);
         }
     }
 
 
     @Override
     public void deleteAllByChannelId(UUID channelId) {
-        messageRepository.deleteAllByChannelId(channelId);
+        messageRepository.deleteAllByChannel_Id(channelId);
+    }
+
+
+    private ScrollPosition getScrollPosition(Window<MessageDto> messageDtoWindow) {
+        MessageDto lastDto = messageDtoWindow.getContent().getLast();
+        Map<String, Object> keysetMap = new HashMap<>();
+        keysetMap.put("createdAt", lastDto.createdAt());
+        keysetMap.put("id", lastDto.id());
+        return ScrollPosition.forward(keysetMap);
     }
 }

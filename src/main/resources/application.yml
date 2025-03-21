@@ -4,11 +4,31 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 10MB # 요청 파일 하나당 허용 사이즈
-      max-request-size: 100MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
+      max-file-size: 20MB # 요청 파일 하나당 허용 사이즈
+      max-request-size: 50MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
   threads:
     virtual:
       enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always  # 애플리케이션 실행 시 항상 schema.sql 실행
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        jdbc:
+            batch_size: 50
+        order_inserts: true
+        order_updates: true
+        format_sql: true
+        #dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
 
 springdoc:
   api-docs:
@@ -18,12 +38,21 @@ springdoc:
   default-consumes-media-type: application/json
 
 discodeit:
-  repository:
-    type: jcf
-    file-directory: .discodeit
+  storage:
+    type: local
+    local.root-path : "C:\\binary-storage"
+  #repository:
+    #type: jcf
+    #file-directory: .discodeit
 
 
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
 
 logging:
   level:
-    com.sprint: TRACE
+    org.hibernate.sql : DEBUG
+#    org.hibernate.type.descriptor.sql : TRACE
+

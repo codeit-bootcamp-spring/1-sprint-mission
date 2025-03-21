@@ -14,12 +14,4 @@ public record MessageDtoForCreate(
         UUID userId,
         @NotBlank(message = "내용은 필수입니다.")
         String content) {
-
-    public Message toEntity() {
-        return new Message(
-                channelId,
-                userId,
-                content
-        );
-    }
 }

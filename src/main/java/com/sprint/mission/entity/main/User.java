@@ -1,44 +1,67 @@
 package com.sprint.mission.entity.main;
 
-
-import com.sprint.mission.dto.request.UserDtoForCreate;
+import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.entity.addOn.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
+import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.FetchType.*;
+import static lombok.AccessLevel.*;
+
+@Entity
+@EqualsAndHashCode(of = {"username", "email", "password"}, callSuper = true)
+@ToString(of = {"username", "email", "password", "profile"})  // callSuper 제거 및 id 등 직접 명시
+@Getter //@Builder
+@NoArgsConstructor(access = PROTECTED)
 @Schema(description = "유저")
-public class User implements Serializable {
+@Table(name = "users")
+public class User extends BaseUpdatableEntity{
 
-    private static final long serialVersionUID = 1L;
-
-    private final UUID id;
-    private final Instant createAt;
-    private Instant updateAt;
-
-    private String name;
+    private String username;
     private String email;
     private String password;
 
-    private UUID profileImgId;
+    //변경가능하니
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "profile_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL) // profile이 삭제되면 user의 profile은 null로 변경
+    private BinaryContent profile;
 
-    public User(String name, String password, String email, UUID profileImgId) {
-        this.id = UUID.randomUUID();
-        this.createAt = Instant.now();
-        this.name = name;
+    @OneToOne(mappedBy = "user", cascade = REMOVE)
+    private UserStatus status;
+
+    // REMOVE => user가 삭제되면 readStatus도 삭제됨
+    @OneToMany(mappedBy = "user", cascade = REMOVE, orphanRemoval = true)
+    private List<ReadStatus> readStatus = new ArrayList<>();
+
+    public User(String username, String password, String email, BinaryContent profile) {
+        this.username = username;
         this.password = password;
         this.email = email;
-        this.profileImgId = profileImgId;
+        this.profile = profile;
     }
 
-    public void refreshUpdateAt() {
-        this.updateAt = Instant.now();
+    public User assignStatus(UserStatus status) {
+        this.status = status;
+        return this;
     }
+
+    public User update(String newName, String newPassword, String newEmail) {
+        this.username = newName;
+        this.password = newPassword;
+        this.email = newEmail;
+        return this;
+    }
+
+//    public Optional<BinaryContent> getProfile() { // mapping은 null 체크 해줌
+//        return Optional.ofNullable(profile);
+//    }
 }

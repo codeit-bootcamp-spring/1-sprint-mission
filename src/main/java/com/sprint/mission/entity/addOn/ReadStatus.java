@@ -1,41 +1,42 @@
 package com.sprint.mission.entity.addOn;
 
+import com.sprint.mission.entity.main.BaseUpdatableEntity;
+import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-@Schema(description = "메시지 읽음 상태 정보")
+import static jakarta.persistence.FetchType.*;
+@Entity
+@EqualsAndHashCode(of = {"user", "channel"}, callSuper = true)
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor
+@ToString(of = {"lastReadAt"})
 @Getter
-public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
-    private UUID userId;
-    private UUID channelId;
+@Schema(description = "메시지 읽음 상태 정보")
+@Table(name = "read_statuses")
+public class ReadStatus extends BaseUpdatableEntity {
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    private User user;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "channel_id", unique = true)
+    private Channel channel;
+
+    @NotNull
     private Instant lastReadAt;
 
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadAt = lastReadAt;
-    }
-
     public void update(Instant newLastReadAt) {
-        boolean anyValueUpdated = false;
         if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
             this.lastReadAt = newLastReadAt;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
         }
     }
 }

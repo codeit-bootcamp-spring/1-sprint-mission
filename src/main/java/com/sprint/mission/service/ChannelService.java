@@ -3,7 +3,7 @@ package com.sprint.mission.service;
 
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
-import com.sprint.mission.dto.response.FindChannelAllDto;
+import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 
@@ -13,8 +13,8 @@ import java.util.UUID;
 public interface ChannelService {
 //
 //    Channel create(ChannelDtoForRequest dto);
-
-  List<FindChannelAllDto> findAllByUserId(UUID userId);
+//
+//  List<FindChannelAllDto> findAllByUserId(UUID userId);
 
   List<Channel> findAll();
 
@@ -24,7 +24,9 @@ public interface ChannelService {
 
   Channel findById(UUID id);
 
-  void update(UUID channelId, ChannelDtoForUpdate dto);
+  List<ChannelDto> findAllByUserId(UUID userId);
+
+  Channel update(UUID channelId, ChannelDtoForUpdate dto);
 
   void delete(UUID channelId);
 //    void validateDuplicateName(String name);
