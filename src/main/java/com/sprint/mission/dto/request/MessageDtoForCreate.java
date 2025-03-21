@@ -1,17 +1,20 @@
 package com.sprint.mission.dto.request;
 
-import com.sprint.mission.entity.addOn.BinaryMessageContent;
+import com.sprint.mission.entity.main.Message;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.UUID;
 
-@Getter
-public class MessageDtoForCreate {
+public record MessageDtoForCreate(
+    UUID channelId,
+    UUID userId,
+    String content) {
 
-    private UUID channelId;
-    private UUID userId;
-    private String content;
-    private List<byte[]> attachments;
-
+    public Message toEntity() {
+        return new Message(
+            channelId,
+            userId,
+            content
+        );
+    }
 }

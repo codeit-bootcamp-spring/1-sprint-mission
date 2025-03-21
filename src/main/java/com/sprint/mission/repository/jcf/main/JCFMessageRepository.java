@@ -1,11 +1,8 @@
 package com.sprint.mission.repository.jcf.main;
 
-import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.repository.MessageRepository;
-import com.sprint.mission.service.exception.NotFoundId;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -33,10 +30,10 @@ public class JCFMessageRepository implements MessageRepository{
     }
 
 
-    public List<Message> findAllByChannel(Channel channel){
+    public List<Message> findAllByChannel(UUID channelId){
         return data.values().stream()
-                .filter(message -> message.getWrittenPlace().equals(channel))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
@@ -47,5 +44,9 @@ public class JCFMessageRepository implements MessageRepository{
     @Override
     public boolean existsById(UUID id) {
         return data.containsKey(id);
+    }
+
+    public void deleteAllByChannelId(UUID channelId) {
+        data.values().removeIf(message -> message.getChannelId().equals(channelId));
     }
 }

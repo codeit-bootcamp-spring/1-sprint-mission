@@ -1,23 +1,18 @@
 package com.sprint.mission.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.dto.request.UserDtoForRequest;
-import com.sprint.mission.dto.request.UserDtoForRequest2;
-import com.sprint.mission.dto.response.FindChannelDto;
+import com.sprint.mission.common.CommonResponse;
+import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.dto.request.UserDtoForCreate;
+import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.dto.response.FindUserDto;
-import com.sprint.mission.entity.addOn.BinaryProfileContent;
+import com.sprint.mission.dto.response.SaveUserDto;
 import com.sprint.mission.entity.addOn.UserStatus;
-import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.service.ChannelService;
-import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
+import com.sprint.mission.service.UserService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
-import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
-import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,63 +20,63 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
-    private final JCFUserService userService;
+    private final UserService userService;
     private final UserStatusService userStatusService;
-    private final BinaryProfileService binaryProfileService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
-
-    //@ModelAttribute UserDtoForRequest requestDTO << 이거 써도 되지만 PUT, PATCH에서는 못 쓰기에 일관성 있게 RequestPart
-    @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<String> create(@RequestPart(value = "dto") UserDtoForRequest requestDTO,
-                                         @RequestPart(value = "profileImg") MultipartFile profile) {
-        requestDTO.setProfileImg(profile);
-        userService.create(requestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("User created successfully");
+    @RequestMapping(path = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponse> create(@RequestPart("createRequestDto") UserDtoForCreate requestDTO,
+                                                 @RequestPart(value = "profile", required = false) MultipartFile profile) {
+        Optional<BinaryContentDto> binaryContentDto = BinaryContentDto.fileToBinaryContentDto(profile);
+        User user = userService.create(requestDTO, binaryContentDto);
+        return CommonResponse.toResponseEntity
+                (CREATED, "유저가 성공적으로 생성되었습니다.", SaveUserDto.fromEntity(user));
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<FindUserDto> findById(@PathVariable UUID userId) {
-        User findUser = userService.findById(userId);
-        BinaryProfileContent profile = binaryProfileService.findById(userId);
-        boolean isOnline = userStatusService.findById(userId).isOnline();
-        return ResponseEntity.status(HttpStatus.OK).body(new FindUserDto(findUser, profile.getBytes(), isOnline));
-    }
+    @RequestMapping(path = "update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponse> update(
+            @RequestParam("userId") UUID userId,
+            @RequestPart("updateRequestDto") UserDtoForUpdate requestDTO) {
 
-    @GetMapping
-    public ResponseEntity<List<FindUserDto>> findAll() {
-        Map<User, UserStatus> statusMapByUser = userStatusService.findStatusMapByUserList(userService.findAll());
-
-        List<FindUserDto> userListDTO = new ArrayList<>();
-        for (User user : statusMapByUser.keySet()) {
-            BinaryProfileContent profile = binaryProfileService.findById(user.getId());
-            userListDTO.add(new FindUserDto(user, profile.getBytes(), statusMapByUser.get(user).isOnline()));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(userListDTO);
-    }
-
-    @PatchMapping(path = "/{userId}", consumes = {"multipart/form-data"})
-    public ResponseEntity<String> update(@PathVariable UUID userId,
-                                         @RequestPart(value = "dto") UserDtoForRequest requestDTO,
-                                         @RequestPart(value = "profileImg") MultipartFile changedImage) {
-        requestDTO.setProfileImg(changedImage);
         userService.update(userId, requestDTO);
-        return ResponseEntity.ok("Successfully updated");
+        return CommonResponse.toResponseEntity
+                (OK, "성공적으로 업데이트되었습니다", requestDTO);
     }
 
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<String> delete(@PathVariable UUID userId) {
+    @RequestMapping("delete")
+    public ResponseEntity<CommonResponse> delete(@RequestParam("userId") UUID userId) {
         userService.delete(userId);
-        return ResponseEntity.ok("Successfully deleted");
+        return CommonResponse.toResponseEntity
+                (NO_CONTENT, "성공적으로 삭제되었습니다", null);
+    }
+
+    @RequestMapping("updateStatusByUserId")
+    public ResponseEntity<CommonResponse> updateStatusByUserId(@RequestParam("userId") UUID userId) {
+        UserStatus userStatus = userStatusService.updateByUserId(userId);
+        return CommonResponse.toResponseEntity
+                (OK, "status updated Successfully", userStatus);
+    }
+
+
+    @RequestMapping("findAll")
+    public ResponseEntity<CommonResponse> findAll() {
+        Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
+        log.info("statusMapByUser : {}", statusMapByUser);
+        List<FindUserDto> findUserDtos = statusMapByUser.keySet().stream()
+                .map(user -> {
+                    return FindUserDto.fromEntityAndStatus(user, statusMapByUser.get(user));
+                }).toList();
+
+        return CommonResponse.toResponseEntity
+                (OK, "유저 리스트 조회 성공", findUserDtos);
     }
 }

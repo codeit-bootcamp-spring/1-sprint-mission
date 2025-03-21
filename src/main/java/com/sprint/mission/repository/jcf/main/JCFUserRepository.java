@@ -3,7 +3,6 @@ package com.sprint.mission.repository.jcf.main;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -15,8 +14,9 @@ public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data = new HashMap<>();
 
     @Override
-    public void save(User user) {
+    public User save(User user) {
         data.put(user.getId(), user);
+        return user;
     }
 
     @Override
@@ -38,5 +38,12 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public boolean existsById(UUID id){
         return data.containsKey(id);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return data.values().stream()
+                .filter(user -> user.getName().equals(username))
+                .findFirst();
     }
 }

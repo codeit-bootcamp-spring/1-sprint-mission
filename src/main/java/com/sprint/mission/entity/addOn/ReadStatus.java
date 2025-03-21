@@ -1,23 +1,40 @@
 package com.sprint.mission.entity.addOn;
 
+import lombok.Getter;
+
+import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
-public class ReadStatus {
+@Getter
+public class ReadStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private UUID userId;
+    private UUID channelId;
+    private Instant lastReadAt;
 
-    //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
-    //사용자별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용
-    // 채널요청 시 여기에 저장되게??
-    // 채널 ID,
-    Map<UUID, Instant> lastReadChannel = new HashMap<>();
-
-    public void updateReadTime(UUID channelId){
-        lastReadChannel.replace(channelId, Instant.now());
+    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.userId = userId;
+        this.channelId = channelId;
+        this.lastReadAt = lastReadAt;
     }
 
-    public Instant findLastReadByChannel(UUID channelId){
-        return lastReadChannel.get(channelId);
+    public void update(Instant newLastReadAt) {
+        boolean anyValueUpdated = false;
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }

@@ -1,54 +1,85 @@
 package com.sprint.mission.service.jcf.addOn;
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.jcf.addOn.UserStatusRepository;
-import com.sprint.mission.service.exception.NotFoundId;
+import com.sprint.mission.repository.UserStatusRepository;
+import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserStatusService {
 
-    private final UserStatusRepository userStatusRepository;
+  private final UserStatusRepository userStatusRepository;
+  private final JCFUserRepository userRepository;
 
-    // DTO로 파라미터 그룹화...??? 필요없다
-    public void create(UUID userId){
-        if(userStatusRepository.isExistById(userId)){
-            throw new RuntimeException("cannot create userStatus : already exist userStatus");
-        } else {
-            userStatusRepository.save(new UserStatus(userId));
-        }
+  // DTO로 파라미터 그룹화
+  public UserStatus create(UUID userId) {
+    if (userStatusRepository.existsById(userId)) {
+      throw new CustomException(ErrorCode.ALREADY_EXIST_USER_STATUS);
+    }
+    if (userRepository.existsById(userId)) {
+      throw new CustomException(ErrorCode.NO_SUCH_USER);
     }
 
-    public UserStatus findById(UUID userId){
-        return userStatusRepository.findById(userId).orElseThrow(() -> new NotFoundId("userId에 맞는 userstatus가 존재하지 않습니다"));
-        // 이걸 그냥 빈 Userstatus로 반환할지 오류 터트릴지 고민
-    }
+    return userStatusRepository.save(new UserStatus(userId));
 
-    public List<UserStatus> findAll(){
-        return userStatusRepository.findAll();
-    }
+  }
 
-    public Map<User, UserStatus> findStatusMapByUserList(List<User> userList){
-        return userStatusRepository.findStatusMapByUser(userList);
-    }
+  public Optional<UserStatus> findById(UUID userStatusId) {
+    return userStatusRepository.findById(userStatusId);
+  }
 
-    // 이건 DTO가 필요없는거 같은데
-    //[ ] userId 로 특정 User의 객체를 업데이트합니다.
-    // ??? 오타인걸로 생각 userstatus 업데이트
-    public void update(UUID userId){
-        userStatusRepository.findById(userId).ifPresentOrElse((updatingUserStatus) -> {
-            updatingUserStatus.join();
-            userStatusRepository.save(updatingUserStatus);
-        }, NotFoundId::new);
-    }
+  public List<UserStatus> findAll() {
+    return userStatusRepository.findAll();
+  }
+//
+//    public Map<User, UserStatus> findStatusMapByUserList(List<User> userList){
+//        return userStatusRepository.findByUserId(userList);
+//    }
 
-    public void delete(UUID userId){
-        if (userStatusRepository.isExistById(userId)) throw new NotFoundId();
-        else userStatusRepository.delete(userId);
+  // 이건 DTO가 필요없는거 같은데
+  //[ ] userId 로 특정 User의 객체를 업데이트합니다.
+  // ??? 오타인걸로 생각 userstatus 업데이트
+  public UserStatus updateByUserId(UUID userId) {
+    UserStatus updatingUserStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_STATUS_MATCHING_USER));
+    updatingUserStatus.update();
+    return userStatusRepository.save(updatingUserStatus);
+  }
+
+  public void delete(UUID statusId) {
+    if (userStatusRepository.existsById(statusId)) {
+      throw new CustomException(ErrorCode.NO_SUCH_USER_STATUS);
+    } else {
+      userStatusRepository.deleteById(statusId);
     }
-}
+  }
+
+  public void deleteByUserId(UUID userId) {
+    userStatusRepository.deleteByUserId(userId);
+  }
+
+  public Map<User, Boolean> findStatusMapByUserList() {
+    Map<User, Boolean> userStatusMap = new HashMap<>();
+    userRepository.findAll().forEach((user) -> {
+      Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.getId());
+      userStatus.ifPresentOrElse(status ->
+          {
+            userStatusMap.put(user, status.isOnline());
+          },
+          () -> {
+            userStatusMap.put(user, false);
+          });
+    });
+    return userStatusMap;
+  }
+};
+
