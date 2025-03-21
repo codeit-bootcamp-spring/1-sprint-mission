@@ -2,16 +2,13 @@ package com.sprint.mission.entity.main;
 
 import com.sprint.mission.entity.addOn.ReadStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.CascadeType.*;
 
@@ -46,14 +43,4 @@ public class Channel extends BaseUpdatableEntity{
         if (this.channelType == ChannelType.PRIVATE) return true;
         else return false;
     }
-
-    public static Channel createChannel(String name, String description, ChannelType channelType) {
-        return new Channel(name, description, channelType);
-    }
-
-
-//    @AssertTrue(message = "채널 이름은 설명보다 짧아야 합니다.")
-//    public boolean nameValidCheck() {
-//        return this.name.length() < this.description.length();
-//    }
 }

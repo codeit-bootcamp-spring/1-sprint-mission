@@ -10,6 +10,7 @@ import com.sprint.mission.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BinaryService {
 
     private final BinaryContentRepository binaryContentRepository;
@@ -33,19 +35,11 @@ public class BinaryService {
         return savedUser;
     }
 
+    @Transactional(readOnly = true)
     public BinaryContent findById(UUID id){
         return binaryContentRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
     }
-
-//    public List<BinaryContent> findAllByIdList(List<UUID> idList) {
-//        return binaryContentRepository.findAllById(idList);
-//    }
-//    public ResponseEntity<Resource> download(UUID binaryId) {
-//        BinaryContent downlodingBinaryContent = binaryContentRepository.findById(binaryId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
-//
-//    }
 
     public void deleteById(UUID binaryId) {
         if (!binaryContentRepository.existsById(binaryId)) throw new CustomException(ErrorCode.NO_SUCH_BINARY);
@@ -54,6 +48,7 @@ public class BinaryService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
         return binaryContentRepository.findAllById(binaryContentIds);
     }

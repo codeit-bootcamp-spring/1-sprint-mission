@@ -26,9 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-//import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -130,7 +132,6 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
-        //Message deletingMessage = this.findById(messageId);
         // BinaryContent랑 cascade Remove관계라
         if (!messageRepository.existsById(messageId)) {
             throw new CustomException(ErrorCode.NO_SUCH_MESSAGE);

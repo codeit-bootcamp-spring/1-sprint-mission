@@ -23,14 +23,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.*;
@@ -60,7 +60,7 @@ public class MessageController {
             @Parameter(description = "Message 첨부 파일들")
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
         // 컬렉션을 옵셔널로 반환하는 것 피하기 : 생성 비용 + 불필요한 중첩 구조 (애초에 컬렉션이 Optional같은 역할)
-        List<BinaryContentDtoForCreate> binaryContentDtoForCreateList = attachments == null || attachments.isEmpty()
+        List<BinaryContentDtoForCreate> binaryContentDtoForCreateList = ((attachments == null) || attachments.isEmpty())
                 ? Collections.emptyList()
                 : attachments.stream().map(binaryContentMapper::convertFileToBinaryContentDto)
                 .flatMap(Optional::stream) // 비어있는 Optional은 무시

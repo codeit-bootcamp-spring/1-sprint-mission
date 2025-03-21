@@ -10,7 +10,6 @@ import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.UserDtoForCreate;
@@ -22,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -69,12 +70,14 @@ public class JCFUserService implements UserService {
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
     // 패스워드 정보 제외
+    @Transactional(readOnly = true)
     @Override
     public User findById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<User> findAll() {
         return userRepository.findAllWithRelations();
@@ -88,9 +91,7 @@ public class JCFUserService implements UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
         userRepository.delete(deletingUser);
     }
-
     //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
-
     @Override
     public void isDuplicateNameEmail(String username, String email) {
         List<User> allUser = userRepository.findAll();
@@ -116,12 +117,5 @@ public class JCFUserService implements UserService {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-//        boolean isDuplicateName = allUser.stream()
-//                .anyMatch(user -> name.equals(user.getName()));
-//        if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
-//
-//        boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));
-//        if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
 }

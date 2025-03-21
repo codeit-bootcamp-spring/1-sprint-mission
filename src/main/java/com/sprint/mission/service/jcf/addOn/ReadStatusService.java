@@ -16,6 +16,7 @@ import com.sprint.mission.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
@@ -45,6 +47,7 @@ public class ReadStatusService {
         return readStatusRepository.save(new ReadStatus(user, channel, request.lastReadAt()));
     }
 
+    @Transactional(readOnly = true)
     public ReadStatus findById(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_READ_STATUS));
@@ -68,11 +71,13 @@ public class ReadStatusService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUser_Id(userId);
 
     }
 
+    @Transactional(readOnly = true)
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
         return readStatusRepository.findAllByChannel_Id(channelId);
     }

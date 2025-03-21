@@ -23,9 +23,12 @@ import com.sprint.mission.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static com.sprint.mission.entity.main.ChannelType.PRIVATE;
 import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
@@ -34,6 +37,7 @@ import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class JCFChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
@@ -41,7 +45,6 @@ public class JCFChannelService implements ChannelService {
     private final MessageService messageService;
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
-    private final JCFUserService userService;
     private final MessageRepository messageRepository;
 
 
@@ -69,18 +72,20 @@ public class JCFChannelService implements ChannelService {
      * [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId [ ] PUBLIC 채널
      * 목록은 전체 조회합니다. [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
      */
+    @Transactional(readOnly = true)
     @Override
     public Channel findById(UUID channelId) {
         return channelRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<Channel> findAll() {
         return channelRepository.findAll();
     }
 
-    //
+    @Transactional(readOnly = true)
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
         // 쿼리1
@@ -94,7 +99,7 @@ public class JCFChannelService implements ChannelService {
             // 쿼리2
             Instant lastMessageAt = messageRepository.findTop1ByChannel_IdOrderByCreatedAtDesc(channel.getId())
                     .map(BaseEntity::getCreatedAt)
-                    .orElseGet(null);
+                    .orElse(null);
 
             // 쿼리3
             List<User> userList = readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
@@ -109,16 +114,6 @@ public class JCFChannelService implements ChannelService {
 
         return channelDtoList;
     }
-
-
-    //public record ChannelDto(
-    //        UUID id,
-    //        ChannelType channelType,
-    //        String name,
-    //        String description,
-    //        List<UserDto> participants,
-    //        Instant lastMessageAt) {
-    //}
 
     @Override
     public Channel update(UUID channelId, ChannelDtoForUpdate dto) {
@@ -151,58 +146,5 @@ public class JCFChannelService implements ChannelService {
             throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
         }
     }
-
-    /**
-     * 응답 DTO (타입별)
-     */
-//    private FindChannelDto getFindChannelDto(Channel findedChannel) {
-//        return (findedChannel.getChannelType().equals(ChannelType.PRIVATE)
-//                ? new FindPrivateChannelDto(findedChannel)
-//                : new FindPublicChannelDto(findedChannel));
-//    }
-//
-//    // 카피 해온거
-//    private FindChannelAllDto toDto(Channel channel) {
-//        Instant lastMessageAt = messageService.findAllByChannelId(channel.getId())
-//                .stream()
-//                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
-//                .map(Message::getCreatedAt)
-//                .limit(1)
-//                .findFirst()
-//                .orElse(Instant.MIN);
-//
-//        List<UUID> participantIds = new ArrayList<>();
-//        if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
-//            readStatusRepository.findAllByChannelId(channel.getId()).stream()
-//                    .map((readStatus) -> readStatus.getUser().getId())
-//                    .forEach(participantIds::add);
-//        }
-//
-//        return new FindChannelAllDto(
-//                channel.getId(),
-//                channel.getChannelType(),
-//                channel.getName(),
-//                channel.getDescription(),
-//                participantIds,
-//                lastMessageAt
-//        );
-//    }
-
-//        public Map<FindUserDto, Instant> lastReadTimeListInChannel(UUID channelId) {
-//            Channel inChannel = channelRepository.findById(channelId)
-//                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
-//            if (inChannel.getChannelType().equals(ChannelType.PUBLIC)) {
-//                throw new CustomException(ErrorCode.CANNOT_REQUEST_LAST_READ_TIME);
-//            }
-//
-//            // 유저별 이 채널 마지막 readTime
-//            // 이 때 쓰는 findUserDto는 profile null
-//            Map<FindUserDto, Instant> readTimeMap = new HashMap<>();
-//            for (User user : inChannel.getUserList()) {
-//                UserStatus status = userStatusService.findById(user.getId());
-//                readTimeMap.put(new FindUserDto(user, status.isOnline()), user.getReadStatus().findLastReadByChannel(channelId));
-//            }
-//            return readTimeMap;
-//        }
 }
 
