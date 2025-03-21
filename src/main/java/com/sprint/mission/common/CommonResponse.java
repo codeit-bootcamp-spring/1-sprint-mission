@@ -28,4 +28,15 @@ public class CommonResponse<T> {
                         .data(data)
                         .build());
     }
+
+    // API(매개변수, 반환값)에 null을 최대한 쓰지 말기 원칙 中 null 잘 다루기
+    public static ResponseEntity<CommonResponse> toResponseEntityWithoutData(HttpStatus status, String message){
+        return ResponseEntity
+                .status(status)
+                .body(CommonResponse.builder()
+                        .status(status.value()+"")
+                        .message(message)
+                        .data(null)
+                        .build());
+    }
 }

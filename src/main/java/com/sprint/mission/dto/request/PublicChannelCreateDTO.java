@@ -16,7 +16,4 @@ public record PublicChannelCreateDTO(
         @Schema(example = "Spring 교육과정입니다.")
         @NotBlank(message = "설명은 필수입니다.")
         String description) {
-    public Channel toChannel() {
-        return new Channel(name, description, ChannelType.PUBLIC);
-    }
 }

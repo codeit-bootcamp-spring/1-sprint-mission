@@ -1,35 +1,41 @@
 package com.sprint.mission.entity.addOn;
 
+import com.sprint.mission.entity.main.BaseUpdatableEntity;
+import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
+import static jakarta.persistence.FetchType.*;
+
+@Entity
+@EqualsAndHashCode(of = {"lastActiveAt"}, callSuper = true)
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@AllArgsConstructor
+@ToString(of = "lastActiveAt")
+@Getter @Builder
 @Schema(description = "유저 상태")
-public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
-    private UUID userId;
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdatableEntity {
+
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
+
     private Instant lastActiveAt;
 
-    public UserStatus(UUID userId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
-        this.userId = userId;
+    public UserStatus(User user) {
+        this.user = user;
         this.lastActiveAt = Instant.now();
     }
 
     public void update() {
         this.lastActiveAt = Instant.now();
-        this.updatedAt = Instant.now();
     }
 
     public boolean isOnline(){

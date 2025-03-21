@@ -1,46 +1,46 @@
 package com.sprint.mission.entity.main;
 
-import com.sprint.mission.dto.request.ChannelDtoForUpdate;
+import com.sprint.mission.entity.addOn.ReadStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.*;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
+import static jakarta.persistence.CascadeType.*;
+
+@Entity
+@EqualsAndHashCode(of = {"channelType", "name"}, callSuper = true)
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@ToString(of = {"channelType", "name", "description"})
 @Getter
-@Setter
 @Schema(description = "채널")
-public class Channel implements Serializable {
-
-    private static final long serialVersionUID = 2L;
-
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity{
 
     private ChannelType channelType;
     private String name;
     private String description;
 
+    @OneToMany(mappedBy = "channel", cascade = REMOVE, orphanRemoval = true)
+    private List<ReadStatus> readStatus = new ArrayList<>();
+
     public Channel(String name, String description, ChannelType channelType) {
-        this.id = UUID.randomUUID();
         this.name = name;
         this.channelType = channelType;
         this.description = description;
-        this.createdAt = Instant.now();
     }
 
-    public void updateByDTO(ChannelDtoForUpdate dto){
-        this.name = dto.newName();
-        this.description = dto.newDescription();
-        this.updatedAt = Instant.now();
+    public void update(String newName, String newDescription) {
+        this.name = newName;
+        this.description = newDescription;
     }
 
-    public Boolean isPrivate(){
-        return channelType.equals(ChannelType.PRIVATE);
+    public boolean isPrivate() {
+        if (this.channelType == ChannelType.PRIVATE) return true;
+        else return false;
     }
-
-
 }
