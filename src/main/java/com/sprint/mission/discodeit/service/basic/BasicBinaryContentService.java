@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
 
+  @Transactional
   @Override
   public BinaryContent create(BinaryContentCreateRequest request) {
     Long size = (request.file() != null) ? (long) request.file().length : 0;
@@ -43,7 +45,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public void delete(UUID binaryContentId) {
-    if (!binaryContentRepository.existsId(binaryContentId)) {
+    if (!binaryContentRepository.existsById(binaryContentId)) {
       throw new NoSuchElementException("파일이 존재하지 않습니다.");
     }
     binaryContentRepository.deleteById(binaryContentId);

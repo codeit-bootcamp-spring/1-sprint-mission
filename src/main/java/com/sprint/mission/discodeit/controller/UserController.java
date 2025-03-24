@@ -1,17 +1,15 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.user_status.UserStatusUpdateRequest;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,7 +30,7 @@ public class UserController {
 
   @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDTO> createUser(
-      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     User user = userService.create(userCreateRequest, profile);
@@ -41,18 +39,17 @@ public class UserController {
 
   @PutMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDTO> updateUser(
-      @PathVariable UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart("userStatusUpdateRequest") UserStatusUpdateRequest userStatusUpdateRequest,
+      @PathVariable("userId") UUID userId,
+      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     User user = userService.update(userId, userUpdateRequest, profile);
-    UserStatus userStatus = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
+    UserStatus userStatus = userStatusService.findByUserId(userId);
     return ResponseEntity.status(HttpStatus.OK).body(UserDTO.fromEntity(user, userStatus));
   }
 
   @DeleteMapping(value = "/{userId}")
-  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+  public ResponseEntity<Void> deleteUser(@PathVariable("userId") UUID userId) {
     userService.delete(userId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
@@ -64,8 +61,8 @@ public class UserController {
 
   @PutMapping(value = "/status/{userId}")
   public ResponseEntity<Void> updateUserStatus(
-      @PathVariable UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
+      @PathVariable("userId") UUID userId,
+      @Valid @RequestBody UserStatusUpdateRequest request) {
     userStatusService.updateByUserId(userId, request);
     return ResponseEntity.status(HttpStatus.OK).build();
   }

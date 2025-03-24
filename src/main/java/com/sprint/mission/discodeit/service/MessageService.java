@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.MessageDTO;
-import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDTO;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -14,11 +13,7 @@ public interface MessageService {
 
   Message create(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachments);
 
-  MessageDTO findById(UUID messageId);
-
   List<MessageDTO> findByChannel(UUID channelId);
-
-  List<MessageDTO> findByUser(UUID userId);
 
   Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest);
 

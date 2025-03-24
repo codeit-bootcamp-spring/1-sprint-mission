@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,33 +34,36 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
   private final BinaryContentService binaryContentService;
 
+  @Transactional
   @Override
   public User create(UserCreateRequest userCreateRequest, MultipartFile profile) {
     if (!isValidEmail(userCreateRequest.email())) {
       throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
     }
 
-    if (userRepository.existsName(userCreateRequest.userName())) {
+    if (userRepository.existsByUsername((userCreateRequest.userName()))) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
     }
 
-    if (userRepository.existsEmail(userCreateRequest.email())) {
+    if (userRepository.existsByEmail((userCreateRequest.email()))) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이메일입니다.");
     }
 
-    Optional<BinaryContentCreateRequest> profileRequest = resolveProfileRequest(profile);
-    UUID nullableProfileId = profileRequest
-        .map(request -> binaryContentService.create(request).getId())
+    BinaryContent nullableProfile = Optional.ofNullable(profile)
+        .filter(p -> !p.isEmpty())
+        .flatMap(this::resolveProfileRequest)
+        .map(binaryContentService::create)
         .orElse(null);
 
     User user = new User(
         userCreateRequest.userName(),
         userCreateRequest.email(),
         userCreateRequest.password(),
-        nullableProfileId);
+        nullableProfile,
+        null);
     userRepository.save(user);
 
-    UserStatus userStatus = new UserStatus(user.getId(), Instant.EPOCH);
+    UserStatus userStatus = new UserStatus(user, Instant.EPOCH);
     userStatusRepository.save(userStatus);
 
     return user;
@@ -87,6 +91,7 @@ public class BasicUserService implements UserService {
         .toList();
   }
 
+  @Transactional
   @Override
   public User update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile profile) {
     User user = userRepository.findById(userId)
@@ -100,37 +105,44 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
     }
 
-    if (userRepository.existsName(userUpdateRequest.newUsername())) {
+    if (userRepository.existsByUsername(userUpdateRequest.newUserName())) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
     }
 
-    if (userRepository.existsEmail(userUpdateRequest.newEmail())) {
+    if (userRepository.existsByEmail(userUpdateRequest.newEmail())) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이메일입니다.");
     }
 
-    Optional<BinaryContentCreateRequest> profileRequest = resolveProfileRequest(profile);
-    if (profileRequest.isPresent()) {
-      BinaryContentCreateRequest profileData = profileRequest.get();
-      BinaryContent binaryContent = binaryContentService.create(profileData);
-      binaryContentRepository.save(binaryContent);
-    }
+    Optional<BinaryContent> newProfile = Optional.ofNullable(profile)
+        .filter(p -> !p.isEmpty())
+        .flatMap(this::resolveProfileRequest)
+        .map(binaryContentService::create);
 
-    user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail());
+    newProfile.ifPresent(binaryContent -> {
+      if (user.getProfile() != null) {
+        binaryContentRepository.deleteById(user.getProfile().getId());
+      }
+      binaryContentRepository.save(binaryContent);
+      user.updateProfile(binaryContent);
+    });
+
+    user.update(userUpdateRequest.newUserName(), userUpdateRequest.newEmail());
     return userRepository.save(user);
   }
 
+
   @Override
   public void delete(UUID userId) {
-    if (!userRepository.existsId(userId)) {
-      throw new NoSuchElementException("유저가 존재하지 않습니다.");
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+
+    if (user.getProfile() != null && binaryContentRepository.existsById(
+        user.getProfile().getId())) {
+      binaryContentRepository.deleteById(user.getProfile().getId());
     }
 
-    if (binaryContentRepository.existsId(userId)) {
-      binaryContentRepository.deleteById(userId);
-    }
-
-    userStatusRepository.deleteByUserId(userId);
-    userRepository.delete(userId);
+    userStatusRepository.deleteById(userId);
+    userRepository.deleteById(userId);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {

@@ -1,47 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
-public class Channel extends BaseEntity implements  Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final User admin;
-    private final ChannelType type;
-    private String channelName;
-    private List<UUID> memberList;
+@Entity
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
 
-    public Channel(ChannelType type, String channelName, User admin) {
-        super();
-        this.channelName = channelName;
-        this.admin = admin;
-        this.memberList = new ArrayList<>();
-        this.type = type;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(nullable = false)
+  private String name;
+  @Column(columnDefinition = "TEXT")
+  private String description;
+
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    public void update(String newName) {
-        boolean isUpdated = false;
-        if (!newName.equals(this.channelName)) {
-            this.channelName = newName;
-            isUpdated = true;
-        }
-
-        if (isUpdated) {
-            updated();
-        }
+    if (!newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
-    public void addMember(User user) {
-        memberList.add(user.getId());
-    }
-
-    public void deleteMember(User user) {
-        memberList.remove(user.getId());
-    }
-
+  }
 }

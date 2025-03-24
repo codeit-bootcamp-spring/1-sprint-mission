@@ -1,25 +1,30 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.io.Serial;
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
-public class BinaryContent extends BaseEntity implements Serializable {
+@Entity
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "binary_contents")
+public class BinaryContent extends BaseEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-  private final String fileName;
-  private final String contentType;
-  private final Long size;
-  private final byte[] file;
-
-  public BinaryContent(String fileName, String contentType, byte[] file, Long size) {
-    super();
-    this.fileName = fileName;
-    this.contentType = contentType;
-    this.file = file;
-    this.size = size;
-  }
+  @Column(name = "file_name", nullable = false)
+  private String fileName;
+  @Column(name = "content_type", nullable = false)
+  private String contentType;
+  @Column(name = "bytes", nullable = false)
+  private byte[] file;
+  @Column(name = "size", nullable = false)
+  private Long size;
 }
