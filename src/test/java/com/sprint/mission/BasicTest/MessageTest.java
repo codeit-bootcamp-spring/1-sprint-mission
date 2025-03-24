@@ -10,7 +10,7 @@ import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinaryContentRepository;
+import com.sprint.mission.repository.BinarycontentRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserStatusRepository;
 import com.sprint.mission.service.ChannelService;
@@ -48,7 +48,7 @@ public class MessageTest {
     @Autowired
     private ChannelService channelService;
     @Autowired
-    private BinaryContentRepository binarycontentRepository;
+    private BinarycontentRepository binarycontentRepository;
 
     @Autowired
     private MessageRepository messageRepository;
@@ -104,10 +104,6 @@ public class MessageTest {
         System.out.println("업데이트 후 getContent() = " + createdMessage.getContent());
 
         MessageDto dto = messageMapper.toDto(createdMessage);
-
-        List<BinaryContent> all = binarycontentRepository.findAll();
-        System.out.println("가자~~~~~~~~~~~~~~~~~");
-        all.forEach(System.out::println);
 
         assertThat(createdMessage.getContent()).isNotEqualTo(testMessageDto.content());
         assertThat(createdMessage.getId()).isEqualTo(createdMessage.getId());

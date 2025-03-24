@@ -6,7 +6,7 @@ import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
-import com.sprint.mission.repository.BinaryContentRepository;
+import com.sprint.mission.repository.BinarycontentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.UUID;
 @Transactional
 public class BinaryService {
 
-    private final BinaryContentRepository binaryContentRepository;
+    private final BinarycontentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
 
@@ -44,12 +44,12 @@ public class BinaryService {
     public void deleteById(UUID binaryId) {
         if (!binaryContentRepository.existsById(binaryId)) throw new CustomException(ErrorCode.NO_SUCH_BINARY);
         else {
-            binaryContentRepository.deleteById(binaryId);
+            binaryContentRepository.delete(binaryId);
         }
     }
 
     @Transactional(readOnly = true)
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-        return binaryContentRepository.findAllById(binaryContentIds);
+        return binaryContentRepository.findAllByIdIn(binaryContentIds);
     }
 }

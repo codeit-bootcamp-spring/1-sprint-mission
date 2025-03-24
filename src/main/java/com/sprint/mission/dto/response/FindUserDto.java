@@ -17,16 +17,4 @@ public record FindUserDto(
     String email,
     UUID profileImgId,
     boolean isOnline) {
-
-  public static FindUserDto fromEntityAndStatus(User user, Boolean isOnline) {
-    return new FindUserDto(
-        user.getId(),
-        user.getCreateAt(),
-        user.getUpdateAt(),
-        user.getName(),
-        user.getEmail(),
-        user.getProfileImgId(),
-        isOnline
-    );
-  }
 }
