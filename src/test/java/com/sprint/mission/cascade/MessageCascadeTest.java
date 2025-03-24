@@ -8,7 +8,7 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinaryContentRepository;
+import com.sprint.mission.repository.BinarycontentRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.service.ChannelService;
@@ -55,7 +55,7 @@ public class MessageCascadeTest {
     @Autowired
     private ReadStatusRepository readStatusRepository;
     @Autowired
-    private BinaryContentRepository binaryContentRepository;
+    private BinarycontentRepository binaryContentRepository;
 
     // 메시지의 첨부파일이 사라지면 메시지는 사라지지 않고 메시지의 첨부파일이 NULL값으로 변경된다
     @BeforeEach

@@ -6,7 +6,7 @@ import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinaryContentRepository;
+import com.sprint.mission.repository.BinarycontentRepository;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.repository.UserStatusRepository;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
@@ -46,7 +46,7 @@ public class UserUserStatusCascadeTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private BinaryContentRepository binaryContentRepository;
+    private BinarycontentRepository binaryContentRepository;
 
     @DisplayName("User의 userstauts 필드가 cascade Remove설정된거 테스트")
     @Test

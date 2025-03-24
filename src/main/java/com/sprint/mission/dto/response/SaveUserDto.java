@@ -12,15 +12,4 @@ public record SaveUserDto(
         String name,
         String email,
         UUID profileImgId){
-
-    public static SaveUserDto fromEntity(User user) {
-        return new SaveUserDto(
-                user.getId(),
-                user.getCreateAt(),
-                user.getUpdateAt(),
-                user.getName(),
-                user.getEmail(),
-                user.getProfileImgId()
-        );
-    }
 }
