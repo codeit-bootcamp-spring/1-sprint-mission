@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.response;
 
 
 import lombok.AllArgsConstructor;
@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StatusResponseDto<T> {
 
-    private boolean loggedIn;
-    private String userId;
+  private boolean loggedIn;
+  private String userId;
 }

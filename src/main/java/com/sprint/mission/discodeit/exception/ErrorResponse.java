@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.exception;
 
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -9,22 +10,19 @@ import javax.print.DocFlavor;
 import java.time.LocalDateTime;
 
 @Getter
-@Builder
+@JsonPropertyOrder({"timestamp", "status", "message", "details"})
 public class ErrorResponse {
-    private final LocalDateTime timestamp;
-    private final int status;
-    private final String error;
-    private final String message;
-    private final String path;
 
-    public static ErrorResponse of(HttpStatus status, String message, String path) {
-        return ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(status.value())
-                .error(status.getReasonPhrase())
-                .message(message)
-                .path(path)
-                .build();
-    }
+  private final LocalDateTime timestamp;
+  private final HttpStatus status;
+  private final String message;
+  private final String details;
 
+  @Builder
+  public ErrorResponse(LocalDateTime timestamp, HttpStatus status, String message, String details) {
+    this.timestamp = timestamp;
+    this.status = status;
+    this.message = message;
+    this.details = details;
+  }
 }
