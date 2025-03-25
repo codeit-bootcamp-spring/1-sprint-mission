@@ -8,7 +8,7 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinarycontentRepository;
+import com.sprint.mission.repository.BinaryContentRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.service.ChannelService;
@@ -16,7 +16,6 @@ import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.service.jcf.addOn.ReadStatusService;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -55,7 +53,7 @@ public class MessageCascadeTest {
     @Autowired
     private ReadStatusRepository readStatusRepository;
     @Autowired
-    private BinarycontentRepository binaryContentRepository;
+    private BinaryContentRepository binaryContentRepository;
 
     // 메시지의 첨부파일이 사라지면 메시지는 사라지지 않고 메시지의 첨부파일이 NULL값으로 변경된다
     @BeforeEach

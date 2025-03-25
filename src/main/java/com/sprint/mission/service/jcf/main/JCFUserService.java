@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,7 +37,6 @@ public class JCFUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
     private final BinaryService profileService;
-    private final ExecutorService ves;
     private final UserMapper userMapper;
     private final BinaryContentMapper binaryContentMapper;
 
@@ -51,7 +51,6 @@ public class JCFUserService implements UserService {
             return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
         }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
         log.info("Create user의 profile : {}", createdUser.getProfile());
-
         User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
         UserStatus userStatus = userStatusService.create(savedUser);
         return savedUser.assignStatus(userStatus);
@@ -96,26 +95,36 @@ public class JCFUserService implements UserService {
     public void isDuplicateNameEmail(String username, String email) {
         List<User> allUser = userRepository.findAll();
 
-        Future<?> isDuplicateNameF = ves.submit(() -> {
-            boolean isDuplicateName = allUser.stream()
-                    .anyMatch(user -> username.equals(user.getUsername()));
-            if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
-        });
+        boolean isDuplicateName = allUser.stream()
+                .anyMatch(usr -> username.equals(usr.getUsername()));
 
-        Future<?> isDuplicateEmailF = ves.submit(() -> {
-            boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));
-            if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
-        });
+        if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
 
-        try {
-            isDuplicateNameF.get();
-            isDuplicateEmailF.get();
-        } catch (ExecutionException e) {
-            throw e.getCause() instanceof CustomException
-                    ? (CustomException) e.getCause()
-                    : new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        boolean isDuplicateEmail = allUser.stream()
+                .anyMatch(usr -> email.equals(usr.getEmail()));
+
+        if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
+//
+//        Future<?> isDuplicateNameF = ves.submit(() -> {
+//            boolean isDuplicateName = allUser.stream()
+//                    .anyMatch(user -> username.equals(user.getUsername()));
+//            if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
+//        });
+//
+//        Future<?> isDuplicateEmailF = ves.submit(() -> {
+//            boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));
+//            if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
+//        });
+//
+//        try {
+//            isDuplicateNameF.get();
+//            isDuplicateEmailF.get();
+//        } catch (ExecutionException e) {
+//            throw e.getCause() instanceof CustomException
+//                    ? (CustomException) e.getCause()
+//                    : new RuntimeException(e);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }

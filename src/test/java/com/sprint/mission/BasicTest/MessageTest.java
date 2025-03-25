@@ -3,20 +3,16 @@ package com.sprint.mission.BasicTest;
 import com.sprint.mission.dto.MessageMapper;
 import com.sprint.mission.dto.response.MessageDto;
 import com.sprint.mission.dto.request.*;
-import com.sprint.mission.dto.response.PageResponse;
 import com.sprint.mission.dto.response.ScrollPageResponse;
-import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinarycontentRepository;
+import com.sprint.mission.repository.BinaryContentRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserStatusRepository;
 import com.sprint.mission.service.ChannelService;
-import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.UserService;
-import com.sprint.mission.service.jcf.addOn.BinaryService;
 import com.sprint.mission.service.jcf.main.JCFMessageService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -48,7 +44,7 @@ public class MessageTest {
     @Autowired
     private ChannelService channelService;
     @Autowired
-    private BinarycontentRepository binarycontentRepository;
+    private BinaryContentRepository binarycontentRepository;
 
     @Autowired
     private MessageRepository messageRepository;
