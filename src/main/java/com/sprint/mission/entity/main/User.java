@@ -61,7 +61,9 @@ public class User extends BaseUpdatableEntity{
         return this;
     }
 
-//    public Optional<BinaryContent> getProfile() { // mapping은 null 체크 해줌
-//        return Optional.ofNullable(profile);
-//    }
+    public void assetName(){
+        if (this.username.contains("example")) {
+            throw new IllegalArgumentException("이름에 example이 포함될 수 없습니다.");
+        }
+    }
 }

@@ -14,7 +14,9 @@ import com.sprint.mission.service.UserService;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import jakarta.persistence.EntityManager;
+import jdk.swing.interop.SwingInterOpUtils;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,22 +48,23 @@ public class UserTest {
     @Autowired
     private UserStatusRepository userStatusRepository;
 
-    //@BeforeEach
+    @BeforeEach
     void createTest() {
         for (int i = 0; i < 20; i++) {
             UserDtoForCreate createDto = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
             userService.create(createDto, null);
         }
+        System.out.println("여기가 문제?");
     }
 
     @Test
-    void setUpTest() {
+    void setUpTest() { // 약 7초 걸림
         List<User> users = userRepository.findAll();
         assertThat(users).isNotEmpty();
         assertThat(users.size()).isEqualTo(20);
         users.forEach(user -> {
-            //UserStatus findUserstatus = userStatusService.findById(user.getStatus().getId());
-            //assertThat(findUserstatus.getUser()).isEqualTo(user);
+            UserStatus findUserstatus = userStatusService.findByUserId(user.getStatus().getId());
+            assertThat(findUserstatus.getUser()).isEqualTo(user);
         });
     }
 
