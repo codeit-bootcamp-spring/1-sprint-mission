@@ -22,13 +22,17 @@ public class User extends BaseUpdatableEntity {
 
   @Column(length = 50, nullable = false, unique = true)
   private String username;
+
   @Column(length = 100, nullable = false, unique = true)
   private String email;
+
   @Column(length = 60, nullable = false)
   private String password;
+
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "profile_id", columnDefinition = "uuid")
   private BinaryContent profile;
+
   @JsonManagedReference
   @Setter(AccessLevel.PROTECTED)
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
