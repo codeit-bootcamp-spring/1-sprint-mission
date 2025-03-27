@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
@@ -69,7 +69,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public ChannelRequestDTO findDTO(UUID uuid) {
+  public ChannelDto findDTO(UUID uuid) {
     Channel channel = findById(uuid);
 
     //Public 일 때 userIdList , time은 null
@@ -80,30 +80,30 @@ public class BasicChannelService implements ChannelService {
       userIdList = readStatusRepository.findAllUserIdByChannelId(uuid);
       time = readStatusRepository.findLatestTimeByChannelId(uuid);
     }
-    ChannelRequestDTO channelRequestDTO = new ChannelRequestDTO(channel, time, userIdList);
-    return channelRequestDTO;
+    ChannelDto channelDto = new ChannelDto(channel, time, userIdList);
+    return channelDto;
   }
 
   //특정 User가 볼 수 있는 Channel 목록을 조회
   @Override
-  public List<ChannelRequestDTO> findAllByUserId(UUID userId) {
-    List<ChannelRequestDTO> channelRequestDTOList = findAllDTO();
-    List<ChannelRequestDTO> userChannelRequestDTOList = channelRequestDTOList.stream()
-        .filter(channelRequestDTO -> channelRequestDTO.getType().equals(ChannelType.PUBLIC)
+  public List<ChannelDto> findAllByUserId(UUID userId) {
+    List<ChannelDto> channelDtoList = findAllDTO();
+    List<ChannelDto> userChannelDtoList = channelDtoList.stream()
+        .filter(channelDto -> channelDto.getType().equals(ChannelType.PUBLIC)
             ||
-            (channelRequestDTO.getType().equals(ChannelType.PRIVATE) &&
-                channelRequestDTO.isUserExist(userId)))
+            (channelDto.getType().equals(ChannelType.PRIVATE) &&
+                channelDto.isUserExist(userId)))
         .toList();
-    return userChannelRequestDTOList;
+    return userChannelDtoList;
   }
 
   @Override
-  public List<ChannelRequestDTO> findAllDTO() {
+  public List<ChannelDto> findAllDTO() {
     List<Channel> channelList = findAll();
-    List<ChannelRequestDTO> channelRequestDTOList = channelList.stream()
+    List<ChannelDto> channelDtoList = channelList.stream()
         .map(channel -> findDTO(channel.getId()))
         .collect(Collectors.toList());
-    return channelRequestDTOList;
+    return channelDtoList;
   }
 
 

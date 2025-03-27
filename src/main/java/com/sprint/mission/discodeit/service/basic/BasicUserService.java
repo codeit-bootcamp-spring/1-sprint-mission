@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserRequestDTO;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,12 +47,12 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserRequestDTO findUserDTO(UUID userId) {
+  public UserDto findUserDTO(UUID userId) {
     User user = userRepository.findById(userId).orElseThrow(
         () -> new NoSuchElementException("user Not found"));
     UserStatus userStatus = userStatusRepository.findByUserId(userId);
-    UserRequestDTO userRequestDTO = new UserRequestDTO(user, userStatus.isOnline());
-    return userRequestDTO;
+    UserDto userDto = new UserDto(user, userStatus.isOnline());
+    return userDto;
   }
 
   //내부 사용전용
@@ -68,14 +67,14 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public List<UserRequestDTO> findAllUserDTO() {
+  public List<UserDto> findAllUserDTO() {
     List<User> userList = findAll();
 
-    List<UserRequestDTO> userRequestDTOS = userList.stream()
-        .map(user -> new UserRequestDTO(user, userStatusRepository.findByUserId(user.getId())
+    List<UserDto> userDtos = userList.stream()
+        .map(user -> new UserDto(user, userStatusRepository.findByUserId(user.getId())
             .isOnline()))
         .collect(Collectors.toList());
-    return userRequestDTOS;
+    return userDtos;
   }
 
   @Override

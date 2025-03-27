@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserRequestDTO;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
@@ -13,9 +13,9 @@ public interface UserService {
 
   User createUser(UserCreateDTO userCreateDTO);
 
-  UserRequestDTO findUserDTO(UUID id);
+  UserDto findUserDTO(UUID id);
 
-  List<UserRequestDTO> findAllUserDTO();
+  List<UserDto> findAllUserDTO();
 
   User updateUser(UUID id, UserUpdateDTO userUpdateDTO);
 

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelRequestDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -64,12 +64,12 @@ public class ChannelController {
 
   //특정 사용자가 볼 수 있는 모든 채널 목록 조회
   @GetMapping("/{userId}")
-  public List<ChannelRequestDTO> findAllByUserId(@PathVariable("userId") UUID id) {
+  public List<ChannelDto> findAllByUserId(@PathVariable("userId") UUID id) {
     return channelService.findAllByUserId(id);
   }
 
   @GetMapping
-  public List<ChannelRequestDTO> findAll() {
+  public List<ChannelDto> findAll() {
     return channelService.findAllDTO();
   }
 

@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Getter
-public class UserRequestDTO {
+public class UserDto {
 
   private final UUID id;
   private final String name;
@@ -15,7 +15,7 @@ public class UserRequestDTO {
   private final BinaryContent filePath;
   private final Boolean isOnline;
 
-  public UserRequestDTO(User user, boolean isOnline) {
+  public UserDto(User user, boolean isOnline) {
     this.id = user.getId();
     this.name = user.getUsername();
     this.email = user.getEmail();
