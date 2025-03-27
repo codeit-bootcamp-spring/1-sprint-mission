@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: discodeit
   servlet:
@@ -22,11 +24,15 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.SQL: debug # 이 설정은 특정한 패키지(org.hibernate.SQL)에 대해서만 로그 레벨을 debug로 지정
+    org.hibernate.orm.jdbc.bind: trace #  Hibernate의 로그 레벨 중 하나로, JDBC 파라미터 바인딩에 관련된 매우 상세한 로그를 출력
+    root: info #애플리케이션 전체에 대한 기본 로그 레벨 설정
 
 discodeit:
   storage:
     type: local
     local:
       root-path: .discodeit/storage
+
+server:
+  port: 8080
