@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -27,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +51,7 @@ public class BasicMessageService implements MessageService {
   private final MessageMapper messageMapper;
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentMapper binaryContentMapper;
+  private final PageResponseMapper pageResponseMapper;
 
 
   @Override
@@ -89,9 +93,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size) {
     Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-    Page<Message> messages;
-    Long totalElements = null;
-    //messageRepository.countByChannelId(channelId);
+    Slice<Message> messages;
 
     if (cursor == null) {
       messages = messageRepository.findFirstMessages(channelId, pageable);
@@ -103,9 +105,13 @@ public class BasicMessageService implements MessageService {
     Instant nextCursor =
         hasNext ? messages.getContent().get(messages.getContent().size() - 1).getCreatedAt() : null;
 
-    return new PageResponse<>(messages.stream()
+    List<MessageDto> dtos = messages.stream()
         .map(messageMapper::toDto)
-        .collect(Collectors.toList()), nextCursor, size, hasNext, totalElements);
+        .toList();
+
+    Slice<MessageDto> dtoSlice = new SliceImpl<>(dtos, pageable, hasNext);
+
+    return pageResponseMapper.fromSlice(dtoSlice, nextCursor);
   }
 
 
