@@ -1,18 +1,28 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.entity.User;
-import java.util.Map;
-import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User createUser(String username);
+    // 생성
+    UUID create(CreateUserRequestDto createUserDto, MultipartFile profileImageFile) throws IOException;
 
-    Map<UUID, User> getUsers();
+    // 읽기
+    User find(UUID id);
 
-    Optional<User> getUser(UUID uuid);
+    // 모두 읽기
+    List<UserDto> findAll();
 
-    Optional<User> updateUser(UUID uuid, String username);
+    // 수정
+    void updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto, MultipartFile profileImageFile) throws IOException;
 
-    Optional<User> deleteUser(UUID uuid);
+    // 삭제
+    void delete(UUID id);
 }
