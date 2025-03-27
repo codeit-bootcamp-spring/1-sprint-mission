@@ -24,18 +24,16 @@ repositories {
 }
 
 dependencies {
-    //PostgreSQL 의존성 추가
-    implementation 'org.postgresql:postgresql:42.7.4'
-    // Spring Data JPA 의존성 추가
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    // Spring Boot Web Starter (웹 애플리케이션 개발을 위한 의존성)
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    // OpenAPI 문서 생성을 위한 SpringDoc 의존성
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
-    //lombok
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'org.postgresql:postgresql'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    //테스트 관련
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

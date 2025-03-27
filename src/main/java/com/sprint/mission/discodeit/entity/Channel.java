@@ -6,27 +6,22 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
 @Table(name = "channels")
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel extends BaseUpdatableEntity {
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "type", nullable = false)
+  @Column(nullable = false)
   private ChannelType type;
-
-  @Column(name = "name", length = 100)
+  @Column(length = 100)
   private String name;
-
-  @Column(name = "description", length = 500)
+  @Column(length = 500)
   private String description;
 
   public Channel(ChannelType type, String name, String description) {
@@ -42,6 +37,5 @@ public class Channel extends BaseUpdatableEntity {
     if (newDescription != null && !newDescription.equals(this.description)) {
       this.description = newDescription;
     }
-
   }
 }
