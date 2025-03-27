@@ -1,57 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public class Channel {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String channelName;
-    private List<UUID> messageList;
+@Entity
+@Table(name = "channels")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
-    public UUID getId() {
-        return id;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(length = 100)
+  private String name;
+  @Column(length = 500)
+  private String description;
+
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
+
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    public Long getCreatedAt() {
-        return createdAt;
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public List<UUID> getMessageList() {
-        return messageList;
-    }
-
-    public UUID addMessageToChannel(UUID messageUUID) {
-        messageList.add(messageUUID);
-        return messageUUID;
-    }
-
-    public String toString(){
-        return "\nuuid: "+ id + " channelName: " + channelName;
-    }
-
-    public void updateChannelName(String channelName) {
-        this.channelName = channelName;
-        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-    }
-
-    public Channel(String channelName){
-        this.id = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-        this.updatedAt = createdAt;
-        this.channelName = channelName;
-        this.messageList = new ArrayList<>();
-    }
+  }
 }

@@ -6,24 +6,34 @@ spring:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/discodeit
+    url: jdbc:postgresql://localhost:5432/discodeitdb
     username: root
-    password: 1234
+    password: Abcd123@
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     #        default_batch_fetch_size: 100
-    open-in-view: false
 
 
 logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: ASC
+    enabled: true
 
 discodeit:
   storage:
