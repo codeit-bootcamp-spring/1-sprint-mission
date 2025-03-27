@@ -10,8 +10,9 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: debug
+    org.hibernate.SQL: info
     org.hibernate.orm.jdbc.bind: trace
+    root: info
 
 springdoc:
   api-docs:

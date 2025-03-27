@@ -16,4 +16,8 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     #        default_batch_fetch_size: 100
 
-
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: trace
+    root: info
