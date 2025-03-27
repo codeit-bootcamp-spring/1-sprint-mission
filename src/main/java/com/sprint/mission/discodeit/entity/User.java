@@ -1,58 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
 public class User extends BaseUpdatableEntity {
 
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  private UUID id;
-
-  @Column(nullable = false, unique = true, length = 50)
+  @Column(length = 50, nullable = false, unique = true)
   private String username;
-
-  @Column(nullable = false, unique = true, length = 100)
+  @Column(length = 100, nullable = false, unique = true)
   private String email;
-
-  @Column(nullable = false, unique = true, length = 50)
+  @Column(length = 60, nullable = false)
   private String password;
-
-  @OneToOne
-  @JoinColumn(name = "profile_id")
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
   private BinaryContent profile;
-
+  @JsonManagedReference
+  @Setter(AccessLevel.PROTECTED)
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus status;
-
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ReadStatus> readStatuses;
-
-  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Message> messages;
-
-  @ManyToMany
-  @JoinTable(
-          name = "user_channels",
-          joinColumns = @JoinColumn(name = "user_id"),
-          inverseJoinColumns = @JoinColumn(name = "channel_id")
-  )
-  private List<Channel> channels;
 
   public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
@@ -61,27 +41,19 @@ public class User extends BaseUpdatableEntity {
     this.profile = profile;
   }
 
-  public void update(String newUsername, String newEmail, String newPassword, BinaryContent newProfile) {
-    boolean anyValueUpdated = false;
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent newProfile) {
     if (newUsername != null && !newUsername.equals(this.username)) {
       this.username = newUsername;
-      anyValueUpdated = true;
     }
     if (newEmail != null && !newEmail.equals(this.email)) {
       this.email = newEmail;
-      anyValueUpdated = true;
     }
     if (newPassword != null && !newPassword.equals(this.password)) {
       this.password = newPassword;
-      anyValueUpdated = true;
     }
-    if (newProfile != null && !newProfile.equals(this.profile)) {
+    if (newProfile != null) {
       this.profile = newProfile;
-      anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      this.setUpdatedAtNow(); // 업데이트 시간 갱신
     }
   }
 }
