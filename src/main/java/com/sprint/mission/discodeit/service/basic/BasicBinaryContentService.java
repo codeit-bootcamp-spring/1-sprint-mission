@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -21,16 +23,25 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentMapper binaryContentMapper;
 
+  private final BinaryContentStorage binaryContentStorage;
+
+  @Transactional
   @Override
   public BinaryContentDto create(BinaryContentCreateDTO binaryContentCreateDTO) {
+
+    byte[] bytes = binaryContentCreateDTO.bytes();
+
     BinaryContent binaryContent = BinaryContent.builder()
         .fileName(binaryContentCreateDTO.fileName())
         .size(binaryContentCreateDTO.size())
         .contentType(binaryContentCreateDTO.contentType())
-        .bytes(binaryContentCreateDTO.bytes())
         .build();
 
-    return binaryContentMapper.toDto(binaryContentRepository.save(binaryContent));
+    //파일 메타 정보를 DB에 저장
+    //bytes를 로컬에 저장
+    binaryContentRepository.save(binaryContent);
+    binaryContentStorage.put(binaryContent.getId(), bytes);
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override

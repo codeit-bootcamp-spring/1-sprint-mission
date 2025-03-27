@@ -5,8 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,9 +30,6 @@ public class BinaryContent extends BaseEntity implements Serializable {
 
   @Column(name = "content_type")
   private String contentType;
-
-  @Column(name = "bytes")
-  private byte[] bytes;
 
 
 }

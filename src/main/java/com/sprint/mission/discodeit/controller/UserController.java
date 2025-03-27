@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.service.UserService;
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/user")
@@ -29,16 +34,28 @@ public class UserController {
 
   // 사용자 등록
   @PostMapping
-  public ResponseEntity<UserDto> createUser(@RequestBody UserCreateDTO userCreateDTO) {
-    return ResponseEntity.ok(userService.createUser(userCreateDTO));
+  public ResponseEntity<UserDto> createUser(
+      @RequestPart UserCreateDTO userCreateDTO,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) {
+    Optional<BinaryContentCreateDTO> profileRequest = Optional.ofNullable(profile)
+        .flatMap(this::resolveProfileRequest);
+    UserDto createdUser = userService.createUser(userCreateDTO, profileRequest);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdUser);
   }
 
   // 사용자 정보 수정
   @PatchMapping("/{id}")
-  public ResponseEntity<UserDto> updateUser(@PathVariable("id") UUID id,
-      @RequestBody UserUpdateDTO userUpdateDTO) {
-
-    return ResponseEntity.ok(userService.updateUser(id, userUpdateDTO));
+  public ResponseEntity<UserDto> updateUser(
+      @PathVariable("id") UUID id,
+      @RequestPart UserUpdateDTO userUpdateDTO,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) {
+    Optional<BinaryContentCreateDTO> profileRequest = Optional.ofNullable(profile)
+        .flatMap(this::resolveProfileRequest);
+    return ResponseEntity.ok(userService.updateUser(id, userUpdateDTO, profileRequest));
   }
 
   // 사용자 삭제
@@ -69,5 +86,24 @@ public class UserController {
     UserStatusUpdateDTO updatedStatus = userService.updateUserStatus(id, userStatusUpdateDTO);
     return ResponseEntity.status(HttpStatus.OK).body(updatedStatus);
   }
+
+  private Optional<BinaryContentCreateDTO> resolveProfileRequest(MultipartFile profileFile) {
+    if (profileFile.isEmpty()) {
+      return Optional.empty();
+    } else {
+      try {
+        BinaryContentCreateDTO binaryContentCreateRequest = new BinaryContentCreateDTO(
+            profileFile.getOriginalFilename(),
+            profileFile.getSize(),
+            profileFile.getContentType(),
+            profileFile.getBytes()
+        );
+        return Optional.of(binaryContentCreateRequest);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+  }
+
 }
 

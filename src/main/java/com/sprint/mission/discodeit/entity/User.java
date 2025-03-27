@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -9,13 +7,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 @Entity
 @Table(name = "users")
@@ -43,11 +40,14 @@ public class User extends BaseUpdatableEntity implements Serializable {
 
   //update
 
-  public void updateUser(String username, String email, String password) {
+  public void updateUser(String username, String email, String password,
+      BinaryContent nullableProfile) {
     this.username = username;
     this.email = email;
     this.password = password;
-    update();
+    this.profile = nullableProfile;
+
+    super.update();
   }
 
   //새로운 이미지가 들어오면, 완전히 새로운 이미지 객체로 간주 ?

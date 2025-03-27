@@ -1,16 +1,22 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +32,13 @@ public class BasicUserService implements UserService {
 
   private final UserMapper userMapper;
 
+  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentRepository binaryContentRepository;
+
+  @Transactional
   @Override
-  public UserDto createUser(UserCreateDTO userCreateDTO) {
+  public UserDto createUser(UserCreateDTO userCreateDTO,
+      Optional<BinaryContentCreateDTO> optionalProfileCreateRequest) {
     if (userRepository.existsByUsername(userCreateDTO.name())) {
       throw new IllegalArgumentException("이미 존재하는 이름입니다. ");
     }
@@ -35,11 +46,25 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이미 존재하는 이메일입니다. ");
     }
 
+    //nullable한 프로필
+    BinaryContent nullableProfile = optionalProfileCreateRequest
+        .map(profileRequest -> {
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        })
+        .orElse(null);
+
     User user = User.builder()
         .username(userCreateDTO.name())
         .email(userCreateDTO.email())
         .password(userCreateDTO.password())
-        .profile(userCreateDTO.profile())
+        .profile(nullableProfile)
         .build();
 
     return userMapper.toDto(userRepository.save(user));
@@ -72,10 +97,30 @@ public class BasicUserService implements UserService {
         .collect(Collectors.toList());
   }
 
+  @Transactional
   @Override
-  public UserDto updateUser(UUID userID, UserUpdateDTO userUpdateDTO) {
+  public UserDto updateUser(
+      UUID userID, UserUpdateDTO userUpdateDTO,
+      Optional<BinaryContentCreateDTO> optionalProfileCreateRequest) {
+
+    //nullable한 프로필
+    BinaryContent nullableProfile = optionalProfileCreateRequest
+        .map(profileRequest -> {
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        })
+        .orElse(null);
+
     User user = findbyId(userID);
-    user.updateUser(userUpdateDTO.newName(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword());
+
+    user.updateUser(userUpdateDTO.newName(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword(),
+        nullableProfile);
     return userMapper.toDto(userRepository.save(user));
   }
 

@@ -15,7 +15,6 @@ public class BinaryContentMapper {
         .fileName(binaryContent.getFileName())  // String
         .size(binaryContent.getSize())  // Long
         .contentType(binaryContent.getContentType())  // String
-        .bytes(binaryContent.getBytes())  // byte[]
         .build();
   }
 
