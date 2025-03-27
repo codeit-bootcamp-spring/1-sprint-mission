@@ -1,11 +1,14 @@
 <configuration>
   <!--파일은 {프로젝트 루트}/.logs 경로에 저장되도록 설정 -->
   <property name="LOG_PATH" value="./.logs"/>
-
+  <conversionRule conversionWord="clr"
+    converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+  <conversionRule conversionWord="highlight"
+    converterClass="com.sprint.mission.discodeit.log.CustomHighlightConverter"/>
   <!-- 콘솔로 출력 -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      <pattern>%blue(%d{yyyy-MM-dd HH:mm:ss.SS}) %boldMagenta([%thread]) %highlight(%-5level) %logger{36}-%msg%n</pattern>
     </encoder>
   </appender>
 

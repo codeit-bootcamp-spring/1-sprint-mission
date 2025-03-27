@@ -1,6 +1,3 @@
-spring:
-  profiles: prod
-  
 logging:
   level:
     root: INFO

@@ -1,6 +1,10 @@
 spring:
+  output:
+    ansi:
+      enabled: ALWAYS
   profiles:
-    active: dev
+    active: prod
+
   application:
     name: discodeit
   servlet:

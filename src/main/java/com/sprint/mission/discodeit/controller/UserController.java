@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.log.PrivacyMaskingUtil;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.io.IOException;
@@ -38,12 +39,30 @@ public class UserController implements UserApi {
   private final UserService userService;
   private final UserStatusService userStatusService;
 
+
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Override
   public ResponseEntity<UserDto> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+
+    log.info("사용자 생성 요청: username: {}, email: {}, password: {} "
+            + "/ 프로필 파일 여부 : {}",
+        userCreateRequest.username(),
+        PrivacyMaskingUtil.maskEmail(userCreateRequest.email()),
+        PrivacyMaskingUtil.maskPassword(userCreateRequest.password()),
+        (profile == null ? "프로필 없음" : "프로필 있음")
+
+    );
+    if (profile != null) {
+      log.info("프로필 파일 정보: name:{}, size: {}bytes, type: {}",
+          profile.getOriginalFilename(),
+          profile.getSize(),
+          profile.getContentType()
+      );
+    }
+
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto createdUser = userService.create(userCreateRequest, profileRequest);
