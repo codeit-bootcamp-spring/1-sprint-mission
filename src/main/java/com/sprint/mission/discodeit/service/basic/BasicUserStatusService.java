@@ -1,19 +1,20 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +23,10 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
 
+  private final UserStatusMapper userStatusMapper;
+
   @Override
-  public UserStatus create(UserStatusCreateDTO userStatusCreateDTO) {
+  public UserStatusDto create(UserStatusCreateDTO userStatusCreateDTO) {
     User user = userRepository.findById(userStatusCreateDTO.userId()).orElseThrow(
         () -> new NoSuchElementException("User not found"));
 
@@ -35,9 +38,8 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus = UserStatus.builder()
         .user(user)
         .build();
-    
-    userStatusRepository.save(userStatus);
-    return userStatus;
+
+    return userStatusMapper.toDto(userStatusRepository.save(userStatus));
   }
 
   @Override
@@ -46,14 +48,16 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatus find(UUID uuid) {
-    return userStatusRepository.findById(uuid).orElseThrow(
+  public UserStatusDto find(UUID uuid) {
+    UserStatus userStatus = userStatusRepository.findById(uuid).orElseThrow(
         () -> new NoSuchElementException("userStatus not found"));
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
-  public List<UserStatus> findAll() {
-    return userStatusRepository.findAll();
+  public List<UserStatusDto> findAll() {
+    return userStatusRepository.findAll()
+        .stream().map(u -> userStatusMapper.toDto(u)).collect(Collectors.toList());
   }
 
   private UserStatus findByUserId(UUID userId) {
@@ -62,11 +66,11 @@ public class BasicUserStatusService implements UserStatusService {
 
 
   @Override
-  public UserStatus update(UUID id, UserStatusUpdateDTO userStatusUpdateDTO) {
-    UserStatus userStatus = find(id);
+  public UserStatusDto update(UUID id, UserStatusUpdateDTO userStatusUpdateDTO) {
+    UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
+        () -> new NoSuchElementException("userStatus not found"));
     userStatus.update(userStatusUpdateDTO);
-    userStatusRepository.save(userStatus);
-    return userStatus;
+    return userStatusMapper.toDto(userStatusRepository.save(userStatus));
   }
 
   @Override

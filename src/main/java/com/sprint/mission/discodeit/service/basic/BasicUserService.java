@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.List;
@@ -24,12 +23,11 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserStatusService userStatusService;
-  private final UserStatusRepository userStatusRepository;
 
   private final UserMapper userMapper;
 
   @Override
-  public User createUser(UserCreateDTO userCreateDTO) {
+  public UserDto createUser(UserCreateDTO userCreateDTO) {
     if (userRepository.existsByUsername(userCreateDTO.name())) {
       throw new IllegalArgumentException("이미 존재하는 이름입니다. ");
     }
@@ -44,15 +42,14 @@ public class BasicUserService implements UserService {
         .profile(userCreateDTO.profile())
         .build();
 
-    return userRepository.save(user);
+    return userMapper.toDto(userRepository.save(user));
   }
 
   @Override
   public UserDto findUserDTO(UUID userId) {
     User user = userRepository.findById(userId).orElseThrow(
         () -> new NoSuchElementException("user Not found"));
-    UserDto userDto = userMapper.toDto(user);
-    return userDto;
+    return userMapper.toDto(user);
   }
 
   //내부 사용전용
@@ -70,17 +67,16 @@ public class BasicUserService implements UserService {
   public List<UserDto> findAllUserDTO() {
     List<User> userList = findAll();
 
-    List<UserDto> userDtos = userList.stream()
+    return userList.stream()
         .map(user -> userMapper.toDto(user))
         .collect(Collectors.toList());
-    return userDtos;
   }
 
   @Override
-  public User updateUser(UUID userID, UserUpdateDTO userUpdateDTO) {
+  public UserDto updateUser(UUID userID, UserUpdateDTO userUpdateDTO) {
     User user = findbyId(userID);
     user.updateUser(userUpdateDTO.newName(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword());
-    return userRepository.save(user);
+    return userMapper.toDto(userRepository.save(user));
   }
 
   @Override

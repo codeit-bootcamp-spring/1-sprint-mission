@@ -1,23 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
@@ -28,8 +28,10 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
 
+  private final MessageMapper messageMapper;
+
   @Override
-  public Message createMessage(MessageCreateDTO messageCreateDTO) {
+  public MessageDto createMessage(MessageCreateDTO messageCreateDTO) {
     Channel foundChannel = channelRepository.findById(messageCreateDTO.channelId()).orElseThrow(()
         -> new NoSuchElementException(messageCreateDTO.channelId() + "does not exist"));
 
@@ -43,32 +45,32 @@ public class BasicMessageService implements MessageService {
         .author(foundUser)
         .attachments(messageCreateDTO.attachments()).build();
 
-    return messageRepository.save(message);
+    return messageMapper.toDto(messageRepository.save(message));
   }
 
   @Override
-  public Message findById(UUID id) {
-    return messageRepository.findById(id)
+  public MessageDto findById(UUID id) {
+    Message message = messageRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Message not found"));
+    return messageMapper.toDto(message);
   }
 
   @Override
-  public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findByChannelId(channelId);
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
+    return messageRepository.findByChannelId(channelId)
+        .stream()
+        .map(messageMapper::toDto)
+        .collect(Collectors.toList());
   }
 
-  @Override
-  public List<Message> findAll() {
-    return messageRepository.findAll();
-  }
 
   @Override
-  public Message update(MessageUpdateDTO messageUpdateDTO) {
+  public MessageDto update(MessageUpdateDTO messageUpdateDTO) {
     Message message = messageRepository.findById(messageUpdateDTO.uuid())
         .orElseThrow(() -> new EntityNotFoundException("Message not found"));
 
     message.updateContent(messageUpdateDTO.content(), messageUpdateDTO.binaryContentList());
-    return messageRepository.save(message);
+    return messageMapper.toDto(messageRepository.save(message));
   }
 
   @Override

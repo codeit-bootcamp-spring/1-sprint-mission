@@ -31,29 +31,29 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusService readStatusService;
 
   @Override
-  public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO) {
+  public ChannelDto createPublicChannel(ChannelCreateDTO channelCreateDTO) {
     Channel channel = Channel.builder()
         .channelName(channelCreateDTO.name())
         .description(channelCreateDTO.description())
         .type(ChannelType.PUBLIC)
         .build();
 
-    return channelRepository.save(channel);
+    return channelMapper.toDto(channelRepository.save(channel));
   }
 
   @Transactional
   @Override
-  public Channel createPrivateChannel(PrivateChannelCreateDTO channelCreateDTO) {
+  public ChannelDto createPrivateChannel(PrivateChannelCreateDTO channelCreateDTO) {
     Channel channel = Channel.builder()
         .channelName(channelCreateDTO.getName())
         .description(channelCreateDTO.getDescription())
         .type(ChannelType.PRIVATE)
         .build();
 
-    //TODO: 순서?
+    //TODO: 순서? 트랜잭션 어노테이션 설정 보기.
     Channel channel1 = channelRepository.save(channel);
     createReadStatus(channel, channelCreateDTO);
-    return channel1;
+    return channelMapper.toDto(channel1);
   }
 
 

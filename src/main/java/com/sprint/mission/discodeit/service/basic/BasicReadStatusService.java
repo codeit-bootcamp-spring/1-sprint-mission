@@ -1,22 +1,25 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.persistence.EntityExistsException;
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
@@ -26,9 +29,12 @@ public class BasicReadStatusService implements ReadStatusService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
 
+  private final ReadStatusMapper readStatusMapper;
+  private final UserMapper userMapper;
+
   //PRIVATE 채널시에만 수행
   @Override
-  public ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO) {
+  public ReadStatusDto create(ReadStatusCreateDTO readStatusCreateDTO) {
 
     User user = userRepository.findById(readStatusCreateDTO.userId()).orElseThrow(
         () -> new NoSuchElementException("user not found"));
@@ -51,25 +57,30 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new EntityExistsException("해당 Channel과 User에 대한 ReadStatus가 이미 존재합니다.");
     }
 
-    return readStatusRepository.save(readStatus);
+    return readStatusMapper.toDto(readStatusRepository.save(readStatus));
   }
 
   @Override
-  public ReadStatus findbyId(UUID uuid) {
-    return readStatusRepository.findById(uuid).orElseThrow(
+  public ReadStatusDto findbyId(UUID uuid) {
+    ReadStatus readStatus = readStatusRepository.findById(uuid).orElseThrow(
         () -> new NoSuchElementException("ReadStatus not found"));
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
-  public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
+  public List<ReadStatusDto> findAllByUserId(UUID userId) {
+    return readStatusRepository.findAllByUserId(userId).stream()
+        .map(readStatusMapper::toDto)
+        .collect(Collectors.toList());
   }
 
   @Override
-  public ReadStatus update(ReadStatusUpdateDTO readStatusUpdateDTO) {
-    ReadStatus readStatus = findbyId(readStatusUpdateDTO.id());
+  public ReadStatusDto update(ReadStatusUpdateDTO readStatusUpdateDTO) {
+    ReadStatus readStatus = readStatusRepository.findById(readStatusUpdateDTO.id()).orElseThrow(
+        () -> new NoSuchElementException("ReadStatus not found")
+    );
     readStatus.update();
-    return readStatusRepository.save(readStatus);
+    return readStatusMapper.toDto(readStatusRepository.save(readStatus));
   }
 
   @Override

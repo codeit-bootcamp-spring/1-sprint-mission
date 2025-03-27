@@ -24,22 +24,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserController {
 
+
   private final UserService userService;
 
   // 사용자 등록
   @PostMapping
-  public ResponseEntity<String> addUser(@RequestBody UserCreateDTO userCreateDTO) {
-    userService.createUser(userCreateDTO);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body("User: " + userCreateDTO.name() + " created");
+  public ResponseEntity<UserDto> createUser(@RequestBody UserCreateDTO userCreateDTO) {
+    return ResponseEntity.ok(userService.createUser(userCreateDTO));
   }
 
   // 사용자 정보 수정
   @PatchMapping("/{id}")
-  public ResponseEntity<String> updateUser(@PathVariable("id") UUID id,
+  public ResponseEntity<UserDto> updateUser(@PathVariable("id") UUID id,
       @RequestBody UserUpdateDTO userUpdateDTO) {
-    userService.updateUser(id, userUpdateDTO);
-    return ResponseEntity.status(HttpStatus.OK).body("User updated");
+
+    return ResponseEntity.ok(userService.updateUser(id, userUpdateDTO));
   }
 
   // 사용자 삭제

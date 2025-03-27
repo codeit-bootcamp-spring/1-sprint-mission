@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
@@ -29,23 +28,19 @@ public class ChannelController {
   private final ChannelService channelService;
   private final ChannelMapper channelMapper;
 
-  //TODO: 반환을 DTO로 고치기. 
+  //TODO: 반환을 DTO로 고치기.
   // 공개 채널 생성
   @PostMapping
   public ResponseEntity<ChannelDto> createPublicChannel(
       @RequestBody ChannelCreateDTO channelCreateDTO) {
-    Channel createdChannel = channelService.createPublicChannel(channelCreateDTO);
-    ChannelDto channelDto = channelMapper.toDto(createdChannel); // Channel -> ChannelDto 변환 필요
-    return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
+    return ResponseEntity.ok(channelService.createPublicChannel(channelCreateDTO));
   }
 
   // 비공개 채널 생성
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> createPrivateChannel(
       @RequestBody PrivateChannelCreateDTO channelCreateDTO) {
-    Channel createdChannel = channelService.createPrivateChannel(channelCreateDTO);
-    ChannelDto channelDto = channelMapper.toDto(createdChannel); // Channel -> ChannelDto 변환 필요
-    return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
+    return ResponseEntity.ok(channelService.createPrivateChannel(channelCreateDTO));
   }
 
   // 공개 채널 정보 수정

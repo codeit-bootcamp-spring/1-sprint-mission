@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import java.util.UUID;
@@ -27,19 +27,16 @@ public class MessageController {
 
   // 메시지 전송
   @PostMapping
-  public ResponseEntity<String> sendMessage(@RequestBody MessageCreateDTO messageCreateDTO) {
-    messageService.createMessage(messageCreateDTO);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body("Message sent: " + messageCreateDTO.toString());
+  public ResponseEntity<MessageDto> sendMessage(@RequestBody MessageCreateDTO messageCreateDTO) {
+    return ResponseEntity.ok(messageService.createMessage(messageCreateDTO));
   }
 
   // 메시지 수정
   @PatchMapping("/{id}")
-  public ResponseEntity<String> updateMessage(@PathVariable("id") UUID id,
+  public ResponseEntity<MessageDto> updateMessage(@PathVariable("id") UUID id,
       @RequestBody MessageUpdateDTO messageUpdateDTO) {
-    messageService.update(messageUpdateDTO);
-    return ResponseEntity.status(HttpStatus.OK)
-        .body("Message updated: " + messageUpdateDTO.toString());
+
+    return ResponseEntity.ok(messageService.update(messageUpdateDTO));
   }
 
   // 메시지 삭제
@@ -51,8 +48,7 @@ public class MessageController {
 
   // 채널 ID로 메시지 목록 조회
   @GetMapping("/{id}")
-  public ResponseEntity<List<Message>> getMessagesByChannelId(@PathVariable("id") UUID id) {
-    List<Message> messages = messageService.findAllByChannelId(id);
-    return ResponseEntity.ok(messages); // 상태 코드 200과 함께 메시지 목록 반환
+  public ResponseEntity<List<MessageDto>> getMessagesByChannelId(@PathVariable("id") UUID id) {
+    return ResponseEntity.ok(messageService.findAllByChannelId(id)); //
   }
 }
