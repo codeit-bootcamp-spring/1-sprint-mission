@@ -1,7 +1,7 @@
 spring:
   application:
     name: discodeit
-  profiles.active: ${ACTIVE}
+  profiles.active: ${ACTIVE:dev}
   servlet:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
