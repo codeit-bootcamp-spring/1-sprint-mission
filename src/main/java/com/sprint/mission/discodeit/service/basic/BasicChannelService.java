@@ -7,20 +7,18 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
-import java.util.NoSuchElementException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
@@ -28,7 +26,7 @@ public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
-  private final MessageRepository messageRepository;
+  private final ChannelMapper channelMapper;
   //Service
   private final ReadStatusService readStatusService;
 
@@ -71,16 +69,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelDto findDTO(UUID uuid) {
     Channel channel = findById(uuid);
-
-    //Public 일 때 userIdList , time은 null
-    //이 아이디리스트는 readStatus에서 찾아야함.
-    List<UUID> userIdList = null;
-    Instant time = null;
-    if (channel.getType() == ChannelType.PRIVATE) {
-      userIdList = readStatusRepository.findAllUserIdByChannelId(uuid);
-      time = readStatusRepository.findLatestTimeByChannelId(uuid);
-    }
-    ChannelDto channelDto = new ChannelDto(channel, time, userIdList);
+    ChannelDto channelDto = channelMapper.toDto(channel);
     return channelDto;
   }
 

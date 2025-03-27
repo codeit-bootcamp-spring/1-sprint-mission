@@ -1,33 +1,33 @@
 package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
+import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 
-import java.util.UUID;
-
 @Getter
+@Builder
 public class UserDto {
 
   private final UUID id;
   private final String name;
   private final String email;
-  private final BinaryContent filePath;
-  private final Boolean isOnline;
+  private final BinaryContent profile;
+  private final Boolean online;
 
-  public UserDto(User user, boolean isOnline) {
-    this.id = user.getId();
-    this.name = user.getUsername();
-    this.email = user.getEmail();
-    this.filePath = user.getProfile();
-    this.isOnline = isOnline;
+  public UserDto(UUID id, String name, String email, BinaryContent profile, boolean online) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.profile = profile;
+    this.online = online;
   }
 
   @Override
   public String toString() {
     return "User[Name: " + this.getName() +
         " Email: " + this.getEmail() +
-        " FilePath: " + this.getFilePath() +
+        " Profile: " + this.getProfile() +
         " ID: " + this.id + "]";
   }
 

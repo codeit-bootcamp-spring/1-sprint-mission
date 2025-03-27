@@ -5,18 +5,17 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import java.util.NoSuchElementException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
@@ -26,6 +25,8 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final UserStatusService userStatusService;
   private final UserStatusRepository userStatusRepository;
+
+  private final UserMapper userMapper;
 
   @Override
   public User createUser(UserCreateDTO userCreateDTO) {
@@ -50,8 +51,7 @@ public class BasicUserService implements UserService {
   public UserDto findUserDTO(UUID userId) {
     User user = userRepository.findById(userId).orElseThrow(
         () -> new NoSuchElementException("user Not found"));
-    UserStatus userStatus = userStatusRepository.findByUserId(userId);
-    UserDto userDto = new UserDto(user, userStatus.isOnline());
+    UserDto userDto = userMapper.toDto(user);
     return userDto;
   }
 
@@ -71,8 +71,7 @@ public class BasicUserService implements UserService {
     List<User> userList = findAll();
 
     List<UserDto> userDtos = userList.stream()
-        .map(user -> new UserDto(user, userStatusRepository.findByUserId(user.getId())
-            .isOnline()))
+        .map(user -> userMapper.toDto(user))
         .collect(Collectors.toList());
     return userDtos;
   }
