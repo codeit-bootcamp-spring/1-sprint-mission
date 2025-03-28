@@ -9,27 +9,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<String> handleException(IllegalArgumentException e) {
-    e.printStackTrace();
-    return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
-        .body(e.getMessage());
+  @ExceptionHandler(DiscodeitException.class)
+  public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
+    ErrorCode code = e.getErrorCode();
+    HttpStatus status = HttpStatus.valueOf(code.getStatus());
+
+    ErrorResponse response = new ErrorResponse(
+        e.getTimestamp(),
+        code.getCode(),
+        code.getMessage(),
+        e.getDetails(),
+        e.getClass().getSimpleName(),
+        code.getStatus()
+    );
+
+    return ResponseEntity.status(status).body(response);
   }
 
-  @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<String> handleException(NoSuchElementException e) {
-    e.printStackTrace();
-    return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .body(e.getMessage());
-  }
-
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleException(Exception e) {
-    e.printStackTrace();
-    return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(e.getMessage());
-  }
 }
