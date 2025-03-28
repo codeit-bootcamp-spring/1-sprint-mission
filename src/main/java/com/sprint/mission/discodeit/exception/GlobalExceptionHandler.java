@@ -30,7 +30,21 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  // 0. 서버 내부 오류
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    log.error("서버 내부 에러: {}", e.getMessage());
+    ErrorResponse errorResponse = new ErrorResponse(
+        Instant.now(),
+        e.toString(),
+        "서버 에러",
+        null,
+        e.getClass().getSimpleName(),
+        HttpStatus.INTERNAL_SERVER_ERROR.value()
+    );
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+  }
+
+  // 0. 기타 오류
   @ExceptionHandler(DiscodeitException.class)
   public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
     log.error("애플리케이션 예외 발생: 타입={}, 메시지={}", e.getClass().getSimpleName(), e.getMessage());
