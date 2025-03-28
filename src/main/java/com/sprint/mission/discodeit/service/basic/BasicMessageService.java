@@ -78,7 +78,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new NoSuchElementException("Author with id " + authorId + " does not exist")
         );
-
+    log.info("[MessageService] 메시지 첨부파일 저장작업 시작");
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
           String fileName = attachmentRequest.fileName();
@@ -88,6 +88,7 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
+          log.info("[MessageService] 메시지 점부파일 저장 성공");
           binaryContentStorage.put(binaryContent.getId(), bytes);
           return binaryContent;
         })

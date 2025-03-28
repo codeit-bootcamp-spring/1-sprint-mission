@@ -120,7 +120,7 @@ public class BasicUserService implements UserService {
     );
     if (optionalProfileCreateRequest.isPresent()) {
       BinaryContentCreateRequest profileRequest = optionalProfileCreateRequest.get();
-      log.debug("[UserService] 수정 프로필 요청 정보: 파일 fileName: {}, type: {}, size: {} byte",
+      log.debug("[UserService] 사용자 수정 프로필 요청 정보: 파일 fileName: {}, type: {}, size: {} byte",
           profileRequest.fileName(),
           profileRequest.contentType(),
           profileRequest.bytes().length);
@@ -137,7 +137,7 @@ public class BasicUserService implements UserService {
     if (userRepository.existsByUsername(newUsername)) {
       throw new IllegalArgumentException("User with username " + newUsername + " already exists");
     }
-
+    log.info("[UserService] 사용자 프로필 사진 저장작업 시작");
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
 
@@ -147,6 +147,7 @@ public class BasicUserService implements UserService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
+          log.info("[UserService] 사용자 프로필 저장 성공");
           binaryContentStorage.put(binaryContent.getId(), bytes);
           return binaryContent;
         })

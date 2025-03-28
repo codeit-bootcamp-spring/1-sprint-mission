@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -75,9 +77,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentDto metaData) {
+    log.info("[BinaryContentStorage] 다운로드 요청 작업 시작");
+    log.debug("[BinaryContentStorage] 다운로드 요청 정보 id: {}, fileName: {}, size: {}, contentType: {}",
+        metaData.id(),
+        metaData.fileName(),
+        metaData.size(),
+        metaData.contentType()
+    );
     InputStream inputStream = get(metaData.id());
     Resource resource = new InputStreamResource(inputStream);
-
+    log.info("[BinaryContentStorage] 다운로드 요청 작업 성공");
     return ResponseEntity
         .status(HttpStatus.OK)
         .header(HttpHeaders.CONTENT_DISPOSITION,
