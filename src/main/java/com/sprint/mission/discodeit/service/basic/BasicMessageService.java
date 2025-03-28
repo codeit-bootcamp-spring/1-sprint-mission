@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -16,7 +16,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -48,11 +48,12 @@ public class BasicMessageService implements MessageService {
     User writer = userRepository.findById(messageCreateRequest.writerId())
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-    boolean isMember = channelService.getParticipantIds(channel.getId()).stream()
-        .anyMatch(uuid -> uuid.equals(messageCreateRequest.writerId()));
-
-    if (channel.getType() == ChannelType.PRIVATE && !isMember) {
-      throw new IllegalArgumentException("PRIVATE 채널의 멤버가 아닙니다.");
+    if (channel.getType() == ChannelType.PRIVATE) {
+      boolean isMember = channelService.getParticipantIds(channel.getId()).stream()
+          .anyMatch(uuid -> uuid.equals(messageCreateRequest.writerId()));
+      if (!isMember) {
+        throw new IllegalArgumentException("PRIVATE 채널의 멤버가 아닙니다.");
+      }
     }
 
     List<BinaryContent> binaryContents = Optional.ofNullable(attachments)
@@ -81,11 +82,12 @@ public class BasicMessageService implements MessageService {
     }
   }
 
+  @Transactional(readOnly = true)
   @Override
-  public List<MessageDTO> findByChannel(UUID channelId) {
+  public List<MessageDto> findByChannel(UUID channelId) {
     List<Message> messages = messageRepository.findByChannelId(channelId);
     return messages.stream()
-        .map(MessageDTO::fromEntity)
+        .map(MessageDto::fromEntity)
         .toList();
   }
 
@@ -104,6 +106,7 @@ public class BasicMessageService implements MessageService {
     return messageRepository.save(message);
   }
 
+  @Transactional
   @Override
   public void delete(UUID messageId, UUID writerId) {
     Message message = messageRepository.findById(messageId)
@@ -112,11 +115,6 @@ public class BasicMessageService implements MessageService {
     if (!message.getWriter().getId().equals(writerId)) {
       throw new IllegalArgumentException("작성자만 삭제 할 수 있습니다.");
     }
-
-    message.getAttachments().stream()
-        .map(BinaryContent::getId)
-        .forEach(binaryContentRepository::deleteById);
-
     messageRepository.deleteById(messageId);
   }
 }

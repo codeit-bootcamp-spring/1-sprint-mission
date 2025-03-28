@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 
@@ -13,7 +13,7 @@ public interface MessageService {
 
   Message create(MessageCreateRequest messageCreateRequest, List<MultipartFile> attachments);
 
-  List<MessageDTO> findByChannel(UUID channelId);
+  List<MessageDto> findByChannel(UUID channelId);
 
   Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest);
 

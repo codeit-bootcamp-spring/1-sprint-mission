@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,20 +47,19 @@ public class BasicUserStatusService implements UserStatusService {
     return userStatus;
   }
 
+  @Transactional(readOnly = true)
   @Override
   public UserStatus findByUserId(UUID userStatusId) {
-    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+    return userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
-
-    return userStatus;
   }
 
-
+  @Transactional
   @Override
   public void delete(UUID userStatusId) {
-    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+    userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
 
-    userStatusRepository.delete(userStatus);
+    userStatusRepository.deleteById(userStatusId);
   }
 }

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageDTO;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -23,21 +23,21 @@ public class MessageController {
 
   @PostMapping(value = "", consumes = {
       MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<MessageDTO> createMessage(
+  public ResponseEntity<MessageDto> createMessage(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
     Message message = messageService.create(messageCreateRequest, attachments);
-    return ResponseEntity.status(HttpStatus.CREATED).body(MessageDTO.fromEntity(message));
+    return ResponseEntity.status(HttpStatus.CREATED).body(MessageDto.fromEntity(message));
   }
 
   @PatchMapping(value = "/{messageId}")
-  public ResponseEntity<MessageDTO> updateMessage(
+  public ResponseEntity<MessageDto> updateMessage(
       @PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request
   ) {
     Message message = messageService.update(messageId, request);
-    return ResponseEntity.status(HttpStatus.OK).body(MessageDTO.fromEntity(message));
+    return ResponseEntity.status(HttpStatus.OK).body(MessageDto.fromEntity(message));
   }
 
   @DeleteMapping(value = "/{messageId}/{writerId}")
@@ -49,7 +49,7 @@ public class MessageController {
   }
 
   @GetMapping(value = "/{channelId}")
-  public ResponseEntity<List<MessageDTO>> getChannelMessages(
+  public ResponseEntity<List<MessageDto>> getChannelMessages(
       @PathVariable("channelId") UUID channelId) {
     return ResponseEntity.status(HttpStatus.OK).body(messageService.findByChannel(channelId));
   }

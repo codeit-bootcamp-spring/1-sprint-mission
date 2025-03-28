@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserDTO(
+public record UserDto(
     UUID userId,
     Instant createdAt,
     Instant updatedAt,
@@ -15,8 +15,8 @@ public record UserDTO(
     boolean isOnline
 ) {
 
-  public static UserDTO createEntity(User user) {
-    return new UserDTO(
+  public static UserDto createEntity(User user) {
+    return new UserDto(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),
@@ -27,8 +27,8 @@ public record UserDTO(
     );
   }
 
-  public static UserDTO fromEntity(User user, UserStatus userStatus) {
-    return new UserDTO(
+  public static UserDto fromEntity(User user, UserStatus userStatus) {
+    return new UserDto(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),

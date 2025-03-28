@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,24 +69,26 @@ public class BasicUserService implements UserService {
     return user;
   }
 
+  @Transactional(readOnly = true)
   @Override
-  public UserDTO find(UUID userId) {
+  public UserDto find(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
 
-    return UserDTO.fromEntity(user, userStatus);
+    return UserDto.fromEntity(user, userStatus);
   }
 
+  @Transactional(readOnly = true)
   @Override
-  public List<UserDTO> findAll() {
+  public List<UserDto> findAll() {
     return userRepository.findAll()
         .stream()
         .map(user -> {
           UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
               .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
-          return UserDTO.fromEntity(user, userStatus);
+          return UserDto.fromEntity(user, userStatus);
         })
         .toList();
   }
@@ -131,15 +133,11 @@ public class BasicUserService implements UserService {
   }
 
 
+  @Transactional
   @Override
   public void delete(UUID userId) {
-    User user = userRepository.findById(userId)
+    userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
-
-    if (user.getProfile() != null && binaryContentRepository.existsById(
-        user.getProfile().getId())) {
-      binaryContentRepository.deleteById(user.getProfile().getId());
-    }
 
     userStatusRepository.deleteById(userId);
     userRepository.deleteById(userId);

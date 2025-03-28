@@ -57,7 +57,7 @@ CREATE TABLE read_statuses
     updated_at   TIMESTAMPTZ,
     user_id      UUID        NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     channel_id   UUID        NOT NULL REFERENCES channels (id) ON DELETE CASCADE,
-    last_read_at TIMESTAMPTZ NOT NULL,
+    last_read_at TIMESTAMPTZ NULL,
     UNIQUE (user_id, channel_id)
 );
 

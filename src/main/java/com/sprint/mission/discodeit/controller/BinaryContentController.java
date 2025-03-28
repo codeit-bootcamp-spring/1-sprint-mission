@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +18,17 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
 
   @GetMapping(value = "/{binaryContentId}")
-  public ResponseEntity<BinaryContent> getBinaryContent(
+  public ResponseEntity<BinaryContentDto> getBinaryContent(
       @PathVariable("binaryContentId") UUID binaryContentId) {
-    return ResponseEntity.status(HttpStatus.OK).body(binaryContentService.find(binaryContentId));
+    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+    return ResponseEntity.status(HttpStatus.OK).body(binaryContentDto);
   }
 
   @GetMapping(value = "/all")
-  public ResponseEntity<List<BinaryContent>> getMultipleBinaryContents(
+  public ResponseEntity<List<BinaryContentDto>> getMultipleBinaryContents(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(binaryContents);
+    List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    return ResponseEntity.status(HttpStatus.OK).body(binaryContents);
   }
 
 }

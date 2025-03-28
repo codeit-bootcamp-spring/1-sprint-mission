@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 import java.util.UUID;
 
-public record MessageDTO(
+public record MessageDto(
     UUID messageId,
     UUID channelId,
     UUID writerId,
@@ -13,8 +13,8 @@ public record MessageDTO(
     List<BinaryContent> attachments
 ) {
 
-  public static MessageDTO fromEntity(Message message) {
-    return new MessageDTO(
+  public static MessageDto fromEntity(Message message) {
+    return new MessageDto(
         message.getId(),
         message.getChannel().getId(),
         message.getWriter().getId(),

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.LoginRequest;
+import com.sprint.mission.discodeit.dto.login.LoginRequest;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -10,6 +10,7 @@ import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.NoSuchElementException;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -18,6 +19,7 @@ public class BasicAuthService implements AuthService {
   private final UserRepository userRepository;
   private final UserStatusService userStatusService;
 
+  @Transactional
   @Override
   public User login(LoginRequest loginRequest) {
     User user = userRepository.findById(loginRequest.userId())

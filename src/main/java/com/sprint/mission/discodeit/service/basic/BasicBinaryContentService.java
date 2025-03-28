@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,18 +32,25 @@ public class BasicBinaryContentService implements BinaryContentService {
     return binaryContentRepository.save(binaryContent);
   }
 
+  @Transactional(readOnly = true)
   @Override
-  public BinaryContent find(UUID binaryContentId) {
-    return binaryContentRepository.findById(binaryContentId)
+  public BinaryContentDto find(UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+
+    return BinaryContentDto.fromEntity(binaryContent);
   }
 
+  @Transactional(readOnly = true)
   @Override
-  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
+    List<BinaryContent> binaryContents = binaryContentRepository.findAllById(binaryContentIds);
+    return binaryContents.stream()
+        .map(BinaryContentDto::fromEntity)
         .toList();
   }
 
+  @Transactional
   @Override
   public void delete(UUID binaryContentId) {
     if (!binaryContentRepository.existsById(binaryContentId)) {
