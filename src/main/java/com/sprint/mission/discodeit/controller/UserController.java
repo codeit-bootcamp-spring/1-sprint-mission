@@ -46,26 +46,17 @@ public class UserController implements UserApi {
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-
-    log.info("사용자 생성 요청: username: {}, email: {}, password: {} "
-            + "/ 프로필 파일 여부 : {}",
+    log.info("[UserController] 사용자 생성 요청: username: {}, 프로필 파일 여부 : {}",
         userCreateRequest.username(),
-        PrivacyMaskingUtil.maskEmail(userCreateRequest.email()),
-        PrivacyMaskingUtil.maskPassword(userCreateRequest.password()),
         (profile == null ? "프로필 없음" : "프로필 있음")
-
     );
-    if (profile != null) {
-      log.info("프로필 파일 정보: name:{}, size: {}bytes, type: {}",
-          profile.getOriginalFilename(),
-          profile.getSize(),
-          profile.getContentType()
-      );
-    }
 
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
+
     UserDto createdUser = userService.create(userCreateRequest, profileRequest);
+    log.info("[UserController] 사용자 생성 요청 성공 id: {}, name: {}",
+        createdUser.id(), createdUser.username());
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdUser);
@@ -81,9 +72,15 @@ public class UserController implements UserApi {
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.info("[UserController] 사용자 수정 요청 userUpdateRequest: {}, 프로필 파일 여부 : {}",
+        userUpdateRequest,
+        (profile == null ? "프로필 없음" : "프로필 있음")
+    );
+
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+    log.info("[UserController] 사용자 수정 성공: {}", updatedUser.id());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUser);
@@ -92,7 +89,11 @@ public class UserController implements UserApi {
   @DeleteMapping(path = "{userId}")
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
+    log.info("[UserController] 사용자 삭제 요청 id: {}",
+        userId);
     userService.delete(userId);
+    log.info("[UserController] 사용자 삭제 성공 id: {}",
+        userId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.log.PrivacyMaskingUtil;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -40,6 +41,23 @@ public class BasicUserService implements UserService {
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
+    log.info("[UserService] 사용자 생성 시작 name: {}, 프로필 이미지: {} ",
+        userCreateRequest.username(),
+        (optionalProfileCreateRequest.isEmpty() ? "프로필 없음" : "프로필 있음")
+    );
+    log.debug("[UserService] 사용자 생성 요청 정보 name: {}, email: {}, password: {}, 프로필 이미지: {}",
+        username,
+        PrivacyMaskingUtil.maskEmail(email),
+        PrivacyMaskingUtil.maskPassword(userCreateRequest.password()),
+        (optionalProfileCreateRequest.isEmpty() ? "프로필 없음" : "프로필 있음")
+    );
+    if (optionalProfileCreateRequest.isPresent()) {
+      BinaryContentCreateRequest profileRequest = optionalProfileCreateRequest.get();
+      log.debug("[UserService] 프로필 요청 정보: 파일 fileName: {}, type: {}, size: {} byte",
+          profileRequest.fileName(),
+          profileRequest.contentType(),
+          profileRequest.bytes().length);
+    }
 
     if (userRepository.existsByEmail(email)) {
       throw new IllegalArgumentException("User with email " + email + " already exists");
@@ -64,9 +82,12 @@ public class BasicUserService implements UserService {
 
     User user = new User(username, email, password, nullableProfile);
     Instant now = Instant.now();
+    log.info("[UserService] userStatus 생성 시작: name: {}", user.getUsername());
     UserStatus userStatus = new UserStatus(user, now);
-
+    log.info("[UserService] userStatus 생성 성공 userName: {},userStatusId: {}", user.getUsername(),
+        userStatus.getId());
     userRepository.save(user);
+    log.info("[UserService] 사용자 생성 성공 userName: {},userId: {}", user.getUsername(), user.getId());
     return userMapper.toDto(user);
   }
 
@@ -89,8 +110,24 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    log.info("[UserService] 사용자 수정 시작 targetUser: {}", userId);
+    log.debug(
+        "[UserService] 사용자 수정 요청 정보 newName: {}, newEmail: {}, newPassword: {}, new 프로필 이미지: {}",
+        userUpdateRequest.newUsername(),
+        PrivacyMaskingUtil.maskEmail(userUpdateRequest.newEmail()),
+        PrivacyMaskingUtil.maskPassword(userUpdateRequest.newPassword()),
+        (optionalProfileCreateRequest.isEmpty() ? "프로필 없음" : "프로필 있음")
+    );
+    if (optionalProfileCreateRequest.isPresent()) {
+      BinaryContentCreateRequest profileRequest = optionalProfileCreateRequest.get();
+      log.debug("[UserService] 수정 프로필 요청 정보: 파일 fileName: {}, type: {}, size: {} byte",
+          profileRequest.fileName(),
+          profileRequest.contentType(),
+          profileRequest.bytes().length);
+    }
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() ->
+            new NoSuchElementException("User with id " + userId + " not found"));
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
@@ -117,17 +154,18 @@ public class BasicUserService implements UserService {
 
     String newPassword = userUpdateRequest.newPassword();
     user.update(newUsername, newEmail, newPassword, nullableProfile);
-
+    log.info("[UserService] 사용자 수정 성공 targetUser: {}", userId);
     return userMapper.toDto(user);
   }
 
   @Transactional
   @Override
   public void delete(UUID userId) {
+    log.info("[UserService] 사용자 삭제 시작 id: {}", userId);
     if (userRepository.existsById(userId)) {
       throw new NoSuchElementException("User with id " + userId + " not found");
     }
-
     userRepository.deleteById(userId);
+    log.info("[UserService] 사용자 삭제 성공 id: {}", userId);
   }
 }
