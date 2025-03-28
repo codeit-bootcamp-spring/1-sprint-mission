@@ -49,9 +49,11 @@ dependencies {
 
     // PostgreSQL 의존성
     runtimeOnly 'org.postgresql:postgresql'            // 런타임에만 PostgreSQL 드라이버
+    // h2 의존성
+    runtimeOnly 'com.h2database:h2'
 
     // Spring Boot Test 의존성
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'   // 테스트 관련 의존성
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // JUnit 플랫폼 런처 (JUnit 테스트 실행)
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
