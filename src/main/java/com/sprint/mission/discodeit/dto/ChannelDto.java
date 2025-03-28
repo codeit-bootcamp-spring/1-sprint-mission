@@ -4,6 +4,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -17,5 +19,8 @@ public class ChannelDto {
 
     @Enumerated(EnumType.STRING)
     private String type;
-
+    
+    private List<UserDto> participants;
+    
+    private Instant lastMessageAt;
 }

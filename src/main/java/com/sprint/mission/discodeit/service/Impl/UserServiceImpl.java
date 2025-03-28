@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.service.Impl;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.UsersDto;
+import com.sprint.mission.discodeit.dto.UserStatusDto;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.DomainErrorCode;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,7 +63,7 @@ public class UserServiceImpl implements UserService {
       throw e;
     } catch (Exception e) {
       log.error("[회원가입 실패] 예상치 못한 오류: {}", e.getMessage(), e);
-      throw new RestApiException(DomainErrorCode.USER_CREATE_ERROR, "회원가입 처리 중 오류가 발생했습니다.");
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "회원가입 처리 중 오류가 발생했습니다.");
     }
   }
 
@@ -91,10 +95,10 @@ public class UserServiceImpl implements UserService {
       throw e;
     } catch (IOException e) {
       log.error("[회원가입 실패] 프로필 이미지 처리 중 오류: {}", e.getMessage(), e);
-      throw new RestApiException(DomainErrorCode.USER_CREATE_ERROR, "프로필 이미지 처리 중 오류가 발생했습니다.");
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "프로필 이미지 처리 중 오류가 발생했습니다.");
     } catch (Exception e) {
       log.error("[회원가입 실패] 예상치 못한 오류: {}", e.getMessage(), e);
-      throw new RestApiException(DomainErrorCode.USER_CREATE_ERROR, "회원가입 처리 중 오류가 발생했습니다.");
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "회원가입 처리 중 오류가 발생했습니다.");
     }
   }
 
@@ -116,59 +120,97 @@ public class UserServiceImpl implements UserService {
     // User 엔티티에 프로필 이미지 설정
     user.setProfileImage(profileImage.getBytes());
     user.setProfile(binaryContent);
+
+    // UserDto의 profileImage 및 profile 필드 설정
     dto.setProfileImage(binaryContent.getId().toString());
+    dto.setProfile(BinaryContentDto.builder()
+        .id(binaryContent.getId())
+        .fileName(binaryContent.getFileName())
+        .contentType(binaryContent.getContentType())
+        .size(binaryContent.getSize())
+        .build());
   }
 
   @Transactional
   @Override
-  public UsersDto update(UUID id, UsersDto usersDTO, byte[] profileImage) {
+  public UserDto update(UUID userId, UserUpdateRequest updateRequest, byte[] profileImage) {
     try {
-      User user = findUserById(id);
+      User user = findUserById(userId);
 
-      Objects.requireNonNull(usersDTO, "UserDTO cannot be null");
+      Objects.requireNonNull(updateRequest, "UserUpdateRequest cannot be null");
 
-      // TODO: 실제 업데이트 로직 구현
+      // 필드 업데이트
+      if (updateRequest.getNewUsername() != null && !updateRequest.getNewUsername().isEmpty()) {
+        user.setName(updateRequest.getNewUsername());
+      }
+
+      if (updateRequest.getNewEmail() != null && !updateRequest.getNewEmail().isEmpty()) {
+        // 이메일 중복 확인
+        if (!user.getEmail().equals(updateRequest.getNewEmail())) {
+          checkEmailDuplication(updateRequest.getNewEmail());
+          user.setEmail(updateRequest.getNewEmail());
+        }
+      }
+
+      if (updateRequest.getNewPassword() != null && !updateRequest.getNewPassword().isEmpty()) {
+        user.setPassword(updateRequest.getNewPassword());
+      }
 
       if (profileImage != null && profileImage.length > 0) {
         updateProfileImage(user, profileImage);
       }
 
       userRepository.save(user);
-      return userMapper.toDtos(user);
+      return userMapper.toDto(user);
     } catch (RestApiException e) {
       throw e;
     } catch (Exception e) {
       log.error("[회원정보 수정 실패] 예상치 못한 오류: {}", e.getMessage(), e);
-      throw new RestApiException(DomainErrorCode.USER_CREATE_ERROR, "회원정보 수정 중 오류가 발생했습니다.");
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "회원정보 수정 중 오류가 발생했습니다.");
     }
   }
 
   @Transactional
   @Override
-  public UsersDto update(UUID id, UsersDto usersDTO, MultipartFile profileImage)
+  public UserDto update(UUID userId, UserUpdateRequest updateRequest, MultipartFile profileImage)
       throws IOException {
     try {
-      User user = findUserById(id);
+      User user = findUserById(userId);
 
-      Objects.requireNonNull(usersDTO, "UserDTO cannot be null");
+      Objects.requireNonNull(updateRequest, "UserUpdateRequest cannot be null");
 
-      // TODO: 실제 업데이트 로직 구현
+      // 필드 업데이트
+      if (updateRequest.getNewUsername() != null && !updateRequest.getNewUsername().isEmpty()) {
+        user.setName(updateRequest.getNewUsername());
+      }
+
+      if (updateRequest.getNewEmail() != null && !updateRequest.getNewEmail().isEmpty()) {
+        // 이메일 중복 확인
+        if (!user.getEmail().equals(updateRequest.getNewEmail())) {
+          checkEmailDuplication(updateRequest.getNewEmail());
+          user.setEmail(updateRequest.getNewEmail());
+        }
+      }
+
+      if (updateRequest.getNewPassword() != null && !updateRequest.getNewPassword().isEmpty()) {
+        user.setPassword(updateRequest.getNewPassword());
+      }
 
       if (profileImage != null && !profileImage.isEmpty()) {
-        handleProfileImage(user, profileImage, null);
-        usersDTO.setProfileImage(user.getProfile().getId().toString());
+        UserDto tempDto = new UserDto();
+        handleProfileImage(user, profileImage, tempDto);
       }
 
       userRepository.save(user);
-      return userMapper.toDtos(user);
+      return userMapper.toDto(user);
     } catch (RestApiException e) {
       throw e;
     } catch (IOException e) {
       log.error("[회원정보 수정 실패] 프로필 이미지 처리 중 오류: {}", e.getMessage(), e);
-      throw new RestApiException(DomainErrorCode.USER_CREATE_ERROR, "프로필 이미지 처리 중 오류가 발생했습니다.");
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "프로필 이미지 처리 중 오류가 발생했습니다.");
     } catch (Exception e) {
       log.error("[회원정보 수정 실패] 예상치 못한 오류: {}", e.getMessage(), e);
-      throw new RestApiException(DomainErrorCode.USER_CREATE_ERROR, "회원정보 수정 중 오류가 발생했습니다.");
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "회원정보 수정 중 오류가 발생했습니다.");
     }
   }
 
@@ -190,9 +232,9 @@ public class UserServiceImpl implements UserService {
 
   @Transactional
   @Override
-  public void delete(UUID id) {
+  public void delete(UUID userId) {
     try {
-      User user = findUserById(id);
+      User user = findUserById(userId);
 
       userRepository.delete(user);
 
@@ -203,13 +245,13 @@ public class UserServiceImpl implements UserService {
       throw e;
     } catch (Exception e) {
       log.error("[회원 삭제 실패] 예상치 못한 오류: {}", e.getMessage(), e);
-      throw new RestApiException(DomainErrorCode.USER_CREATE_ERROR, "회원 삭제 중 오류가 발생했습니다.");
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "회원 삭제 중 오류가 발생했습니다.");
     }
   }
 
   @Override
-  public UserDto find(UUID id) {
-    User user = findUserById(id);
+  public UserDto find(UUID userId) {
+    User user = findUserById(userId);
     return userMapper.toDto(user);
   }
 
@@ -229,7 +271,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public List<UsersDto> findAll() {
+  public List<UserDto> findAll() {
     List<User> users = userRepository.findAll();
     if (users == null) {
       log.warn("경고: userRepository.findAll()이 null을 반환했습니다.");
@@ -237,7 +279,7 @@ public class UserServiceImpl implements UserService {
     }
 
     return users.stream()
-        .map(userMapper::toDtos)
+        .map(userMapper::toDto)
         .collect(Collectors.toList());
   }
 
@@ -252,7 +294,23 @@ public class UserServiceImpl implements UserService {
       throw e;
     } catch (Exception e) {
       log.error("[상태 업데이트 실패] 예상치 못한 오류: {}", e.getMessage(), e);
-      throw new RestApiException(DomainErrorCode.USER_CREATE_ERROR, "상태 업데이트 중 오류가 발생했습니다.");
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "상태 업데이트 중 오류가 발생했습니다.");
+    }
+  }
+
+  @Transactional
+  @Override
+  public UserStatusDto updateUserStatus(UUID userId, UserStatusUpdateRequest updateRequest) {
+    try {
+      User user = findUserById(userId);
+      Instant lastActiveAt = updateRequest.getNewLastActiveAt();
+
+      return new UserStatusDto(userId, lastActiveAt);
+    } catch (RestApiException e) {
+      throw e;
+    } catch (Exception e) {
+      log.error("[사용자 상태 업데이트 실패] 예상치 못한 오류: {}", e.getMessage(), e);
+      throw new RestApiException(DomainErrorCode.USER_SERVER_ERROR, "사용자 상태 업데이트 중 오류가 발생했습니다.");
     }
   }
 

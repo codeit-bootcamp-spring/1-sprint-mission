@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface BinaryContentService {
 
-    BinaryContentDto create(String fileName, Long size, String contentType, byte[] data);
+  BinaryContentDto create(String fileName, Long size, String contentType, byte[] data);
 
-    BinaryContentDto find(UUID binaryContentId);
+  BinaryContentDto find(UUID binaryContentId);
 
-    List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds);
+  List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds);
 
-    void delete(UUID binaryContentId);
+  void delete(UUID binaryContentId);
 }

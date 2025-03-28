@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UsersDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -30,12 +32,27 @@ public class UserMapper {
     if (user == null) {
       return null;
     }
+    
+    BinaryContentDto profileDto = null;
+    if (user.getProfile() != null) {
+      BinaryContent profile = user.getProfile();
+      profileDto = BinaryContentDto.builder()
+          .id(profile.getId())
+          .fileName(profile.getFileName())
+          .contentType(profile.getContentType())
+          .size(profile.getSize())
+          .build();
+    }
+    
     return UserDto.builder()
         .id(user.getId())
         .name(user.getName())
+        .username(user.getName())
         .email(user.getEmail())
         .password(user.getPassword())
+        .online(user.isOnline())
         .profileImage(user.getProfileImage() != null ? new String(user.getProfileImage()) : null)
+        .profile(profileDto)
         .build();
   }
 
