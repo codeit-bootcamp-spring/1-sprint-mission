@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.code.ErrorCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDTo;
@@ -12,7 +12,10 @@ import com.sprint.mission.discodeit.entity.ChannelCategory;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -23,6 +26,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -30,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -49,15 +54,18 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public ChannelDto create(CreatePublicChannelDto createPublicChannelDto)
-      throws CustomException {
+      throws DiscodeitException {
+    log.info("Public 채널 생성 시작: {}", createPublicChannelDto);
 
     if (createPublicChannelDto == null) {
-      throw new CustomException(ErrorCode.EMPTY_DATA);
+      log.error("채널 정보 누락");
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
     Channel channel = new Channel(createPublicChannelDto.name(), ChannelType.PUBLIC,
         ChannelCategory.TEXT, createPublicChannelDto.description());
-    channelRepository.save(channel);
+    Channel createdChannel = channelRepository.save(channel);
+    log.info("Public 채널 생성 완료: channelId = {}", createdChannel.getId());
     return channelMapper.toDto(channel);
   }
 
@@ -65,12 +73,17 @@ public class BasicChannelService implements ChannelService {
   @Transactional //channel create 동작 중, readStatus 생성 오류시 롤백 되도록 해야되는데?
   //todo - 고민: 읽기용 메서드인 경우에도 트랜젝션이 적용되나?
   public ChannelDto create(CreatePrivateChannelDTo createPrivateChannelDTo) {
+
+    log.info("Private 채널 생성 시작: {}", createPrivateChannelDTo);
+
     if (createPrivateChannelDTo == null || createPrivateChannelDTo.participantIds().isEmpty()) {
-      throw new CustomException(ErrorCode.EMPTY_DATA);
+      log.error("채널 정보 누락");
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
     Channel channel = new Channel(null, ChannelType.PRIVATE, ChannelCategory.TEXT, null);
     Channel savedChannel = channelRepository.save(channel);
+    log.debug("Private 채널 생성 완료: channelId = {}", savedChannel.getId());
 
     List<String> userIds = createPrivateChannelDTo.participantIds().stream().distinct().toList();
     List<UserDto> participants = new ArrayList<>();
@@ -78,12 +91,18 @@ public class BasicChannelService implements ChannelService {
     for (String userId : userIds) {
       User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
       if (user == null) {
-        throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        log.warn("Private 채널에 존재하지 않는 사용자 추가 시도");
+        throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
       }
       ReadStatus readStatus = new ReadStatus(channel, user, Instant.now());
-      readStatusRepository.save(readStatus);
+      ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
+      log.debug("Private 채널과 사용자를 ReadStatus로 연결 : readStatusId = {}, channelId = {}, userId = {}",
+          savedReadStatus.getId(), savedReadStatus.getChannel().getId(),
+          savedReadStatus.getUser().getId());
       participants.add(userMapper.toDto(user));
+      log.info("Private 채널에 사용자 추가:  channelId = {}, userId = {}", channel.getId(), user.getId());
     }
+    log.info("Private 채널 생성 완료: channelId = {}", savedChannel.getId());
     return channelMapper.toDto(channel);
   }
 
@@ -108,7 +127,7 @@ public class BasicChannelService implements ChannelService {
   public List<MessageDto> findAllMessagesByChannelId(String channelId) {
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
     if (channel == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
     return messageRepository.findByChannelId(channel.getId()).stream().map(messageMapper::toDto)
         .toList();
@@ -116,17 +135,17 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional(readOnly = true)
-  public ChannelDto findById(String channelId, String userId) throws CustomException {
+  public ChannelDto findById(String channelId, String userId) throws DiscodeitException {
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
     if (channel == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
         channel.getId(), UUID.fromString(userId)).orElse(null);
 
     if (readStatus == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
     List<UserDto> participants = List.of();
     if (channel.getType() == ChannelType.PRIVATE) {
@@ -141,39 +160,47 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public ChannelDto updateChannel(String channelId, UpdateChannelDto updateChannelDto)
-      throws CustomException {
+      throws DiscodeitException {
+
+    log.info("체널 수정 시작: channelId = {}", channelId);
 
     //dto가 비어있는 경우, 채널 조회를 수행하지 않도록 수정
     if (updateChannelDto == null) {
-      throw new CustomException(ErrorCode.EMPTY_DATA);
+      log.error("채널 정보 누락");
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
 
     if (channel == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      log.warn("채널을 찾을 수 없음: channelId = {}", channelId);
+      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     if (channel.getType() == ChannelType.PRIVATE) {
-      throw new CustomException(ErrorCode.CHANNEL_PRIVATE_NOT_UPDATABLE);
+      log.error("Private 채널 수정 시도: channelId = {}, channelType = {}", channel.getId(),
+          channel.getType());
+      throw new PrivateChannelUpdateException(ErrorCode.CHANNEL_PRIVATE_NOT_UPDATABLE);
     }
 
     channel.setName(updateChannelDto.channelName());
     channel.setDescription(updateChannelDto.description());
 
-    //명시적으로 save 할 필요 없이 변경 감지가 알아서 처리한다.
-    //channelRepository.save(channel);
+    Channel updatedChannel = channelRepository.save(channel);
+    log.info("Public 채널 정보 수정 완료: channelId = {}", updatedChannel.getId());
 
-    return channelMapper.toDto(channel);
+    return channelMapper.toDto(updatedChannel);
   }
 
   @Override
   @Transactional
-  public boolean delete(String channelId) throws CustomException {
+  public boolean delete(String channelId) throws DiscodeitException {
+    log.info("체널 삭제 시작: channelId = {}", channelId);
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
 
     if (channel == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      log.warn("존재 하지 않는 채널 삭제 시도");
+      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     //레포지토리에서 한번에 삭제 할 수 있는 방법이 있을까?
@@ -187,6 +214,7 @@ public class BasicChannelService implements ChannelService {
     // 따라서 필요시 영속성 컨텍스트도 초기화 해야한다.
     // 대용량 데이터의 경우 CASCADE 삭제도 시간이 오래 걸릴 수 있으므로, 비동기 처리나 배치 처리를 고려해볼 수 있다.
     channelRepository.delete(channel);
+    log.info("체널 삭제 완료: channelId = {}", channelId);
     return true;
   }
 

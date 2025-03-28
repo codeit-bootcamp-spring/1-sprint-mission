@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.code.ErrorCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.auth.UserLoginDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -27,14 +28,14 @@ public class BasicAuthService implements AuthService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserDto login(UserLoginDto userLoginDto) throws CustomException {
+  public UserDto login(UserLoginDto userLoginDto) throws DiscodeitException {
     if (userLoginDto == null || userLoginDto.username() == null
         || userLoginDto.password() == null) {
-      throw new CustomException(ErrorCode.EMPTY_DATA);
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
     User user = userRepository.findByUsername(userLoginDto.username()).orElse(null);
     if (user == null || !user.getPassword().equals(userLoginDto.password())) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
     }
     // 이것도 마찬가지로 제어할 수 없는 값이라 이 방식을 쓰면 안되는지?
     UserStatusDto userStatusDto = userStatusService.updateByUserId(user.getId().toString(),

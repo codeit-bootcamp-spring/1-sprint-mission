@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.code.ErrorCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
@@ -10,7 +10,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageMissMatchException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -19,6 +23,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -45,24 +51,33 @@ public class BasicMessageService implements MessageService {
   //텍스트만 있는 메세지
   @Override
   @Transactional
-  public MessageDto create(CreateMessageDto createMessageDto) throws CustomException {
+  public MessageDto create(CreateMessageDto createMessageDto) throws DiscodeitException {
+    log.info("메세지 생성 시작: userId = {}, channelId = {}, messageContent = {}",
+        createMessageDto.getAuthorId(), createMessageDto.getChannelId(),
+        createMessageDto.content());
+
     if (createMessageDto.content() == null) {
-      throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
+      log.warn("메세지 생성 정보 누락");
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
     ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
-        createMessageDto.getChannelId(),
-        createMessageDto.getAuthorId()).orElse(null);
+        createMessageDto.getChannelId(), createMessageDto.getAuthorId()).orElse(null);
+    log.debug("사용자가 채널에 속해있는지 ReadStatus로 검증: readStatusId = {}, channelId = {}, userId = {}",
+        readStatus.getId(), readStatus.getChannel().getId(), readStatus.getUser().getId());
 
     if (readStatus == null) {
       //해당 채널에 참여하지 않은 사용자가 해당 private 채널이 존재한다는 사실도 몰라야 한다.
       //그래서 user not in channel 이 아닌 Channel not found 로 예외처리
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      log.error("사용자가 채널에 참여하고 있지 않음");
+      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     Message message = new Message(readStatus.getUser(), createMessageDto.content(),
         readStatus.getChannel());
     Message saved = messageRepository.save(message);
+
+    log.info("메세지 생성 완료: messageId = {}", saved.getId());
 
     return messageMapper.toDto(saved);
   }
@@ -71,36 +86,43 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageDto create(CreateMessageDto createMessageDto, List<MultipartFile> files)
-      throws CustomException {
+      throws DiscodeitException {
     MessageDto messageDto = create(createMessageDto);
 
+    log.info("메세지 파일 첨부 시작: messageId = {}", messageDto.id());
+
     if (files == null || files.isEmpty()) {
-      throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
+      log.warn("첨부 파일 누락");
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
     Message message = messageRepository.findById(messageDto.id()).orElse(null);
 
     if (message == null) {
-      throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
+      log.error("메세지를 찾을 수 없음");
+      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
     }
 
     //더 좋은 방법이 없을까... 이건 Service를 의존해서 create를 쓰는게 좋을까?
+    log.debug("첨부 파일과 메세지 연결 시작");
     for (MultipartFile file : files) {
       BinaryContent savedContent = null;
       try {
-        BinaryContent binaryContent = new BinaryContent(
-            file.getName(),
-            file.getContentType(),
-            file.getSize()
-        );
+        BinaryContent binaryContent = new BinaryContent(file.getName(), file.getContentType(),
+            file.getSize());
         savedContent = binaryContentRepository.save(binaryContent);
+        log.debug("첨부 파일 저장 완료: attachmentId = {}", savedContent.getId());
       } catch (RuntimeException e) {
+        log.error("첨부 파일 저장 중 오류 발생: {}", e.getMessage());
         throw new RuntimeException(e);
       }
       message.addFile(savedContent);
+      log.debug("첨부 파일과 메세지 연결 완료: messageId ={}, attachmentId = {}", message.getId(),
+          savedContent.getId());
     }
 
-    messageRepository.save(message);
+    Message createdMessage = messageRepository.save(message);
+    log.info("첨부 파일이 있는 메세지 생성 완료: messageId ={}", createdMessage.getId());
 
     return messageMapper.toDto(message);
   }
@@ -116,7 +138,7 @@ public class BasicMessageService implements MessageService {
   public MessageDto findById(String messageId) {
     Message message = messageRepository.findById(UUID.fromString(messageId)).orElse(null);
     if (message == null) {
-      throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
+      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
     }
     return messageMapper.toDto(message);
   }
@@ -138,7 +160,7 @@ public class BasicMessageService implements MessageService {
       //todo - 고민: 메세지를 검색할때 유저 아이디가 없다고 에러를 출력해야할까?
       //그냥 검색값의 오류인지...
       //나중에 search 기능 만들때 더 고민해보고 수정하기
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
     }
     return messageRepository.findByAuthorId(author.getId()).stream().map(messageMapper::toDto)
         .toList();
@@ -158,11 +180,11 @@ public class BasicMessageService implements MessageService {
       int size) {
 
     if (channelId == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     Channel channel = channelRepository.findById(UUID.fromString(channelId))
-        .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
     Pageable pageable = (Pageable) PageRequest.of(0, size + 1);
 
@@ -182,9 +204,7 @@ public class BasicMessageService implements MessageService {
       nextCursorInstant = messages.get(messages.size() - 1).getCreatedAt();
     }
 
-    List<MessageDto> messageDtos = messages.stream()
-        .map(messageMapper::toDto)
-        .toList();
+    List<MessageDto> messageDtos = messages.stream().map(messageMapper::toDto).toList();
 
     return pageResponseMapper.fromCursorResult(messageDtos, hasNext, size, nextCursorInstant, null);
   }
@@ -223,17 +243,26 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto)
-      throws CustomException {
+      throws DiscodeitException {
+    log.info("메세지 정보 수정 시작: messageId = {}", messageId);
+
     Message message = messageRepository.findById(UUID.fromString(messageId)).orElse(null);
     if (message == null) {
-      throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
+      log.warn("존재하지 않는 메세지 수정 시도");
+      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
     }
+    //todo 예외명 뭐로하지
     if (updateMessageDto.newContent().isEmpty()) {
-      throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
+      log.error("메세지 수정 정보 누락");
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
     if (!message.getAuthor().getId().toString().equals(updateMessageDto.userId())) {
-      throw new CustomException(ErrorCode.MESSAGE_OWNER_NOT_MATCH);
+      log.error("작성자가 아닌 사용자가 수정 시도");
+      throw new MessageMissMatchException(ErrorCode.MESSAGE_OWNER_NOT_MATCH);
     }
+
+    log.debug("메세지 내용 수정: messageId ={}, oldContent = {}, newContent = {}", messageId,
+        message.getContent(), updateMessageDto.newContent());
 
     message.setContent(updateMessageDto.newContent());
     message.setUpdatedAt(updateMessageDto.updatedAt());
@@ -246,22 +275,30 @@ public class BasicMessageService implements MessageService {
     //아니라면 추가해야함
     //message.addImages(updateMessageDto.binaryContentIds());
     //}
+    Message savedMessage = messageRepository.save(message);
+    log.info("메세지 수정 완료: messageId ={}, newContent = {}", savedMessage.getId(),
+        message.getContent());
 
     return messageMapper.toDto(message);
   }
 
   @Override
   @Transactional
-  public boolean delete(String messageId, String userId) throws CustomException {
+  public boolean delete(String messageId, String userId) throws DiscodeitException {
+    log.info("메세지 삭제 시작: messageId = {}, userId = {}", messageId, userId);
     Message message = messageRepository.findById(UUID.fromString(messageId)).orElse(null);
     if (message == null) {
-      throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
+      log.warn("존재하지 않는 메세지");
+      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
     }
     if (!message.getAuthor().getId().toString().equals(userId)) {
-      throw new CustomException(ErrorCode.MESSAGE_OWNER_NOT_MATCH);
+      log.error("작성자가 아닌 사용자가 삭제 시도: messageId ={}, authorId = {}, userId ={} ", messageId,
+          message.getAuthor().getId(), userId);
+      throw new DiscodeitException(ErrorCode.MESSAGE_OWNER_NOT_MATCH);
     }
 
     messageRepository.delete(message);
+    log.info("메세지 삭제 완료: messageId ={}", messageId);
 
     return true;
   }

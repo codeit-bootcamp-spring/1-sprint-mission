@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.code.ErrorCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -60,10 +60,10 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @Transactional
   public UserStatusDto create(CreateUserStatusDto createUserStatusDto)
-      throws CustomException {
+      throws DiscodeitException {
     User user = userRepository.findById(createUserStatusDto.getUserId()).orElse(null);
     if (user == null) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+      throw new DiscodeitException(ErrorCode.USER_NOT_FOUND);
     }
     UserStatus userStatus = userStatusRepository.findByUser(user).orElse(null);
     if (userStatus != null) {
@@ -83,7 +83,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     User user = userRepository.findById(UUID.fromString(id)).orElse(null);
     if (user == null) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+      throw new DiscodeitException(ErrorCode.USER_NOT_FOUND);
     }
     UserStatus userStatus = user.getUserStatus();
     userStatus.setUpdatedAt(updateUserStatusDto.updateAt());

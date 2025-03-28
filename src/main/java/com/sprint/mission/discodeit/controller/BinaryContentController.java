@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
@@ -58,12 +60,26 @@ public class BinaryContentController {
   @PostMapping
   public ResponseEntity<BinaryContentDto> uploadBinaryContent(
       @RequestParam("file") MultipartFile file) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(binaryContentService.create(file));
+    log.info("파일 업로드 요청");
+
+    try {
+      BinaryContentDto binaryContentDto = binaryContentService.create(file);
+      return ResponseEntity.status(HttpStatus.CREATED).body(binaryContentDto);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw e;
+    }
   }
 
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> downloadBinaryContent(@PathVariable String binaryContentId) {
-    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
-    return binaryContentStorage.download(binaryContentDto);
+    log.info("파일 다운로드 요청: binaryContentId = {}", binaryContentId);
+    try {
+      BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+      return binaryContentStorage.download(binaryContentDto);
+    } catch (Exception e) {
+      log.error(e.getMessage());
+      throw e;
+    }
   }
 }

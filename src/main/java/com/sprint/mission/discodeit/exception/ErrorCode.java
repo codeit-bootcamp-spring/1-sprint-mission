@@ -1,0 +1,47 @@
+package com.sprint.mission.discodeit.exception;
+
+public enum ErrorCode {
+
+  //사용자 관련 에러
+  USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
+  USER_EMAIL_ALREADY_REGISTERED("이미 등록된 이메일 입니다."),
+  USER_NAME_ALREADY_REGISTERED("이미 등록된 username 입니다."),
+  INVALID_USER_STATUS("유효하지 않은 사용자 상태입니다."),
+  USER_NOT_IN_CHANNEL("사용자가 해당 채널에 있지 않습니다."),
+
+  //채널 관련 에러
+  CHANNEL_NOT_FOUND("채널을 찾을 수 없습니다."),
+  CHANNEL_PRIVATE_NOT_UPDATABLE("PRIVATE 채널은 수정할 수 없습니다."),
+
+  //메세지 관련 에러
+  MESSAGE_NOT_FOUND("메세지를 찾을 수 없습니다."),
+  MESSAGE_OWNER_NOT_MATCH("해당 메세지를 작성한 유저가 아닙니다."),
+  MESSAGE_CHANNEL_NOT_MATCH("해당 메세지가 작성된 채널이 아닙니다."),
+
+  //데이터 관련 에러
+  EMPTY_DATA("DTO가 비어있습니다."),
+
+  //ReadStatus 에러
+  READ_STATUS_NOT_FOUND("해당 read status를 찾을 수 없습니다."),
+  READ_STATUS_ALREADY_EXIST("해당 유저 또는 채널의 ReadStatus가 이미 존재합니다."),
+
+  //UserStatus 에러
+  USER_STATUS_NOT_FOUND("해당 유저의 UserStatus가 없습니다."),
+
+  CONTENT_NOT_FOUND("해당 파일이 없습니다."),
+
+  NOT_DELETED("연관관계 주인이 지워지지 않았습니다."),
+
+  FILE_NOT_CREATED("파일 생성 중 오류가 발생했습니다.");
+
+  private final String message;
+
+  ErrorCode(String message) {
+    this.message = message;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+}

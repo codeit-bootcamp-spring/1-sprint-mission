@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.code.ErrorCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -33,21 +35,21 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional
   public ReadStatusDto create(CreateReadStatusDto createReadStatusDto)
-      throws CustomException {
+      throws DiscodeitException {
 
     if (createReadStatusDto == null || createReadStatusDto.channelId() == null
         || createReadStatusDto.userId() == null) {
-      throw new CustomException(ErrorCode.EMPTY_DATA);
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
     Channel channel = channelRepository.findById(UUID.fromString(createReadStatusDto.channelId()))
         .orElse(null);
     if (channel == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      throw new DiscodeitException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     User user = userRepository.findById(UUID.fromString(createReadStatusDto.userId())).orElse(null);
     if (user == null) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
     }
 
     ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
@@ -55,7 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
         UUID.fromString(createReadStatusDto.userId())).orElse(null);
 
     if (readStatus != null) {
-      throw new CustomException(ErrorCode.READ_STATUS_ALREADY_EXIST);
+      throw new DiscodeitException(ErrorCode.READ_STATUS_ALREADY_EXIST);
     }
 
     readStatus = new ReadStatus(channel, user, createReadStatusDto.lastReadAt());
@@ -70,7 +72,7 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
         .orElse(null);
     if (readStatus == null) {
-      throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
+      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
     return readStatusMapper.toDto(readStatus);
   }
@@ -81,13 +83,13 @@ public class BasicReadStatusService implements ReadStatusService {
       UpdateReadStatusDto updateReadStatusDto) {
 
     if (updateReadStatusDto == null) {
-      throw new CustomException(ErrorCode.EMPTY_DATA);
+      throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
         .orElse(null);
     if (readStatus == null) {
-      throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
+      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
     readStatus.setLastReadAt(updateReadStatusDto.newLastReadAt());
@@ -104,7 +106,7 @@ public class BasicReadStatusService implements ReadStatusService {
     List<ReadStatus> readStatuses = readStatusRepository.findByUserId(UUID.fromString(userId));
 
     if (readStatuses == null || readStatuses.isEmpty()) {
-      throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
+      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
     List<ReadStatusDto> readStatusDtos = new ArrayList<>();
@@ -129,13 +131,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
     if (channel == null) {
-      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+      throw new DiscodeitException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(
         UUID.fromString(channelId));
     if (readStatuses == null || readStatuses.isEmpty()) {
-      throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
+      throw new DiscodeitException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
     List<ReadStatusDto> readStatusDtos = new ArrayList<>();
@@ -152,7 +154,7 @@ public class BasicReadStatusService implements ReadStatusService {
         UUID.fromString(userId));
 
     if (allReadStatusByUserId == null) {
-      throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
+      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
     List<ReadStatusDto> readStatusDtos = new ArrayList<>();
@@ -176,7 +178,7 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
         .orElse(null);
     if (readStatus == null) {
-      throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
+      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
     readStatusRepository.delete(readStatus);
     return true;

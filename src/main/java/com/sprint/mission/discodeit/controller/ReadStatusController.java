@@ -5,13 +5,16 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
@@ -29,14 +32,14 @@ public class ReadStatusController {
   //개별 생성
   @PostMapping
   public ResponseEntity<ReadStatusDto> createReadStatus(
-      @RequestBody CreateReadStatusDto createReadStatusDto) {
+      @Valid @RequestBody CreateReadStatusDto createReadStatusDto) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(readStatusService.create(createReadStatusDto));
   }
 
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable String readStatusId,
-      @RequestBody UpdateReadStatusDto updateReadStatusDto) {
+      @Valid @RequestBody UpdateReadStatusDto updateReadStatusDto) {
     ReadStatusDto updatedReadStatusDto = readStatusService.update(readStatusId,
         updateReadStatusDto);
     return ResponseEntity.ok().body(updatedReadStatusDto);
@@ -52,7 +55,7 @@ public class ReadStatusController {
   @PatchMapping
   public ResponseEntity<List<ReadStatusDto>> updateChannelReadStatus(
       @RequestParam String channelId,
-      @RequestBody UpdateReadStatusDto updateReadStatusDto) {
+      @Valid @RequestBody UpdateReadStatusDto updateReadStatusDto) {
     return ResponseEntity.ok(readStatusService.updateByChannelId(channelId, updateReadStatusDto));
   }
 }

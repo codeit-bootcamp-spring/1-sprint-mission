@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ByteArrayResource;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Component
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -36,11 +38,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @PostConstruct // 빈 생성시 자동으로 호출되어 저장소 디렉터리 구조를 준비
   private void init() {
+    log.info("Initializing storage directory {}", rootPath);
     try {
       if (!Files.exists(this.rootPath)) {
         Files.createDirectories(this.rootPath);
       }
-      System.out.println("Storage initialized at: " + this.rootPath); //todo - log 로 수정하기
+      log.info("Initialized storage directory {}", this.rootPath);
     } catch (IOException e) {
       throw new RuntimeException("Failed to initialized storage directory", e);
     }
@@ -57,11 +60,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Override
   @Transactional
   public UUID put(UUID id, byte[] content) {
+    log.info("파일 저장: id = {}", id);
     try {
       Path filePath = resolvePath(id);
       Files.write(filePath, content);
+      log.info("파일 저장 완료");
       return id;
     } catch (IOException e) {
+      log.error("파일 쓰기 오류: {}", e.getMessage());
       throw new RuntimeException("Failed to store file", e);
     }
   }
@@ -73,6 +79,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       Path filePath = resolvePath(id);
       return new FileInputStream(filePath.toFile());
     } catch (IOException e) {
+      log.error("파일 읽기 오류: {}", e.getMessage());
       throw new RuntimeException("Failed to read file", e);
     }
   }
@@ -80,6 +87,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Override
   @Transactional(readOnly = true)
   public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
+    log.info("파일 다운로드: binaryContentId = {}", binaryContentDto.id());
     try {
       InputStream fileStream = get(binaryContentDto.id());
       InputStreamResource resource = new InputStreamResource(fileStream);
@@ -100,12 +108,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     } catch (Exception e) {
 
       // 오류 메시지를 StringResource로 변환하여 Resource 타입으로 반환
+      log.error("파일 다운로드 실패: {}", e.getMessage());
       ByteArrayResource errorResource = new ByteArrayResource(
           ("Failed to download file: " + e.getMessage()).getBytes());
-
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .contentType(MediaType.TEXT_PLAIN)
-          .body(errorResource);
+      throw new RuntimeException("Failed to download file", e);
     }
   }
 }
