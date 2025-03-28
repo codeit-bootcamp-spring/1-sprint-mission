@@ -1,25 +1,29 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.user.FindUserDto;
-import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.controller.api.AuthApi;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.service.basic.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController {
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController implements AuthApi {
 
   private final AuthService authService;
 
-  @PostMapping("/login")
-  public ResponseEntity<FindUserDto> login(@RequestParam String username,
-      @RequestParam String password) {
-    FindUserDto findUserDto = authService.login(username, password);
-    return ResponseEntity.ok(findUserDto);
+  @PostMapping(path = "login")
+  public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest) {
+    UserDto user = authService.login(loginRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(user);
   }
 }
