@@ -1,6 +1,6 @@
 <configuration>
   <!-- 로그 경로 설정 -->
-  <property name="LOG_PATH" value="/.logs"/>
+  <property name="LOG_PATH" value=".logs"/>
 
   <!-- 콘솔로 출력 -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
