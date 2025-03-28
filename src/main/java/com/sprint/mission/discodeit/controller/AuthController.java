@@ -27,19 +27,19 @@ public class AuthController implements AuthApi {
 
 	@PostMapping(path = "login")
 	public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest) {
-		log.info("로그인 요청 - username: {}", loginRequest.username());
+		log.info("Login request - username: {}", loginRequest.username());
 		try {
 			UserDto user = authService.login(loginRequest);
-			log.info("로그인 성공 - username: {}", loginRequest.username());
+			log.info("Login successful - username: {}", loginRequest.username());
 			return ResponseEntity.ok(user);
 		} catch (NoSuchElementException e) {
-			log.warn("로그인 실패 - 존재하지 않는 사용자: {}", loginRequest.username());
+			log.warn("Login failed - User not found: {}", loginRequest.username());
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} catch (IllegalArgumentException e) {
-			log.warn("로그인 실패 - 잘못된 비밀번호: {}", loginRequest.username());
+			log.warn("Login failed - Incorrect password: {}", loginRequest.username());
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 		} catch (Exception e) {
-			log.error("로그인 중 알 수 없는 오류 발생 - username: {}", loginRequest.username(), e);
+			log.error("Unexpected error during login - username: {}", loginRequest.username(), e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}

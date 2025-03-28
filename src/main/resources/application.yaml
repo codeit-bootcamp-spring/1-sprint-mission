@@ -8,11 +8,6 @@ spring:
   profiles:
     active: dev  # 기본 프로파일 (운영 환경에서는 prod로 변경)
 
-logging:
-  level:
-    org.hibernate.SQL: info
-    org.hibernate.orm.jdbc.bind: trace
-    root: info
 
 springdoc:
   api-docs:
@@ -28,3 +23,5 @@ discodeit:
     type: local
     local:
       root-path: .discodeit/storage
+logging:
+  config: classpath:logback-spring.xml

@@ -28,19 +28,20 @@ public class BasicAuthService implements AuthService {
 	public UserDto login(LoginRequest loginRequest) {
 		String username = loginRequest.username();
 		String password = loginRequest.password();
-		log.debug("로그인 처리 시작 - username: {}", loginRequest.username());
+		log.debug("Processing login - username: {}", loginRequest.username());
+
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> {
-				log.warn("로그인 실패 - 존재하지 않는 사용자: {}", username);
-				return new NoSuchElementException("User with username " + username + "not found");
+				log.warn("Login failed - User not found: {}", username);
+				return new NoSuchElementException("User with username " + username + " not found");
 			});
 
 		if (!user.getPassword().equals(password)) {
-			log.warn("로그인 실패 - 잘못된 비밀번호: {}", username);
+			log.warn("Login failed - Incorrect password: {}", username);
 			throw new IllegalArgumentException("Wrong password");
 		}
 
-		log.info("로그인 성공 - username: {}", username);
+		log.info("Login successful - username: {}", username);
 		return userMapper.toDto(user);
 	}
 }
