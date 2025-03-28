@@ -32,7 +32,12 @@ public class ChannelController implements ChannelApi {
 
   @PostMapping(path = "public")
   public ResponseEntity<ChannelDto> create(@RequestBody PublicChannelCreateRequest request) {
+    log.info("[ChannelController] public 채널 생성 요청 name: {}", request.name());
     ChannelDto createdChannel = channelService.create(request);
+    log.info("[ChannelController] public 채널 생성 성공 name: {}, id: {}",
+        createdChannel.name(),
+        createdChannel.id()
+    );
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdChannel);
@@ -40,7 +45,9 @@ public class ChannelController implements ChannelApi {
 
   @PostMapping(path = "private")
   public ResponseEntity<ChannelDto> create(@RequestBody PrivateChannelCreateRequest request) {
+    log.info("[ChannelController] private 채널 생성 요청");
     ChannelDto createdChannel = channelService.create(request);
+    log.info("[ChannelController] private 채널 생성 성공 id: {}", createdChannel.id());
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdChannel);
@@ -49,7 +56,9 @@ public class ChannelController implements ChannelApi {
   @PatchMapping(path = "{channelId}")
   public ResponseEntity<ChannelDto> update(@PathVariable("channelId") UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
+    log.info("[ChannelController] 채널 수정 요청 id: {}", channelId);
     ChannelDto updatedChannel = channelService.update(channelId, request);
+    log.info("[ChannelController] 채널 수정 성공 id: {}", updatedChannel.id());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedChannel);
@@ -57,7 +66,9 @@ public class ChannelController implements ChannelApi {
 
   @DeleteMapping(path = "{channelId}")
   public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
+    log.info("[ChannelController] 채널 삭제 요청 id: {}", channelId);
     channelService.delete(channelId);
+    log.info("[ChannelController] 채널 삭제 성공 id: {}", channelId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();

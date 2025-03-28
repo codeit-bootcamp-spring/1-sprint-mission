@@ -36,25 +36,36 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto create(PublicChannelCreateRequest request) {
+    log.info("[ChannelService] public 채널 생성 시작 name: {}", request.name());
+    log.debug("[ChannelService] public 채널 생성 요청 정보 name: {}, description: {}",
+        request.name(),
+        request.description()
+    );
     String name = request.name();
     String description = request.description();
     Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
-    channelRepository.save(channel);
+    Channel channel1 = channelRepository.save(channel);
+    log.info("[ChannelService] public 채널 생성 성공 name: {}, id: {}",
+        channel1.getName(),
+        channel1.getId()
+    );
     return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
+    log.info("[ChannelService] private 채널 생성 시작");
+    log.debug("[ChannelService] private 채널 생성 요청 정보 userListId: {}",
+        request.participantIds());
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
-    channelRepository.save(channel);
-
+    Channel privateCh = channelRepository.save(channel);
+    log.info("[ChannelService] private 채널 생성 성공 id: {}", privateCh.getId());
     List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
         .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
         .toList();
     readStatusRepository.saveAll(readStatuses);
-
     return channelMapper.toDto(channel);
   }
 
@@ -84,6 +95,9 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
+    log.info("[ChannelService] 채널 수정 시작 id: {}", channelId);
+    log.debug("[ChannelService] 채널 수정 요청 정보 id: {}, newName: {}, newDescription: {}",
+        channelId, request.newName(), request.newDescription());
     String newName = request.newName();
     String newDescription = request.newDescription();
     Channel channel = channelRepository.findById(channelId)
@@ -93,19 +107,21 @@ public class BasicChannelService implements ChannelService {
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
     channel.update(newName, newDescription);
+    log.info("[ChannelService] 채널 수정 성공 id: {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
   public void delete(UUID channelId) {
+    log.info("[ChannelService] 채널 삭제 시작 id: {}", channelId);
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
-
     messageRepository.deleteAllByChannelId(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
 
     channelRepository.deleteById(channelId);
+    log.info("[ChannelService] 채널 삭제 성공 id: {}", channelId);
   }
 }
