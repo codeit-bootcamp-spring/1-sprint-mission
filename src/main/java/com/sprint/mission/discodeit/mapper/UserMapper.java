@@ -3,11 +3,12 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class, UserStatusMapper.class})
 public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    UserDto toDto(User user);
+  @Mapping(target = "online", expression = "java(user.getStatus().isOnline())")
+  UserDto toDto(User user);
 }

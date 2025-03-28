@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserStatusMapper {
-    UserStatusMapper INSTANCE = Mappers.getMapper(UserStatusMapper.class);
 
-    UserStatusDto toDto(UserStatus userStatus);
+  @Mapping(target = "userId", source = "user.id")
+  UserStatusDto toDto(UserStatus userStatus);
 }

@@ -1,37 +1,37 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
+import com.sprint.mission.discodeit.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
-    // 로그인
-    @Override
-    public UserDto login(LoginRequestDto loginRequestDto) {
-        return checkAccount(loginRequestDto.name(), loginRequestDto.password());
+  @Override
+  @Transactional(readOnly = true)
+  public UserDto login(LoginRequest request) {
+    String username = request.username();
+    String password = request.password();
+
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(
+            () -> new NoSuchElementException("User with username " + username + " not found"));
+
+    if (!user.getPassword().equals(password)) {
+      throw new IllegalArgumentException("Wrong password");
     }
 
-    // 계정 확인
-    private UserDto checkAccount(String username, String password) {
-        User user = userRepository.findAll().stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-
-        if (user.getPassword().toString().equals(password)) {
-            return UserMapper.INSTANCE.toDto(user);
-        } else {
-            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
-        }
-    }
+    return userMapper.toDto(user);
+  }
 }

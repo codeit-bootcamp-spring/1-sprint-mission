@@ -1,38 +1,29 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequestDto;
-import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequestDto;
-import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.UpdatePublicChannelRequestDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
-
-import java.time.Instant;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.UpdatePublicChannelRequest;
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {// 생성
 
-    UUID createPublic(CreatePublicChannelRequestDto createPublicChannelRequestDto);
-    UUID createPrivate(CreatePrivateChannelRequestDto createPrivateChannelRequestDto);
+  // 공개 채널 생성
+  ChannelDto create(CreatePublicChannelRequest request);
 
-    // 읽기
-    Channel find(UUID id);
+  // 비공개 채널 생성
+  ChannelDto create(CreatePrivateChannelRequest request);
 
-    // 모두 읽기
-    List<FindChannelResponseDto> findAllByUserId(UUID userId);
+  // 채널 단건 검색
+  ChannelDto find(UUID channelId);
 
-    // 수정
-    FindChannelResponseDto updateChannel(UpdatePublicChannelRequestDto updatePublicChannelRequestDto);
+  // 유저 id를 통핸 채널 다건 검색
+  List<ChannelDto> findAllByUserId(UUID userId);
 
-    // 멤버 수정
-    // 멤버가 List에 있을 경우 멤버 삭제, 없을 경우 추가
-    void addMember(UUID id, UUID userId);
-    void deleteMember(UUID id, UUID memberId);
+  // 공개 채널 수정
+  ChannelDto update(UUID channelId, UpdatePublicChannelRequest request);
 
-    // 삭제
-    void delete(UUID id);
-
-    // 마지막 메시지 시간
-    void updateLastMessageTime(UUID channelID, Instant lastMessageTime);
+  // 채널 삭제
+  void delete(UUID channelId);
 }

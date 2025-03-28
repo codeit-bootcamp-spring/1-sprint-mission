@@ -1,154 +1,66 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.vo.Email;
-import com.sprint.mission.discodeit.vo.Password;
-import com.sprint.mission.discodeit.vo.PhoneNumber;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.io.IOException;
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-@Getter
-@Table(name = "users")
 @Entity
-@NoArgsConstructor(force = true)
-public class User extends BaseUpdatableEntity implements Serializable {             // 유저 정보
+@Table(name = "users")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseUpdatableEntity {             // 유저 정보
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @Column(name = "username", length = 50, nullable = false, unique = true)
+  private String username;    // 아이디
 
-    // User 필드
-    @Column(name = "username")
-    private String username;                // 로그인 시 필요한 아이디
+  @Column(name = "email", length = 100, nullable = false, unique = true)
+  private String email;   // 이메일
 
-    @Embedded
-    private Email email;                    // 이메일
+  @Column(name = "password", length = 60, nullable = false)
+  private String password;    // 비밀번호
 
-    @Embedded
-    private Password password;              // 비밀번호
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
+  private BinaryContent profile;    // 프로필 사진
 
-    @Column(name = "nickname")
-    private String nickname;                // 닉네임
+  @JsonManagedReference   // 순환 참조 문제 해결 - 부모
+  @Setter(AccessLevel.PROTECTED)  // status 값을 같은 패키지나 하위 클래스에서는 수정 가능하나, 외부 클래스에서는 변경 불가
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;    // 유저 접속 상태
 
-    @Embedded
-    private PhoneNumber phoneNumber;        // 휴대폰 번호
+  // 생성자
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
+  }
 
-    @OneToOne
-    @JoinColumn(name = "profile_id", referencedColumnName = "id")
-    private BinaryContent profile;                 // 프로필 사진
+  // 유저 수정
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent newProfile) {
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final UserStatus status;        // 유저 접속 상태
-
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Channel> ownedChannels;
-
-    // 생성자
-    public User(String email, String password, String username, String nickname, String phoneNumber, BinaryContent profile) throws IOException {
-
-        this.email = new Email(email);
-        this.password = new Password(password);
-        validationAndSetName(username);
-        validationAndSetNickname(nickname);
-        this.phoneNumber = new PhoneNumber(phoneNumber);
-        this.profile = profile;
-
-        this.status = new UserStatus(this);
-        this.ownedChannels = new ArrayList<>();
+    if (newUsername != null && !newUsername.equals(this.username)) {
+      this.username = newUsername;
     }
-
-
-    // update 함수
-    public void updateEmail(String updateEmail) {
-        if (!updateEmail.isBlank()){       // 수정 시에는 null 들어올 시 IllegalArgumentException이 뜨지 않고, 메서드가 무시되도록 하기 위해 if문 작성
-            this.email = new Email(updateEmail);
-        }
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
     }
-
-    public void updatePassword(String updatePassword) {
-        if (!updatePassword.isBlank()){
-            this.password = new Password(updatePassword);
-        }
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
     }
-
-    public void updateUsername(String updateName) {
-        if (!updateName.isBlank()){
-            validationAndSetName(updateName);
-        }
+    if (newProfile != null) {
+      this.profile = newProfile;
     }
-
-    public void updateNickname(String updateNickname) {
-        if (!updateNickname.isBlank()){
-            validationAndSetNickname(updateNickname);
-        }
-    }
-
-    public void updatePhoneNumber(String updatePhoneNumber) {
-        if (!updatePhoneNumber.isBlank()){
-            this.phoneNumber = new PhoneNumber(updatePhoneNumber);
-        }
-    }
-
-    public void updateProfile(BinaryContent profile) throws IOException {
-        if (profile != null) {
-            this.profile = profile;
-        }
-    }
-
-    public void addChannel(Channel channel) {
-        this.ownedChannels.add(channel);
-    }
-
-    public void deleteChannel(Channel channel) {
-        this.ownedChannels.remove(channel);
-    }
-
-
-    // 이름 유효성 검사 및 세팅
-    private void validationAndSetName(String name) {
-
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("이름을 입력해주세요.");
-        }
-
-        name = name.trim();
-
-        this.username = name;
-    }
-
-    // 닉네임 유효성 검사 및 세팅
-    private void validationAndSetNickname(String nickname) {
-
-        if (nickname == null || nickname.isBlank()) {
-            throw new IllegalArgumentException("닉네임을 입력해주세요.");
-        }
-
-        nickname = nickname.trim();
-
-        this.nickname = nickname;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "email=" + email +
-                ", password=" + password +
-                ", name='" + username + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", phoneNumber=" + phoneNumber +
-                '}';
-    }
+  }
 }

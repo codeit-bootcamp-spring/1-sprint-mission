@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,38 +19,42 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-@Table(name = "user_statuses")
 @Entity
-@NoArgsConstructor(force = true)
-public class UserStatus extends BaseUpdatableEntity implements Serializable {
+@Table(name = "user_statuses")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+  @JsonBackReference  // 순환 참조 해결 - 자식
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;    // 유저
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private final User user;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant lastActiveAt;   // 마지막 접속 시간
 
-    @Column(name = "last_active_at")
-    private Instant lastActiveAt; // 최종 접속 시간
+  // 생성자
+  public UserStatus(User user, Instant lastActiveAt) {
+    setUser(user);
+    this.lastActiveAt = lastActiveAt;
+  }
 
-    public UserStatus(User user) {
-        this.user = user;
-        this.lastActiveAt = Instant.now();
+  // 접속 상태 수정
+  public void update(Instant lastActiveAt) {
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
     }
+  }
 
-    public void updateLastAccessTime() {
-        this.lastActiveAt = Instant.now();
-    }
+  // 현재 온라인 상태인지 판별
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 
-    // 현재 유저가 접속해있는지 판별하는 메서드
-    // 현재 시간 기준으로 마지막 접속으로부터 5분 이내이면 접속 중으로 판단
-    public boolean checkAccess() {
-        Instant now = Instant.now();
-
-        Duration between = Duration.between(lastActiveAt, now);
-
-        return between.getSeconds() <= 300;     // 접속 중이면 true, 아니면 false 반환
-    }
+  // 유저 세팅
+  protected void setUser(User user) {
+    this.user = user;
+    user.setStatus(this);
+  }
 }

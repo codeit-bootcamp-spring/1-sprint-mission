@@ -1,86 +1,68 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-    private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
-    // 파일 생성
-    @Override
-    public BinaryContent create(CreateBinaryContentRequestDto createBinaryContentRequestDto) throws IOException {
+  @Override
+  @Transactional
+  public BinaryContentDto create(CreateBinaryContentRequest request) {
+    String fileName = request.fileName();
+    byte[] bytes = request.bytes();
+    String contentType = request.contentType();
 
-        MultipartFile multipartFile = createBinaryContentRequestDto.multipartFile();
-        String fileName = createBinaryContentRequestDto.filePath();
+    BinaryContent binaryContent = new BinaryContent(
+        fileName,
+        (long) bytes.length,
+        contentType
+    );
 
-        BinaryContent binaryContent = new BinaryContent(multipartFile, fileName);
+    binaryContentRepository.save(binaryContent);
+    binaryContentStorage.put(binaryContent.getId(), bytes);
 
-        binaryContentRepository.save(binaryContent);
+    return binaryContentMapper.toDto(binaryContent);
+  }
 
-        return binaryContent;
+  @Override
+  public BinaryContentDto find(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .map(binaryContentMapper::toDto)
+        .orElseThrow(() -> new NoSuchElementException(
+            "BinaryContent with id " + binaryContentId + " not found"
+        ));
+  }
+
+  @Override
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllById(binaryContentIds).stream()
+        .map(binaryContentMapper::toDto)
+        .toList();
+  }
+
+  @Override
+  @Transactional
+  public void delete(UUID binaryContentId) {
+    if (!binaryContentRepository.existsById(binaryContentId)) {
+      throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
     }
-
-    // 파일 단건 조회
-    @Override
-    public BinaryContentDto find(UUID id) {
-
-        BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("해당 파일이 존재하지 않습니다."));
-
-        return BinaryContentMapper.INSTANCE.toDto(binaryContent);
-    }
-
-    // 파일 다건 조회
-    @Override
-    public List<BinaryContentDto> findAll() {
-
-        List<BinaryContentDto> list= binaryContentRepository.findAll().stream()
-                .map(BinaryContentMapper.INSTANCE::toDto)
-                .toList();
-
-        if (list.isEmpty()) {
-            throw new NoSuchElementException("파일이 존재하지 않습니다.");
-        }
-
-        return list;
-    }
-
-    // 파일 다건 조회 - id list로 반환
-    @Override
-    public List<UUID> findAllByIdIn() {
-
-        List<UUID> list = binaryContentRepository.findAll().stream()
-                .map(BinaryContent::getId)
-                .toList();
-
-        if (list.isEmpty()) {
-            throw new NoSuchElementException("파일이 존재하지 않습니다.");
-        }
-
-        return list;
-    }
-
-    // 파일 삭제
-    @Override
-    public void delete(UUID id) {
-        
-        BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow();
-        binaryContent.deleteFile();     // 로컬에 저장된 사진 파일 삭제
-
-        binaryContentRepository.deleteById(id); // 저장된 객체 삭제
-    }
+    binaryContentRepository.deleteById(binaryContentId);
+  }
 }
