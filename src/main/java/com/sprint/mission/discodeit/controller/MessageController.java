@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/messages")
+@Slf4j
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
@@ -36,6 +38,9 @@ public class MessageController implements MessageApi {
   public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+    log.info("메시지 생성 요청: channelId={}, authorId={}",
+            messageCreateRequest.channelId(), messageCreateRequest.authorId());
+
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
@@ -59,6 +64,9 @@ public class MessageController implements MessageApi {
   @PatchMapping(path = "{messageId}")
   public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request) {
+    log.debug("메시지 수정 요청: messageId={}, newContent={}",
+            messageId, request.newContent());
+
     MessageDto updatedMessage = messageService.update(messageId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -67,6 +75,8 @@ public class MessageController implements MessageApi {
 
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
+    log.warn("메시지 삭제 요청: messageId={}", messageId);
+
     messageService.delete(messageId);
     return ResponseEntity
             .status(HttpStatus.NO_CONTENT).build();

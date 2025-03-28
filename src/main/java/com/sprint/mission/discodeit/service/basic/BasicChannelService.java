@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
@@ -30,6 +32,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelDto create(PublicChannelCreateRequest request) {
+        log.info("공개 채널 생성 요청: name={}, description={}", request.name(), request.description());
 
         String name = request.name();
         String description = request.description();
@@ -42,6 +45,8 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelDto create(PrivateChannelCreateRequest request) {
+        log.info("비공개 채널 생성 요청: 참여자 ID 수 = {}", request.participantIds().size());
+
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         channelRepository.save(channel);
 
@@ -79,6 +84,9 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
+        log.debug("채널 수정 요청: channelId={}, newName={}, newDescription={}",
+                channelId, request.newName(), request.newDescription());
+
         String newName = request.newName();
         String newDescription = request.newDescription();
         Channel channel = channelRepository.findById(channelId).orElseThrow(
@@ -93,6 +101,8 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public void delete(UUID channelId) {
+        log.warn("채널 삭제 요청: channelId={}", channelId);
+
         if(!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }

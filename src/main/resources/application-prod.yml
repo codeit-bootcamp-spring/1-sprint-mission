@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://<운영 DB 주소>:5432/discodeit
+    username: prod_user
+    password: prod_password
+
+    jpa:
+      hibernate:
+        ddl_auto: validate
+      show-sql: false
+      properties:
+        hibernate:
+          format_sql: false
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    root: info
+    org:
+      hibernate:
+        SQL: DEBUG
+        type: TRACE
+    com.discodeit: INFO

@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -45,6 +47,9 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
                            List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    log.info("메시지 생성 요청: channelId={}, authorId={}, content={}",
+            messageCreateRequest.channelId(), messageCreateRequest.authorId(), messageCreateRequest.content());
+
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
 
@@ -112,6 +117,8 @@ public class BasicMessageService implements MessageService {
   @Transactional
   @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+    log.debug("메시지 수정 요청: messageId={}, newContent={}", messageId, request.newContent());
+
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
@@ -123,6 +130,8 @@ public class BasicMessageService implements MessageService {
   @Transactional
   @Override
   public void delete(UUID messageId) {
+    log.warn("메시지 삭제 요청: messageId={}", messageId);
+
     if(!messageRepository.existsById(messageId)) {
       throw new NoSuchElementException("Message with id " + messageId + " not found");
     }

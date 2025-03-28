@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
@@ -26,6 +28,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional
     @Override
     public BinaryContentDto create(BinaryContentCreateRequest request) {
+        log.info("파일 업로드 요청: filename={}, contentType={}, size={} bytes",
+                request.fileName(), request.contentType(), request.bytes().length);
+
         String fileName = request.fileName();
         byte[] bytes = request.bytes();
         String contentType = request.contentType();
@@ -57,6 +62,8 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional
     @Override
     public void delete(UUID binaryContentId) {
+        log.warn("파일 삭제 요청: binaryContentId={}", binaryContentId);
+
         if (!binaryContentRepository.existsById(binaryContentId)) {
             throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
         }
