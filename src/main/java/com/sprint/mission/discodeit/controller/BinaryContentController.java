@@ -35,8 +35,9 @@ public class BinaryContentController {
     return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds));
   }
 
-//  @GetMapping("/{binaryContentId}/download")
-//  public ResponseEntity<?> download(@RequestParam("id") UUID binaryContentId) {
-//    binaryContentStorage.download()
-//  }
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<?> download(@RequestParam("id") UUID binaryContentId) {
+    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+    return ResponseEntity.ok(binaryContentStorage.download(binaryContentDto)); //로직 위임
+  }
 }
