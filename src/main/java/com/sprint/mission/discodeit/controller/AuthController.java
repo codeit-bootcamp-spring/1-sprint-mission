@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.*;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.response.ApiResponse;
 import com.sprint.mission.discodeit.dto.response.StatusResponseDto;
+import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -24,80 +23,53 @@ import java.util.UUID;
 public class AuthController {
 
   private final UserService userService;
+  private final AuthService authService;
 
   @Operation(summary = "로그인", description = "로그인")
-  @PostMapping("/login")
-  public ResponseEntity<ApiResponse<UsersDto>> login(@Valid @RequestBody LoginRequest loginRequest,
-      BindingResult bindingResult,
+  @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<ApiResponse<UserDto>> login(
+      @RequestBody LoginRequest loginRequest,
       HttpSession session) {
 
-    if (bindingResult.hasErrors()) {
-      return ResponseEntity.badRequest()
-          .body(new ApiResponse<>(false, "입력값이 유효하지 않습니다."));
-    }
+    UserDto userDTO = authService.login(loginRequest);
 
-    try {
-      UserDto userDTO = userService.findByEmail(loginRequest.getEmail());
+    // 세션에 사용자 ID 저장
+    session.setAttribute("userId", userDTO.getId().toString());
 
-      if (userDTO != null && userDTO.getPassword().equals(loginRequest.getPassword())) {
-        session.setAttribute("userId", userDTO.getId().toString());
-        userService.updateOnlineStatus(userDTO.getId(), true);
+    // 사용자 상태 업데이트
+    userService.updateOnlineStatus(userDTO.getId(), true);
 
-        return ResponseEntity.ok(new ApiResponse<>(true, "로그인 성공"));
-      } else {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(new ApiResponse<>(false, "이메일 또는 비밀번호 확인해주세요."));
-      }
-    } catch (Exception e) {
-      log.error("로그인 처리 중 오류 발생: {} ", e.getMessage(), e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(new ApiResponse<>(false, "로그인 처리 중 오류 발생"));
-    }
+    return ResponseEntity.ok(new ApiResponse<>(true, "로그인 성공", userDTO));
   }
 
   @Operation(summary = "로그아웃", description = "로그아웃")
   @PostMapping("/logout")
-  public ResponseEntity<ApiResponse<UserDto>> logout(HttpSession session) {
+  public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {
+    String userId = (String) session.getAttribute("userId");
 
-    try {
-      String userId = (String) session.getAttribute("userId");
+    if (userId != null) {
+      // 사용자 상태 업데이트
+      userService.updateOnlineStatus(UUID.fromString(userId), false);
 
-      if (userId != null) {
-        userService.updateOnlineStatus(UUID.fromString(userId), false);
-        session.invalidate();
+      // 세션 무효화
+      session.invalidate();
 
-        return ResponseEntity.ok(new ApiResponse(true, "로그아웃 성공"));
-      } else {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-            .body(new ApiResponse<>(false, "로그인 상태가 아닙니다."));
-      }
-    } catch (Exception e) {
-      log.error("로그아웃 처리 중 오류 발생 : {}", e.getMessage(), e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(new ApiResponse<>(false, "로그아웃 처리 중 오류가 발생했습니다."));
+      return ResponseEntity.ok(new ApiResponse<>(true, "로그아웃 성공"));
+    } else {
+      return ResponseEntity.ok(new ApiResponse<>(false, "로그인 상태가 아닙니다."));
     }
   }
-
 
   @Operation(summary = "상태 확인", description = "로그인/로그아웃 상태 확인")
   @GetMapping("/status")
   public ResponseEntity<ApiResponse<StatusResponseDto>> checkLoginStatus(HttpSession session) {
     String userId = (String) session.getAttribute("userId");
 
-    StatusResponseDto statusResponse;
-    if (userId != null) {
-      statusResponse = StatusResponseDto.builder()
-          .loggedIn(true)
-          .userId(userId)
-          .build();
+    StatusResponseDto statusResponse = StatusResponseDto.builder()
+        .loggedIn(userId != null)
+        .userId(userId)
+        .build();
 
-    } else {
-      statusResponse = StatusResponseDto.builder()
-          .loggedIn(false)
-          .build();
-    }
-
-    ApiResponse<StatusResponseDto> response = new ApiResponse<>(true, "Status retrieved");
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(new ApiResponse<>(true, "상태 조회 성공", statusResponse));
   }
 }

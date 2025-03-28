@@ -49,7 +49,7 @@ public class BinaryContentController {
     try {
       BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
       return binaryContentStorage.download(binaryContent);
-    } catch (ResourceNotFoundException e) {
+    } catch (IOException e) {
       return ResponseEntity.notFound().build();
     }
   }
