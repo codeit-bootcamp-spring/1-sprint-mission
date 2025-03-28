@@ -45,3 +45,6 @@ bin/
 ### test data ###
 data/
 .discodeit/data
+
+### logs ###
+.logs/
