@@ -24,9 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
@@ -56,7 +56,7 @@ public class BasicUserService implements UserService {
       UserStatus newUserStatus = userStatusRepository.save(UserStatus.createUserStatus(newUser));
       newUser.updateStatus(newUserStatus);
 
-      log.info("Create User: {}", newUser);
+      log.info("Created user - id: {}", newUser.getId());
       return userMapper.entityToDto(newUser);
     }
     return null;
@@ -98,14 +98,15 @@ public class BasicUserService implements UserService {
             }
           });
     }
-    log.info("Update User :{}", user);
+    log.info("Updated user - id: {}", user.getId());
     return userMapper.entityToDto(user);
   }
 
   @Override
   public void deleteById(UUID id) {
-    User user = findByIdOrThrow(id);
+    findByIdOrThrow(id);
     userRepository.deleteById(id);
+    log.info("Deleted user - id: {}", id);
   }
 
   private User findByIdOrThrow(UUID id) {

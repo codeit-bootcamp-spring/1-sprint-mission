@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BasicMassageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -73,7 +73,7 @@ public class BasicMassageService implements MessageService {
       );
       messageRepository.save(message);
 
-      log.info("Create Message: {}", message);
+      log.info("Created message - id: {}", message.getId());
       return messageMapper.entityToDto(message);
     }
     return null;
@@ -87,7 +87,7 @@ public class BasicMassageService implements MessageService {
     Pageable pageable = PageRequest.of(0, 50, Sort.by("createdAt").descending());
     Slice<Message> slice = messageRepository.findAllByChannelId(channelId, pageable);
     Slice<MessageResponse> responseSlice = slice.map(messageMapper::entityToDto);
-    
+
     return PageResponseMapper.fromSlice(responseSlice);
   }
 
@@ -104,7 +104,7 @@ public class BasicMassageService implements MessageService {
       message.updateContent(request.newContent());
       messageRepository.save(message);
 
-      log.info("update message: {}", message);
+      log.info("Updated message - id: {}", message.getId());
       return messageMapper.entityToDto(message);
     }
     return null;
@@ -112,7 +112,9 @@ public class BasicMassageService implements MessageService {
 
   @Override
   public void deleteById(UUID id) {
+    findByIdOrThrow(id);
     messageRepository.deleteById(id);
+    log.info("Deleted message - id: {}", id);
   }
 
   private Message findByIdOrThrow(UUID id) {

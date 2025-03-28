@@ -77,6 +77,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     InputStream inputStream = get(binaryContentResponse.id());
     InputStreamResource resource = new InputStreamResource(inputStream);
 
+    log.info("Binary content download succeeded - id: {}", binaryContentResponse.id());
     return ResponseEntity.status(HttpStatus.OK)
         .header(
             HttpHeaders.CONTENT_DISPOSITION,

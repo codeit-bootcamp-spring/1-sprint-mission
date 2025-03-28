@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.UserStatusResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -29,6 +31,7 @@ public class UserController implements UserApiDocs {
   @GetMapping
   @Override
   public ResponseEntity<CustomApiResponse<List<UserResponse>>> getAllUser() {
+
     return ResponseEntity.ok(CustomApiResponse.success(userService.findAll()));
   }
 
@@ -39,6 +42,7 @@ public class UserController implements UserApiDocs {
       @RequestPart("user") UserRequest userRequest,
       @RequestPart(value = "image", required = false) MultipartFile userProfileImage
   ) {
+    log.info("POST /api/users - user: {}", userRequest.name());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CustomApiResponse.created(userService.createUser(userRequest, userProfileImage)));
   }
@@ -51,6 +55,8 @@ public class UserController implements UserApiDocs {
       @RequestPart("user") UserRequest userRequest,
       @RequestPart(value = "image", required = false) MultipartFile userProfileImage
   ) {
+
+    log.info("PUT /api/users/{}", userId);
     return ResponseEntity.ok(
         CustomApiResponse.success(userService.update(userId, userRequest, userProfileImage))
     );
@@ -60,6 +66,8 @@ public class UserController implements UserApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<Void>> deleteUser(@PathVariable UUID userId) {
     userService.deleteById(userId);
+
+    log.info("DELETE /api/users/{}", userId);
     return ResponseEntity.ok(CustomApiResponse.success("User deleted successfully"));
   }
 

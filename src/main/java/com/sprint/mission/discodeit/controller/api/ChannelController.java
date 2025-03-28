@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.ChannelResponse;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
@@ -24,6 +26,8 @@ public class ChannelController implements ChannelApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<ChannelResponse>> createPublicChannel(
       @RequestBody ChannelRequest.CreatePublic publicChannelRequest) {
+
+    log.info("POST /api/channels/public - channel: {}", publicChannelRequest.name());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CustomApiResponse.created(channelService.createPublicChannel(publicChannelRequest)));
   }
@@ -32,6 +36,8 @@ public class ChannelController implements ChannelApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<ChannelResponse>> createPrivateChannel(
       @RequestBody ChannelRequest.CreatePrivate privateChannelRequest) {
+
+    log.info("POST /api/channels/private");
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(
             CustomApiResponse.created(channelService.createPrivateChannel(privateChannelRequest)));
@@ -43,6 +49,8 @@ public class ChannelController implements ChannelApiDocs {
       @PathVariable UUID channelId,
       @RequestBody ChannelRequest.Update publicChannelRequest
   ) {
+
+    log.info("PUT /api/channels/public/{}", channelId);
     return ResponseEntity.ok(
         CustomApiResponse.success(channelService.update(channelId, publicChannelRequest))
     );
@@ -52,6 +60,7 @@ public class ChannelController implements ChannelApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<Void>> deleteChannel(@PathVariable UUID channelId) {
     channelService.deleteById(channelId);
+    log.info("DELETE /api/channels/{}", channelId);
     return ResponseEntity.ok(CustomApiResponse.success("Channel deleted successfully"));
   }
 

@@ -17,6 +17,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(RestApiException.class)
   public ResponseEntity<CustomApiResponse<ErrorResponse>> handleCustomException(
       RestApiException ex) {
+    log.info(ex.getMessage());
     ErrorResponse errorResponse = ErrorResponse.builder()
         .errorCode(ex.getErrorCode())
         .detail(ex.getDetailMessage())

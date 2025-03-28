@@ -33,8 +33,10 @@ public class BasicBinaryContentService implements BinaryContentService {
         file.getName(), file.getSize(), file.getContentType());
 
     BinaryContent newBinaryContent = binaryContentRepository.save(newFile);
+
     binaryContentStorage.put(newBinaryContent.getId(), convertToBytes(file));
-    log.info("Create User Profile : {}", newBinaryContent);
+
+    log.info("Save User Profile success - profileId: {}", newBinaryContent.getId());
     return binaryContentMapper.entityToDto(newBinaryContent);
   }
 

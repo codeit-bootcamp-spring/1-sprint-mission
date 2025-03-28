@@ -41,7 +41,7 @@ public class BasicAuthService implements AuthService {
       throw new RestApiException(ErrorCode.LOGIN_FAILED, "Entered the wrong password.");
     }
 
-    log.info("user login : {}", findUser.getId());
+    log.info("Login success - userId: {}", findUser.getId());
     return userMapper.entityToDto(findUser);
   }
 }

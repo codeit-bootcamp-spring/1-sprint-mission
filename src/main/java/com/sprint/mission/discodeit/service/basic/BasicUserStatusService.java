@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
@@ -38,7 +38,7 @@ public class BasicUserStatusService implements UserStatusService {
       throw new DuplicateRequestException("UserStatus already exists");
     }
     UserStatus newUserStatus = UserStatus.createUserStatus(user);
-    log.info("Create UserStatus: {}", newUserStatus);
+    log.info("Created UserStatus - id: {}", newUserStatus.getId());
     return userStatusMapper.entityToDto(userStatusRepository.save(newUserStatus));
   }
 

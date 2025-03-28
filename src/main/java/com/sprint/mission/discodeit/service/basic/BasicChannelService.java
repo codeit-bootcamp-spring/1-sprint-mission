@@ -45,7 +45,7 @@ public class BasicChannelService implements ChannelService {
           request.description());
       channelRepository.save(newChannel);
 
-      log.info("Create Public Channel: {}", newChannel);
+      log.info("Created public channel - id: {}", newChannel.getId());
       return channelMapper.entityToDto(newChannel);
     }
     return null;
@@ -62,7 +62,7 @@ public class BasicChannelService implements ChannelService {
           new ReadStatusRequest.Create(userId, newChannel.getId(), newChannel.getCreatedAt()));
     }
 
-    log.info("Create Private Channel: {}", newChannel);
+    log.info("Created private channel - id: {}", newChannel.getId());
     return channelMapper.entityToDto(newChannel);
   }
 
@@ -95,7 +95,7 @@ public class BasicChannelService implements ChannelService {
       Optional.ofNullable(request.name()).ifPresent(channel::updateName);
       Optional.ofNullable(request.description()).ifPresent(channel::updateDescription);
 
-      log.info("Update Channel : {}", channel);
+      log.info("Updated public channel - id: {}", channel.getId());
       return channelMapper.entityToDto(channel);
     }
     return null;
@@ -103,7 +103,9 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void deleteById(UUID id) {
+    findByIdOrThrow(id);
     channelRepository.deleteById(id);
+    log.info("Deleted channel - id: {}", id);
   }
 
   private Channel findByIdOrThrow(UUID id) {
@@ -111,18 +113,4 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(() -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "id : " + id));
   }
 
-//  private Instant getLastMessageTime(UUID id) {
-//    List<Message> channelMessages = messageRepository.findAllByChannelId(id);
-//    if (channelMessages.isEmpty()) {
-//      return null;
-//    }
-//    return channelMessages.stream()
-//        .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
-//        .findFirst().get().getCreatedAt();
-//  }
-//
-//  private List<UUID> findJoinUsersById(UUID id) {
-//    return readStatusService.findAllByChannelId(id).stream().map(ReadStatusResponse::channelId)
-//        .collect(Collectors.toList());
-//  }
 }
