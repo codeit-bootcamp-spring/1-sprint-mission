@@ -63,21 +63,17 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
           "Failed to read binary content: No binary content available to read.");
     }
-    try (
-        InputStream fis = new FileInputStream(resolvePath(id).toFile());
-    ) {
-      return fis;
+    try {
+      return new FileInputStream(resolvePath(id).toFile());
     } catch (FileNotFoundException e) {
       throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
           "Failed to create stream: File not found.");
-    } catch (IOException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
-          "Failed to create stream: The file may be corrupted.");
     }
   }
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentResponse binaryContentResponse) {
+    //참고: "When using InputStreamResource, the underlying stream is closed automatically after the response is written."
     InputStream inputStream = get(binaryContentResponse.id());
     InputStreamResource resource = new InputStreamResource(inputStream);
 
@@ -86,8 +82,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\""
                 + binaryContentResponse.fileName() + "\"")
-//                + getExtension(binaryContentResponse.contentType()))
-//        .contentType(new MediaType(binaryContentResponse.contentType()))
         .contentType(MediaType.valueOf(binaryContentResponse.contentType()))
         .body(resource);
   }
@@ -96,10 +90,4 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     return root.resolve(uuid.toString());
   }
 
-  private String getExtension(String contentType) {
-    if (contentType == null || !contentType.contains("/")) {
-      return "";
-    }
-    return "." + contentType.substring(contentType.lastIndexOf("/") + 1);
-  }
 }
