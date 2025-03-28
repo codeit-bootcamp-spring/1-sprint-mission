@@ -46,6 +46,10 @@ public class MessageController implements MessageApi {
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
+    log.info("[MessageController] 메시지 생성 요청 targetChannelId: {}, attachments: {}",
+        messageCreateRequest.channelId(),
+        (attachments.isEmpty() ? "첨부파일 없음" : "첨부파일 있음")
+    );
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
@@ -62,6 +66,7 @@ public class MessageController implements MessageApi {
             .toList())
         .orElse(new ArrayList<>());
     MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    log.info("[MessageController] 메시지 생성 성공 id: {}", createdMessage.id());
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);
@@ -70,7 +75,9 @@ public class MessageController implements MessageApi {
   @PatchMapping(path = "{messageId}")
   public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request) {
+    log.info("[MessageController] 메시지 수정 요청 id: {}", messageId);
     MessageDto updatedMessage = messageService.update(messageId, request);
+    log.info("[MessageController] 메시지 수정 성공 id: {}", updatedMessage.id());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedMessage);
@@ -78,7 +85,9 @@ public class MessageController implements MessageApi {
 
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
+    log.info("[MessageController] 메시지 삭제 요청 id: {}", messageId);
     messageService.delete(messageId);
+    log.info("[MessageController] 메시지 삭제 성공 id: {}", messageId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();

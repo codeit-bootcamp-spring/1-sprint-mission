@@ -47,6 +47,27 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    log.info("[MessageService] 메시지 생성 시작 targetChannelId: {}, attachments: {}",
+        messageCreateRequest.channelId(),
+        (binaryContentCreateRequests.isEmpty() ? "첨부파일 없음" : "첨부파일 있음")
+    );
+    log.debug(
+        "[MessageService] 메시지 생성 요청 정보 content: {}, channelId: {}, authorId: {}, attachments: {}",
+        messageCreateRequest.content(),
+        messageCreateRequest.channelId(),
+        messageCreateRequest.authorId(),
+        (binaryContentCreateRequests.isEmpty() ? "첨부파일 없음" : "첨부파일 있음")
+    );
+    if (!binaryContentCreateRequests.isEmpty()) {
+      for (int i = 0; i < binaryContentCreateRequests.size(); i++) {
+        BinaryContentCreateRequest request = binaryContentCreateRequests.get(i);
+        log.debug("[MessageService] 메시지 첨부파일[{}] 정보 fileName: {}, contentType: {}, size: {}byte ",
+            i, request.fileName(),
+            request.contentType(),
+            request.bytes().length
+        );
+      }
+    }
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
 
@@ -81,6 +102,7 @@ public class BasicMessageService implements MessageService {
     );
 
     messageRepository.save(message);
+    log.info("[MessageService] 메시지 생성 성공 id: {}", message.getId());
     return messageMapper.toDto(message);
   }
 
@@ -114,21 +136,26 @@ public class BasicMessageService implements MessageService {
   @Transactional
   @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+    log.info("[MessageService] 메시지 수정 시작 id: {}", messageId);
+    log.debug("[MessageService] 메시지 수정 요청 정보 newContent: {}", request.newContent());
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     message.update(newContent);
+    log.info("[MessageService] 메시지 수정 성공 id: {}", messageId);
     return messageMapper.toDto(message);
   }
 
   @Transactional
   @Override
   public void delete(UUID messageId) {
+    log.info("[MessageService] 메시지 삭제 시작 id: {}", messageId);
     if (!messageRepository.existsById(messageId)) {
       throw new NoSuchElementException("Message with id " + messageId + " not found");
     }
 
     messageRepository.deleteById(messageId);
+    log.info("[MessageService] 메시지 삭제 성공 id: {}", messageId);
   }
 }
