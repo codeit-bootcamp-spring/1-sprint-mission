@@ -9,8 +9,7 @@ public record CreateUserDto(
     @Size(min = 1, max = 50)
     String username,
     //닉네임
-    @NotBlank
-    @Size(min = 1, max = 50)
+    @Size(max = 50)
     String nickname,
     @NotBlank
     @Email
