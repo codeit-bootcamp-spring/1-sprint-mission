@@ -11,7 +11,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update  # 개발 중: update, 운영 환경에서는 validate 또는 none 권장
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -20,7 +20,7 @@ spring:
 
   sql:
     init:
-      mode: always  # 초기 SQL 실행 (필요할 경우 설정)
+      mode: always
 
 discodeit:
   storage:
