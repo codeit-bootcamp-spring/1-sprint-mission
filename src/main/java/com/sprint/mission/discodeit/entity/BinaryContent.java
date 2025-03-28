@@ -1,33 +1,28 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "binary_contents")
-public class BinaryContent extends BaseUpdatableEntity {
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class BinaryContent extends BaseEntity {
     @Column(nullable = false)
     private String fileName;
 
     @Column(nullable = false)
     private Long size;
 
-    @Column(nullable = false)
+    @Column(length = 100, nullable = false)
     private String contentType;
-
-    @ManyToOne
-    @JoinColumn(name = "message_id")
-    private Message message;
-
-    protected BinaryContent() {
-    }
 
     public BinaryContent(String fileName, Long size, String contentType) {
         this.fileName = fileName;
         this.size = size;
-        this.contentType = contentType;}
+        this.contentType = contentType;
+    }
 }

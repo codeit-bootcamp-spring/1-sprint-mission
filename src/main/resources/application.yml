@@ -19,6 +19,7 @@ spring:
     hibernate:
       ddl_auto: update
     show-sql: true
+    open-in-view: false # OSIV 비활성화
     properties:
       hibernate:
         format_sql: true  # SQL을 보기 좋게 정렬
@@ -32,8 +33,7 @@ logging:
         type: TRACE # SQL 바인딩된 값도 출력
 
 discodeit:
-  repository:
-    type: file  # 파일 저장소 설정 유지
   storage:
+    type: local
     local:
-      root-path: .discodeit # 파일 저장소의 루트 경로 지정
+      root-path: .discodeit/storage # 파일 저장소의 루트 경로 지정

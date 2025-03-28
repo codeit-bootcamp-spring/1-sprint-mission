@@ -26,35 +26,28 @@ public class BinaryContentController implements BinaryContentApi {
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
 
-  @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContent> find(
-      @PathVariable UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+  @GetMapping(path = "{binaryContentId}")
+  public ResponseEntity<BinaryContentDto> find(
+      @PathVariable("binaryContentId") UUID binaryContentId) {
+    BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContent);
   }
 
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
-      @RequestParam List<UUID> binaryContentIds) {
-    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+  public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
+      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+    List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContents);
   }
 
-  @GetMapping("/{binaryContentId}/download")
-  public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+  @GetMapping(path = "{binaryContentId}/download")
+  public ResponseEntity<?> download(@PathVariable("binaryContentId") UUID binaryContentId) {
 
-    BinaryContentDto binaryContentDto = new BinaryContentDto(
-            binaryContent.getId(),
-            binaryContent.getFileName(),
-            binaryContent.getSize(),
-            binaryContent.getContentType()
-    );
-
+    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
     return binaryContentStorage.download(binaryContentDto);
   }
 }
