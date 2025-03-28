@@ -16,7 +16,7 @@ public class CustomHighlightConverter extends ForegroundCompositeConverterBase<I
       case "WARN" -> ANSIConstants.BOLD + ANSIConstants.YELLOW_FG;
       case "INFO" -> ANSIConstants.BOLD + ANSIConstants.GREEN_FG;
       case "DEBUG" -> ANSIConstants.BOLD + ANSIConstants.BLUE_FG;
-      case "TRACE" -> ANSIConstants.BLUE_FG;
+      case "TRACE" -> ANSIConstants.BOLD + ANSIConstants.MAGENTA_FG;
       default -> ANSIConstants.DEFAULT_FG;
     };
   }
