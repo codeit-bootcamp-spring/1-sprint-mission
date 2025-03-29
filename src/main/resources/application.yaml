@@ -19,6 +19,10 @@ discodeit:
     local:
       root-path: /storage
 
+logging:
+  level:
+    root: INFO
+
 springdoc:
   packages-to-scan: com.sprint.mission.discodeit.controller
   default-consumes-media-type: application/json;charset=UTF-8

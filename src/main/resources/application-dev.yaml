@@ -16,7 +16,7 @@ spring:
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
     org.hibernate.SQL: DEBUG # Hibernate SQL 쿼리 로그만 DEBUG 활성화
 
 server:

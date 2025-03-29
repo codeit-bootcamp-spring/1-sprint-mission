@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
@@ -35,29 +37,49 @@ public class MessageController {
       @RequestPart(value = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "binaryContents", required = false) List<MultipartFile> attachments)
       throws Exception {
+    log.info("메세지 생성 요청(Request): messageContent={}, hasProfileImage={}",
+        messageCreateRequest.content(),
+        !attachments.isEmpty());
 
+    // 메세지 첨부 파일 생성
     List<BinaryContentCreateRequest> binaryContentCreateRequests = new ArrayList<>();
-    if (attachments != null) {
+    if (!attachments.isEmpty()) {
       for (MultipartFile file : attachments) {
+        log.debug("메세지 첨부 파일 생성: fileName={}", file.getName());
         binaryContentCreateRequests.add(new BinaryContentCreateRequest(file));
       }
     }
 
+    // 메세지 생성
+    MessageDto messageDto = messageService.createMessage(messageCreateRequest,
+        binaryContentCreateRequests);
+
+    log.info("메세지 생성 응답(Response): messageContent={}, HttpStatus={}",
+        messageDto.content(),
+        HttpStatus.OK);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body( // 201
-            messageService.createMessage(messageCreateRequest, binaryContentCreateRequests));
+        .body(messageDto);
   }
 
   @PatchMapping(value = "/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
-    return ResponseEntity.ok(messageService.updateMessageText(messageId,
-        messageUpdateRequest)); // 스프린트 미션 5 심화 조건 중 API 스펙을 준수
+    log.info("메세지 수정 요청(Request): messageChanged={}", !messageUpdateRequest.newMessage().isEmpty());
+
+    // 메세지 수정
+    MessageDto messageDto = messageService.updateMessageText(messageId, messageUpdateRequest);
+    log.info("메세지 수정 응답(Response): newContent={}, HttpStatus={}",
+        messageDto.content(),
+        HttpStatus.OK);
+    return ResponseEntity.ok(messageDto);
   }
 
   @DeleteMapping(value = "/{messageId}")
   public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+    log.info("메세지 삭제 요청(Request)");
+    // 메세지 삭제
     messageService.deleteMessageById(messageId);
+    log.info("메세지 삭제 응답(Response): HttpStatus={}", HttpStatus.NO_CONTENT);
     return ResponseEntity.noContent().build(); // 204
   }
 
