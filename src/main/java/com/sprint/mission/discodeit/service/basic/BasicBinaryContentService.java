@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
@@ -54,10 +56,17 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public ResponseEntity<?> downloadBinaryContent(UUID binaryContentId) {
+    log.info("파일 다운로드 시도");
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "binaryContent(" + binaryContentId + ")가 없습니다."));
-    return binaryContentStorage.download(binaryContentMapper.toDto(binaryContent));
+        .orElseThrow(() -> {
+          log.error("파일 다운로드 단계에서 파일을 찾지 못함: binaryContentId={}", binaryContentId);
+          return new NoSuchElementException(
+              "binaryContent(" + binaryContentId + ")가 없습니다.");
+        });
+    ResponseEntity<?> downloadFile = binaryContentStorage.download(
+        binaryContentMapper.toDto(binaryContent));
+    log.info("파일 다운로드 시도 성공");
+    return downloadFile;
   }
 
   @Transactional
