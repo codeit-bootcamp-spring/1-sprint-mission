@@ -9,11 +9,16 @@ public class DiscodeitException extends RuntimeException {
 
   private final Instant timestamp;
   private final ErrorCode errorCode;
-  private final Map<String, Object> details;  // TODO 꼭 Map 으로 해야하나? 이렇게 한 이유는 무엇이고 다르게 할 수 있는 방법은 ?
+  private final Map<String, Object> details;
 
   public DiscodeitException(ErrorCode errorCode, Map<String, Object> details) {
     this.timestamp = Instant.now();
     this.errorCode = errorCode;
     this.details = details;
   }
+
+  public String getExceptionTypeName() {
+    return this.getClass().getSimpleName();
+  }
+
 }

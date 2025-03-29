@@ -1,21 +1,34 @@
 package com.sprint.mission.discodeit.dto.response;
 
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
+import lombok.Builder;
 import lombok.Getter;
 
+@Builder
 @Getter
 public class ErrorResponse {
 
-  private Instant timestamp;
-  private String message;
-  private String code;
-  private Map<String, Object> details;
-  private String exceptionType; // 발생한 예외 클래스의 이름. 변수 명이 잘 드러나지 않음. exception Class Type?
-  private int status; // 상태 코드
+  private final Instant timestamp;
+  private final String message;
+  private final String code;
+  @Builder.Default
+  private Map<String, Object> details = new HashMap<>();
+  private final String exceptionType;
+  private final int status;
 
-  public ErrorResponse(Instant timestamp, String message, String code, Map<String, Object> details,
-      String exceptionType, int status) {
+  @Builder
+  private ErrorResponse(
+      Instant timestamp,
+      String message,
+      String code,
+      Map<String, Object> details,
+      String exceptionType,
+      int status
+  ) {
     this.timestamp = timestamp;
     this.message = message;
     this.code = code;
@@ -24,16 +37,33 @@ public class ErrorResponse {
     this.status = status;
   }
 
-  public ErrorResponse of(
-
+  public static ErrorResponse of(
+      DiscodeitException discodeitException
   ) {
-    return new ErrorResponse(
-        Instant.now(),
-        message,
-        code,
-        details,
-        exceptionType,
-        status
-    );
+    ErrorCode errorCode = discodeitException.getErrorCode();
+
+    return ErrorResponse.builder()
+        .timestamp(discodeitException.getTimestamp())
+        .message(errorCode.getMessage())
+        .code(errorCode.getCode())
+        .details(discodeitException.getDetails())
+        .exceptionType(discodeitException.getExceptionTypeName())
+        .status(errorCode.getStatus().value())
+        .build();
+  }
+
+
+  public static ErrorResponse ofUnknown(
+      Exception exception
+  ) {
+    ErrorCode errorCoder = ErrorCode.UNKNOWN;
+
+    return ErrorResponse.builder()
+        .timestamp(Instant.now())
+        .message(exception.getMessage())
+        .code(errorCoder.getCode())
+        .exceptionType(Exception.class.getSimpleName())
+        .status(errorCoder.getStatus().value())
+        .build();
   }
 }
