@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -60,4 +63,13 @@ public class User extends BaseUpdatableEntity {
       this.profile = newProfile;
     }
   }
+
+  public void matchPassword(String password) {
+    if (this.password.equals(password)) {
+      return;
+    }
+
+    throw new DiscodeitException(ErrorCode.PASSWORD_NOT_MATCH, Map.of());
+  }
+
 }

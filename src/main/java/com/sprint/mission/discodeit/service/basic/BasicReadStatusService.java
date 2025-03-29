@@ -44,8 +44,8 @@ public class BasicReadStatusService implements ReadStatusService {
     if (isExistsReadStatusByUserAndChannel(user, channel)) {
       throw ReadStatusException.of(
           Map.of(
-              "userId", userId,
-              "channelId", channelId)
+              "User Id", userId,
+              "Channel Id", channelId)
       );
     }
 
