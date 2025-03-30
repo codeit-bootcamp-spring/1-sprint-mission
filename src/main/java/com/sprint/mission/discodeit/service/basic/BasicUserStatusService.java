@@ -5,10 +5,12 @@ import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.transaction.Transactional;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +41,7 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatusDto findUserStatusById(UUID userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(
-            () -> new NoSuchElementException("UserStatus(" + userStatusId + ")가 존재하지 않습니다."));
+            () -> new UserStatusNotFoundException(Map.of("userStatusId", userStatusId)));
     return userStatusMapper.toDto(userStatus);
   }
 
@@ -47,7 +49,7 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatusDto findUserStatusByUserId(UUID userId) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(
-            () -> new NoSuchElementException("userId(" + userId + ")인 UserStatus가 존재하지 않습니다."));
+            () -> new UserStatusNotFoundException(Map.of("userId", userId)));
     return userStatusMapper.toDto(userStatus);
   }
 
@@ -64,8 +66,9 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatusDto updateUserStatus(UserStatusUpdateRequest request) {
     UserStatus userStatus =
         userStatusRepository.findById(request.UserStatusId())
-            .orElseThrow(() -> new NoSuchElementException(
-                "UserStatus(" + request.UserStatusId() + ")가 없습니다."));
+            .orElseThrow(
+                () -> new UserStatusNotFoundException(
+                    Map.of("userStatusId", request.UserStatusId())));
 
     userStatus.updateLastConnectAt(request.lastConnectTime());
     userStatus.refreshUpdateAt();
@@ -81,7 +84,7 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus =
         userStatusRepository.findByUserId(userId)
             .orElseThrow(
-                () -> new NoSuchElementException("userId(" + userId + ")인 UserStatus가 존재하지 않습니다."));
+                () -> new UserStatusNotFoundException(Map.of("userId", userId)));
 
     userStatus.updateLastConnectAt(request.newLastActiveAt());
     userStatus.refreshUpdateAt();

@@ -5,6 +5,9 @@ import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.exception.channel.ChannelModificationNotAllowedException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -72,12 +75,12 @@ public class BasicChannelService implements ChannelService {
             .user(userRepository.findById(userId).orElseThrow(() ->
             {
               log.error("비공개 채널 생성 단계에서 유저를 찾지 못함: userId={}", userId);
-              return new NoSuchElementException("유저(" + userId + ")가 존재하지 않습니다.");
+              return new UserNotFoundException(Map.of("UserId", userId));
             }))
             .channel(channelRepository.findById(channel.getId()).orElseThrow(
                 () -> {
                   log.error("비공개 채널을 찾지 못함: privateChannelId={}", channel.getId());
-                  return new NoSuchElementException("채널(" + channel.getId() + ")이 존재하지 않습니다.");
+                  return new ChannelNotFoundException(Map.of("channelId", channel.getId()));
                 }))
             .lastReadAt(channel.getCreatedAt())
             .build()
@@ -102,7 +105,7 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto getChannelById(UUID id) {
     // 특정 채널을 불러오기
     Channel channel = channelRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("해당 채널( " + id + " )이 없습니다."));
+        .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", id)));
 
     return channelMapper.toDto(channel);
   }
@@ -114,14 +117,14 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(id).orElseThrow(
         () -> {
           log.error("채널 수정 단계에서 채널을 찾지 못함: channelId={}", id);
-          return new NoSuchElementException("채널(" + id + ")가 존재하지 않습니다.");
+          return new ChannelNotFoundException(Map.of("channelId", id));
         }); // 전역 404
 
     log.info("채널 수정 시도: originalChannelName={}", channel.getName());
 
     if (channel.getType() == ChannelType.PRIVATE) {
       log.warn("PRIVATE 채널이라서 수정이 불가함: channelId={}", id);
-      throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
+      throw new ChannelModificationNotAllowedException(Map.of("privateChannelId", id));
     } // 전역 400
 
     channel.updateName(request.newName());
@@ -145,7 +148,7 @@ public class BasicChannelService implements ChannelService {
 
       if (channelRepository.findById(id).isEmpty()) {
         log.error("채널 삭제 단계에서 채널을 찾지 못함: channelId={}", id);
-        throw new NoSuchElementException("채널(" + id + ")가 존재하지 않습니다.");
+        throw new ChannelNotFoundException(Map.of("channelId", id));
       }
 
       log.info("채널 메세지 삭제");
@@ -166,7 +169,7 @@ public class BasicChannelService implements ChannelService {
               .toList();
 
       readStatuseIds.forEach(readStatusService::deleteReadStatusById);
-      
+
       // 채널 삭제
       channelRepository.deleteById(id);
       log.info("채널 삭제 시도 성공");
