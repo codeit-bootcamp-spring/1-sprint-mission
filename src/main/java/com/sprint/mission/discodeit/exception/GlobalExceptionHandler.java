@@ -4,12 +4,22 @@ import com.sprint.mission.discodeit.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+      MethodArgumentNotValidException methodArgumentNotValidException
+  ){
+    log.error("Not Valid Exception", methodArgumentNotValidException);
+    ErrorResponse errorResponse = ErrorResponse.of(methodArgumentNotValidException);
+    return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
+  }
 
   @ExceptionHandler(DiscodeitException.class)
   protected ResponseEntity<ErrorResponse> handleDiscodeitException(
@@ -18,7 +28,6 @@ public class GlobalExceptionHandler {
     log.error("Discodeit Exception ", discodeitException);
 
     ErrorResponse errorResponse = ErrorResponse.of(discodeitException);
-
     return ResponseEntity
         .status(errorResponse.getStatus())
         .body(errorResponse);
@@ -29,7 +38,6 @@ public class GlobalExceptionHandler {
     log.error("Exception ", exception);
 
     ErrorResponse errorResponse = ErrorResponse.ofUnknown(exception);
-
     return ResponseEntity.
         status(errorResponse.getStatus())
         .body(errorResponse);

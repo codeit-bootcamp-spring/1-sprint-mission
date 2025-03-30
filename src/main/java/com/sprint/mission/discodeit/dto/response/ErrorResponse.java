@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Builder
 @Getter
@@ -64,6 +67,25 @@ public class ErrorResponse {
         .code(errorCoder.getCode())
         .exceptionType(Exception.class.getSimpleName())
         .status(errorCoder.getStatus().value())
+        .build();
+  }
+
+  public static ErrorResponse of(MethodArgumentNotValidException methodArgumentNotValidException) {
+    BindingResult bindingResult = methodArgumentNotValidException.getBindingResult();
+    Map<String, Object> errorDetails = new HashMap<>();
+    bindingResult.getFieldErrors().forEach(error -> {
+      errorDetails.put(
+          error.getField(),
+          String.format("Rejected value: '%s', Reason: %s", error.getRejectedValue(), error.getDefaultMessage())
+      );
+    });
+    return ErrorResponse.builder()
+        .timestamp(Instant.now())
+        .message("Validation failed for one or more fields")
+        .code("VALIDATION_ERROR")
+        .details(errorDetails)
+        .exceptionType(methodArgumentNotValidException.getClass().getSimpleName())
+        .status(HttpStatus.BAD_REQUEST.value())
         .build();
   }
 }
