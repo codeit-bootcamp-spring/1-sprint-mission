@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.UnmodifiablePrivateChannelException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -25,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
@@ -36,7 +37,7 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto create(PublicChannelCreateRequest request) {
     String name = request.name();
     String description = request.description();
-    Channel channel = new Channel(ChannelType.PUBLIC, name, description);
+    Channel channel = Channel.ofPublic(name, description);
 
     channelRepository.save(channel);
     return channelMapper.toDto(channel);
@@ -45,7 +46,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
-    Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+    Channel channel = Channel.ofPrivate();
     channelRepository.save(channel);
 
     List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
@@ -59,10 +60,8 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   @Override
   public ChannelDto find(UUID channelId) {
-    return channelRepository.findById(channelId)
-        .map(channelMapper::toDto)
-        .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+    Channel foundChannel = getChannelById(channelId);
+    return channelMapper.toDto(foundChannel);
   }
 
   @Transactional(readOnly = true)
@@ -84,26 +83,33 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     String newName = request.newName();
     String newDescription = request.newDescription();
-    Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
-    if (channel.getType().equals(ChannelType.PRIVATE)) {
-      throw new IllegalArgumentException("Private channel cannot be updated");
+    Channel channel = getChannelById(channelId);
+    if (channel.isPrivate()) {
+      throw UnmodifiablePrivateChannelException.of(channelId);
     }
     channel.update(newName, newDescription);
     return channelMapper.toDto(channel);
   }
 
+  private Channel getChannelById(UUID channelId) {
+    return channelRepository.findById(channelId)
+        .orElseThrow(() -> ChannelNotFoundException.of(channelId));
+  }
+
   @Transactional
   @Override
   public void delete(UUID channelId) {
-    if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException("Channel with id " + channelId + " not found");
+    if (isExistsById(channelId)) {
+      messageRepository.deleteAllByChannelId(channelId);
+      readStatusRepository.deleteAllByChannelId(channelId);
+      channelRepository.deleteById(channelId);
     }
 
-    messageRepository.deleteAllByChannelId(channelId);
-    readStatusRepository.deleteAllByChannelId(channelId);
-
-    channelRepository.deleteById(channelId);
+    throw ChannelNotFoundException.of(channelId);
   }
+
+  private boolean isExistsById(UUID channelId) {
+    return channelRepository.existsById(channelId);
+  }
+
 }
