@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.readstatus.ReadStatusException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
@@ -17,7 +17,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,11 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
     Channel channel = getChannelById(channelId);
 
     if (isExistsReadStatusByUserAndChannel(user, channel)) {
-      throw ReadStatusException.of(
-          Map.of(
-              "User Id", userId,
-              "Channel Id", channelId)
-      );
+      throw ReadStatusAlreadyExistsException.of(userId, channelId);
     }
 
     Instant lastReadAt = request.lastReadAt();
@@ -58,12 +53,12 @@ public class BasicReadStatusService implements ReadStatusService {
 
   private User getUserById(UUID userId) {
     return userRepository.findById(userId)
-        .orElseThrow(() -> UserAlreadyExistsException.of(Map.of("User Id", userId)));
+        .orElseThrow(() -> UserAlreadyExistsException.of(userId));
   }
 
   private Channel getChannelById(UUID channelId) {
     return channelRepository.findById(channelId)
-        .orElseThrow(() -> ChannelNotFoundException.of(Map.of("Channel Id", channelId)));
+        .orElseThrow(() -> ChannelNotFoundException.of(channelId));
   }
 
   private Boolean isExistsReadStatusByUserAndChannel(User user, Channel channel) {
@@ -95,15 +90,15 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   @Override
   public void delete(UUID readStatusId) {
-    if (!readStatusRepository.existsById(readStatusId)) {
-      throw ReadStatusNotFoundException.of(Map.of("ReadStatus id ", readStatusId));
+    if (readStatusRepository.existsById(readStatusId)) {
+      readStatusRepository.deleteById(readStatusId);
     }
 
-    readStatusRepository.deleteById(readStatusId);
+    throw ReadStatusNotFoundException.of(readStatusId);
   }
 
   private ReadStatus getReadStatus(UUID readStatusId) {
     return readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> ReadStatusNotFoundException.of(Map.of("ReadStatus id ", readStatusId)));
+        .orElseThrow(() -> ReadStatusNotFoundException.of(readStatusId));
   }
 }
