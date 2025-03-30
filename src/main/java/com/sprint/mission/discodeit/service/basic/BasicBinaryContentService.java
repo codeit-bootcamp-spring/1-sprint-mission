@@ -3,11 +3,14 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.binaryContent.FileNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
+import java.io.File;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +45,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   public BinaryContentDto findBinaryContentById(UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "binaryContent(" + binaryContentId + ")가 없습니다."));
+        .orElseThrow(() -> new FileNotFoundException(Map.of("binaryContentId", binaryContentId)));
     return binaryContentMapper.toDto(binaryContent);
   }
 
@@ -60,8 +62,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> {
           log.error("파일 다운로드 단계에서 파일을 찾지 못함: binaryContentId={}", binaryContentId);
-          return new NoSuchElementException(
-              "binaryContent(" + binaryContentId + ")가 없습니다.");
+          return new FileNotFoundException(Map.of("binaryContentId", binaryContentId));
         });
     ResponseEntity<?> downloadFile = binaryContentStorage.download(
         binaryContentMapper.toDto(binaryContent));

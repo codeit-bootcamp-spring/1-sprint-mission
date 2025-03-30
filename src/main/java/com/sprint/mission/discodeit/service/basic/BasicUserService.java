@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -16,6 +19,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,12 +52,13 @@ public class BasicUserService implements UserService {
 
     // username과 email이 다른 유저와 같이 겹치는지 검증
     if (userRepository.existsByUsername(userCreateRequest.username())) {
-      log.warn("이미 존재하는 유저: username={}", userCreateRequest.username());
-      throw new IllegalArgumentException("동일한 username이 존재합니다."); // 전역 에러에서 400 처리
+      log.warn("이미 존재하는 유저 이름: username={}", userCreateRequest.username());
+      throw new UsernameAlreadyExistsException(Map.of("username", userCreateRequest.username()));
     }
     if (userRepository.existsByEmail(userCreateRequest.email())) {
       log.warn("이미 존재하는 이메일: email={}", userCreateRequest.email());
-      throw new IllegalArgumentException("동일한 email이 존재합니다."); // 전역 에러에서 400 처리
+      throw new EmailAlreadyExistsException(
+          Map.of("email", userCreateRequest.email()));
     }
 
     // 프로필 이미지 생성 : BinaryContent 도메인 객체 생성
@@ -99,7 +104,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto getUserById(UUID id) {
     User user = userRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("유저(" + id + ")가 없습니다."));
+        .orElseThrow(() -> new UserNotFoundException(Map.of("UserId", id)));
     return userMapper.toDto(user);
   }
 
@@ -115,7 +120,7 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(id)
         .orElseThrow(() -> {
           log.error("유저 수정 단계에서 유저를 찾지 못함: userId={}", id);
-          return new NoSuchElementException("유저(" + id + ")를 찾지 못했습니다.");
+          return new UserNotFoundException(Map.of("UserId", id));
         });
 
     log.info("유저 수정 시도: originalUsername={}", user.getUsername());
@@ -123,8 +128,9 @@ public class BasicUserService implements UserService {
     // 유저 데이터 수정
     if (userUpdateRequest.newUsername() != null) {
       if (userRepository.existsByUsername(userUpdateRequest.newUsername())) {
-        log.warn("이미 존재하는 유저: username={}", userUpdateRequest.newUsername());
-        throw new IllegalArgumentException("같은 username가 존재합니다.");
+        log.warn("이미 존재하는 유저 이름: username={}", userUpdateRequest.newUsername());
+        throw new UsernameAlreadyExistsException(
+            Map.of("username", userUpdateRequest.newUsername()));
       }
       user.updateUsername(userUpdateRequest.newUsername());
       log.info("유저 이름 수정: newUsername={}", userUpdateRequest.newUsername());
@@ -132,7 +138,8 @@ public class BasicUserService implements UserService {
     if (userUpdateRequest.newEmail() != null) {
       if (userRepository.existsByEmail(userUpdateRequest.newEmail())) {
         log.warn("이미 존재하는 이메일: email={}", userUpdateRequest.newEmail());
-        throw new IllegalArgumentException("같은 email이 존재합니다.");
+        throw new EmailAlreadyExistsException(
+            Map.of("email", userUpdateRequest.newEmail()));
       }
       user.updateEmail(userUpdateRequest.newEmail());
       log.info("유저 이메일 수정: newEmail={}", userUpdateRequest.newEmail());
@@ -165,7 +172,7 @@ public class BasicUserService implements UserService {
       User user = userRepository.findById(id)
           .orElseThrow(() -> {
             log.error("유저 삭제 단계에서 유저를 찾지 못함: userId={}", id);
-            return new NoSuchElementException("유저(" + id + ")가 없습니다.");
+            return new UserNotFoundException(Map.of("UserId", id));
           });
       log.info("유저 상태 삭제");
       // 유저 상태 삭제
