@@ -103,7 +103,7 @@ public class BasicUserService implements UserService {
   @Override
   public void delete(UUID userId) {
     if (userRepository.existsById(userId)) {
-      throw UserNotFoundException.of(Map.of("User Id", userId));
+      throw UserNotFoundException.of(userId);
     }
 
     log.info("Deleted user {}", userId);

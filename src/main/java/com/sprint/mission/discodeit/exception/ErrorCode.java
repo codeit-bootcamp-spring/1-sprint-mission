@@ -25,6 +25,10 @@ public enum ErrorCode {
   // Message
   MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 메시지를 찾을 수 없습니다.", "M001"),
 
+  // User Status
+  DUPLICATE_USER_STATUS(HttpStatus.BAD_REQUEST, "이미 존재하는 유저 상태 입니다.", "S001"),
+  USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 유저 상태를 찾을 수 없습니다.", "S002"),
+
   // Server
   UNKNOWN(HttpStatus.INTERNAL_SERVER_ERROR, "관리자에게 문의해주세요.", "S001"),
   ;

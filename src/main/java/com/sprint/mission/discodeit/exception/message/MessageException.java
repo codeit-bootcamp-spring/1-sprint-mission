@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class MessageException extends DiscodeitException {
 
-  public MessageException(ErrorCode errorCode, Map<String, Object> details) {
+  protected MessageException(ErrorCode errorCode, Map<String, Object> details) {
     super(errorCode, details);
   }
 

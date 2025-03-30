@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class BinaryException extends DiscodeitException {
 
-  public BinaryException(ErrorCode errorCode, Map<String, Object> details) {
+  protected BinaryException(ErrorCode errorCode, Map<String, Object> details) {
     super(errorCode, details);
   }
 
