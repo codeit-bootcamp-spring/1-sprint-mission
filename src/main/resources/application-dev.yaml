@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit_dev
+    username: dev_user
+    password: dev_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    generate_statistics: true
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        highlight_sql: true
+        use_sql_comments: true
+        format_sql: true
+logging:
+  level:
+    root: DEBUG

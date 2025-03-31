@@ -2,31 +2,18 @@ spring:
   application:
     name: 1-sprint-mission
 
+  profiles:
+    active: dev
+
   servlet:
     multipart:
       enabled: true
       maxFileSize: 10MB
       maxRequestSize: 30MB
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    open-in-view: false
-    generate_statistics: true
-    database: postgresql
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      dialect: org.hibernate.dialect.PostgreSQLDialect
-      hibernate:
-        highlight_sql: true # ANSI 코드에 색을 나타낸다
-        use_sql_comments: true
-        format_sql: true
+logging:
+  level:
+    root: INFO
 
 file:
   path:

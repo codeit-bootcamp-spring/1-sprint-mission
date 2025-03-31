@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://{{prod-db-server}}:5432/discodeit
+    username: prod_user
+    password: prod_secure_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    generate_statistics: false
+    database: postgresql
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    root: WARN
