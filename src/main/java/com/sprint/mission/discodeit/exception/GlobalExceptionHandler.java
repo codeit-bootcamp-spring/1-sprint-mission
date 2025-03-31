@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,8 +14,9 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
       MethodArgumentNotValidException methodArgumentNotValidException
-  ){
+  ) {
     log.error("Not Valid Exception", methodArgumentNotValidException);
+
     ErrorResponse errorResponse = ErrorResponse.of(methodArgumentNotValidException);
     return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
   }

@@ -76,7 +76,8 @@ public class ErrorResponse {
     bindingResult.getFieldErrors().forEach(error -> {
       errorDetails.put(
           error.getField(),
-          String.format("Rejected value: '%s', Reason: %s", error.getRejectedValue(), error.getDefaultMessage())
+          String.format("Rejected value: '%s', Reason: %s", error.getRejectedValue(),
+              error.getDefaultMessage())
       );
     });
     return ErrorResponse.builder()

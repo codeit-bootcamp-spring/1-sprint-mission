@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.Map;
 import java.util.UUID;
 
-public class MessageNotFoundException extends MessageException{
+public class MessageNotFoundException extends MessageException {
 
   public MessageNotFoundException(ErrorCode errorCode, Map<String, Object> details) {
     super(errorCode, details);
