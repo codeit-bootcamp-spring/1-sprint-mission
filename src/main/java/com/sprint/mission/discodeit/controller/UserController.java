@@ -4,8 +4,10 @@ import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.*;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +30,7 @@ public class UserController {
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> createUser(
-      @RequestPart(value = "userCreateRequest") UserCreateRequest userCreateRequest,
+      @Valid @RequestPart(value = "userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "binaryContent", required = false) MultipartFile file) throws Exception {
 
     /* 유저 생성 요청(Request) */
@@ -73,7 +75,7 @@ public class UserController {
 
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
-      @RequestPart(value = "userUpdateRequest") UserUpdateRequest userUpdateRequest,
+      @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile file) throws Exception {
     log.info(
         "유저 수정 요청(Request): usernameChanged={}, emailChanged={}, passwordChanged={}, hasProfileImage={}",

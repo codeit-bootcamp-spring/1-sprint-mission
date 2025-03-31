@@ -1,8 +1,7 @@
-package com.sprint.mission.discodeit.dto.user;
+package com.sprint.mission.discodeit.dto.userStatus;
 
 import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
-import java.util.UUID;
 
 public record UserStatusCreateRequest(
     User user,

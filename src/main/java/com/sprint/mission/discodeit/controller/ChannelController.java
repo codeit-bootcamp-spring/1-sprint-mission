@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class ChannelController {
 
   @PostMapping(value = "/public")
   public ResponseEntity<ChannelDto> createPublicChannel(
-      @RequestBody ChannelPublicRequest channelPublicRequest) {
+      @Valid @RequestBody ChannelPublicRequest channelPublicRequest) {
     log.info("공개 채널 생성 요청(Request): publicChannelName={}", channelPublicRequest.name());
 
     log.info("공개 채널 생성 응답(Response): publicChannelName={}, HttpStatus={}",
@@ -51,7 +52,7 @@ public class ChannelController {
   // 무엇보다 Public 채널을 업데이트하는 건데 엔드 포인트에 public이 붙지 않는 것도 고민되는 부분입니다.
   @PatchMapping(value = "/{channelId}")
   public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable UUID channelId,
-      @RequestBody ChannelUpdateRequest channelUpdateRequest) {
+      @Valid @RequestBody ChannelUpdateRequest channelUpdateRequest) {
     log.info("채널 수정 요청(Request): nameChanged={}, descriptionChanged={}",
         channelUpdateRequest.newName() != null,
         channelUpdateRequest.newDescription() != null
