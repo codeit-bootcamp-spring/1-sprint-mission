@@ -25,4 +25,13 @@ public class ErrorResponse {
 		this.message = message;
 		this.details = null;
 	}
+
+	public ErrorResponse(int status, String simpleName, String code, String message, Map<String, Object> details) {
+		this.timestamp = Instant.now();
+		this.status = status;
+		this.exceptionType = simpleName;
+		this.code = code;
+		this.message = message;
+		this.details = details;
+	}
 }

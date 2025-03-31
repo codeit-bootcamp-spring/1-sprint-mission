@@ -14,6 +14,24 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+	// Custom Exception (DiscodeitException) 처리
+	@ExceptionHandler(DiscodeitException.class)
+	public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
+		log.error("DiscodeitException: ", e);
+
+		// ErrorResponse 생성
+		ErrorResponse errorResponse = new ErrorResponse(
+			e.getErrorCode().getStatus(),          // HTTP 상태 코드
+			e.getClass().getSimpleName(),          // 예외 클래스 이름 (exceptionType)
+			e.getErrorCode().getCode(),            // 에러 코드
+			e.getMessage(),                        // 에러 메시지
+			e.getDetails()                         // 에러 세부 정보
+		);
+
+		// 클라이언트에게 응답
+		return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(e.getErrorCode().getStatus()));
+	}
+
 	//IllegalArgumentException 처리
 	@ExceptionHandler(IllegalArgumentException.class)
 	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
