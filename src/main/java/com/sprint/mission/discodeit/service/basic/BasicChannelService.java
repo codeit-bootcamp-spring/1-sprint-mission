@@ -125,10 +125,9 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional(readOnly = true)
   public List<MessageDto> findAllMessagesByChannelId(String channelId) {
-    Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
-    if (channel == null) {
-      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
-    }
+    Channel channel = channelRepository.findById(UUID.fromString(channelId))
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+
     return messageRepository.findByChannelId(channel.getId()).stream().map(messageMapper::toDto)
         .toList();
   }
@@ -136,10 +135,8 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional(readOnly = true)
   public ChannelDto findById(String channelId, String userId) throws DiscodeitException {
-    Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
-    if (channel == null) {
-      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
-    }
+    Channel channel = channelRepository.findById(UUID.fromString(channelId))
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
     ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
         channel.getId(), UUID.fromString(userId)).orElse(null);
@@ -147,6 +144,7 @@ public class BasicChannelService implements ChannelService {
     if (readStatus == null) {
       throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
+
     List<UserDto> participants = List.of();
     if (channel.getType() == ChannelType.PRIVATE) {
       participants = readStatusRepository.findByChannelId(channel.getId()).stream().map(
@@ -170,12 +168,8 @@ public class BasicChannelService implements ChannelService {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
-
-    if (channel == null) {
-      log.warn("채널을 찾을 수 없음: channelId = {}", channelId);
-      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
-    }
+    Channel channel = channelRepository.findById(UUID.fromString(channelId))
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
     if (channel.getType() == ChannelType.PRIVATE) {
       log.error("Private 채널 수정 시도: channelId = {}, channelType = {}", channel.getId(),
@@ -196,12 +190,8 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public boolean delete(String channelId) throws DiscodeitException {
     log.info("체널 삭제 시작: channelId = {}", channelId);
-    Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
-
-    if (channel == null) {
-      log.warn("존재 하지 않는 채널 삭제 시도");
-      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
-    }
+    Channel channel = channelRepository.findById(UUID.fromString(channelId))
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
     //레포지토리에서 한번에 삭제 할 수 있는 방법이 있을까?
     //대용량 서비스라면? -> 삭제 완료될 때까지 기다려야함

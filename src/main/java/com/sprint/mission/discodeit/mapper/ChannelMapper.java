@@ -33,7 +33,7 @@ public class ChannelMapper {
         channel.getDescription(),
         channel.getCreatedAt(),
         lastMessageTimeStamp,
-        channel.getUsers().stream().map(rs -> userMapper.toDto(rs.getUser())).toList()
+        channel.getReadStatuses().stream().map(rs -> userMapper.toDto(rs.getUser())).toList()
     );
   }
 }

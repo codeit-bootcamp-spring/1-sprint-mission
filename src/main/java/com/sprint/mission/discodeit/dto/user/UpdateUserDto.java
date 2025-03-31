@@ -25,7 +25,7 @@ public record UpdateUserDto(
     //접속 상태
     boolean isOnline,
     //사용자 설정 상태 메세지
-    @Size(min = 1, max = 50)
+    @Size(max = 50)
     String newStatusMessage,
     //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
     AccountStatus accountStatus,

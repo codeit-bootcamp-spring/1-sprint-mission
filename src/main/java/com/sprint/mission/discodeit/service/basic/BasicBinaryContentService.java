@@ -54,10 +54,8 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional(readOnly = true)
   public BinaryContentDto findById(String contentId) throws BinaryContentNotFoundException {
     BinaryContent binaryContent = binaryContentRepository.findById(UUID.fromString(contentId))
-        .orElse(null);
-    if (binaryContent == null) {
-      throw new BinaryContentNotFoundException(ErrorCode.CONTENT_NOT_FOUND);
-    }
+        .orElseThrow(() -> new BinaryContentNotFoundException(ErrorCode.CONTENT_NOT_FOUND));
+
     return binaryContentMapper.toDto(binaryContent);
   }
 
@@ -75,13 +73,9 @@ public class BasicBinaryContentService implements BinaryContentService {
   public boolean deleteById(String contentId) throws BinaryContentNotFoundException {
     log.info("파일 삭제 시작: contentId = {}", contentId);
     BinaryContent binaryContent = binaryContentRepository.findById(UUID.fromString(contentId))
-        .orElse(null);
+        .orElseThrow(() -> new BinaryContentNotFoundException(ErrorCode.CONTENT_NOT_FOUND));
 
-    if (binaryContent == null) {
-      log.warn("파일 없음: contentId = {}", contentId);
-      throw new BinaryContentNotFoundException(ErrorCode.CONTENT_NOT_FOUND);
-    }
-    binaryContentRepository.deleteById(UUID.fromString(contentId));
+    binaryContentRepository.deleteById(binaryContent.getId());
     log.info("파일 삭제 완료: contentId = {}", contentId);
     return true;
   }

@@ -14,7 +14,7 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
   //유저가 속한 채널만 가져오는 쿼리
   //Channels과 ReadStatuses를 fetch 조인 하여 user_id가 같은 channel들만 가져옴
   @Query("SELECT DISTINCT c FROM Channel c " +
-      "JOIN FETCH c.users rs " +
+      "JOIN FETCH c.readStatuses rs " +
       "WHERE rs.user.id = :userId")
   List<Channel> findChannelsWithReadStatusByUserId(@Param("userId") UUID userId);
 
@@ -22,7 +22,7 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
   //Channels과 ReadStatuses, Users를 fetch 조인
   //해당 channel에 속한 모든 participants까지 가져올 수 있도록 한다.
   @Query("SELECT DISTINCT c FROM Channel c " +
-      "JOIN FETCH c.users rs " +
+      "JOIN FETCH c.readStatuses rs " +
       "JOIN FETCH rs.user u " +
       "LEFT JOIN FETCH u.userStatus " +
       "WHERE c.id = :channelId AND c.type = com.sprint.mission.discodeit.entity.ChannelType.PRIVATE")

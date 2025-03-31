@@ -39,7 +39,7 @@ public class Channel extends BaseUpdatableEntity {
   private List<Message> messages = new ArrayList<>();
 
   @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ReadStatus> users = new ArrayList<>();
+  private List<ReadStatus> readStatuses = new ArrayList<>();
 
 
   public Channel(String name, ChannelType type, ChannelCategory channelCategory,

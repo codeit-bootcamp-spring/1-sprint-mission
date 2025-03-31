@@ -89,7 +89,8 @@ public class BasicUserService implements UserService {
   public UserDto create(CreateUserDto createUserDto, MultipartFile file)
       throws DiscodeitException {
     UserDto userDto = create(createUserDto);
-    User user = userRepository.findById(userDto.id()).orElse(null);
+    User user = userRepository.findById(userDto.id())
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
     log.info("사용자 생성 후 프로필 추가: userId={}", user.getId());
     if (!file.getContentType().equals("image/png") && !file.getContentType().equals("image/jpeg") &&
@@ -122,11 +123,8 @@ public class BasicUserService implements UserService {
     if (userId == null) {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
-    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
-
-    if (user == null) {
-      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
-    }
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
     return userMapper.toDto(user);
   }
 
@@ -134,10 +132,8 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public UserDto findByEmail(String email) throws DiscodeitException {
     User user = userRepository.findAll().stream().filter(u -> u.getEmail().equals(email))
-        .findFirst().orElse(null);
-    if (user == null) {
-      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
-    }
+        .findFirst().orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+
     return userMapper.toDto(user);
   }
 
@@ -168,12 +164,8 @@ public class BasicUserService implements UserService {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
-
-    if (user == null) {
-      log.warn("존재하지 않는 사용자: userId = {}", userId);
-      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
-    }
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
     //to
     user.setUsername(updateUserDto.newUsername());
@@ -187,13 +179,13 @@ public class BasicUserService implements UserService {
     User savedUser = userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", savedUser.getId());
 
-    UserStatus userStatus = userStatusRepository.findByUser(savedUser).orElse(null);
-    if (userStatus == null) {
-      log.error("사용자 상태가 존재하지 않음");
-      throw new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND);
-    }
+    UserStatus userStatus = userStatusRepository.findByUser(savedUser)
+        .orElseThrow(() -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+
     user.setUserStatus(userStatus);
     log.debug("사용자 상태 객체 연결");
+
+    userRepository.save(user);
 
     return userMapper.toDto(savedUser);
   }
@@ -246,12 +238,9 @@ public class BasicUserService implements UserService {
   public boolean deleteUser(String userId) throws DiscodeitException {
     log.info("사용자 삭제 시작: userId = {}", userId);
 
-    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    if (user == null) {
-      log.warn("존재하지 않는 사용자 삭제 시도: userId = {}", userId);
-      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
-    }
     userRepository.delete(user);
     log.info("사용자 삭제 완료: userId = {}", userId);
     return true;

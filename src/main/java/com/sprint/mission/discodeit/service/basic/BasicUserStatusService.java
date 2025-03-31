@@ -7,6 +7,9 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -30,10 +33,7 @@ public class BasicUserStatusService implements UserStatusService {
   @Transactional(readOnly = true)
   public UserStatusDto findById(String userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(UUID.fromString(userStatusId))
-        .orElse(null);
-    if (userStatus == null) {
-      throw new IllegalArgumentException("userStatus not found");
-    }
+        .orElseThrow(() -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
 
     return userStatusMapper.toDto(userStatus);
   }
@@ -41,14 +41,12 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @Transactional(readOnly = true)
   public UserStatusDto findByUserId(String userId) {
-    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
-    if (user == null) {
-      throw new IllegalArgumentException("user not found");
-    }
-    UserStatus userStatus = userStatusRepository.findByUser(user).orElse(null);
-    if (userStatus == null) {
-      throw new IllegalArgumentException("User Status not found");
-    }
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+    UserStatus userStatus = userStatusRepository.findByUser(user)
+        .orElseThrow(() -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+
     return userStatusMapper.toDto(userStatus);
   }
 
@@ -61,13 +59,13 @@ public class BasicUserStatusService implements UserStatusService {
   @Transactional
   public UserStatusDto create(CreateUserStatusDto createUserStatusDto)
       throws DiscodeitException {
-    User user = userRepository.findById(createUserStatusDto.getUserId()).orElse(null);
-    if (user == null) {
-      throw new DiscodeitException(ErrorCode.USER_NOT_FOUND);
-    }
+    User user = userRepository.findById(createUserStatusDto.getUserId())
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+
     UserStatus userStatus = userStatusRepository.findByUser(user).orElse(null);
     if (userStatus != null) {
-      throw new IllegalArgumentException("userStatus already exists");
+      throw new UserStatusException(ErrorCode.INVALID_USER_STATUS);
+      //todo 에러코드 수정
     }
     userStatus = new UserStatus(user);
 
@@ -81,10 +79,9 @@ public class BasicUserStatusService implements UserStatusService {
   @Transactional
   public UserStatusDto updateByUserId(String id, UpdateUserStatusDto updateUserStatusDto) {
 
-    User user = userRepository.findById(UUID.fromString(id)).orElse(null);
-    if (user == null) {
-      throw new DiscodeitException(ErrorCode.USER_NOT_FOUND);
-    }
+    User user = userRepository.findById(UUID.fromString(id))
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+
     UserStatus userStatus = user.getUserStatus();
     userStatus.setUpdatedAt(updateUserStatusDto.updateAt());
     userStatusRepository.save(userStatus);
@@ -96,10 +93,8 @@ public class BasicUserStatusService implements UserStatusService {
   @Transactional
   public boolean delete(String userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(UUID.fromString(userStatusId))
-        .orElse(null);
-    if (userStatus == null) {
-      throw new IllegalArgumentException("User status not found");
-    }
+        .orElseThrow(() -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+    
     userStatusRepository.delete(userStatus);
 
     return true;

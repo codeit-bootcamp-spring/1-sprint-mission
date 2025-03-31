@@ -61,17 +61,17 @@ public class BasicMessageService implements MessageService {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
-        createMessageDto.getChannelId(), createMessageDto.getAuthorId()).orElse(null);
-    log.debug("사용자가 채널에 속해있는지 ReadStatus로 검증: readStatusId = {}, channelId = {}, userId = {}",
-        readStatus.getId(), readStatus.getChannel().getId(), readStatus.getUser().getId());
+    log.debug("사용자가 채널에 속해있는지 ReadStatus로 검증 시작: channelId = {}, userId = {}",
+        createMessageDto.getChannelId(), createMessageDto.getAuthorId());
 
-    if (readStatus == null) {
-      //해당 채널에 참여하지 않은 사용자가 해당 private 채널이 존재한다는 사실도 몰라야 한다.
-      //그래서 user not in channel 이 아닌 Channel not found 로 예외처리
-      log.error("사용자가 채널에 참여하고 있지 않음");
-      throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
-    }
+    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
+            createMessageDto.getChannelId(), createMessageDto.getAuthorId())
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+    //해당 채널에 참여하지 않은 사용자가 해당 private 채널이 존재한다는 사실도 몰라야 한다.
+    //그래서 user not in channel 이 아닌 Channel not found 로 예외처리
+
+    log.debug("사용자가 채널에 속해있는지 ReadStatus로 검증 완료: readStatusId = {}, channelId = {}, userId = {}",
+        readStatus.getId(), readStatus.getChannel().getId(), readStatus.getUser().getId());
 
     Message message = new Message(readStatus.getUser(), createMessageDto.content(),
         readStatus.getChannel());
@@ -96,12 +96,8 @@ public class BasicMessageService implements MessageService {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    Message message = messageRepository.findById(messageDto.id()).orElse(null);
-
-    if (message == null) {
-      log.error("메세지를 찾을 수 없음");
-      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
-    }
+    Message message = messageRepository.findById(messageDto.id())
+        .orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
 
     //더 좋은 방법이 없을까... 이건 Service를 의존해서 create를 쓰는게 좋을까?
     log.debug("첨부 파일과 메세지 연결 시작");
@@ -154,14 +150,13 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional(readOnly = true)
   public List<MessageDto> findAllByAuthorId(String authorId) {
-    User author = userRepository.findById(UUID.fromString(authorId)).orElse(null);
+    User author = userRepository.findById(UUID.fromString(authorId))
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    if (author == null) {
-      //todo - 고민: 메세지를 검색할때 유저 아이디가 없다고 에러를 출력해야할까?
-      //그냥 검색값의 오류인지...
-      //나중에 search 기능 만들때 더 고민해보고 수정하기
-      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
-    }
+    //todo - 고민: 메세지를 검색할때 유저 아이디가 없다고 에러를 출력해야할까?
+    //그냥 검색값의 오류인지...
+    //나중에 search 기능 만들때 더 고민해보고 수정하기
+
     return messageRepository.findByAuthorId(author.getId()).stream().map(messageMapper::toDto)
         .toList();
   }
@@ -246,11 +241,9 @@ public class BasicMessageService implements MessageService {
       throws DiscodeitException {
     log.info("메세지 정보 수정 시작: messageId = {}", messageId);
 
-    Message message = messageRepository.findById(UUID.fromString(messageId)).orElse(null);
-    if (message == null) {
-      log.warn("존재하지 않는 메세지 수정 시도");
-      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
-    }
+    Message message = messageRepository.findById(UUID.fromString(messageId))
+        .orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+
     //todo 예외명 뭐로하지
     if (updateMessageDto.newContent().isEmpty()) {
       log.error("메세지 수정 정보 누락");
@@ -286,11 +279,9 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public boolean delete(String messageId, String userId) throws DiscodeitException {
     log.info("메세지 삭제 시작: messageId = {}, userId = {}", messageId, userId);
-    Message message = messageRepository.findById(UUID.fromString(messageId)).orElse(null);
-    if (message == null) {
-      log.warn("존재하지 않는 메세지");
-      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
-    }
+    Message message = messageRepository.findById(UUID.fromString(messageId))
+        .orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+
     if (!message.getAuthor().getId().toString().equals(userId)) {
       log.error("작성자가 아닌 사용자가 삭제 시도: messageId ={}, authorId = {}, userId ={} ", messageId,
           message.getAuthor().getId(), userId);

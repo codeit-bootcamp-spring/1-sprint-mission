@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
@@ -42,15 +43,10 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
     Channel channel = channelRepository.findById(UUID.fromString(createReadStatusDto.channelId()))
-        .orElse(null);
-    if (channel == null) {
-      throw new DiscodeitException(ErrorCode.CHANNEL_NOT_FOUND);
-    }
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
-    User user = userRepository.findById(UUID.fromString(createReadStatusDto.userId())).orElse(null);
-    if (user == null) {
-      throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
-    }
+    User user = userRepository.findById(UUID.fromString(createReadStatusDto.userId()))
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
     ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
         UUID.fromString(createReadStatusDto.channelId()),
@@ -87,10 +83,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
-        .orElse(null);
-    if (readStatus == null) {
-      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
-    }
+        .orElseThrow(() -> new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
 
     readStatus.setLastReadAt(updateReadStatusDto.newLastReadAt());
     readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
@@ -129,10 +122,8 @@ public class BasicReadStatusService implements ReadStatusService {
   public List<ReadStatusDto> updateByChannelId(String channelId,
       UpdateReadStatusDto updateReadStatusDto) {
 
-    Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
-    if (channel == null) {
-      throw new DiscodeitException(ErrorCode.CHANNEL_NOT_FOUND);
-    }
+    Channel channel = channelRepository.findById(UUID.fromString(channelId))
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
     List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(
         UUID.fromString(channelId));
@@ -176,10 +167,8 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   public boolean delete(String readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
-        .orElse(null);
-    if (readStatus == null) {
-      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
-    }
+        .orElseThrow(() -> new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
+    
     readStatusRepository.delete(readStatus);
     return true;
   }
