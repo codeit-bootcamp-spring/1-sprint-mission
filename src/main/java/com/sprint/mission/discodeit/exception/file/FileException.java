@@ -1,6 +1,9 @@
-package com.sprint.mission.discodeit.exception;
+package com.sprint.mission.discodeit.exception.file;
 
 import java.util.Map;
+
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 
 public abstract class FileException extends DiscodeitException {
 	protected FileException(ErrorCode errorCode, String message, Map<String, Object> details) {

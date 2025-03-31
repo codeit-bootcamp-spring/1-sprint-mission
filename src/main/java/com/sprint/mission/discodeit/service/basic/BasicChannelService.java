@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -14,6 +14,8 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -30,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BasicChannelService implements ChannelService {
 
 	private final ChannelRepository channelRepository;
-	//
 	private final ReadStatusRepository readStatusRepository;
 	private final MessageRepository messageRepository;
 	private final UserRepository userRepository;
@@ -44,6 +45,7 @@ public class BasicChannelService implements ChannelService {
 			String name = request.name();
 			String description = request.description();
 			Channel channel = new Channel(ChannelType.PUBLIC, name, description);
+			//채널 생성에서 중복 처리 관련 요구사항 없어 일단 제외
 
 			channelRepository.save(channel);
 			ChannelDto channelDto = channelMapper.toDto(channel);
@@ -85,7 +87,7 @@ public class BasicChannelService implements ChannelService {
 			.map(channelMapper::toDto)
 			.orElseThrow(() -> {
 				log.warn("Channel with id {} not found", channelId);
-				return new NoSuchElementException("Channel with id " + channelId + " not found");
+				return new ChannelNotFoundException(Map.of("channelId", channelId));
 			});
 	}
 
@@ -118,11 +120,11 @@ public class BasicChannelService implements ChannelService {
 			Channel channel = channelRepository.findById(channelId)
 				.orElseThrow(() -> {
 					log.warn("Channel with id {} not found", channelId);
-					return new NoSuchElementException("Channel with id " + channelId + " not found");
+					return new ChannelNotFoundException(Map.of("channelId", channelId));
 				});
 			if (channel.getType().equals(ChannelType.PRIVATE)) {
 				log.warn("Private channel cannot be updated");
-				throw new IllegalArgumentException("Private channel cannot be updated");
+				throw new PrivateChannelUpdateException(Map.of("channelId", channelId));
 			}
 			channel.update(newName, newDescription);
 			ChannelDto channelDto = channelMapper.toDto(channel);
@@ -141,7 +143,7 @@ public class BasicChannelService implements ChannelService {
 		try {
 			if (!channelRepository.existsById(channelId)) {
 				log.warn("Channel with id {} not found", channelId);
-				throw new NoSuchElementException("Channel with id " + channelId + " not found");
+				throw new ChannelNotFoundException(Map.of("channelId", channelId));
 			}
 
 			messageRepository.deleteAllByChannelId(channelId);

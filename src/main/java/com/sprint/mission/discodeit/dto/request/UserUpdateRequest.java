@@ -11,7 +11,7 @@ public record UserUpdateRequest(
 	@Size(max = 100, message = "새 이메일은 최대 100자까지 가능합니다.")
 	String newEmail,
 
-	@Size(min = 8, max = 60, message = "새 비밀번호는 8~60자여야 합니다.")
+	@Size(max = 60, message = "새 비밀번호는 최대 60자까지 가능합니다.")
 	String newPassword
 ) {
 }

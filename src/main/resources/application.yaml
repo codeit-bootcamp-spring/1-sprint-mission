@@ -7,8 +7,6 @@ spring:
       maxRequestSize: 30MB
   profiles:
     active: dev  # 기본 프로파일 (운영 환경에서는 prod로 변경)
-
-
 springdoc:
   api-docs:
     path: /api-docs
@@ -17,7 +15,6 @@ springdoc:
     path: /swagger-ui.html
     groups-order: ASC
     enabled: true
-
 discodeit:
   storage:
     type: local
@@ -25,3 +22,36 @@ discodeit:
       root-path: .discodeit/storage
 logging:
   config: classpath:logback-spring.xml
+
+#Actuator 엔드포인트 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+  #env enabled를 해야지 app관련 json이 리소스에 보이게 된다.
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java-version: 17
+    spring-boot-version: 3.4.0
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeitdb
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    ddl-auto: update
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
+  multipart:
+    maxFileSize: 10MB
+    maxRequestSize: 30MB

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +20,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -59,12 +62,12 @@ public class BasicMessageService implements MessageService {
 			Channel channel = channelRepository.findById(channelId)
 				.orElseThrow(() -> {
 					log.warn("Channel with id {} does not exist", channelId);
-					return new NoSuchElementException("Channel with id " + channelId + " does not exist");
+					return new ChannelNotFoundException(Map.of("channelId", channelId));
 				});
 			User author = userRepository.findById(authorId)
 				.orElseThrow(() -> {
 					log.warn("Author with id {} does not exist", authorId);
-					return new NoSuchElementException("Author with id " + authorId + " does not exist");
+					return new UserNotFoundException(Map.of("userId", authorId));
 				});
 
 			List<BinaryContent> attachments = binaryContentCreateRequests.stream()
@@ -107,7 +110,7 @@ public class BasicMessageService implements MessageService {
 			.map(messageMapper::toDto)
 			.orElseThrow(() -> {
 				log.warn("Message with id {} not found", messageId);
-				return new NoSuchElementException("Message with id " + messageId + " not found");
+				return new MessageNotFoundException(Map.of("messageId", messageId));
 			});
 	}
 
@@ -137,38 +140,29 @@ public class BasicMessageService implements MessageService {
 	@Override
 	public MessageDto update(UUID messageId, MessageUpdateRequest request) {
 		log.info("Updating message with id: {}, request: {}", messageId, request);
-		try {
-			String newContent = request.newContent();
-			Message message = messageRepository.findById(messageId)
-				.orElseThrow(() -> {
-					log.warn("Message with id {} not found", messageId);
-					return new NoSuchElementException("Message with id " + messageId + " not found");
-				});
-			message.update(newContent);
-			MessageDto messageDto = messageMapper.toDto(message);
-			log.info("Updated message: {}", messageDto);
-			return messageDto;
-		} catch (Exception e) {
-			log.error("Error updating message with id: {}", messageId, e);
-			throw e;
-		}
+		String newContent = request.newContent();
+		Message message = messageRepository.findById(messageId)
+			.orElseThrow(() -> {
+				log.warn("Message with id {} not found", messageId);
+				return new MessageNotFoundException(Map.of("messageId", messageId));
+			});
+
+		message.update(newContent);
+		MessageDto messageDto = messageMapper.toDto(message);
+		log.info("Updated message: {}", messageDto);
+		return messageDto;
 	}
 
 	@Transactional
 	@Override
 	public void delete(UUID messageId) {
 		log.info("Deleting message with id: {}", messageId);
-		try {
-			if (!messageRepository.existsById(messageId)) {
-				log.warn("Message with id {} not found", messageId);
-				throw new NoSuchElementException("Message with id " + messageId + " not found");
-			}
-
-			messageRepository.deleteById(messageId);
-			log.info("Deleted message with id: {}", messageId);
-		} catch (Exception e) {
-			log.error("Error deleting message with id: {}", messageId, e);
-			throw e;
+		if (!messageRepository.existsById(messageId)) {
+			log.warn("Message with id {} not found", messageId);
+			throw new MessageNotFoundException(Map.of("messageId", messageId));
 		}
+
+		messageRepository.deleteById(messageId);
+		log.info("Deleted message with id: {}", messageId);
 	}
 }

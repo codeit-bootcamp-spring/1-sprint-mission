@@ -77,4 +77,17 @@ public class GlobalExceptionHandler {
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
+
+	@ExceptionHandler(RuntimeException.class)
+	public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
+		log.error("RuntimeException: ", e);
+		ErrorResponse errorResponse = new ErrorResponse(
+			HttpStatus.BAD_REQUEST.value(),
+			e.getClass().getSimpleName(),
+			ErrorCode.INVALID_INPUT_VALUE.getCode(),
+			e.getMessage()
+		);
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
 }

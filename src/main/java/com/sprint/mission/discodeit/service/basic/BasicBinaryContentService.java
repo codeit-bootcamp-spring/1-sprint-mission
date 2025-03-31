@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.file.FileNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -59,8 +60,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 			.map(binaryContentMapper::toDto)
 			.orElseThrow(() -> {
 				log.warn("BinaryContent with id {} not found", binaryContentId);
-				return new NoSuchElementException(
-					"BinaryContent with id " + binaryContentId + " not found");
+				throw new FileNotFoundException(Map.of("fileId", binaryContentId));
 			});
 	}
 
@@ -77,16 +77,11 @@ public class BasicBinaryContentService implements BinaryContentService {
 	@Override
 	public void delete(UUID binaryContentId) {
 		log.info("Deleting binary content with id: {}", binaryContentId);
-		try {
-			if (!binaryContentRepository.existsById(binaryContentId)) {
-				log.warn("BinaryContent with id {} not found", binaryContentId);
-				throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
-			}
-			binaryContentRepository.deleteById(binaryContentId);
-			log.info("Deleted binary content with id: {}", binaryContentId);
-		} catch (Exception e) {
-			log.error("Error deleting binary content with id: {}", binaryContentId, e);
-			throw e;
+		if (!binaryContentRepository.existsById(binaryContentId)) {
+			log.warn("BinaryContent with id {} not found", binaryContentId);
+			throw new FileNotFoundException(Map.of("fileId", binaryContentId));
 		}
+		binaryContentRepository.deleteById(binaryContentId);
+		log.info("Deleted binary content with id: {}", binaryContentId);
 	}
 }
