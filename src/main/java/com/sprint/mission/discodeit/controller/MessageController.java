@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.reponse.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,16 +35,16 @@ public class MessageController {
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<MessageDto> createMessage(
-      @RequestPart(value = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
+      @Valid @RequestPart(value = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "binaryContents", required = false) List<MultipartFile> attachments)
       throws Exception {
     log.info("메세지 생성 요청(Request): messageContent={}, hasProfileImage={}",
         messageCreateRequest.content(),
-        !attachments.isEmpty());
+        attachments != null);
 
     // 메세지 첨부 파일 생성
     List<BinaryContentCreateRequest> binaryContentCreateRequests = new ArrayList<>();
-    if (!attachments.isEmpty()) {
+    if (attachments != null) {
       for (MultipartFile file : attachments) {
         log.debug("메세지 첨부 파일 생성: fileName={}", file.getName());
         binaryContentCreateRequests.add(new BinaryContentCreateRequest(file));
@@ -63,7 +64,7 @@ public class MessageController {
 
   @PatchMapping(value = "/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
-      @RequestBody MessageUpdateRequest messageUpdateRequest) {
+      @Valid @RequestBody MessageUpdateRequest messageUpdateRequest) {
     log.info("메세지 수정 요청(Request): messageChanged={}", !messageUpdateRequest.newMessage().isEmpty());
 
     // 메세지 수정
