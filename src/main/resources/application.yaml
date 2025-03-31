@@ -1,15 +1,12 @@
 spring:
+  profiles:
+    active: dev
   application: # 애플리케이션 기본 설정
     name: discodeit  # 애플리케이션 이름 설정
   servlet:
     multipart: # multipart 파일 업로드 설정
       max-file-size: 10MB  # 파일 하나 최대 크기
       max-request-size: 30MB # 요청당 최대 크기
-  datasource: # 데이터베이스 설정
-    driver-class-name: org.postgresql.Driver  # PostgreSQL 데이터베이스 사용
-    url: jdbc:postgresql://localhost:5432/discodeit # 연결 URL
-    username: discodeit_user  # 사용자
-    password: discodeit1234 # 비밀번호
   jpa: # JPA, Hibernate 설정
     hibernate:
       ddl-auto: validate  # 데이터베이스 테이블과 엔티티 매핑 검증만 수행, 운영환경에서 일반적으로 validate 사용
@@ -21,10 +18,9 @@ spring:
     # 비활성화 시 서비스 레이어에서만 영속성 컨텍스트 사용 가능
     # 성능 최적화에 도움됨 (특히, Lazy Loading 관련 문제 사전 방지)
 
-logging: # Hibernate SQL 로그 설정
+logging:
   level:
-    org.hibernate.SQL: debug  # Hibernate가 실행하는 SQL 쿼리를 로그로 출력
-    org.hibernate.orm.jdbc.bind: trace  # SQL에 바인딩된 실제 값을 출력 (? 대신 실제 값 보임)
+    root: info  # 기본 로깅 레벨
 
 discodeit: # 파일 저장소 설정
   storage:

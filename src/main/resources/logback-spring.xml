@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+
+  <!-- 로그 레벨 설정 -->
+  <root level="DEBUG">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+
+  <!-- Console appender 설정 - log 메시지 출력 대상 설정 -->
+  <!-- 콘솔 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <Pattern>${PATTERN}</Pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일 -->
+  <!-- 날짜별로 파일명을 다르게 하기 위해 RollingFileAppender 사용 -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--  하루 단위로 로그 파일을 롤링하고, 30일간 보관하도록 설정 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <Pattern>${PATTERN}</Pattern>
+    </encoder>
+  </appender>
+
+
+  <!-- log 패턴 -->
+  <!-- {년}-{월}-{일} {시}:{분}:{초}:{밀리초} [{스레드명}] {로그 레벨(5글자로 맞춤)} {로거 이름(최대 36글자)} - {로그 메시지}{줄바꿈} -->
+  <property name="PATTERN"
+    value="%d{yyyy-MM-dd HH:mm:ss:SSS} %magenta([%thread]) %highlight([%-5level]) %logger{36} - %msg %n"/>
+
+  <!-- log 파일 저장 장소 설정 -->
+  <!-- profile에 따라 분리 - 아직은 경로가 동일하지만, 서버 띄울 때 prod 경로가 변경될 것으로 예상하여 미리 분리 -->
+  <springProfile name="dev">
+    <property name="LOG_PATH" value="./logs"/>
+  </springProfile>
+  <springProfile name="prod">
+    <property name="LOG_PATH" value="./logs"/>
+  </springProfile>
+  
+</configuration>

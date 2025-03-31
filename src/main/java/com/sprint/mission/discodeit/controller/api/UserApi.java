@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.userStatusDto.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -103,6 +104,6 @@ public interface UserApi {
   })
   ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @Parameter(description = "상태를 변경할 User ID") UUID userId,
-      @Parameter(description = "변경할 User 온라인 상태 정보") UpdateUserRequest request
+      @Parameter(description = "변경할 User 온라인 상태 정보") UpdateUserStatusRequest request
   );
 }
