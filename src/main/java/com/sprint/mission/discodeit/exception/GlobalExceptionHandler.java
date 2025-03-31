@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
-import java.util.NoSuchElementException;
+import com.sprint.mission.discodeit.dto.error.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
