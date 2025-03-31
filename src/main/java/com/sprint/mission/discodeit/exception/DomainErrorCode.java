@@ -20,6 +20,7 @@ public enum DomainErrorCode {
   FILE_STORAGE_FAILED(HttpStatus.BAD_REQUEST, "BINARY_001", "파일 저장에 실패하였습니다."),
   FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "BINARY_002", "해당 파일이 존재하지 않습니다."),
   INVALID_CHANNEL_TYPE(HttpStatus.BAD_REQUEST, "CHANNEL_001", "채널 타입이 올바르지 않습니다."),
+  CHANNEL_INVALID_OPERATION(HttpStatus.CONFLICT, "CHANNEL_002", "채널을 사용할 수 없습니다."),
   DUPLICATED_STATUS(HttpStatus.CONFLICT, "READ_STATUS_001", "이미 읽은 상태입니다."),
   STORAGE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "STORAGE_001", "저장소에 문제가 발생하였습니다."),
   STORAGE_NOT_SAVE(HttpStatus.INTERNAL_SERVER_ERROR, "STORAGE_002", "저장소에 문제가 발생하였습니다."),
