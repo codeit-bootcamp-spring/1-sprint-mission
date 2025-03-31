@@ -1,6 +1,11 @@
 spring:
   application:
     name: discodeit
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
   profiles.active: ${ACTIVE:dev}
   servlet:
     multipart:
@@ -35,7 +40,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers
+        include: "*"
         exclude: env
   endpoint:
     health:
