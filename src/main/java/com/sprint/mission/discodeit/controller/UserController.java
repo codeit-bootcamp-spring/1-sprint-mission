@@ -10,11 +10,12 @@ import com.sprint.mission.discodeit.dto.userStatusDto.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import java.io.IOException;
+import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-// 사용자 관리 controller
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -43,9 +44,14 @@ public class UserController implements UserApi {
   public ResponseEntity<UserDto> create(
       @RequestPart("userRequest") CreateUserRequest userRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
-    Optional<CreateBinaryContentRequest> profileRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
+
+    log.info("User 생성 요청 : username={}", userRequest.username());
+
+    Optional<CreateBinaryContentRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
+        profile);
     UserDto userDto = userService.create(userRequest, profileRequest);
+
+    log.info("User 생성 성공 : userId={}", userDto.id());
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -58,9 +64,14 @@ public class UserController implements UserApi {
       @PathVariable("userId") UUID userId,
       @RequestPart("userRequest") UpdateUserRequest userRequest,
       @RequestPart("profile") MultipartFile profile) {
-    Optional<CreateBinaryContentRequest> profileRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
+
+    log.info("User 수정 요청 : userId={}", userId);
+
+    Optional<CreateBinaryContentRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
+        profile);
     UserDto userDto = userService.update(userId, userRequest, profileRequest);
+
+    log.info("User 수정 성공 : userId={}", userId);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -70,7 +81,13 @@ public class UserController implements UserApi {
   @Override
   @DeleteMapping(path = "{userId}")
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
+
+    log.info("User 삭제 요청 : userId={}", userId);
+
     userService.delete(userId);
+
+    log.info("User 삭제 성공 : userId={}", userId);
+
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
@@ -79,7 +96,13 @@ public class UserController implements UserApi {
   @Override
   @GetMapping
   public ResponseEntity<List<UserDto>> findAll() {
+
+    log.info("User 다건 조회 요청");
+
     List<UserDto> userDtos = userService.findAll();
+
+    log.info("User 다건 조회 성공 : 반환 개수={}", userDtos.size());
+
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userDtos);
@@ -90,27 +113,15 @@ public class UserController implements UserApi {
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @PathVariable("userId") UUID userId,
       @RequestBody UpdateUserStatusRequest request) {
+
+    log.info("UserStatus 수정 요청 : userId={}", userId);
+
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, request);
+
+    log.info("UserStatus 수정 성공 : userStatusId={}", userStatusDto.id());
+
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userStatusDto);
-  }
-
-
-  private Optional<CreateBinaryContentRequest> resolveProfileRequest(MultipartFile profileFile) {
-    if (profileFile.isEmpty()) {
-      return Optional.empty();
-    } else {
-      try {
-        CreateBinaryContentRequest binaryContentRequest = new CreateBinaryContentRequest(
-            profileFile.getOriginalFilename(),
-            profileFile.getContentType(),
-            profileFile.getBytes()
-        );
-        return Optional.of(binaryContentRequest);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
   }
 }

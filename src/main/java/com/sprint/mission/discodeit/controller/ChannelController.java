@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChannelController implements ChannelApi {
 
+  private static final Logger log = LoggerFactory.getLogger(ChannelController.class);
   private final ChannelService channelService;
 
   @Override
@@ -33,7 +36,11 @@ public class ChannelController implements ChannelApi {
   public ResponseEntity<ChannelDto> create(
       @RequestBody CreatePublicChannelRequest request) {
 
+    log.info("Public Channel 생성 요청 : channelName={}", request.name());
+
     ChannelDto channelDto = channelService.create(request);
+
+    log.info("Public Channel 생성 성공 : channelId={}", channelDto.id());
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -45,7 +52,11 @@ public class ChannelController implements ChannelApi {
   public ResponseEntity<ChannelDto> create(
       @RequestBody CreatePrivateChannelRequest request) {
 
+    log.info("Private Channel 생성 요청 : participantIds={}", request.participantIds());
+
     ChannelDto channelDto = channelService.create(request);
+
+    log.info("Private Channel 생성 성공 : channelId={}", channelDto.id());
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -58,7 +69,11 @@ public class ChannelController implements ChannelApi {
       @PathVariable("channelId") UUID channelId,
       @RequestBody UpdatePublicChannelRequest request) {
 
+    log.info("Public Channel 수정 요청 : channelId={}", channelId);
+
     ChannelDto channelDto = channelService.update(channelId, request);
+
+    log.info("Public Channel 수정 성공 : channelId={}", channelId);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -69,7 +84,11 @@ public class ChannelController implements ChannelApi {
   @DeleteMapping(path = "{channelId}")
   public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
 
+    log.info("Public Channel 삭제 요청 : channelId={}", channelId);
+
     channelService.delete(channelId);
+
+    log.info("Public Channel 삭제 성공 : channelId={}", channelId);
 
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -80,7 +99,11 @@ public class ChannelController implements ChannelApi {
   @GetMapping
   public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
 
+    log.info("Channel 다건 조회 요청 : userId={}", userId);
+
     List<ChannelDto> channelDtos = channelService.findAllByUserId(userId);
+
+    log.info("Channel 다건 조회 성공 : 반환 개수={}", channelDtos.size());
 
     return ResponseEntity
         .status(HttpStatus.OK)
