@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/api/users")
 public class UserController implements UserApi {
 
@@ -42,12 +44,25 @@ public class UserController implements UserApi {
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.debug("사용자 생성 요청 수신 - username: {}, email: {}", userCreateRequest.username(),
+        userCreateRequest.email());
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    UserDto createdUser = userService.create(userCreateRequest, profileRequest);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdUser);
+    try {
+      UserDto createdUser = userService.create(userCreateRequest, profileRequest);
+      log.info("사용자 생성 성공 - username: {}, email: {}", userCreateRequest.username(),
+          userCreateRequest.email());
+      return ResponseEntity
+          .status(HttpStatus.CREATED)
+          .body(createdUser);
+    } catch (Exception e) {
+      log.error("사용자 생성 실패 - username: {}, email: {}, 원인: {}", userCreateRequest.username(),
+          userCreateRequest.email(), e.getMessage());
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .build();
+    }
+
   }
 
   @PatchMapping(
@@ -60,21 +75,43 @@ public class UserController implements UserApi {
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.info("사용자 정보 수정 요청 수신 - userId: {}", userId);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-        .flatMap(this::resolveProfileRequest);
-    UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedUser);
+        .flatMap(p -> {
+          log.debug("프로필 첨부파일 수신 - fileName: {}, size: {}", p.getOriginalFilename(), p.getSize());
+          return resolveProfileRequest(p);
+        });
+
+    try {
+      UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+      log.info("사용자 정보 수정 성공 - userId: {}", userId);
+      return ResponseEntity
+          .status(HttpStatus.OK)
+          .body(updatedUser);
+    } catch (Exception e) {
+      log.error("사용자 정보 수정 실패 - userId: {}, 원인: {}", userId, e.getMessage());
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .build();
+    }
   }
 
   @DeleteMapping(path = "{userId}")
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
-    userService.delete(userId);
-    return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .build();
+    log.info("사용자 삭제 요청 수신 - userId: {}", userId);
+    try {
+      userService.delete(userId);
+      log.info("사용자 삭제 성공 - userId: {}", userId);
+      return ResponseEntity
+          .status(HttpStatus.NO_CONTENT)
+          .build();
+    } catch (Exception e) {
+      log.error("사용자 삭제 실패 - userId: {}, 원인: {}", userId, e.getMessage());
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .build();
+    }
   }
 
   @GetMapping
@@ -90,14 +127,23 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
-    UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedUserStatus);
+    log.debug("사용자 상태 정보 수정 요청 수신 - userId: {}", userId);
+    try {
+      UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
+      return ResponseEntity
+          .status(HttpStatus.OK)
+          .body(updatedUserStatus);
+    } catch (Exception e) {
+      log.error("사용자 상태 정보 수정 실패 - userId: {}, 원인: {}", userId, e.getMessage());
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .build();
+    }
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
     if (profileFile.isEmpty()) {
+      log.warn("첨부된 프로필 파일이 비어 있습니다 - fileName: {}", profileFile.getOriginalFilename());
       return Optional.empty();
     } else {
       try {
@@ -106,8 +152,14 @@ public class UserController implements UserApi {
             profileFile.getContentType(),
             profileFile.getBytes()
         );
+        log.debug("프로필 파일 처리 완료 - fileName: {}, contentType: {}, size: {} bytes",
+            profileFile.getOriginalFilename(),
+            profileFile.getContentType(),
+            profileFile.getSize());
         return Optional.of(binaryContentCreateRequest);
       } catch (IOException e) {
+        log.error("프로필 파일 처리 실패 - fileName: {}, 원인: {}", profileFile.getOriginalFilename(),
+            e.getMessage(), e);
         throw new RuntimeException(e);
       }
     }

@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -34,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/api/messages")
 public class MessageController implements MessageApi {
 
@@ -44,42 +46,77 @@ public class MessageController implements MessageApi {
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
-        .map(files -> files.stream()
-            .map(file -> {
-              try {
-                return new BinaryContentCreateRequest(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getBytes()
-                );
-              } catch (IOException e) {
-                throw new RuntimeException(e);
-              }
-            })
-            .toList())
-        .orElse(new ArrayList<>());
-    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdMessage);
+    log.info("메시지 생성 요청 수신 - channelId: {}, authorId: {}, 첨부파일 수: {}",
+        messageCreateRequest.channelId(),
+        messageCreateRequest.authorId(),
+        attachments != null ? attachments.size() : 0);
+    try {
+      List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+          .map(files -> files.stream()
+              .map(file -> {
+                try {
+                  return new BinaryContentCreateRequest(
+                      file.getOriginalFilename(),
+                      file.getContentType(),
+                      file.getBytes()
+                  );
+                } catch (IOException e) {
+                  log.error("첨부파일 처리 중 IOException - fileName: {}, 원인: {}",
+                      file.getOriginalFilename(), e.getMessage(), e);
+                  throw new RuntimeException(e);
+                }
+              })
+              .toList())
+          .orElse(new ArrayList<>());
+      MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+      log.info("메시지 생성 성공 - messageId: {}, channelId: {}", createdMessage.id(),
+          createdMessage.channelId());
+      return ResponseEntity
+          .status(HttpStatus.CREATED)
+          .body(createdMessage);
+    } catch (Exception e) {
+      log.error("메시지 생성 실패 - channelId: {}, authorId: {}, 원인: {}",
+          messageCreateRequest.channelId(), messageCreateRequest.authorId(), e.getMessage(), e);
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .build();
+    }
   }
 
   @PatchMapping(path = "{messageId}")
   public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request) {
-    MessageDto updatedMessage = messageService.update(messageId, request);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedMessage);
+    log.info("메시지 업데이트 요청 수신 - messageId: {}", messageId);
+    try {
+      MessageDto updatedMessage = messageService.update(messageId, request);
+      log.info("메시지 업데이트 성공 - messageId: {}", messageId);
+      return ResponseEntity
+          .status(HttpStatus.OK)
+          .body(updatedMessage);
+    } catch (Exception e) {
+      log.error("메시지 업데이트 실패 - messageId: {}, 원인: {}", messageId, e.getMessage(), e);
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .build();
+    }
+
   }
 
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
-    messageService.delete(messageId);
-    return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .build();
+    log.info("메시지 삭제 요청 수신 - messageId: {}", messageId);
+    try {
+      messageService.delete(messageId);
+      log.info("메시지 삭제 성공 - messageId: {}", messageId);
+      return ResponseEntity
+          .status(HttpStatus.NO_CONTENT)
+          .build();
+    } catch (Exception e) {
+      log.error("메시지 삭제 실패 - messageId: {}, 원인: {}", messageId, e.getMessage(), e);
+      return ResponseEntity
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .build();
+    }
   }
 
   @GetMapping

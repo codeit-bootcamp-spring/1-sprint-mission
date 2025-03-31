@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
+@Slf4j
 @RequestMapping("/api/binaryContents")
 public class BinaryContentController implements BinaryContentApi {
 
@@ -44,7 +47,24 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping(path = "{binaryContentId}/download")
   public ResponseEntity<?> download(
       @PathVariable("binaryContentId") UUID binaryContentId) {
-    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
-    return binaryContentStorage.download(binaryContentDto);
+    log.info("파일 다운로드 요청 수신 - binaryContentId: {}", binaryContentId);
+    try {
+      BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+      ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
+
+      log.info("파일 다운로드 처리 완료 - binaryContentId: {}, fileName: {}",
+          binaryContentId, binaryContentDto.fileName());
+
+      return response;
+
+    } catch (NoSuchElementException e) {
+      log.warn("파일 다운로드 실패 - 파일을 찾을 수 없음 - binaryContentId: {}", binaryContentId);
+      throw e;
+
+    } catch (Exception e) {
+      log.error("파일 다운로드 실패 - binaryContentId: {}, 원인: {}",
+          binaryContentId, e.getMessage(), e);
+      throw e;
+    }
   }
 }

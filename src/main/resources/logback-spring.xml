@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ROLLING_FILE">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+    <file>${LOG_PATH}/application.log</file>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/application.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <property name="LOG_PATH" value=".logs"/>
+
+  <property name="LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="ROLLING_FILE"/>
+  </root>
+
+</configuration>
