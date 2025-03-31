@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
@@ -42,9 +44,15 @@ public class UserController implements UserApi {
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.info("사용자 등록 API 호출 - username: {}, email: {}",
+            userCreateRequest.username(), userCreateRequest.email());
+
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
+
     UserDto createdUser = userService.create(userCreateRequest, profileRequest);
+    log.info("사용자 등록 완료 - userId : {}", createdUser.id());
+
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdUser);
@@ -60,9 +68,13 @@ public class UserController implements UserApi {
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.info("✅사용자 수정 API 호출 - userId : {}", userId);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
+
     UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+    log.info("✅사용자 수정 완료 - userId : {}", userId);
+
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUser);
@@ -71,7 +83,10 @@ public class UserController implements UserApi {
   @DeleteMapping(path = "{userId}")
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
+    log.info("✅사용자 삭제 API 호출 - userId : {}", userId);
     userService.delete(userId);
+
+    log.info("✅사용자 삭제 완료 - userId : {}", userId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();

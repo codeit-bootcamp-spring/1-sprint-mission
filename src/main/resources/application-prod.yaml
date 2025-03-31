@@ -1,0 +1,13 @@
+server:
+  port: 80   # 운영 포트는 일반적으로 80 (HTTP)
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://prod-db.mycompany.com:5432/discodeit
+    username: prod_user
+    password: strong_password_here
+
+logging:
+  level:
+    com.sprint.mission.discodeit: info    # 운영에선 info 이상만 출력

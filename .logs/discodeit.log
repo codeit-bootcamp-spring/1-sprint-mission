@@ -1,0 +1,1257 @@
+25-03-31 14:23:25.213 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.13 with PID 5124 (C:\Users\eoals\codeitMission\1-sprint-mission\build\classes\java\main started by eoals in C:\Users\eoals\codeitMission\1-sprint-mission)
+25-03-31 14:23:25.218 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-03-31 14:23:25.219 [main] INFO  c.s.m.discodeit.DiscodeitApplication - The following 1 profile is active: "dev"
+25-03-31 14:23:26.034 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-03-31 14:23:26.107 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 65 ms. Found 6 JPA repository interfaces.
+25-03-31 14:23:26.617 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+25-03-31 14:23:26.630 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+25-03-31 14:23:26.631 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+25-03-31 14:23:26.631 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-03-31 14:23:26.702 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+25-03-31 14:23:26.702 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1443 ms
+25-03-31 14:23:26.807 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+25-03-31 14:23:27.154 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@163e8949
+25-03-31 14:23:27.157 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+25-03-31 14:23:27.276 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-03-31 14:23:27.374 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-03-31 14:23:27.427 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+25-03-31 14:23:27.990 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-03-31 14:23:28.163 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-03-31 14:23:29.336 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-03-31 14:23:29.410 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-03-31 14:23:29.604 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-03-31 14:23:30.153 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-03-31 14:23:30.464 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+25-03-31 14:23:30.477 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+25-03-31 14:23:30.484 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 5.89 seconds (process running for 6.454)
+25-03-31 14:23:30.666 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+25-03-31 14:23:30.667 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+25-03-31 14:23:30.668 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+25-03-31 14:23:35.516 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.profile_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+25-03-31 14:23:35.517 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [안대민]
+25-03-31 14:23:35.547 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        us1_0.id,
+        us1_0.created_at,
+        us1_0.last_active_at,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_statuses us1_0 
+    where
+        us1_0.user_id=?
+25-03-31 14:23:35.547 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.605 [http-nio-8080-exec-4] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id
+25-03-31 14:23:35.635 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.635 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.635 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id
+25-03-31 14:23:35.636 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.636 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.642 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        us1_0.id,
+        us1_0.created_at,
+        us1_0.last_active_at,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_statuses us1_0 
+    where
+        us1_0.user_id=?
+25-03-31 14:23:35.642 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        us1_0.id,
+        us1_0.created_at,
+        us1_0.last_active_at,
+        us1_0.updated_at,
+        us1_0.user_id 
+    from
+        user_statuses us1_0 
+    where
+        us1_0.user_id=?
+25-03-31 14:23:35.642 [http-nio-8080-exec-9] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.642 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.648 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        bc1_0.id,
+        bc1_0.content_type,
+        bc1_0.created_at,
+        bc1_0.file_name,
+        bc1_0.size 
+    from
+        binary_contents bc1_0 
+    where
+        bc1_0.id=?
+25-03-31 14:23:35.649 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [48796e32-4375-4294-bdeb-9c1f915fbbd6]
+25-03-31 14:23:35.650 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?, ?)
+25-03-31 14:23:35.651 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [PUBLIC]
+25-03-31 14:23:35.651 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:35.651 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.660 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.660 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.661 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.661 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:35.662 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        bc1_0.id,
+        bc1_0.content_type,
+        bc1_0.created_at,
+        bc1_0.file_name,
+        bc1_0.size 
+    from
+        binary_contents bc1_0 
+    where
+        bc1_0.id=?
+25-03-31 14:23:35.662 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [48796e32-4375-4294-bdeb-9c1f915fbbd6]
+25-03-31 14:23:35.664 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.664 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [bfc6f154-08bd-4bf2-8637-564097c55ba0]
+25-03-31 14:23:35.667 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        read_statuses rs1_0 
+    join
+        users u1_0 
+            on u1_0.id=rs1_0.user_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    where
+        rs1_0.channel_id=?
+25-03-31 14:23:35.667 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.666 [http-nio-8080-exec-2] WARN  o.a.coyote.http11.Http11Processor - The HTTP response header [Content-Disposition] with value [attachment; filename="이력서 사진.jpg"] has been removed from the response because it is invalid
+java.lang.IllegalArgumentException: The Unicode character [이] at code point [51,060] cannot be encoded as it is outside the permitted range of 0 to 255
+	at org.apache.tomcat.util.buf.MessageBytes.toBytesSimple(MessageBytes.java:310)
+	at org.apache.tomcat.util.buf.MessageBytes.toBytes(MessageBytes.java:283)
+	at org.apache.coyote.http11.Http11OutputBuffer.write(Http11OutputBuffer.java:400)
+	at org.apache.coyote.http11.Http11OutputBuffer.sendHeader(Http11OutputBuffer.java:379)
+	at org.apache.coyote.http11.Http11Processor.writeHeaders(Http11Processor.java:1070)
+	at org.apache.coyote.http11.Http11Processor.prepareResponse(Http11Processor.java:1057)
+	at org.apache.coyote.AbstractProcessor.action(AbstractProcessor.java:377)
+	at org.apache.coyote.Response.action(Response.java:208)
+	at org.apache.coyote.http11.Http11OutputBuffer.doWrite(Http11OutputBuffer.java:187)
+	at org.apache.coyote.Response.doWrite(Response.java:633)
+	at org.apache.catalina.connector.OutputBuffer.realWriteBytes(OutputBuffer.java:329)
+	at org.apache.catalina.connector.OutputBuffer.flushByteBuffer(OutputBuffer.java:776)
+	at org.apache.catalina.connector.OutputBuffer.append(OutputBuffer.java:673)
+	at org.apache.catalina.connector.OutputBuffer.writeBytes(OutputBuffer.java:376)
+	at org.apache.catalina.connector.OutputBuffer.write(OutputBuffer.java:354)
+	at org.apache.catalina.connector.CoyoteOutputStream.write(CoyoteOutputStream.java:103)
+	at org.springframework.web.context.request.async.StandardServletAsyncWebRequest$LifecycleServletOutputStream.write(StandardServletAsyncWebRequest.java:401)
+	at java.base/java.io.InputStream.transferTo(InputStream.java:783)
+	at org.springframework.http.converter.ResourceHttpMessageConverter.writeContent(ResourceHttpMessageConverter.java:160)
+	at org.springframework.http.converter.ResourceHttpMessageConverter.writeInternal(ResourceHttpMessageConverter.java:115)
+	at org.springframework.http.converter.ResourceHttpMessageConverter.writeInternal(ResourceHttpMessageConverter.java:46)
+	at org.springframework.http.converter.AbstractHttpMessageConverter.write(AbstractHttpMessageConverter.java:235)
+	at org.springframework.web.servlet.mvc.method.annotation.AbstractMessageConverterMethodProcessor.writeWithMessageConverters(AbstractMessageConverterMethodProcessor.java:344)
+	at org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor.handleReturnValue(HttpEntityMethodProcessor.java:261)
+	at org.springframework.web.method.support.HandlerMethodReturnValueHandlerComposite.handleReturnValue(HandlerMethodReturnValueHandlerComposite.java:78)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:136)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+25-03-31 14:23:35.671 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.671 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.680 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.680 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.680 [http-nio-8080-exec-4] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.681 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.682 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?, ?)
+25-03-31 14:23:35.682 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [PUBLIC]
+25-03-31 14:23:35.682 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:35.682 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.684 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.684 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:35.685 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.685 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [bfc6f154-08bd-4bf2-8637-564097c55ba0]
+25-03-31 14:23:35.686 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        read_statuses rs1_0 
+    join
+        users u1_0 
+            on u1_0.id=rs1_0.user_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    where
+        rs1_0.channel_id=?
+25-03-31 14:23:35.686 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.689 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.689 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.695 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    update
+        user_statuses 
+    set
+        last_active_at=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+25-03-31 14:23:35.695 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    update
+        user_statuses 
+    set
+        last_active_at=?,
+        updated_at=?,
+        user_id=? 
+    where
+        id=?
+25-03-31 14:23:35.696 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.696 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.696 [http-nio-8080-exec-9] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-03-31T05:23:35.631Z]
+25-03-31 14:23:35.696 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-03-31T05:23:35.632Z]
+25-03-31 14:23:35.697 [http-nio-8080-exec-9] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-03-31T05:23:35.666466200Z]
+25-03-31 14:23:35.697 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-03-31T05:23:35.666466200Z]
+25-03-31 14:23:35.697 [http-nio-8080-exec-9] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.697 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.697 [http-nio-8080-exec-9] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [ad0cf3f9-76f6-442f-88c4-a4a5f96e38ff]
+25-03-31 14:23:35.697 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [ad0cf3f9-76f6-442f-88c4-a4a5f96e38ff]
+25-03-31 14:23:35.711 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id
+25-03-31 14:23:35.724 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.725 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.725 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.725 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:35.729 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?, ?)
+25-03-31 14:23:35.729 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [PUBLIC]
+25-03-31 14:23:35.729 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:35.729 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.732 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.732 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:35.735 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.735 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [bfc6f154-08bd-4bf2-8637-564097c55ba0]
+25-03-31 14:23:35.735 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        read_statuses rs1_0 
+    join
+        users u1_0 
+            on u1_0.id=rs1_0.user_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    where
+        rs1_0.channel_id=?
+25-03-31 14:23:35.736 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.742 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:35.742 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:35.752 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:35.752 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:38.730 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:38.730 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:38.733 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?, ?)
+25-03-31 14:23:38.733 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [PUBLIC]
+25-03-31 14:23:38.733 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:38.733 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:38.735 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:38.736 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:38.737 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:38.737 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [bfc6f154-08bd-4bf2-8637-564097c55ba0]
+25-03-31 14:23:38.739 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        read_statuses rs1_0 
+    join
+        users u1_0 
+            on u1_0.id=rs1_0.user_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    where
+        rs1_0.channel_id=?
+25-03-31 14:23:38.739 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:38.741 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:38.742 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:38.751 [http-nio-8080-exec-4] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:38.751 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:41.730 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:41.730 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:41.732 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?, ?)
+25-03-31 14:23:41.732 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [PUBLIC]
+25-03-31 14:23:41.732 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:41.732 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:41.735 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:41.735 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:41.736 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:41.736 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [bfc6f154-08bd-4bf2-8637-564097c55ba0]
+25-03-31 14:23:41.737 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        read_statuses rs1_0 
+    join
+        users u1_0 
+            on u1_0.id=rs1_0.user_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    where
+        rs1_0.channel_id=?
+25-03-31 14:23:41.737 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:41.739 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:41.739 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:41.748 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:41.748 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:44.731 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:44.731 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:44.734 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?, ?)
+25-03-31 14:23:44.734 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [PUBLIC]
+25-03-31 14:23:44.734 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:44.734 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:44.736 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:44.736 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:44.738 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:44.738 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [bfc6f154-08bd-4bf2-8637-564097c55ba0]
+25-03-31 14:23:44.738 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        read_statuses rs1_0 
+    join
+        users u1_0 
+            on u1_0.id=rs1_0.user_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    where
+        rs1_0.channel_id=?
+25-03-31 14:23:44.739 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:44.742 [http-nio-8080-exec-10] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:44.743 [http-nio-8080-exec-10] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:44.749 [http-nio-8080-exec-9] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:44.749 [http-nio-8080-exec-9] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:47.725 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:47.725 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:47.726 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?, ?)
+25-03-31 14:23:47.726 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [PUBLIC]
+25-03-31 14:23:47.727 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:47.727 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:47.729 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:47.729 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:47.731 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:47.731 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [bfc6f154-08bd-4bf2-8637-564097c55ba0]
+25-03-31 14:23:47.731 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        read_statuses rs1_0 
+    join
+        users u1_0 
+            on u1_0.id=rs1_0.user_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    where
+        rs1_0.channel_id=?
+25-03-31 14:23:47.732 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:47.733 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:47.733 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:47.737 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:47.738 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:50.725 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:50.725 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:50.726 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?, ?)
+25-03-31 14:23:50.726 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [PUBLIC]
+25-03-31 14:23:50.726 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:50.726 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:50.728 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:50.728 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [deccbcd5-4694-4c87-9211-54d9f6670be4]
+25-03-31 14:23:50.728 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:50.729 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [bfc6f154-08bd-4bf2-8637-564097c55ba0]
+25-03-31 14:23:50.729 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id,
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        read_statuses rs1_0 
+    join
+        users u1_0 
+            on u1_0.id=rs1_0.user_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    where
+        rs1_0.channel_id=?
+25-03-31 14:23:50.729 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:50.731 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-03-31 14:23:50.731 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [42e2ebdc-d39d-417c-8580-1307e3b3f850]
+25-03-31 14:23:50.736 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        rs1_0.id,
+        rs1_0.channel_id,
+        rs1_0.created_at,
+        rs1_0.last_read_at,
+        rs1_0.updated_at,
+        rs1_0.user_id 
+    from
+        read_statuses rs1_0 
+    where
+        rs1_0.user_id=?
+25-03-31 14:23:50.736 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [a4d35f44-4873-425c-8170-2ba44fa73683]
+25-03-31 14:23:53.702 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+25-03-31 14:23:53.775 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+25-03-31 14:23:53.778 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-03-31 14:23:53.779 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+25-03-31 14:23:53.782 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
