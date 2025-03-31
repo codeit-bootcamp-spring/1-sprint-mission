@@ -27,11 +27,11 @@
   </appender>
 
   <!-- 최상위 root 로거 레벨: INFO -->
-  <root level="INFO">
+  <root level="DEBUG">
     <appender-ref ref="CONSOLE"/>
     <appender-ref ref="FILE"/>
   </root>
 
-  <!-- 패키지별 다른 레벨 설정 예 (디버그가 필요한 Service) -->
-  <logger name="com.example.demo.service" level="DEBUG"/>
+  <!--  &lt;!&ndash; 패키지별 다른 레벨 설정 예 (디버그가 필요한 Service) &ndash;&gt;-->
+  <!--  <logger name="com.example.demo.service" level="DEBUG"/>-->
 </configuration>
