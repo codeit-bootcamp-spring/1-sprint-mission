@@ -29,6 +29,7 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +45,7 @@ public class UserController implements UserApi {
 	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	@Override
 	public ResponseEntity<UserDto> create(
-		@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+		@Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
 		@RequestPart(value = "profile", required = false) MultipartFile profile
 	) {
 		log.info("Received request to create user: username={}", userCreateRequest.username());
@@ -57,14 +58,11 @@ public class UserController implements UserApi {
 			.body(createdUser);
 	}
 
-	@PatchMapping(
-		path = "{userId}",
-		consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-	)
+	@PatchMapping(path = "{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	@Override
 	public ResponseEntity<UserDto> update(
 		@PathVariable("userId") UUID userId,
-		@RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+		@Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
 		@RequestPart(value = "profile", required = false) MultipartFile profile
 	) {
 		log.info("Received request to update user: id={}", userId);

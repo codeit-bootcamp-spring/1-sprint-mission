@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.service.AuthService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +27,7 @@ public class AuthController implements AuthApi {
 	private final AuthService authService;
 
 	@PostMapping(path = "login")
-	public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest) {
+	public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest loginRequest) {
 		log.info("Login request - username: {}", loginRequest.username());
 		try {
 			UserDto user = authService.login(loginRequest);

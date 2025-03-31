@@ -33,6 +33,7 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,7 +47,7 @@ public class MessageController implements MessageApi {
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<MessageDto> create(
-		@RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+		@Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
 		@RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
 	) {
 		log.info("Creating message with request: {}, attachments: {}", messageCreateRequest,
@@ -114,12 +115,7 @@ public class MessageController implements MessageApi {
 	public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
 		@RequestParam("channelId") UUID channelId,
 		@RequestParam(value = "cursor", required = false) Instant cursor,
-		@PageableDefault(
-			size = 50,
-			page = 0,
-			sort = "createdAt",
-			direction = Direction.DESC
-		) Pageable pageable) {
+		@PageableDefault(size = 50, page = 0, sort = "createdAt", direction = Direction.DESC) Pageable pageable) {
 		log.info("Finding all messages for channel id: {}, cursor: {}, pageable: {}", channelId,
 			cursor, pageable);
 		PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
