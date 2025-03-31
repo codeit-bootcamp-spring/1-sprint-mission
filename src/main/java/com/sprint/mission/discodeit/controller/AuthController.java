@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -25,11 +24,7 @@ public class AuthController implements AuthApi {
   @PostMapping(path = "login")  // path 속성은 value와 완전 동일한 기능, 가독성 위해 선택적 사용
   public ResponseEntity<UserDto> login(@RequestBody LoginRequest request) {
 
-    log.info("login 요청 : username={}", request.username());
-
     UserDto userDto = authService.login(request);
-
-    log.info("login 성공: userId={}", userDto.id());
 
     return ResponseEntity
         .status(HttpStatus.OK)

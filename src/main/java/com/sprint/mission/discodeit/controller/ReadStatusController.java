@@ -33,11 +33,7 @@ public class ReadStatusController implements ReadStatusApi {
   public ResponseEntity<ReadStatusDto> create(
       @RequestBody CreateReadStatusRequest request) {
 
-    log.info("ReadStatus 생성 요청 : userId={}, channelId={}", request.userId(), request.channelId());
-
     ReadStatusDto readStatusDto = readStatusService.create(request);
-
-    log.info("ReadStatus 생성 성공 : readStatusId={}", readStatusDto.id());
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -50,11 +46,7 @@ public class ReadStatusController implements ReadStatusApi {
       @PathVariable("readStatusId") UUID readStatusId,
       @RequestBody UpdateReadStatusRequest request) {
 
-    log.info("ReadStatus 수정 요청 : readStatusId={}", readStatusId);
-
     ReadStatusDto readStatusDto = readStatusService.update(readStatusId, request);
-
-    log.info("ReadStatus 수정 성공 : readStatusId={}", readStatusId);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -66,11 +58,7 @@ public class ReadStatusController implements ReadStatusApi {
   public ResponseEntity<List<ReadStatusDto>> findAllByUserId(
       @RequestParam("userId") UUID userId) {
 
-    log.info("ReadStatus 다건 조회 요청 : userId={}", userId);
-
     List<ReadStatusDto> readStatusDtos = readStatusService.findAllByUserId(userId);
-
-    log.info("ReadStatus 다건 조회 성공 : 반환 개수={}", readStatusDtos.size());
 
     return ResponseEntity
         .status(HttpStatus.OK)

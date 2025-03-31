@@ -97,11 +97,7 @@ public class UserController implements UserApi {
   @GetMapping
   public ResponseEntity<List<UserDto>> findAll() {
 
-    log.info("User 다건 조회 요청");
-
     List<UserDto> userDtos = userService.findAll();
-
-    log.info("User 다건 조회 성공 : 반환 개수={}", userDtos.size());
 
     return ResponseEntity
         .status(HttpStatus.OK)

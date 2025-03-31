@@ -99,11 +99,7 @@ public class ChannelController implements ChannelApi {
   @GetMapping
   public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
 
-    log.info("Channel 다건 조회 요청 : userId={}", userId);
-
     List<ChannelDto> channelDtos = channelService.findAllByUserId(userId);
-
-    log.info("Channel 다건 조회 성공 : 반환 개수={}", channelDtos.size());
 
     return ResponseEntity
         .status(HttpStatus.OK)

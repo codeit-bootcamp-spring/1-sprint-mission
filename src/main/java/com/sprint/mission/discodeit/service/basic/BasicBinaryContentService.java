@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
@@ -25,7 +27,11 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   @Transactional
   public BinaryContentDto create(CreateBinaryContentRequest request) {
+
     String fileName = request.fileName();
+
+    log.info("BinaryContent 생성 요청 : fileName={}", fileName);
+
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
 
@@ -38,7 +44,11 @@ public class BasicBinaryContentService implements BinaryContentService {
     binaryContentRepository.save(binaryContent);
     binaryContentStorage.put(binaryContent.getId(), bytes);
 
-    return binaryContentMapper.toDto(binaryContent);
+    BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
+
+    log.info("BinaryContent 생성 성공 : binaryContentId={}", binaryContentDto.id());
+
+    return binaryContentDto;
   }
 
   @Override

@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -85,9 +87,13 @@ public class BasicChannelService implements ChannelService {
     String newDescription = request.newDescription();
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found")
+            () -> {
+              log.error("Channel not found : channelId={}", channelId);
+              return new NoSuchElementException("Channel with id " + channelId + " not found");
+            }
         );
     if (channel.getType().equals(ChannelType.PRIVATE)) {
+      log.error("Private channel cannot be updated : channelId={}", channelId);
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
     channel.update(newName, newDescription);
@@ -98,6 +104,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public void delete(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
+      log.error("Channel not found : channelId={}", channelId);
       throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
 

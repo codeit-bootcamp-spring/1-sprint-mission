@@ -23,11 +23,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -49,28 +51,20 @@ public class BasicMessageService implements MessageService {
 
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " does not exist")
+            () -> {
+              log.error("Channel not found : channelId={}", channelId);
+              return new NoSuchElementException("Channel with id " + channelId + " does not exist");
+            }
         );
     User author = userRepository.findById(authorId)
         .orElseThrow(
-            () -> new NoSuchElementException("Author with id " + authorId + " does not exist")
+            () -> {
+              log.error("User not found : authorId={}", authorId);
+              return new NoSuchElementException("Author with id " + authorId + " does not exist");
+            }
         );
 
-    List<BinaryContent> attachments = binaryContentRequests.stream()
-        .map(attachmentRequest -> {
-          String fileName = attachmentRequest.fileName();
-          String contentType = attachmentRequest.contentType();
-          byte[] bytes = attachmentRequest.bytes();
-
-          BinaryContent binaryContent = new BinaryContent(
-              fileName,
-              (long) bytes.length,
-              contentType);
-          binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
-          return binaryContent;
-        })
-        .toList();
+    List<BinaryContent> attachments = convertToBinaryContents(binaryContentRequests);
 
     String content = messageRequest.content();
     Message message = new Message(
@@ -117,7 +111,10 @@ public class BasicMessageService implements MessageService {
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found")
+            () -> {
+              log.error("Message not found : messageId={}", messageId);
+              return new NoSuchElementException("Message with id " + messageId + " not found");
+            }
         );
     message.update(newContent);
     return messageMapper.toDto(message);
@@ -127,9 +124,32 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public void delete(UUID messageId) {
     if (!messageRepository.existsById(messageId)) {
+      log.error("Message not found : messageId={}", messageId);
       throw new NoSuchElementException("Message with id " + messageId + " not found");
     }
 
     messageRepository.deleteById(messageId);
+  }
+
+
+  // List<CreateBinaryContentRequest> -> List<BinaryContent>
+  // binaryContentRepository와 binaryContentStorage에 대한 의존성을 가지고 있어 util이 아닌 private 메서드로 분리
+  private List<BinaryContent> convertToBinaryContents(
+      List<CreateBinaryContentRequest> binaryContentRequests) {
+    return binaryContentRequests.stream()
+        .map(attachmentRequest -> {
+          String fileName = attachmentRequest.fileName();
+          String contentType = attachmentRequest.contentType();
+          byte[] bytes = attachmentRequest.bytes();
+
+          BinaryContent binaryContent = new BinaryContent(
+              fileName,
+              (long) bytes.length,
+              contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        })
+        .toList();
   }
 }
