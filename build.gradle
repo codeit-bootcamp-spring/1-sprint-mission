@@ -3,6 +3,7 @@ plugins {
     id 'application' // application 플러그인 추가
     id 'org.springframework.boot' version '3.3.6'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.1' // git 정보 읽기
 }
 
 group = 'com.sprint.mission'
@@ -39,6 +40,12 @@ dependencies {
     // Spring Boot Web 의존성 (Spring MVC, REST 등)
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // Spring Validation 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Spring Actuator 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     // Lombok 의존성 (간결한 코드 작성)
     compileOnly 'org.projectlombok:lombok'             // 컴파일 타임에만 Lombok을 사용
     annotationProcessor 'org.projectlombok:lombok'    // Lombok 애노테이션 프로세서
@@ -62,6 +69,23 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 }
 
+
+gitProperties {
+    dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+    dateFormatTimeZone = "UTC"
+}
+
+tasks.register('writeBuildProperties') {
+    doLast {
+        def props = new Properties()
+        props.setProperty('version', project.version.toString())
+        props.setProperty('time', new Date().format("yyyy-MM-dd'T' HH:mm:ss'Z'", Timezone.getTimeZone("UTC")))
+
+        def file = file("$buildDir/resources/main/build.properties")
+        file.parentFile.mkdir()
+        props.store(file.newWriter(), null)
+    }
+}
 
 tasks.named('test') {
     useJUnitPlatform()

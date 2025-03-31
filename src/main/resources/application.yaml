@@ -23,6 +23,46 @@ logging:
   level:
     root: INFO
 
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "health"
+          - "info"
+          - "metrics"
+          - "loggers"
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  info:
+    git:
+      mode: full # Git 정보를 가져올 수 있도록 설정
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java-version: 17
+    spring-boot-version: 3.4.0
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    ddl-auto: validate
+
+  storage:
+    type: local
+    path: /storage
+
+  multipart:
+    max-file-size: 10MB
+    max-request-size: 20MB
+
+
 springdoc:
   packages-to-scan: com.sprint.mission.discodeit.controller
   default-consumes-media-type: application/json;charset=UTF-8
