@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class BinaryContentController implements BinaryContentApi {
 
   @GetMapping(path = "{binaryContentId}")
   public ResponseEntity<BinaryContentDto> find(
-      @PathVariable("binaryContentId") UUID binaryContentId) {
+      @Valid @PathVariable("binaryContentId") UUID binaryContentId) {
     BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -36,7 +37,7 @@ public class BinaryContentController implements BinaryContentApi {
 
   @GetMapping
   public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
-      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+      @Valid @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
     List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -45,7 +46,7 @@ public class BinaryContentController implements BinaryContentApi {
 
   @GetMapping(path = "{binaryContentId}/download")
   public ResponseEntity<?> download(
-      @PathVariable("binaryContentId") UUID binaryContentId) {
+      @Valid @PathVariable("binaryContentId") UUID binaryContentId) {
     log.info("[BinaryContentController] 파일 다운로드 요청 id: {}", binaryContentId);
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
     log.info("[BinaryContentController] 파일 다운로드 성공 id: {}", binaryContentDto.id());
