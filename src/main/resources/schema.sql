@@ -4,8 +4,7 @@ CREATE TABLE binary_contents
     created_at   TIMESTAMP  NOT NULL,
     file_name    VARCHAR(255) NOT NULL,
     size         BIGINT       NOT NULL,
-    content_type VARCHAR(100) NOT NULL,
-    bytes        BYTEA        NOT NULL
+    content_type VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE users
@@ -18,7 +17,7 @@ CREATE TABLE users
     password   VARCHAR(255) NOT NULL,
     profile_id UUID,
     CONSTRAINT fk_user_profile FOREIGN KEY (profile_id) REFERENCES
-        binary_contents (id) ON DELETE CASCADE
+        binary_contents (id) ON DELETE SET NULL
 );
 
 CREATE TABLE channels
