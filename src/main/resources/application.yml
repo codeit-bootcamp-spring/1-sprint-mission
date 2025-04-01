@@ -26,3 +26,33 @@ logging:
         SQL: DEBUG  # 실행되는 SQL을 출력
         type: TRACE # SQL 바인딩된 값도 출력
     com.discodeit: DEBUG
+
+info:
+  app:
+    name: discodeit
+    version: 1.7.0
+    java-version: 17
+    spring-boot-version: 3.4.0
+    datasource:
+      url: jdbc:postgresql://localhost:5432/discodeit
+      driver: org.postgresql.Driver
+    jpa:
+      ddl-auto: update
+    storage:
+      type: local
+      path: .discodeit/storage
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
