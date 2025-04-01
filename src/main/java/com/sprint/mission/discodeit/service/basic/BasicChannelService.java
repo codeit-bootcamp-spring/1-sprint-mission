@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -64,7 +66,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findById(channelId)
                 .map(channelMapper::toDto)
                 .orElseThrow(
-                        () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+                        () -> new ChannelNotFoundException(channelId));
     }
 
     @Transactional(readOnly = true)
@@ -90,9 +92,9 @@ public class BasicChannelService implements ChannelService {
         String newName = request.newName();
         String newDescription = request.newDescription();
         Channel channel = channelRepository.findById(channelId).orElseThrow(
-                () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+                () -> new ChannelNotFoundException(channelId));
         if(channel.getType().equals(ChannelType.PRIVATE)) {
-            throw new IllegalArgumentException("Private channel cannot be updated");
+            throw new PrivateChannelUpdateException(channelId.toString());
         }
         channel.update(newName, newDescription);
         return channelMapper.toDto(channel);
@@ -104,7 +106,7 @@ public class BasicChannelService implements ChannelService {
         log.warn("채널 삭제 요청: channelId={}", channelId);
 
         if(!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+            throw new ChannelNotFoundException(channelId);
         }
 
         messageRepository.deleteAllByChannelId(channelId);
