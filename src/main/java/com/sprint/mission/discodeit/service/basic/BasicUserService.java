@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 
 import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -16,7 +15,6 @@ import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.validator.UserValidator;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +30,6 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
 
-  private final UserValidator userValidator;
   private final UserMapper userMapper;
 
   private final BinaryContentStorage binaryContentStorage;
@@ -84,8 +81,6 @@ public class BasicUserService implements UserService {
   @Transactional
   public UserDto update(UUID id, UserUpdateDTO dto,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    userValidator.validateUpdateUser(id, dto.getNewUsername(), dto.getNewEmail(),
-        dto.getNewPassword());
     User findUser = userRepository.findById(id)
         .orElseThrow(() -> new UserNotFoundException(id));
 

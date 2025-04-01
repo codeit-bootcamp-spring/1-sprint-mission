@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.ReadStatus.ReadStatusDuplicateException;
 import com.sprint.mission.discodeit.exception.ReadStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -16,7 +15,6 @@ import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.validator.ReadStatusValidator;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,8 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
-
-  private final ReadStatusValidator readStatusValidator;
 
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;

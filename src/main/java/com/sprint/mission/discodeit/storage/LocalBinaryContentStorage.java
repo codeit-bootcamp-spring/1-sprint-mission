@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.FileProcessingException;
+import com.sprint.mission.discodeit.exception.file.FileNotFoundCustomException;
+import com.sprint.mission.discodeit.exception.file.FileReadFailedException;
+import com.sprint.mission.discodeit.exception.file.FileSaveFailedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -49,7 +50,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       return binaryContentId;
     } catch (IOException e) {
       log.error("파일 저장 실패 - id: {}, 에러: {}", binaryContentId, e.toString());
-      throw new FileProcessingException(ErrorCode.FILE_SAVE_FAILED); //파일 저장 실패
+      throw new FileSaveFailedException(e.toString()); //파일 저장 실패
     }
   }
 
@@ -58,14 +59,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     Path filePath = resolvePath(binaryContentId);
     if (!Files.exists(filePath)) {
       log.warn("파일 없음 - id: {}", binaryContentId);
-      throw new NotFoundException(ErrorCode.FILE_NOT_FOUND); //파일 찾을 수 없음
+      throw new FileNotFoundCustomException(filePath.toString()); //파일 찾을 수 없음
     }
     try {
       log.debug("파일 읽기 시작 - id: {}, 경로: {}", binaryContentId, filePath);
       return Files.newInputStream(filePath);
     } catch (IOException e) {
       log.error("파일 읽기 실패 - id: {}, 에러: {}", binaryContentId, e.toString());
-      throw new FileProcessingException(ErrorCode.FILE_READ_FAILED); //파일 읽는 중 오류
+      throw new FileReadFailedException(e.toString()); //파일 읽는 중 오류
     }
   }
 
