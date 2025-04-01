@@ -7,8 +7,7 @@ import lombok.*;
 import java.util.*;
 
 @Getter @Setter
-@Entity @Builder
-@AllArgsConstructor
+@Entity 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
 public class User extends BaseUpdatableEntity {
@@ -45,5 +44,33 @@ public class User extends BaseUpdatableEntity {
     public void removeUserStatus(UserStatus status) {
         userStatuses.remove(status);
         status.setUser(null);
+    }
+    
+    @Builder
+    public User(String name, String email, String password, boolean online, byte[] profileImage, BinaryContent profile, 
+                List<ReadStatus> readStatuses, List<Message> messages, List<UserStatus> userStatuses, UUID id) {
+        super();
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.online = online;
+        this.profileImage = profileImage;
+        this.profile = profile;
+        
+        if (readStatuses != null) {
+            this.readStatuses = readStatuses;
+        }
+        
+        if (messages != null) {
+            this.messages = messages;
+        }
+        
+        if (userStatuses != null) {
+            this.userStatuses = userStatuses;
+        }
+        
+        if (id != null) {
+            this.setId(id);
+        }
     }
 }

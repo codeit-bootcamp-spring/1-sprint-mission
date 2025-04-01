@@ -172,9 +172,17 @@ public class ChannelServiceImpl implements ChannelService {
     return channelMapper.toDto(saved);
   }
 
-
   @Override
   public ChannelDto find(UUID id) {
+    Channel channel = channelRepository.findById(id)
+        .orElseThrow(
+            () -> new RestApiException(DomainErrorCode.CHANNEL_NOT_FOUND, "Channel not found"));
+
+    return channelMapper.toDto(channel);
+  }
+
+  @Override
+  public ChannelDto findById(UUID id) {
     Channel channel = channelRepository.findById(id)
         .orElseThrow(
             () -> new RestApiException(DomainErrorCode.CHANNEL_NOT_FOUND, "Channel not found"));

@@ -59,4 +59,11 @@ public class ChannelController {
         channelService.delete(channelId);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Channel 상세 정보 조회", description = "채널 상세 정보 조회")
+    @GetMapping("/{channelId}")
+    public ResponseEntity<ChannelDto> getChannelDetails(@PathVariable UUID channelId) {
+        ChannelDto channel = channelService.findById(channelId);
+        return ResponseEntity.ok(channel);
+    }
 }

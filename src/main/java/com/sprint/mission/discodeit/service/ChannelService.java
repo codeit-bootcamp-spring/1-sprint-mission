@@ -19,6 +19,7 @@ public interface ChannelService {
     List<ChannelDto> findAllByUserId(UUID userId);
     ChannelDto create(ChannelDto channelDTO);
     ChannelDto find(UUID channelId);
+    ChannelDto findById(UUID channelId);
     ChannelDto update(UUID channelId, ChannelDto channelDTO);
     Map<User, Channel> join(ChannelJoinDto joinDTO);
     void delete(UUID channelId);

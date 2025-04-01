@@ -13,6 +13,7 @@ public enum DomainErrorCode {
   READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "GLOBAL_004", "해당 읽음 상태가 존재하지 않습니다."),
   USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "GLOBAL_005", "해당 사용자의 상태가 존재하지 않습니다."),
   INVALID_INPUT(HttpStatus.BAD_REQUEST, "GLOBAL_006", "입력값이 올바르지 않습니다."),
+  INVALID_OPERATION(HttpStatus.BAD_REQUEST, "GLOBAL_007", "잘못된 작업입니다."),
   DUPLICATED_EMAIL(HttpStatus.CONFLICT, "USER_001", "이미 사용중인 이메일입니다."),
   USER_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "USER_002", "회원가입 중 오류가 발생하였습니다."),
   AUTH_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AUTH_002", "인증 서버에서 오류가 발생했습니다."),

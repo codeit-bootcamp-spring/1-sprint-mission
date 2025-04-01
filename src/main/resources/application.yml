@@ -1,7 +1,7 @@
 spring:
   profiles:
     active: dev
-    
+
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -10,7 +10,7 @@ spring:
 
   thymeleaf:
     cache: false
-    
+      
   h2:
     console:
       enabled: true
@@ -71,3 +71,42 @@ discodeit:
     type: local
     local:
       root-path: /Users/byeonheejae/Desktop/Study/codeit/path/1-sprint-mission
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    build:
+      enabled: true
+
+# 애플리케이션 정보 설정
+info:
+  app:
+    name: ${spring.application.name}
+    version: 1.7.0
+    description: Discodeit Application
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}

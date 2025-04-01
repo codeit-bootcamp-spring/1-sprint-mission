@@ -19,4 +19,9 @@ public abstract class BaseEntity {
     @CreationTimestamp
     @Column(name = "created_at")
     private Instant createdAt;
+    
+    // For testing purposes only
+    public void setId(UUID id) {
+        this.id = id;
+    }
 }
