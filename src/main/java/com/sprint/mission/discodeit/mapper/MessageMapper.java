@@ -14,6 +14,10 @@ public class MessageMapper {
   private final BinaryContentMapper binaryContentMapper;
 
   public MessageDto toDto(Message message) {
+    if (message == null) {
+      return null;
+    }
+
     return new MessageDto(
         message.getId(),
         message.getCreatedAt(),

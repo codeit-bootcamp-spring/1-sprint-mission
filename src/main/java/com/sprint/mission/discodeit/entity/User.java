@@ -38,6 +38,8 @@ public class User extends BaseUpdatableEntity implements Serializable {
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
   //update
 
   public void updateUser(String username, String email, String password,

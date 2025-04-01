@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -17,11 +19,14 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,6 +40,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
 
   private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
 
   private final BinaryContentStorage binaryContentStorage;
 
@@ -79,14 +85,23 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
+  @Transactional
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
-    return messageRepository.findByChannelId(channelId)
-        .stream()
-        .map(messageMapper::toDto)
-        .collect(Collectors.toList());
-  }
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
+      Pageable pageable) {
+    Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+            Optional.ofNullable(createAt).orElse(Instant.now()),
+            pageable)
+        .map(messageMapper::toDto);
 
+    Instant nextCursor = null;
+    if (!slice.getContent().isEmpty()) {
+      nextCursor = slice.getContent().get(slice.getContent().size() - 1)
+          .createdAt();
+    }
+
+    return pageResponseMapper.fromSlice(slice, nextCursor);
+  }
 
   @Override
   public MessageDto update(UUID id, MessageUpdateDTO messageUpdateDTO) {

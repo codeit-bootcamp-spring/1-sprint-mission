@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: discodeit
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit  # PostgreSQL DB 주소
     username: discodeit_user                         # DB 사용자
@@ -19,3 +21,9 @@ spring:
         org.hibernate.SQL: debug  # Hibernate SQL 로그 레벨 설정
         org.hibernate.type.descriptor.sql.BasicBinder: trace  # 바인딩된 파라미터 출력
     database: postgresql
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
