@@ -2,7 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Discodeit API 문서",
-    "description": "Discodeit 프로젝트의 Swagger API 문서입니다."
+    "description": "Discodeit 프로젝트의 Swagger API 문서입니다.",
+    "version": "1.2"
   },
   "servers": [
     {
@@ -94,7 +95,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -137,7 +138,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ReadStatus"
+                    "$ref": "#/components/schemas/ReadStatusDto"
                   }
                 }
               }
@@ -162,14 +163,6 @@
           "required": true
         },
         "responses": {
-          "404": {
-            "description": "Channel 또는 User를 찾을 수 없음",
-            "content": {
-              "*/*": {
-                "example": "Channel | User with id {channelId | userId} not found"
-              }
-            }
-          },
           "400": {
             "description": "이미 읽음 상태가 존재함",
             "content": {
@@ -183,8 +176,16 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReadStatus"
+                  "$ref": "#/components/schemas/ReadStatusDto"
                 }
+              }
+            }
+          },
+          "404": {
+            "description": "Channel 또는 User를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Channel | User with id {channelId | userId} not found"
               }
             }
           }
@@ -208,6 +209,29 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "페이징 커서 정보",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "pageable",
+            "in": "query",
+            "description": "페이징 정보",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Pageable"
+            },
+            "example": {
+              "size": 50,
+              "sort": "createdAt,desc"
+            }
           }
         ],
         "responses": {
@@ -216,10 +240,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Message"
-                  }
+                  "$ref": "#/components/schemas/PageResponse"
                 }
               }
             }
@@ -258,21 +279,21 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "Channel 또는 User를 찾을 수 없음",
-            "content": {
-              "*/*": {
-                "example": "Channel | Author with id {channelId | authorId} not found"
-              }
-            }
-          },
           "201": {
             "description": "Message가 성공적으로 생성됨",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
+                  "$ref": "#/components/schemas/MessageDto"
                 }
+              }
+            }
+          },
+          "404": {
+            "description": "Channel 또는 User를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Channel | Author with id {channelId | authorId} not found"
               }
             }
           }
@@ -302,7 +323,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Channel"
+                  "$ref": "#/components/schemas/ChannelDto"
                 }
               }
             }
@@ -333,7 +354,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Channel"
+                  "$ref": "#/components/schemas/ChannelDto"
                 }
               }
             }
@@ -364,7 +385,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserDto"
                 }
               }
             }
@@ -408,9 +429,6 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "User가 성공적으로 삭제됨"
-          },
           "404": {
             "description": "User를 찾을 수 없음",
             "content": {
@@ -418,6 +436,9 @@
                 "example": "User with id {id} not found"
               }
             }
+          },
+          "204": {
+            "description": "User가 성공적으로 삭제됨"
           }
         }
       },
@@ -462,14 +483,6 @@
           }
         },
         "responses": {
-          "404": {
-            "description": "User를 찾을 수 없음",
-            "content": {
-              "*/*": {
-                "example": "User with id {userId} not found"
-              }
-            }
-          },
           "400": {
             "description": "같은 email 또는 username를 사용하는 User가 이미 존재함",
             "content": {
@@ -483,8 +496,16 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserDto"
                 }
+              }
+            }
+          },
+          "404": {
+            "description": "User를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "User with id {userId} not found"
               }
             }
           }
@@ -534,7 +555,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserStatus"
+                  "$ref": "#/components/schemas/UserStatusDto"
                 }
               }
             }
@@ -572,21 +593,21 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Message 읽음 상태가 성공적으로 수정됨",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ReadStatus"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Message 읽음 상태를 찾을 수 없음",
             "content": {
               "*/*": {
                 "example": "ReadStatus with id {readStatusId} not found"
+              }
+            }
+          },
+          "200": {
+            "description": "Message 읽음 상태가 성공적으로 수정됨",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadStatusDto"
+                }
               }
             }
           }
@@ -655,21 +676,21 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Message가 성공적으로 수정됨",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
-          },
           "404": {
             "description": "Message를 찾을 수 없음",
             "content": {
               "*/*": {
                 "example": "Message with id {messageId} not found"
+              }
+            }
+          },
+          "200": {
+            "description": "Message가 성공적으로 수정됨",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageDto"
+                }
               }
             }
           }
@@ -759,7 +780,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Channel"
+                  "$ref": "#/components/schemas/ChannelDto"
                 }
               }
             }
@@ -833,7 +854,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BinaryContent"
+                    "$ref": "#/components/schemas/BinaryContentDto"
                   }
                 }
               }
@@ -867,7 +888,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BinaryContent"
+                  "$ref": "#/components/schemas/BinaryContentDto"
                 }
               }
             }
@@ -877,6 +898,40 @@
             "content": {
               "*/*": {
                 "example": "BinaryContent with id {binaryContentId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/binaryContents/{binaryContentId}/download": {
+      "get": {
+        "tags": [
+          "BinaryContent"
+        ],
+        "summary": "파일 다운로드",
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "binaryContentId",
+            "in": "path",
+            "description": "다운로드할 파일 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "파일 다운로드 성공",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
               }
             }
           }
@@ -901,20 +956,31 @@
           }
         }
       },
-      "User": {
+      "BinaryContentDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
           },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
+          "fileName": {
+            "type": "string"
           },
-          "updatedAt": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "contentType": {
+            "type": "string"
+          }
+        }
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
             "type": "string",
-            "format": "date-time"
+            "format": "uuid"
           },
           "username": {
             "type": "string"
@@ -922,12 +988,11 @@
           "email": {
             "type": "string"
           },
-          "password": {
-            "type": "string"
+          "profile": {
+            "$ref": "#/components/schemas/BinaryContentDto"
           },
-          "profileId": {
-            "type": "string",
-            "format": "uuid"
+          "online": {
+            "type": "boolean"
           }
         }
       },
@@ -949,20 +1014,12 @@
           }
         }
       },
-      "ReadStatus": {
+      "ReadStatusDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
           },
           "userId": {
             "type": "string",
@@ -995,7 +1052,7 @@
           }
         }
       },
-      "Message": {
+      "MessageDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1017,15 +1074,13 @@
             "type": "string",
             "format": "uuid"
           },
-          "authorId": {
-            "type": "string",
-            "format": "uuid"
+          "author": {
+            "$ref": "#/components/schemas/UserDto"
           },
-          "attachmentIds": {
+          "attachments": {
             "type": "array",
             "items": {
-              "type": "string",
-              "format": "uuid"
+              "$ref": "#/components/schemas/BinaryContentDto"
             }
           }
         }
@@ -1042,20 +1097,12 @@
           }
         }
       },
-      "Channel": {
+      "ChannelDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
           },
           "type": {
             "type": "string",
@@ -1069,6 +1116,16 @@
           },
           "description": {
             "type": "string"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserDto"
+            }
+          },
+          "lastMessageAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -1122,20 +1179,12 @@
           }
         }
       },
-      "UserStatus": {
+      "UserStatusDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
           },
           "userId": {
             "type": "string",
@@ -1144,9 +1193,6 @@
           "lastActiveAt": {
             "type": "string",
             "format": "date-time"
-          },
-          "online": {
-            "type": "boolean"
           }
         }
       },
@@ -1181,93 +1227,49 @@
           }
         }
       },
-      "UserDto": {
+      "Pageable": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "username": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "profileId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "online": {
-            "type": "boolean"
-          }
-        }
-      },
-      "ChannelDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "PUBLIC",
-              "PRIVATE"
-            ]
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "participantIds": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          "lastMessageAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "BinaryContent": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "fileName": {
-            "type": "string"
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           },
           "size": {
             "type": "integer",
+            "format": "int32",
+            "minimum": 1
+          },
+          "sort": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PageResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "nextCursor": {
+            "type": "object"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hasNext": {
+            "type": "boolean"
+          },
+          "totalElements": {
+            "type": "integer",
             "format": "int64"
-          },
-          "contentType": {
-            "type": "string"
-          },
-          "bytes": {
-            "type": "string",
-            "format": "byte"
           }
         }
       }
