@@ -4,10 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -42,5 +45,27 @@ public class GlobalExceptionHandler {
             case PRIVATE_CHANNEL_UPDATE, UNAUTHORIZED -> HttpStatus.BAD_REQUEST;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        Map<String, Object> details = e.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        fieldError -> fieldError.getField(),
+                        fieldError -> fieldError.getDefaultMessage(),
+                        (existing, replacement) -> existing
+                ));
+
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(),
+                "VALIDATION_ERROR",
+                "요청 데이터가 유효하지 않습니다.",
+                details,
+                e.getClass().getSimpleName(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        log.warn("유효성 검사 실패 [{}]: {}", request.getRequestURI(), details);
+        return ResponseEntity.badRequest().body(error);
     }
 }
