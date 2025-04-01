@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.exception.binaryContent.FileProcessingException;
 import com.sprint.mission.discodeit.service.basic.MessageService;
 import java.io.IOException;
 import java.time.Instant;
@@ -61,9 +62,9 @@ public class MessageController implements MessageApi {
                       file.getBytes()
                   );
                 } catch (IOException e) {
-                  log.error("첨부파일 처리 중 IOException - fileName: {}, 원인: {}",
+                  log.error("첨부파일 처리 중 에러 발생 - fileName: {}, 원인: {}",
                       file.getOriginalFilename(), e.getMessage(), e);
-                  throw new RuntimeException(e);
+                  throw new FileProcessingException(file.getName(), e);
                 }
               })
               .toList())

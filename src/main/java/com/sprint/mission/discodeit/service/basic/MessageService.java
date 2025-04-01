@@ -9,6 +9,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -18,7 +21,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -55,13 +57,13 @@ public class MessageService {
         .orElseGet(
             () -> {
               log.warn("메시지 생성 실패 - 존재하지 않는 채널 - channelId: {}", channelId);
-              throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
+              throw new ChannelNotFoundException(channelId);
             });
     User author = userRepository.findById(authorId)
         .orElseGet(
             () -> {
               log.warn("메시지 생성 실패 - 존재하지 않는 사용자 - authorId: {}", authorId);
-              throw new NoSuchElementException("Author with id " + authorId + " does not exist");
+              throw UserNotFoundException.byId(authorId);
             });
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
@@ -105,7 +107,7 @@ public class MessageService {
     return messageRepository.findById(messageId)
         .map(messageMapper::toDto)
         .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            () -> new MessageNotFoundException(messageId));
   }
 
   @Transactional(readOnly = true)
@@ -133,7 +135,7 @@ public class MessageService {
         .orElseGet(
             () -> {
               log.warn("메세지를 찾을 수 없음 - id{}", messageId);
-              throw new NoSuchElementException("Message with id " + messageId + " not found");
+              throw new MessageNotFoundException(messageId);
             });
     message.update(newContent);
     log.info("메시지 업데이트 성공 - messageId: {}", messageId);
@@ -145,7 +147,7 @@ public class MessageService {
     log.debug("메시지 삭제 서비스 진입 - messageId: {}", messageId);
     if (!messageRepository.existsById(messageId)) {
       log.warn("메세지를 찾을 수 없음 - id{}", messageId);
-      throw new NoSuchElementException("Message with id " + messageId + " not found");
+      throw new MessageNotFoundException(messageId);
     }
 
     messageRepository.deleteById(messageId);

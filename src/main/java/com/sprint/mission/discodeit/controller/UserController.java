@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.exception.binaryContent.FileProcessingException;
 import com.sprint.mission.discodeit.service.basic.UserService;
 import com.sprint.mission.discodeit.service.basic.UserStatusService;
 import java.io.IOException;
@@ -160,7 +161,7 @@ public class UserController implements UserApi {
       } catch (IOException e) {
         log.error("프로필 파일 처리 실패 - fileName: {}, 원인: {}", profileFile.getOriginalFilename(),
             e.getMessage(), e);
-        throw new RuntimeException(e);
+        throw new FileProcessingException(profileFile.getOriginalFilename(), e);
       }
     }
   }

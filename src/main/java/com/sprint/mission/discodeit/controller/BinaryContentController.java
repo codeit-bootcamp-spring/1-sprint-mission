@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.binaryContent.FileNotFoundException;
 import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,8 +57,8 @@ public class BinaryContentController implements BinaryContentApi {
 
       return response;
 
-    } catch (NoSuchElementException e) {
-      log.warn("파일 다운로드 실패 - 파일을 찾을 수 없음 - binaryContentId: {}", binaryContentId);
+    } catch (FileNotFoundException e) {
+      log.warn("파일 다운로드 실패 - 파일을 찾을 수 없음 - binaryContentId: {}", binaryContentId, e);
       throw e;
 
     } catch (Exception e) {
