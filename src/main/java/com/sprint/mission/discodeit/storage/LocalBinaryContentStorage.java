@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.FileProcessingException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -13,6 +12,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -22,7 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-
+@Slf4j
 @Component
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -46,8 +46,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     Path filePath = resolvePath(binaryContentId);
     try {
       Files.write(filePath, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+      log.info("파일 저장 완료 - id: {}, 경로: {}", binaryContentId, filePath);
       return binaryContentId;
     } catch (IOException e) {
+      log.error("파일 저장 실패 - id: {}, 에러: {}", binaryContentId, e.toString());
       throw new FileProcessingException(ErrorCode.FILE_SAVE_FAILED); //파일 저장 실패
     }
   }
@@ -56,11 +58,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
     if (!Files.exists(filePath)) {
+      log.warn("파일 없음 - id: {}", binaryContentId);
       throw new NotFoundException(ErrorCode.FILE_NOT_FOUND); //파일 찾을 수 없음
     }
     try {
+      log.debug("파일 읽기 시작 - id: {}, 경로: {}", binaryContentId, filePath);
       return Files.newInputStream(filePath);
     } catch (IOException e) {
+      log.error("파일 읽기 실패 - id: {}, 에러: {}", binaryContentId, e.toString());
       throw new FileProcessingException(ErrorCode.FILE_READ_FAILED); //파일 읽는 중 오류
     }
   }
@@ -68,6 +73,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
+
+    log.info("파일 다운로드 요청 - id: {}, 파일명: {}", binaryContentDto.getId(),
+        binaryContentDto.getFileName());
+
     InputStream inputStream = get(binaryContentDto.getId());
     InputStreamResource resource = new InputStreamResource(inputStream);
 

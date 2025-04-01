@@ -12,12 +12,14 @@ import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validator.ChannelValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -35,6 +37,8 @@ public class BasicChannelService implements ChannelService {
     channelValidator.validateChannel(dto.getName(), dto.getDescription());
     Channel channel = new Channel(dto.getName(), dto.getDescription(), ChannelType.PUBLIC);
     channelRepository.save(channel);
+
+    log.info("public 채널 생성 완료 id: {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
@@ -52,6 +56,7 @@ public class BasicChannelService implements ChannelService {
         })
         .forEach(readStatusRepository::save);
 
+    log.info("private 채널 생성 완료 id: {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
@@ -86,12 +91,15 @@ public class BasicChannelService implements ChannelService {
       throw new BadRequestException(ErrorCode.PRIVATE_CHANNEL_IMMUTABLE);
     }
     findChannel.setChannel(dto.getNewName(), dto.getNewDescription());
+
+    log.info("채널 수정 완료 id: {}", findChannel.getId());
     return channelMapper.toDto(findChannel);
   }
 
   @Override
   public void delete(UUID id) {
     channelRepository.deleteById(id);
+    log.info("채널 삭제 완료 id: {}", id);
   }
 
 }

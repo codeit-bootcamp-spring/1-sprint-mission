@@ -18,11 +18,13 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -40,7 +42,6 @@ public class BasicUserService implements UserService {
   @Transactional
   public UserDto create(UserCreateDTO dto,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    //userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
 
     BinaryContent nullableProfile = saveBinaryFile(optionalProfileCreateRequest);
 
@@ -49,6 +50,9 @@ public class BasicUserService implements UserService {
     //cascade persist
     user.addUserStatus(new UserStatus(Instant.now()));
     User saveUser = userRepository.save(user);
+
+    log.info("사용자 생성 완료 id: {}", saveUser.getId());
+
     return userMapper.toDto(saveUser);
   }
 
@@ -82,15 +86,17 @@ public class BasicUserService implements UserService {
     findUser.updateUser(dto.getNewUsername(), dto.getNewEmail(), dto.getNewPassword(),
         nullableProfile);
 
+    log.info("사용자 수정 완료 id: {}", findUser.getId());
+
     return userMapper.toDto(findUser);
   }
 
   @Override
   @Transactional
   public void delete(UUID id) {
-
     //userStatus ddl on delete cascade, profile jpa delete cascade
     userRepository.deleteById(id);
+    log.info("사용자 삭제 완료 id: {}", id);
   }
 
   @Transactional

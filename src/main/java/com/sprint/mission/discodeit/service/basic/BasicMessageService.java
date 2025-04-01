@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessageRepository;
@@ -23,6 +22,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validator.MessageValidator;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,14 +31,13 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
 
   private final MessageRepository messageRepository;
-  private final MessageValidator messageValidator;
 
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
@@ -50,7 +49,6 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto create(MessageCreateDTO dto,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-    //messageValidator.validateMessage(dto.getContent(), dto.getAuthorId(), dto.getChannelId());
     User findUser = userRepository.findById(dto.getAuthorId())
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
@@ -74,6 +72,8 @@ public class BasicMessageService implements MessageService {
         .forEach(message::addAttachments);
 
     messageRepository.save(message);
+
+    log.info("메시지 생성 완료 id: {}", message.getId());
     return messageMapper.toDto(message);
   }
 
@@ -129,6 +129,8 @@ public class BasicMessageService implements MessageService {
     Message findMessage = messageRepository.findById(id)
         .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
     findMessage.setMessage(dto.getNewContent());
+
+    log.info("메시지 수정 완료 id: {}", findMessage.getId());
     return messageMapper.toDto(findMessage);
   }
 
@@ -136,6 +138,7 @@ public class BasicMessageService implements MessageService {
   public void delete(UUID id) {
     //binaryContent ddl - on delete cascade
     messageRepository.deleteById(id);
+    log.info("메시지 삭제 완료 id: {}", id);
   }
 
 

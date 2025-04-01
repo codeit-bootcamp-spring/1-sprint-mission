@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -36,6 +37,10 @@ public class UserController implements UserApi {
       @RequestPart("userCreateRequest") UserCreateDTO userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+
+    log.info("사용자 생성 요청 수신 - username: {}, email: {}",
+        userCreateRequest.getUsername(), userCreateRequest.getEmail());
+
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     return ResponseEntity
@@ -48,6 +53,10 @@ public class UserController implements UserApi {
       @RequestPart("userUpdateDTO") UserUpdateDTO userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+
+    log.info("사용자 생성 요청 수신 - newUsername: {}, newEmail: {}",
+        userUpdateRequest.getNewUsername(), userUpdateRequest.getNewEmail());
+
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     return ResponseEntity
@@ -73,6 +82,7 @@ public class UserController implements UserApi {
   @PatchMapping("{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateDTO request) {
+
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userStatusService.updateByUserId(userId, request.getNewLastActiveAt()));
