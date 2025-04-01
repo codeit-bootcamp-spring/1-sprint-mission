@@ -5,20 +5,18 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusDuplicateException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.validator.UserStatusValidator;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-  private final UserStatusValidator userStatusValidator;
 
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
@@ -34,10 +31,13 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusDto create(UserStatusCreateDTO dto) {
-    userStatusValidator.validateUserStatus(dto.getUserid());
 
     User findUser = userRepository.findById(dto.getUserid())
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new UserNotFoundException(dto.getUserid()));
+
+    if (userStatusRepository.findByUser_Id(findUser.getId()).isPresent()) {
+      throw new UserStatusDuplicateException("userId", findUser.getId().toString());
+    }
 
     UserStatus userStatus = new UserStatus(findUser, Instant.now());
     userStatusRepository.save(userStatus);
@@ -47,7 +47,7 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public UserStatusDto find(UUID id) {
     UserStatus userStatus = userStatusRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+        .orElseThrow(() -> new UserStatusNotFoundException(id));
     return userStatusMapper.toDto(userStatus);
   }
 
@@ -61,7 +61,7 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public UserStatusDto update(UUID userStatusId, UserStatusUpdateDTO userStatusUpdateDTO) {
     UserStatus findUserStatus = userStatusRepository.findById(userStatusId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+        .orElseThrow(() -> new UserStatusNotFoundException(userStatusId));
     findUserStatus.updateLastActiveAt(userStatusUpdateDTO.getNewLastActiveAt());
     return userStatusMapper.toDto(findUserStatus);
   }
@@ -70,7 +70,7 @@ public class BasicUserStatusService implements UserStatusService {
   @Transactional
   public UserStatusDto updateByUserId(UUID userId, Instant time) {
     UserStatus findUserStatus = userStatusRepository.findByUser_Id(userId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+        .orElseThrow(() -> new UserNotFoundException(userId));
     findUserStatus.updateLastActiveAt(time);
 
     return userStatusMapper.toDto(findUserStatus);

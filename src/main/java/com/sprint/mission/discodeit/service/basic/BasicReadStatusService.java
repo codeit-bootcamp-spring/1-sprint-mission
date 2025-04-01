@@ -7,13 +7,17 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.ReadStatus.ReadStatusDuplicateException;
+import com.sprint.mission.discodeit.exception.ReadStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.ReadStatusValidator;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +40,16 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   public ReadStatusDto create(ReadStatusCreateDTO dto) {
     User findUser = userRepository.findById(dto.getUserId())
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new UserNotFoundException(dto.getUserId()));
     Channel findChannel = channelRepository.findById(dto.getChannelId())
-        .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+        .orElseThrow(() -> new ChannelNotFoundException(dto.getChannelId()));
+    if (readStatusRepository.existsByUserIdAndChannelId(findUser.getId(), findChannel.getId())) {
+      throw new ReadStatusDuplicateException(Map.of(
+          "userId", findUser.getId().toString(),
+          "channelId", findChannel.getId().toString()
+      ));
+    }
+
     ReadStatus readStatus = readStatusRepository.save(
         new ReadStatus(findUser, findChannel, dto.getLastReadAt()));
     return readStatusMapper.toDto(readStatus);
@@ -47,7 +58,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   public ReadStatusDto find(UUID id) {
     ReadStatus readStatus = readStatusRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
+        .orElseThrow(() -> new ReadStatusNotFoundException(id));
     return readStatusMapper.toDto(readStatus);
   }
 
@@ -70,7 +81,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   public ReadStatusDto update(UUID id, ReadStatusUpdateDTO dto) {
     ReadStatus findReadStatus = readStatusRepository.findById(id).
-        orElseThrow(() -> new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
+        orElseThrow(() -> new ReadStatusNotFoundException(id));
     findReadStatus.updateLastReadAt(dto.getNewLastReadAt());
     return readStatusMapper.toDto(findReadStatus);
   }

@@ -9,9 +9,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
@@ -19,7 +20,6 @@ import com.sprint.mission.discodeit.repository.jpa.MessageRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.validator.MessageValidator;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,10 +50,10 @@ public class BasicMessageService implements MessageService {
   public MessageDto create(MessageCreateDTO dto,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
     User findUser = userRepository.findById(dto.getAuthorId())
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new UserNotFoundException(dto.getAuthorId()));
 
     Channel findChannel = channelRepository.findById(dto.getChannelId())
-        .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+        .orElseThrow(() -> new ChannelNotFoundException(dto.getChannelId()));
 
     Message message = new Message(dto.getContent(), findUser, findChannel);
 
@@ -83,7 +83,7 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   public MessageDto find(UUID id) {
     Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+        .orElseThrow(() -> new MessageNotFoundException(id));
     return messageMapper.toDto(message);
   }
 
@@ -127,7 +127,7 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto update(UUID id, MessageUpdateDTO dto) {
     Message findMessage = messageRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+        .orElseThrow(() -> new MessageNotFoundException(id));
     findMessage.setMessage(dto.getNewContent());
 
     log.info("메시지 수정 완료 id: {}", findMessage.getId());

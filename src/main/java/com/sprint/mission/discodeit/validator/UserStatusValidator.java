@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.validator;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserStatusRepository;
 import lombok.RequiredArgsConstructor;

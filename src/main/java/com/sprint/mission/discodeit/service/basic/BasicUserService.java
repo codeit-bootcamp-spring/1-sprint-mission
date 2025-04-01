@@ -8,8 +8,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 
+import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
@@ -43,6 +44,13 @@ public class BasicUserService implements UserService {
   public UserDto create(UserCreateDTO dto,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
+    if (userRepository.existsByEmail(dto.getEmail())) {
+      throw new UserDuplicateException("email", dto.getEmail());
+    }
+    if (userRepository.existsByUsername(dto.getUsername())) {
+      throw new UserDuplicateException("username", dto.getUsername());
+    }
+
     BinaryContent nullableProfile = saveBinaryFile(optionalProfileCreateRequest);
 
     User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword(), nullableProfile);
@@ -60,7 +68,7 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public UserDto find(UUID id) {
     User findUser = userRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new UserNotFoundException(id));
     return userMapper.toDto(findUser);
   }
 
@@ -79,7 +87,14 @@ public class BasicUserService implements UserService {
     userValidator.validateUpdateUser(id, dto.getNewUsername(), dto.getNewEmail(),
         dto.getNewPassword());
     User findUser = userRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new UserNotFoundException(id));
+
+    if (userRepository.existsByEmail(dto.getNewEmail())) {
+      throw new UserDuplicateException("email", dto.getNewEmail());
+    }
+    if (userRepository.existsByUsername(dto.getNewUsername())) {
+      throw new UserDuplicateException("username", dto.getNewUsername());
+    }
 
     BinaryContent nullableProfile = saveBinaryFile(optionalProfileCreateRequest);
 

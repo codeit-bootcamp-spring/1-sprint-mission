@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller.swagger;
 
-import com.sprint.mission.discodeit.dto.ErrorResponse;
 import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageDto;

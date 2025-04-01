@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.*;
@@ -39,7 +38,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional(readOnly = true)
   public BinaryContentDto find(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
+        .orElseThrow(() -> new BinaryContentNotFoundException(id));
     return binaryContentMapper.toDto(binaryContent);
   }
 

@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.FileProcessingException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-  BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
-
   //NOT_FOUND
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User을 찾을 수 없습니다."),
   CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "Channel을 찾을 수 없습니다."),
@@ -27,15 +25,16 @@ public enum ErrorCode {
   LOGIN_INFO_MISMATCH(HttpStatus.UNAUTHORIZED, "로그인 정보가 불일치합니다."),
   PRIVATE_CHANNEL_IMMUTABLE(HttpStatus.FORBIDDEN, "PRIVATE 채널은 수정 불가능합니다."),
 
-  //405
-  METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 메서드입니다."),
-
   //500
   FILE_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장에 실패했습니다."),
-  FILE_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일을 읽는 중 오류가 발생했습니다."),//
-  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "내부 서버 오류입니다.");
-  //FILE_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 처리 중 오류가 발생했습니다."),
+  FILE_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일을 읽는 중 오류가 발생했습니다."),
 
-  private final HttpStatus status;
+  //공통 에러 코드
+  BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."), //400
+  VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "요청 값 검증에 실패했습니다."), //400
+  METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "허용되지 않은 메서드입니다."), //405
+  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."); //500
+
+  private final HttpStatus httpStatus;
   private final String message;
 }

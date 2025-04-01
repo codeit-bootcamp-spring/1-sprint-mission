@@ -1,23 +1,48 @@
 package com.sprint.mission.discodeit.dto;
 
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import java.time.Instant;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ErrorResponse {
-    private final int status;
-    private final String error;
-    private final String code;
-    private final String message;
 
-    //stauts : 상태코드
-    //error : 에러코드
-    //code : enum name
-    //message : enum 메시지
-    public ErrorResponse(ErrorCode errorCode) {
-        this.status = errorCode.getStatus().value();
-        this.error = errorCode.getStatus().name();
-        this.code = errorCode.name();
-        this.message = errorCode.getMessage();
-    }
+  private Instant timestamp;
+  private String code;
+  private String message;
+  private Map<String, Object> details;
+  private String exceptionType;
+  private int status;
+
+  public static ErrorResponse from(DiscodeitException exception) {
+    return ErrorResponse.builder()
+        .timestamp(exception.getTimestamp())
+        .code(exception.getErrorCode().name()) //ex)USER_NOT_FOUND
+        .message(exception.getErrorCode().getMessage()) //"user을 찾을 수 없습니다"
+        .details(exception.getDetails())
+        .exceptionType(exception.getClass().getSimpleName())
+        .status(exception.getErrorCode().getHttpStatus().value())
+        .build();
+  }
+
+  public static ErrorResponse of(ErrorCode errorCode, Map<String, Object> details,
+      Class<?> exceptionClass) {
+    return new ErrorResponse(
+        Instant.now(),
+        errorCode.name(),
+        errorCode.getMessage(),
+        details,
+        exceptionClass.getSimpleName(),
+        errorCode.getHttpStatus().value()
+    );
+  }
+
 }

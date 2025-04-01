@@ -2,15 +2,15 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelImmutableException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.validator.ChannelValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,14 +27,12 @@ public class BasicChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
 
-  private final ChannelValidator channelValidator;
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
 
 
   @Override
   public ChannelDto create(ChannelCreatePublicDTO dto) {
-    channelValidator.validateChannel(dto.getName(), dto.getDescription());
     Channel channel = new Channel(dto.getName(), dto.getDescription(), ChannelType.PUBLIC);
     channelRepository.save(channel);
 
@@ -51,7 +49,7 @@ public class BasicChannelService implements ChannelService {
     dto.getParticipantIds().stream()
         .map(userId -> {
           User findUser = userRepository.findById(userId)
-              .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+              .orElseThrow(() -> new UserNotFoundException(userId));
           return new ReadStatus(findUser, channel, Instant.EPOCH);
         })
         .forEach(readStatusRepository::save);
@@ -64,7 +62,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   public ChannelDto find(UUID id) {
     Channel findChannel = channelRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+        .orElseThrow(() -> new ChannelNotFoundException(id));
     return channelMapper.toDto(findChannel);
   }
 
@@ -85,10 +83,10 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public ChannelDto update(UUID id, ChannelUpdateDTO dto) {
     Channel findChannel = channelRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+        .orElseThrow(() -> new ChannelNotFoundException(id));
 
     if (findChannel.getChannelType() == ChannelType.PRIVATE) {
-      throw new BadRequestException(ErrorCode.PRIVATE_CHANNEL_IMMUTABLE);
+      throw new PrivateChannelImmutableException(id);
     }
     findChannel.setChannel(dto.getNewName(), dto.getNewDescription());
 

@@ -2,50 +2,64 @@ package com.sprint.mission.discodeit.exception;
 
 
 import com.sprint.mission.discodeit.dto.ErrorResponse;
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(FileProcessingException.class)
-  protected ResponseEntity<ErrorResponse> handleFileProcessingException(
-      final FileProcessingException e) {
+  @ExceptionHandler(DiscodeitException.class)
+  public ResponseEntity<ErrorResponse> handleDiscodeitException(
+      final DiscodeitException exception) {
     return ResponseEntity
-        .status(e.getErrorCode().getStatus().value())
-        .body(new ErrorResponse(e.getErrorCode()));
+        .status(exception.getErrorCode().getHttpStatus())
+        .body(ErrorResponse.from(exception));
   }
 
-  @ExceptionHandler(NotFoundException.class)
-  protected ResponseEntity<ErrorResponse> handleNotFoundException(final NotFoundException e) {
-    return ResponseEntity
-        .status(e.getErrorCode().getStatus().value())
-        .body(new ErrorResponse(e.getErrorCode()));
+  //valid 에러
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  protected ResponseEntity<ErrorResponse> handleValidationException(
+      MethodArgumentNotValidException e) {
+    ErrorCode errorCode = ErrorCode.VALIDATION_FAILED;
+
+    // 필드별 에러 메시지 리스트 생성
+    List<String> errors = e.getBindingResult().getFieldErrors().stream()
+        .map(err -> err.getField() + ": " + err.getDefaultMessage())
+        .toList();
+
+    ErrorResponse response = ErrorResponse.of(
+        errorCode,
+        Map.of("errors", errors),
+        e.getClass()
+    );
+
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
-  @ExceptionHandler(BadRequestException.class)
-  protected ResponseEntity<ErrorResponse> handleBadRequestException(final BadRequestException e) {
-    return ResponseEntity
-        .status(e.getErrorCode().getStatus().value())
-        .body(new ErrorResponse(e.getErrorCode()));
-  }
-
-  //HTTP 405 Exception
+  //잘못된 http method 요청
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-  protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
+  protected ResponseEntity<ErrorResponse> handleMethodNotAllowed(
       final HttpRequestMethodNotSupportedException e) {
+    ErrorCode errorCode = ErrorCode.METHOD_NOT_ALLOWED;
     return ResponseEntity
-        .status(ErrorCode.METHOD_NOT_ALLOWED.getStatus().value())
-        .body(new ErrorResponse(ErrorCode.METHOD_NOT_ALLOWED));
+        .status(errorCode.getHttpStatus())
+        .body(ErrorResponse.of(errorCode, Map.of("method", e.getMethod()), e.getClass()));
   }
 
-  //HTTP 500 Exception
+  //그 외 모든 에러
   @ExceptionHandler(Exception.class)
-  protected ResponseEntity<ErrorResponse> handleException(final Exception e) {
+  protected ResponseEntity<ErrorResponse> handleUnknownException(final Exception e) {
     return ResponseEntity
-        .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus().value())
-        .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR));
+        .status(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus())
+        .body(ErrorResponse.of(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            Map.of("error", e.getMessage()),
+            e.getClass()
+        ));
   }
 }
