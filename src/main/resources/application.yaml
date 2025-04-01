@@ -15,11 +15,13 @@ springdoc:
     path: /swagger-ui.html
     groups-order: ASC
     enabled: true
+
 discodeit:
   storage:
     type: local
     local:
       root-path: .discodeit/storage
+      
 logging:
   config: classpath:logback-spring.xml
 

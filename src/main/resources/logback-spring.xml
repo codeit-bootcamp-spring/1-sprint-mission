@@ -1,38 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <!-- 스프링 프로파일 지원 -->
-    <springProperty name="LOG_PATH" source="LOG_PATH" defaultValue="./.logs"/>
-
-    <!-- 콘솔 로그 패턴 설정 -->
-    <property name="CONSOLE_LOG_PATTERN" value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} - %msg%n"/>
-
-    <!-- 파일 로그 패턴 설정 -->
-    <property name="FILE_LOG_PATTERN" value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} - %msg%n"/>
+    <!-- 변수 정의 -->
+    <property name="LOG_PATH" value="${user.dir}/.logs"/>
+    <property name="LOG_PATTERN" value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} - %msg%n"/>
 
     <!-- 콘솔 출력 설정 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <!-- 파일 출력 설정 -->
+    <!-- 파일 출력 설정 (일자별 롤링) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/application.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/application-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory> <!-- 30일간 로그 보관 -->
-        </rollingPolicy>
         <encoder>
-            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 일자별 롤링 명확하게 설정 -->
+            <fileNamePattern>${LOG_PATH}/application.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
     </appender>
 
-    <!-- Root Logger 설정 -->
+    <!-- 스프링 프로파일에 따른 로그 레벨 설정 -->
+    <springProfile name="dev">
+        <logger name="com.spring.discodeit" level="debug"/>
+        <logger name="org.hibernate.SQL" level="debug"/>
+        <logger name="org.hibernate.type.descriptor.sql" level="trace"/>
+        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
+    </springProfile>
+
+    <springProfile name="prod">
+        <logger name="com.spring.discodeit" level="info"/>
+        <logger name="org.hibernate.SQL" level="info"/>
+        <logger name="org.hibernate.type.descriptor.sql" level="trace"/>
+        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
+    </springProfile>
+
+    <!-- 기본 로그 레벨 설정 -->
     <root level="info">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
-
 </configuration>
