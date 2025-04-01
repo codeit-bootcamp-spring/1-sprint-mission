@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class UserController implements UserApi {
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(
-      @RequestPart("userCreateRequest") UserCreateDTO userCreateRequest,
+      @Valid @RequestPart("userCreateRequest") UserCreateDTO userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
 
@@ -50,7 +51,7 @@ public class UserController implements UserApi {
 
   @PatchMapping("{userId}")
   public ResponseEntity<UserDto> update(@PathVariable UUID userId,
-      @RequestPart("userUpdateDTO") UserUpdateDTO userUpdateRequest,
+      @Valid @RequestPart("userUpdateDTO") UserUpdateDTO userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
 
@@ -81,7 +82,7 @@ public class UserController implements UserApi {
 
   @PatchMapping("{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
-      @RequestBody UserStatusUpdateDTO request) {
+      @Valid @RequestBody UserStatusUpdateDTO request) {
 
     return ResponseEntity
         .status(HttpStatus.OK)

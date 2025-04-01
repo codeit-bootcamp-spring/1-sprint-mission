@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +23,16 @@ public class ChannelController implements ChannelApi {
   private final ChannelService channelService;
 
   @PostMapping("public")
-  public ResponseEntity<ChannelDto> createPublic(@RequestBody ChannelCreatePublicDTO request) {
+  public ResponseEntity<ChannelDto> createPublic(
+      @Valid @RequestBody ChannelCreatePublicDTO request) {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(channelService.create(request));
   }
 
   @PostMapping("private")
-  public ResponseEntity<ChannelDto> createPrivate(@RequestBody ChannelCreatePrivateDTO request) {
+  public ResponseEntity<ChannelDto> createPrivate(
+      @RequestBody ChannelCreatePrivateDTO request) {
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(channelService.create(request));
