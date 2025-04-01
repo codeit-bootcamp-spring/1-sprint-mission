@@ -1,4 +1,7 @@
 spring:
+  profiles:
+    active: dev
+    
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -7,9 +10,10 @@ spring:
 
   thymeleaf:
     cache: false
-    h2:
-      console:
-        enabled: true
+    
+  h2:
+    console:
+      enabled: true
 
   jpa:
     hibernate:
@@ -58,13 +62,9 @@ spring:
     # response media type 의 기본 값
     default-produces-media-type: application/json
 
-    # 해당 패턴에 매칭되는 controller만 swagger-ui에 노출한다.
-    # paths-to-match:
-
 logging:
   level:
-    org.hibernate.SQL: debug
-#    org.hibernate.orm.jdbc.bind: trace
+    root: info
 
 discodeit:
   storage:
