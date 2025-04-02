@@ -426,7 +426,6 @@ public class ChannelServiceTest {
     UUID id = UUID.randomUUID();
 
     // 실패 시나리오
-    given(inputHandler.getYesNOInput()).willReturn("y");
     given(userRepository.findById(id)).willReturn(Optional.empty());
 
     /** when & then - 예외 발생 검증 **/

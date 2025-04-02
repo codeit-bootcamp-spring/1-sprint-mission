@@ -53,7 +53,7 @@ public class BasicChannelService implements ChannelService {
         .name(request.name())
         .description(request.description())
         .build();
-    channelRepository.save(channel);
+    channel = channelRepository.save(channel);
 
     log.info("공개 채널 생성 성공: channelName={}, createdAt={}",
         channel.getName(),
@@ -68,7 +68,8 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.builder()
         .type(ChannelType.PRIVATE)
         .build();
-    channelRepository.save(channel);
+    Channel savedChannel = channelRepository.save(channel);
+    log.info("채널 저장 성공, ID: {}", savedChannel.getId());
 
     request.participantIds().stream()
         .map(userId -> ReadStatus.builder()
@@ -77,22 +78,25 @@ public class BasicChannelService implements ChannelService {
               log.error("비공개 채널 생성 단계에서 유저를 찾지 못함: userId={}", userId);
               return new UserNotFoundException(Map.of("UserId", userId));
             }))
-            .channel(channelRepository.findById(channel.getId()).orElseThrow(
+            .channel(channelRepository.findById(savedChannel.getId()).orElseThrow(
                 () -> {
-                  log.error("비공개 채널을 찾지 못함: privateChannelId={}", channel.getId());
-                  return new ChannelNotFoundException(Map.of("channelId", channel.getId()));
+                  log.error("비공개 채널을 찾지 못함: privateChannelId={}", savedChannel.getId());
+                  return new ChannelNotFoundException(Map.of("channelId", savedChannel.getId()));
                 }))
-            .lastReadAt(channel.getCreatedAt())
+            .lastReadAt(savedChannel.getCreatedAt())
             .build()
         )
         .forEach(readStatusRepository::save);
 
     log.info("비공개 채널 생성 성공");
-    return channelMapper.toDto(channel);
+    return channelMapper.toDto(savedChannel);
   }
 
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
+    userRepository.findById(userId).orElseThrow(() -> {
+      return new UserNotFoundException(Map.of("userId", userId));
+    });
     List<Channel> channels = readStatusService.findAllReadStatusEntitiesByUserId(userId).stream()
         .map(ReadStatus::getChannel)
         .toList();
@@ -127,10 +131,14 @@ public class BasicChannelService implements ChannelService {
       throw new ChannelModificationNotAllowedException(Map.of("privateChannelId", id));
     } // 전역 400
 
-    channel.updateName(request.newName());
-    channel.updateDescription(request.newDescription());
-    // 수정 시간 업데이트
-    channel.refreshUpdateAt();
+    if (request.newName() != null) {
+      channel.updateName(request.newName());
+      channel.refreshUpdateAt();
+    }
+    if (request.newDescription() != null) {
+      channel.updateDescription(request.newDescription());
+      channel.refreshUpdateAt();
+    }
 
     log.info("채널 수정 시도 성공: channelName={}, updatedAt={}",
         channel.getName(),

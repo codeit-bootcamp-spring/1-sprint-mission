@@ -101,6 +101,10 @@ public class BasicMessageService implements MessageService {
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
     // 왜 이렇게 변환하는거지 (이해가 필요...)
 
+    channelRepository.findById(channelId).orElseThrow(() -> {
+      return new ChannelNotFoundException(Map.of("channelId", channelId));
+    });
+
     // 페이징된 데이터 조회
     Page<Message> messagePage = messageRepository.findByChannelId(channelId, pageable);
 

@@ -3,7 +3,7 @@ spring:
     name: discodeit
 
   profiles:
-    active: prod
+    active: test
 
   jpa:
     show-sql: true
@@ -48,8 +48,8 @@ info:
     spring-boot-version: 3.4.0
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:h2:mem:devDB;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
 
   jpa:
     ddl-auto: validate

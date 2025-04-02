@@ -13,7 +13,7 @@ spring:
       mode: always # Spring Boot DB 테이블 만들기
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         highlight_sql: true # 텍스트에 컬러 입히기
@@ -22,7 +22,6 @@ spring:
 logging:
   level:
     root: INFO
-    org.springframework.security: TRACE # 요청마다 통과하는 필터 목록 확인하기
     org.hibernate.SQL: DEBUG # Hibernate SQL 쿼리 로그만 DEBUG 활성화, Logger 로 출력
     org.hibernate.orm.jdbc.bind: TRACE # 바인딩된 파라미터 표시 로그
 server:

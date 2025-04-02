@@ -36,7 +36,7 @@ public class UserController {
     /* 유저 생성 요청(Request) */
     log.info("유저 생성 요청(Request): username={}, hasProfileImage={}",
         userCreateRequest.username(),
-        !file.isEmpty());
+        file != null);
 
     // 프로필 이미지 처리 
     /* TODO(멘토님께) : 삼항 연산자를 쓰면 가독성이 떨어진다는 이야기를 들었는데,
