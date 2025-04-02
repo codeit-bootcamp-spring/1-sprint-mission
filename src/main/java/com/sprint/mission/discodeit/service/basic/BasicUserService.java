@@ -7,6 +7,12 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.file.FileUploadFailedException;
+import com.sprint.mission.discodeit.exception.file.InvalidFileDataException;
+import com.sprint.mission.discodeit.exception.user.DuplicatedEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicatedUsernameException;
+import com.sprint.mission.discodeit.exception.user.InvalidUserInputException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -18,6 +24,7 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +32,7 @@ import java.time.Instant;
 import java.util.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -35,21 +43,24 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentMapper binaryContentMapper;
 
-  @Autowired
-  private EntityManager entityManager;
-
   @Override
   @Transactional
   public UserDto createUser(UserCreateRequestDto request, MultipartFile profile) {
+    log.info("Create user: name={},email={},password={}", request.getUsername(), request.getEmail(),
+        request.getPassword());
     if (request.getUsername() == null || request.getEmail() == null
         || request.getPassword() == null) {
-      throw new IllegalArgumentException("사용자 정보를 올바르게 입력해야 합니다.");
+      log.warn("Invalid request: name={},email={},password={}", request.getUsername(),
+          request.getEmail(), request.getPassword());
+      throw new InvalidUserInputException();
     }
     if (userRepository.existsByEmail(request.getEmail())) {
-      throw new IllegalArgumentException("Email already in use");
+      log.warn("Email already exists: {}", request.getEmail());
+      throw new DuplicatedEmailException();
     }
     if (userRepository.existsByUsername(request.getUsername())) {
-      throw new IllegalArgumentException("Name already in use");
+      log.warn("Username already exists: {}", request.getUsername());
+      throw new DuplicatedUsernameException();
     }
 
     BinaryContent profileImage =
@@ -58,6 +69,7 @@ public class BasicUserService implements UserService {
     User user = new User(request.getUsername(), request.getEmail(), request.getPassword(),
         profileImage);
     userRepository.save(user);
+    log.debug("Saved user: id={}, email={}", user.getId(), user.getEmail());
 
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
@@ -71,7 +83,7 @@ public class BasicUserService implements UserService {
   public UserDto getUserById(UUID id) {
     return userRepository.findById(id)
         .map(userMapper::toDto)
-        .orElseThrow(() -> new IllegalArgumentException("User id : " + id + " not found"));
+        .orElseThrow(UserNotFoundException::new);
   }
 
   @Override
@@ -84,12 +96,13 @@ public class BasicUserService implements UserService {
   @Transactional
   public UserDto updateUser(UUID userId, UserUpdateRequestDto request, MultipartFile profile) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User not found"));
-
+        .orElseThrow(UserNotFoundException::new);
+    log.info("Update user: id={}, email={}", userId, user.getEmail());
     BinaryContent oldProfile = user.getProfile();
 
     if (profile != null && !profile.isEmpty()) {
       if (oldProfile == null || !oldProfile.getFileName().equals(profile.getOriginalFilename())) {
+        log.debug("profile update: old={}, new={}", oldProfile, profile);
         if (oldProfile != null) {
           binaryContentStorage.delete(oldProfile.getId(),
               getFileExtension(oldProfile.getFileName()));
@@ -108,17 +121,12 @@ public class BasicUserService implements UserService {
   }
 
 
-  private String getFileExtension(String fileName) {
-    int dotIndex = fileName.lastIndexOf(".");
-    return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
-  }
-
   @Override
   @Transactional
   public void deleteUser(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User not found"));
-
+        .orElseThrow(UserNotFoundException::new);
+    log.info("user deleted: id={}, email={}", userId, user.getEmail());
     if (user.getProfile() != null) {
       UUID profileId = user.getProfile().getId();
       String extension = getFileExtension(user.getProfile().getFileName());
@@ -127,12 +135,17 @@ public class BasicUserService implements UserService {
     }
 
     userRepository.delete(user);
+    log.debug("Deleted user o: id={}, email={}", userId, user.getEmail());
   }
 
+  private String getFileExtension(String fileName) {
+    int dotIndex = fileName.lastIndexOf(".");
+    return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
+  }
 
   private BinaryContent saveProfile(MultipartFile profileFile) {
     if (profileFile == null || profileFile.isEmpty()) {
-      throw new NoSuchElementException("Profile file is null or empty");
+      throw new InvalidFileDataException();
     }
 
     BinaryContent binaryContent = new BinaryContent(
@@ -149,7 +162,7 @@ public class BasicUserService implements UserService {
           extension);
       savedContent.setFilePath(filePath.toString());
     } catch (IOException e) {
-      throw new RuntimeException("Failed to save profile file", e);
+      throw new FileUploadFailedException();
     }
 
     return savedContent;

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.Interface.UserService;
 import com.sprint.mission.discodeit.service.Interface.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ public class UserController implements UserApi {
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UserDto> createUser(
-      @RequestPart("userCreateRequest") UserCreateRequestDto userCreateRequest,
+      @Valid @RequestPart("userCreateRequest") UserCreateRequestDto userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
     UserDto createdUser = userService.createUser(userCreateRequest, profile);
@@ -48,7 +49,7 @@ public class UserController implements UserApi {
       MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<UserDto> updateUser(
       @PathVariable("userId") UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequestDto userUpdateRequest,
+      @Valid @RequestPart("userUpdateRequest") UserUpdateRequestDto userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
 

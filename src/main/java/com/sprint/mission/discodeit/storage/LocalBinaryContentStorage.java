@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.file.FileUploadFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +50,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       Files.write(filePath, data);
       return filePath;
     } catch (IOException e) {
-      throw new RuntimeException("Failed to store file", e);
+      throw new FileUploadFailedException();
     }
   }
 

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.Interface.MessageService;
+import jakarta.validation.Valid;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class MessageController implements MessageApi {
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> createMessage(
-      @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
+      @Valid @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
     List<BinaryContentDto> attachmentRequests = attachments != null
@@ -47,7 +48,7 @@ public class MessageController implements MessageApi {
   @Override
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable("messageId") UUID messageId,
-      @RequestBody UpdateMessageRequestDto request) {
+      @Valid @RequestBody UpdateMessageRequestDto request) {
     MessageDto updatedMessage = messageService.updateMessage(messageId, request);
     return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
   }

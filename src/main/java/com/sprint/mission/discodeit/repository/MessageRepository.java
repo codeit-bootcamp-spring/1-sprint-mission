@@ -16,12 +16,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   boolean existsById(UUID id);
 
-
-  Page<Message> findByChannelId(UUID channelId, Pageable pageable);
-
-  @Query("SELECT COUNT(m) FROM Message m WHERE m.channel.id = :channelId")
-  Long countByChannelId(@Param("channelId") UUID channelId);
-
   @EntityGraph(attributePaths = {"author", "author.profile.id", "attachmentIds"})
   @Query("SELECT m FROM Message m "
       + "WHERE m.channel.id = :channelId ORDER BY m.createdAt DESC")

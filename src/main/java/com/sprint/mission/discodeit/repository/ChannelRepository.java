@@ -24,7 +24,4 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
       )
       """)
   List<Channel> findAllByUserId(UUID userId);
-
-  @Query("select c from Channel c left join fetch c.readStatuses where c.id= : channelId")
-  Optional<Channel> findWithReadStatus(@Param("channelId") UUID channelId);
 }

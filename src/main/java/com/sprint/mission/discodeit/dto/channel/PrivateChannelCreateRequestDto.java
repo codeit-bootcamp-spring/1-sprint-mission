@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto.channel;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,5 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PrivateChannelCreateRequestDto {
 
+  @NotEmpty
+  @Size(min = 1)
   private List<UUID> participantIds;
 }

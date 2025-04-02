@@ -5,40 +5,90 @@ discodeit:
       root-path: /path/to/storage
 
 spring:
+  profiles:
+    active: dev
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
         default_batch_fetch_size: 100
+  output:
+    ansi:
+      enabled: always
   #  sql:
   #    init:
   #      mode: always
   #      schema-locations: classpath:schema.sql
-  profiles:
-    active: local
   servlet:
     multipart:
       enabled: true
       max-file-size: 5MB  # 업로드할 파일 최대 크기
       max-request-size: 10MB
 
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-
-
 logging:
   level:
-    root:   # 전체 로그 레벨을 DEBUG로 변경
-    org.springframework.web: DEBUG  # Spring Web 관련 로그 상세 출력
-    org.springframework.web.servlet: DEBUG
-    org.springframework.web.multipart: DEBUG  # Multipart 파일 업로드 관련 로그
+    root: info
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers, env
+#  endpoint:
+#    health:
+#      show-details: always
+
+info:
+  app.name: Discodeit
+  app.version: 1.7.0
+  java-version: 17
+  spring-boot-version: 3.4.2
+  datasource-url: ${spring.datasource.url}
+  ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+  storage-type: ${discodeit.storage.type}
+  storage-path: ${discodeit.storage.local.root-path}
+#  app:
+#    name: Discodeit
+#    version: 1.7.0
+#    java-version: 17
+#    spring-boot-version: 3.4.2
+#
+#  datasource:
+#    url: ${spring.datasource.url}
+#    driver-class-name: ${spring.datasource.driver-class-name}
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+#
+#  storage:
+#    type: ${discodeit.storage.type}
+#    path: ${discodeit.storage.local.root-path}
+#
+#  multipart:
+#    max-file-size: ${spring.servlet.multipart.max-file-size}
+#    max-request-size: ${spring.servlet.multipart.max-request-size}
+#  app:
+#    name: Discodeit
+#    version: 1.7.0
+#    java-version: 17
+#    spring-boot-version: 3.4.2
+#
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/discodeit
+#    driver-class-name: org.postgresql.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#
+#  storage:
+#    type: local
+#    path: /path/to/storage
+#
+#  multipart:
+#    max-file-size: 5MB
+#    max-request-size: 10MB

@@ -6,6 +6,10 @@ import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.UserAlreadyMemberException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -33,14 +37,14 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   public ReadStatusDto create(CreateReadStatusRequestDto request) {
     Channel channel = channelRepository.findById(request.getChannelId())
-        .orElseThrow(() -> new NoSuchElementException("No channel found"));
+        .orElseThrow(ChannelNotFoundException::new);
 
     User user = userRepository.findById(request.getUserId())
-        .orElseThrow(() -> new NoSuchElementException("No user found"));
+        .orElseThrow(UserNotFoundException::new);
 
     if (readStatusRepository.existsByUserIdAndChannelId(request.getChannelId(),
         request.getUserId())) {
-      throw new NoSuchElementException("user already has member of channel");
+      throw new UserAlreadyMemberException();
     }
 
     Instant now = request.getLastReadAt();
@@ -52,7 +56,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   public ReadStatus find(UUID id) {
     return readStatusRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("readStatus not found"));
+        .orElseThrow(ReadStatusNotFoundException::new);
   }
 
   @Override
@@ -65,7 +69,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   public ReadStatusDto update(UUID readStatusId, UpdateReadStatusRequestDto request) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new NoSuchElementException("ReadStatus id not found"));
+        .orElseThrow(ReadStatusNotFoundException::new);
     readStatus.update(request.getNewLastReadAt());
     return readStatusMapper.toDto(readStatus);
   }
@@ -79,7 +83,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   public void delete(UUID id) {
     if (!readStatusRepository.existsById(id)) {
-      throw new NoSuchElementException("readStatus not found");
+      throw new ReadStatusNotFoundException();
     }
     readStatusRepository.deleteById(id);
   }

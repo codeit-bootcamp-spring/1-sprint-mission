@@ -12,6 +12,4 @@ public interface BinaryContentRepository extends JpaRepository<BinaryContent, UU
   List<BinaryContent> findAllByIdIn(List<UUID> ids);
 
   void deleteById(UUID id);
-
-  void deleteByMessage(Message message);
 }
