@@ -20,11 +20,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -33,16 +30,7 @@ class UserServiceTest {
 	private UserRepository userRepository;
 
 	@Mock
-	private UserStatusRepository userStatusRepository;
-
-	@Mock
 	private UserMapper userMapper;
-
-	@Mock
-	private BinaryContentRepository binaryContentRepository;
-
-	@Mock
-	private BinaryContentStorage binaryContentStorage;
 
 	@InjectMocks
 	private BasicUserService userService;

@@ -28,12 +28,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
@@ -49,12 +47,6 @@ class MessageServiceTest {
 
 	@Mock
 	private MessageMapper messageMapper;
-
-	@Mock
-	private BinaryContentStorage binaryContentStorage;
-
-	@Mock
-	private BinaryContentRepository binaryContentRepository;
 
 	@InjectMocks
 	private BasicMessageService messageService;
@@ -92,7 +84,7 @@ class MessageServiceTest {
 		given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
 		given(userRepository.findById(authorId)).willReturn(Optional.of(author));
 		given(messageRepository.save(any(Message.class))).willReturn(message);
-		given(messageMapper.toDto(message)).willReturn(messageDto);
+		given(messageMapper.toDto(any(Message.class))).willReturn(messageDto);
 
 		// when
 		MessageDto result = messageService.create(request, List.of());
