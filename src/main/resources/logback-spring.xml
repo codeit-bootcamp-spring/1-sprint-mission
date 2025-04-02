@@ -1,0 +1,45 @@
+<configuration>
+
+  <!-- Spring Boot 색상 지원을 위한 설정 포함 -->
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+  <!-- 로그 파일 경로 -->
+  <property name="LOG_PATH" value=".logs"/>
+  <property name="LOG_FILE" value="${LOG_PATH}/application.log"/>
+
+  <!-- 기본 콘솔 패턴 (색상 지원) -->
+  <property name="CONSOLE_LOG_PATTERN"
+    value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%thread]){faint} %highlight(%-5level) %clr(%logger{36}){cyan} - %msg%n"/>
+
+  <!-- 기본 파일 패턴 (색상 없음) -->
+  <property name="FILE_LOG_PATTERN"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger - %msg%n"/>
+
+  <!-- 콘솔 로그 -->
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <!-- 파일 로그 -->
+  <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_FILE}</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/application.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <!-- 루트 로거 설정 -->
+  <root level="INFO">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="FileAppender"/>
+  </root>
+
+</configuration>
