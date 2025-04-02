@@ -27,9 +27,6 @@ public class UserStatus extends BaseUpdatableEntity {
   @JoinColumn(name = "user_id")
   private User user;
 
-  // 다이어그램에는 없는데 Mapper 용으로 생성
-  boolean online;
-
   // JPA용 기본 생성자, JPA만 접근할 수 있도록 protected 접근자 설정
   protected UserStatus() {
 
@@ -40,7 +37,6 @@ public class UserStatus extends BaseUpdatableEntity {
   }
 
   public boolean isOnline() {
-    online = Duration.between(this.lastActiveAt, Instant.now()).toMinutes() <= 5;
-    return online;
+    return Duration.between(this.lastActiveAt, Instant.now()).toMinutes() <= 5;
   }
 }

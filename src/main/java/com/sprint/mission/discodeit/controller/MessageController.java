@@ -6,13 +6,13 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.reponse.PageResponse;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -43,17 +43,26 @@ public class MessageController {
         attachments != null);
 
     // 메세지 첨부 파일 생성
-    List<BinaryContentCreateRequest> binaryContentCreateRequests = new ArrayList<>();
-    if (attachments != null) {
-      for (MultipartFile file : attachments) {
-        log.debug("메세지 첨부 파일 생성: fileName={}", file.getName());
-        binaryContentCreateRequests.add(new BinaryContentCreateRequest(file));
-      }
-    }
+    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getSize(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
 
     // 메세지 생성
     MessageDto messageDto = messageService.createMessage(messageCreateRequest,
-        binaryContentCreateRequests);
+        attachmentRequests);
 
     log.info("메세지 생성 응답(Response): messageContent={}, HttpStatus={}",
         messageDto.content(),

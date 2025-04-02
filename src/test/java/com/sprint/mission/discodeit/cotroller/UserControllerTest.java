@@ -12,10 +12,14 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.mockito.Mockito.eq;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -62,9 +66,11 @@ public class UserControllerTest {
     // 서비스 호출시 반환 값 지정
     // given(userService.createUser(any(UserCreateRequest.class), null)).willReturn(userDto); --> Mockito에서 인수 매처(argument matchers)와 원시값(raw value)을 혼합해서 사용하면 안 된다.
     given(
-        userService.createUser(any(UserCreateRequest.class),
-            any(BinaryContentCreateRequest.class))).willReturn(
-        userDto);
+        userService.createUser(
+            any(UserCreateRequest.class),
+            eq(Optional.ofNullable(any(BinaryContentCreateRequest.class)))
+        )
+    ).willReturn(userDto);
   }
 
   @Test

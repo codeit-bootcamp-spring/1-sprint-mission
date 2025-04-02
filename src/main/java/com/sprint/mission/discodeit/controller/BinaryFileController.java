@@ -30,11 +30,7 @@ public class BinaryFileController {
   @GetMapping(value = "/{binaryContentId}/download")
   public ResponseEntity<?> downloadBinaryContent(@PathVariable UUID id) {
     log.info("파일 다운로드 요청(Request)");
-    // BinaryContentStorage 를 직접 들고와서 쓰라는 것(클래스 다이어그램)으로 이해는 했지만,
-    // 그러면 컨트롤러 단에서 Mapper를 통한 변환(id로 BinaryContent 를 부르고, BinaryContent <-> DTO)이 이뤄이지 때문에
-    // 저는 우선 binaryContentService 에 download 관련 메서드를 추가했습니다.
-    // 내부적으로는 binaryContentStorage 의 downlaod 메서드가 호출됩니다.
-    // 즉, 다운로드 API -> (컨트롤러 - 서비스 - 스토리지) 단에서 기능 구현
+
     ResponseEntity<?> downloadBinaryContent = binaryContentService.downloadBinaryContent(id);
     log.info("파일 다운로드 응답(Response): HttpStatus={}", HttpStatus.OK);
     return downloadBinaryContent;

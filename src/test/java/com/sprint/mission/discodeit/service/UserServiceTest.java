@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.exception.user.UsernameAlreadyExistsExceptio
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.never;
 
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -46,6 +48,12 @@ public class UserServiceTest {
 
   @Mock
   private UserRepository userRepository;
+
+  @Mock
+  private BinaryContentStorage binaryContentStorage;
+
+  @Mock
+  private BinaryContentRepository binaryContentRepository;
 
   @Mock
   private BinaryContentService binaryContentService;
@@ -75,8 +83,9 @@ public class UserServiceTest {
     // (1) UserService 에서 User 객체 생성 시도할 때 받는 파라미터
     UserCreateRequest userCreateRequest = new UserCreateRequest("testUser", "test@example.com",
         "password123");
-    BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
-        "profile.jpg", 1024L, "image/jpeg", new byte[]{});
+    Optional<BinaryContentCreateRequest> binaryContentCreateRequest = Optional.of(
+        new BinaryContentCreateRequest(
+            "profile.jpg", 1024L, "image/jpeg", new byte[]{}));
 
     // (2) 유효성 검증 -- when이 실행될 때 아래와 같은 결과를 반환한다.
     given(userRepository.existsByUsername("testUser")).willReturn(false);
@@ -110,8 +119,11 @@ public class UserServiceTest {
     then(userRepository).should().existsByUsername("testUser");
     // 이하 동문
     then(userRepository).should().existsByEmail("test@example.com");
+    then(binaryContentRepository).should().save(any(BinaryContent.class));
+    then(binaryContentStorage).should()
+        .put(any(UUID.class), binaryContentCreateRequest.get().bytes());
+
     // 클라이언트가 요청해서 그대로 전달되는 객체 --> 특정한 객체가 전달되었는지 확인하기 위해
-    then(binaryContentService).should().createBinaryContent(binaryContentCreateRequest);
     // 서비스 내부에서 새로 생성되는 객체 --> 어떤 객체든 전달되었는지만 확인하기 위해 any(...)
     then(userStatusService).should().createUserStatus(any(UserStatusCreateRequest.class));
     then(userRepository).should().save(any(User.class));
@@ -132,8 +144,9 @@ public class UserServiceTest {
     // (1) UserService 에서 User 객체 생성 시도할 때 받는 파라미터
     UserCreateRequest userCreateRequest = new UserCreateRequest("existingUser", "test@example.com",
         "password123");
-    BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
-        "profile.jpg", 1024L, "image/jpeg", new byte[]{});
+    Optional<BinaryContentCreateRequest> binaryContentCreateRequest = Optional.of(
+        new BinaryContentCreateRequest(
+            "profile.jpg", 1024L, "image/jpeg", new byte[]{}));
 
     // (2) 이미 존재하는 사용자명 시뮬레이션
     given(userRepository.existsByUsername("existingUser")).willReturn(true);
@@ -149,7 +162,7 @@ public class UserServiceTest {
     // 아래 메서드들이 발생되지 않았는지 검증
     then(userRepository).should(never()).existsByEmail("test@example.com");
     then(userRepository).should(never()).save(any(User.class));
-    then(binaryContentService).should(never()).createBinaryContent(binaryContentCreateRequest);
+
     then(userStatusService).should(never()).createUserStatus(any(UserStatusCreateRequest.class));
     then(userMapper).should(never()).toDto(any(User.class));
   }
@@ -166,12 +179,9 @@ public class UserServiceTest {
         "newUserName",
         "newEmail@example.com",
         "newPassword123");
-    BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
-        "newProfile.png",
-        1340L,
-        "image/png",
-        new byte[]{}
-    );
+    Optional<BinaryContentCreateRequest> binaryContentCreateRequest = Optional.of(
+        new BinaryContentCreateRequest(
+            "profile.jpg", 1024L, "image/jpeg", new byte[]{}));
 
     // userRepository.findById() 메서드 호출시 existingUser를 반환한다.
     // (1) 기존 User 객체 반환
@@ -192,23 +202,6 @@ public class UserServiceTest {
     // (3) 프로필 이미지 생성 성공 시 반환 값 설정
 
     UUID profileId = UUID.randomUUID();
-
-    BinaryContentDto binaryContentDto = new BinaryContentDto(
-        profileId, // 고유 ID 생성
-        binaryContentCreateRequest.fileName(),
-        binaryContentCreateRequest.size(),
-        binaryContentCreateRequest.contentType(),
-        binaryContentCreateRequest.bytes()
-    );
-
-    given(binaryContentService.createBinaryContent(binaryContentCreateRequest)).willReturn(
-        binaryContentDto);
-
-    given(binaryContentMapper.toEntity(binaryContentDto)).willReturn(new BinaryContent(
-        binaryContentCreateRequest.fileName(),
-        binaryContentCreateRequest.size(),
-        binaryContentCreateRequest.contentType()
-    ));
 
     // (4) usreMapper.toDto() 메서드가 호출될 때 Userdto 설정
     // 파라미터로 받지 않는 값들은 any() 로 지정하기
@@ -234,10 +227,7 @@ public class UserServiceTest {
     then(userRepository).should().existsByUsername("newUserName");
     then(userRepository).should().existsByEmail("newEmail@example.com");
 
-    then(binaryContentService).should().createBinaryContent(binaryContentCreateRequest);
-
     then(userMapper).should().toDto(existingUser);
-    then(binaryContentMapper).should().toEntity(binaryContentDto);
 
     assertNotNull(result);
     assertEquals("newUserName", result.username());
@@ -253,12 +243,9 @@ public class UserServiceTest {
         "newUserName",
         "newEmail@example.com",
         "newPassword123");
-    BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
-        "newProfile.png",
-        1340L,
-        "image/png",
-        new byte[]{}
-    );
+    Optional<BinaryContentCreateRequest> binaryContentCreateRequest = Optional.of(
+        new BinaryContentCreateRequest(
+            "profile.jpg", 1024L, "image/jpeg", new byte[]{}));
 
     // (1) 존재하지 않는 사용자에 대한 시뮬레이션
     given(userRepository.findById(notFoundId)).willReturn(Optional.empty());
@@ -274,8 +261,6 @@ public class UserServiceTest {
     // 아래 메서드들이 발생되지 않았는지 검증
     then(userRepository).should(never()).existsByUsername("newUserName");
     then(userRepository).should(never()).existsByEmail("newEmail@example.com");
-
-    then(binaryContentService).should(never()).createBinaryContent(binaryContentCreateRequest);
 
     then(userMapper).should(never()).toDto(any(User.class));
     then(binaryContentMapper).should(never()).toEntity(any(BinaryContentDto.class));

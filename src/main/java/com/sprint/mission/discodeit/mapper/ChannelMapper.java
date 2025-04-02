@@ -43,7 +43,7 @@ public abstract class ChannelMapper {
     return readStatusRepository.findByChannelId(channelId)
         .stream()
         .map(ReadStatus::getUser)
-        .map(user -> userMapper.toDto(user))
+        .map(userMapper::toDto)
         .toList();
   }
 
