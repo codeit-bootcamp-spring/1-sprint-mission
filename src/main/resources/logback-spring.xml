@@ -7,13 +7,14 @@
   <property name="LOG_PATH" value=".logs"/>
   <property name="LOG_FILE" value="${LOG_PATH}/application.log"/>
 
-  <!-- 기본 콘솔 패턴 (색상 지원) -->
+  <!-- 콘솔 로그 패턴 -->
   <property name="CONSOLE_LOG_PATTERN"
-    value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%thread]){faint} %highlight(%-5level) %clr(%logger{36}){cyan} - %msg%n"/>
+    value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%thread]){faint} %clr([%X{requestId}]){yellow} %clr(%X{method}){green} %clr(%X{uri}){magenta} %highlight(%-5level) %clr(%logger{36}){cyan} - %msg%n"/>
 
-  <!-- 기본 파일 패턴 (색상 없음) -->
+  <!-- 파일 로그 패턴 (색상 없음) -->
   <property name="FILE_LOG_PATTERN"
-    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger - %msg%n"/>
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{requestId}] %X{method} %X{uri} %-5level %-36logger - %msg%n"/>
+
 
   <!-- 콘솔 로그 -->
   <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">

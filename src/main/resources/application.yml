@@ -5,6 +5,13 @@ discodeit:
       root-path: /path/to/storage
 
 spring:
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
   profiles:
     active: dev
   jpa:
@@ -50,45 +57,3 @@ info:
   ddl-auto: ${spring.jpa.hibernate.ddl-auto}
   storage-type: ${discodeit.storage.type}
   storage-path: ${discodeit.storage.local.root-path}
-#  app:
-#    name: Discodeit
-#    version: 1.7.0
-#    java-version: 17
-#    spring-boot-version: 3.4.2
-#
-#  datasource:
-#    url: ${spring.datasource.url}
-#    driver-class-name: ${spring.datasource.driver-class-name}
-#
-#  jpa:
-#    hibernate:
-#      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
-#
-#  storage:
-#    type: ${discodeit.storage.type}
-#    path: ${discodeit.storage.local.root-path}
-#
-#  multipart:
-#    max-file-size: ${spring.servlet.multipart.max-file-size}
-#    max-request-size: ${spring.servlet.multipart.max-request-size}
-#  app:
-#    name: Discodeit
-#    version: 1.7.0
-#    java-version: 17
-#    spring-boot-version: 3.4.2
-#
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/discodeit
-#    driver-class-name: org.postgresql.Driver
-#
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#
-#  storage:
-#    type: local
-#    path: /path/to/storage
-#
-#  multipart:
-#    max-file-size: 5MB
-#    max-request-size: 10MB
