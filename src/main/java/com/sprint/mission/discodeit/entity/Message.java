@@ -8,13 +8,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Entity
+@Table(name = "messages")
 @Getter
+@AllArgsConstructor // @Builder가 모든 필드를 받는 생성자를 필요로 한다
 @Builder
 public class Message extends BaseUpdatableEntity {
 
@@ -36,6 +40,10 @@ public class Message extends BaseUpdatableEntity {
       inverseJoinColumns = @JoinColumn(name = "attachment_id")
   )
   private List<BinaryContent> attachments;
+
+  protected Message() {
+
+  }
 
   public void updateMessageText(String content) {
     if (content == null) {

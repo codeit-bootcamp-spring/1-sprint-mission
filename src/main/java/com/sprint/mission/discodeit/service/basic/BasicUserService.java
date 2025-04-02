@@ -2,30 +2,35 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 //
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 //
 import java.time.Instant;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Slf4j
@@ -34,19 +39,22 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
+
   //
   private final BinaryContentService binaryContentService;
   private final UserStatusService userStatusService;
   //
   private final UserMapper userMapper;
-  private final BinaryContentMapper binaryContentMapper;
   //
   private final InputHandler inputHandler;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Transactional
   @Override
   public UserDto createUser(UserCreateRequest userCreateRequest,
-      BinaryContentCreateRequest binaryContentCreateRequest) {
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
     log.info("사용자 생성 시도: username={}", userCreateRequest.username());
 
@@ -62,31 +70,49 @@ public class BasicUserService implements UserService {
     }
 
     // 프로필 이미지 생성 : BinaryContent 도메인 객체 생성
-    if (binaryContentCreateRequest != null) {
-      log.info("프로필 이미지 생성 시도: fileName={}, contentType={} ",
-          binaryContentCreateRequest.fileName(),
-          binaryContentCreateRequest.contentType());
-      binaryContentService.createBinaryContent(binaryContentCreateRequest);
-    }
+    // binaryContentService.createBinaryContent() 를 호출하는 대신
+    // 로직을 참고해 작성
+    BinaryContent nullableProfile =
+        optionalProfileCreateRequest.map(
+                profileRequest -> {
+                  log.info("프로필 이미지 생성 시도: fileName={}, contentType={} ",
+                      profileRequest.fileName(),
+                      profileRequest.contentType());
+                  BinaryContent binaryContent = BinaryContent.builder()
+                      .fileName(profileRequest.fileName())
+                      .size(profileRequest.size())
+                      .contentType(profileRequest.contentType())
+                      .build();
+                  BinaryContent content = binaryContentRepository.save(binaryContent);
+                  binaryContentStorage.put(content.getId(), profileRequest.bytes());
+                  return content;
+                })
+            .orElse(null);
 
     // 유저 생성 : User 도메인 객체 생성
     User user = User.builder()
         .username(userCreateRequest.username())
         .email(userCreateRequest.email())
         .password(userCreateRequest.password())
+        .profile(nullableProfile)
         .build();
+
+    user = userRepository.save(user);
 
     log.info("유저 상태 생성 시도");
     // 유저 상태 생성 : UserStatus 도메인 객체 생성
-    UserStatusCreateRequest userStatusCreateRequest =
-        new UserStatusCreateRequest(
-            user,
-            Instant.now());
-    userStatusService.createUserStatus(userStatusCreateRequest);
+    UserStatus userStatus = UserStatus.builder()
+        .user(user)
+        .lastActiveAt(Instant.now())
+        .build();
+    userStatusRepository.save(userStatus);
 
-    // todo: User 생성시 UserStatus, BinaryContent 지정하기
-
-    userRepository.save(user);
+    /** 멘토님 궁금한 점 있습니다!!!
+     * base 7 코드에서는 user에  userStatus를 지정하지 않던데
+     * 저는 위와 같이 했을 때 toDto 쪽에서 문제가 생기던데,
+     * 코드를 어떻게 이해보면 될까요?
+     * **/
+    user.updateUserStatus(userStatus);
 
     /* 중복이 없는 유저 이름과 만들어진 시각을 log.info에 담는다.*/
     log.info("사용자 생성 시도 성공: username={}, createdAt={}", user.getUsername(), user.getCreatedAt());
@@ -112,7 +138,7 @@ public class BasicUserService implements UserService {
   @Transactional
   @Override
   public UserDto updateUserInfo(UUID id, UserUpdateRequest userUpdateRequest,
-      BinaryContentCreateRequest binaryContentCreateRequest) {
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
     // boolean isUpdated = false; JPA 의 더티 채킹으로 save 하지 않아도 DB에 자동 업데이트
 
@@ -150,14 +176,25 @@ public class BasicUserService implements UserService {
     }
 
     // 프로필 이미지 수정
-    if (binaryContentCreateRequest != null) {
-      log.info("프로필 이미지 생성 시도: fileName={}, contentType={} ",
-          binaryContentCreateRequest.fileName(),
-          binaryContentCreateRequest.contentType());
-      user.updateProfile(binaryContentMapper.toEntity(
-          binaryContentService.createBinaryContent(binaryContentCreateRequest))
-      );
-    }
+
+    BinaryContent nullableProfile =
+        optionalProfileCreateRequest.map(
+                profileRequest -> {
+                  log.info("프로필 이미지 생성 시도: fileName={}, contentType={} ",
+                      profileRequest.fileName(),
+                      profileRequest.contentType());
+                  BinaryContent binaryContent = BinaryContent.builder()
+                      .fileName(profileRequest.fileName())
+                      .size(profileRequest.size())
+                      .contentType(profileRequest.contentType())
+                      .build();
+                  BinaryContent content = binaryContentRepository.save(binaryContent);
+                  binaryContentStorage.put(content.getId(), profileRequest.bytes());
+                  return content;
+                })
+            .orElse(null);
+    user.updateProfile(nullableProfile);
+
     log.info("사용자 수정 시도 성공: username={}, updatedAt={}", user.getUsername(), user.getUpdatedAt());
     return userMapper.toDto(user);
   }

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  List<Message> findByChannelId(UUID channelId); // Channel에 포함된 메세지 찾기
+  List<Message> findByChannelId(UUID channelId); // Channel 에 포함된 메세지 찾기
 
   Page<Message> findByChannelId(UUID channelId, Pageable pageable);
 }

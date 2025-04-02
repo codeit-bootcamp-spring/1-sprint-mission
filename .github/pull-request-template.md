@@ -2,241 +2,197 @@
 
 ### 기본 요구사항
 
-### API 명세
+### 프로파일 기반 설정 관리
 
-    - 이번 미션은 아래의 API 스펙과 비교하며 구현해보세요.   
-    - API 스펙 v1.1
-    - 정적 리소스 v1.1
-    - 소스 코드(참고용) v1.1
+- [x] 개발, 운영 환경에 대한 프로파일을 구성하세요.
+    - [x] application-dev.yaml, application-prod.yaml 파일을 생성하세요.
+    - [x] 다음과 같은 설정값을 프로파일별로 분리하세요.
+        - [x] 데이터베이스 연결 정보
+        - [x] 서버 포트
 
-### 데이터베이스
+### 로그 관리
 
-- [X] 아래와 같이 데이터베이스 환경을 설정하세요.
-    - 데이터베이스: discodeit
-    - 유저: discodeit_user
-    - 패스워드: discodeit1234
-- [x] ERD를 참고하여 DDL을 작성하고, 테이블을 생성하세요.
-    - 작성한 DDL 파일은 /src/main/resources/schema.sql 경로에 포함하세요.
-        - PK: Primary Key
-        - UK: Unique Key
-        - NN: Not Null
-        - FK: Foreign Key
-            - ON DELETE CASCADE: 연관 엔티티 삭제 시 같이 삭제
-            - ON DELETE SET NULL: 연관 엔티티 삭제 시 NULL로 변경
+- [x] Lombok의 @Slf4j 어노테이션을 활용해 로깅을 쉽게 추가할 수 있도록 구성하세요.
+- [x] application.yaml에 기본 로깅 레벨을 설정하세요.
+    - 기본적으로 info 레벨로 설정합니다.
+- [x] 환경 별 적절한 로깅 레벨을 프로파일 별로 설정해보세요.
+    - SQL 로그를 보기위해 설정했던 레벨은 유지합니다.
+    - 우리가 작성한 프로젝트의 로그는 개발 환경에서 debug, 운영 환경에서는 info 레벨로 설정합니다.
+- [x] Spring Boot의 기본 로깅 구현체인 Logback의 설정 파일을 구성하세요.
+    - [x]  logback-spring.xml 파일을 생성하세요.
+    - [x]  다음 예시와 같은 로그 메시지를 출력하기 위한 로깅 패턴과 출력 방식을 커스터마이징하세요.
 
-### Spring Data JPA 적용하기
+      - 로그 출력 예시
 
-- [x] Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
-- [x] 앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
-- [x] 디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
+        # 패턴
 
-### 엔티티 정의하기
+        {년}-{월}-{일} {시}:{분}:{초}:{밀리초} [{스레드명}] {로그 레벨(5글자로 맞춤)} {로거 이름(최대 36글자)} - {로그 메시지}{줄바꿈}
 
-- [X]  클래스 다이어그램을 참고해 도메인 모델의 공통 속성을 추상 클래스로 정의하고 상속 관계를 구현하세요.
-- 이때 Serializable 인터페이스는 제외합니다.
-- 패키지명: com.sprint.mission.discodeit.entity.base
-- 클래스 다이어그램 (xs6bzcvs6-image.png)
+        # 예시
 
-- [x]  JPA의 어노테이션을 활용해 createdAt, updatedAt 속성이 자동으로 설정되도록 구현하세요.
-- @CreatedDate, @LastModifiedDate
+        25-01-01 10:33:55.740 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot
+        v3.4.0, Spring v6.2.0
 
-- [x]  클래스 다이어그램을 참고해 클래스 참조 관계를 수정하세요. 필요한 경우 생성자, update 메소드를 수정할 수 있습니다. 단, 아직 JPA Entity와 관련된
-  어노테이션은 작성하지 마세요.
-- 클래스 다이어그램(pq5iz92wt-image.png)
-    - 화살표의 방향과 화살표 유무에 유의하세요.
+    - ![img_4.png](img_4.png)
 
-- [X]  ERD와 클래스 다이어그램을 토대로 연관관계 매핑 정보를 표로 정리해보세요.(이 내용은 PR에 첨부해주세요.)
+    - [x]  콘솔과 파일에 동시에 로그를 기록하도록 설정하세요.
+      - [x] 파일은 {프로젝트 루트}/.logs 경로에 저장되도록 설정하세요.
+    - [x]  로그 파일은 일자별로 롤링되도록 구성하세요.
+    - [x]  로그 파일은 30일간 보관하도록 구성하세요.
 
-| 엔티티 관계                | 다중성  | 방향성                          | 부모-자식 관계                       | 연관관계의 주인   |
-|-----------------------|------|------------------------------|--------------------------------|------------|
-| User:UserStatus       | 	1:1 | User↔UserStatus 양방향	         | 부모: User, 자식: UserStatus	      | UserStatus |
-| User:ReadStatus       | 1:N  | ReadStatus → User 단방향        | 부모: User, 자식: ReadStatus       | ReadStatus |
-| User:BinaryContent    | 1:1  | User → BinaryContent  단방향    | 부모: BinaryContent, 자식: User    | User       |
-| User:Message          | 1:N  | Message → User  단방향          | 부모: User, 자식: Message          | Message    |
-| ReadStatus:Channel    | 1:1  | ReadStatus → Channel  단방향    | 부모: Channel, 자식: ReadStatus    | ReadStatus |
-| Channel : Message     | 1:N  | Message→ Channel  단방향        | 부모: Channel, 자식: Message       | Message    |
-| Message:BinaryContent | 1:N  | Message → BInaryContent  단방향 | 부모: BInaryContent, 자식: Message | Message    |
+- [x] 서비스 레이어와 컨트롤러 레이어의 주요 메소드에 로깅을 추가하세요.
+    - [x] 로깅 레벨을 적절히 사용하세요: ERROR, WARN, INFO, DEBUG
+    - [x] 다음과 같은 메소드에 로깅을 추가하세요:
+        - [x] 사용자 생성/수정/삭제
+        - [x] 채널 생성/수정/삭제
+        - [x] 메시지 생성/수정/삭제
+        - [x] 파일 업로드/다운로드
 
-- [x] JPA 주요 어노테이션을 활용해 ERD, 연관관계 매핑 정보를 도메인 모델에 반영해보세요.
-    - @Entity, @Table
-    - @Column, @Enumerated
-    - @OneToMany, @OneToOne, @ManyToOne
-    - @JoinColumn, @JoinTable
+### 예외 처리 고도화
 
-        - 엔티티와 분리해 다른 레이어에 둘 수 있는 로직은 분리, 그렇지 않은 로직은 남겨두는 식으로 진행했습니다.
-        - 엔티티에 있던 유효성 검증 로직을 제거했습니다.
-          JPA를 통해 DB와 교류할 때, 엔티티는 **데이터베이스 테이블과 매핑되는 역할**만 담당하므로,
-          **데이터 구조에만 집중하는 것**이 **책임 분리 관점**에서 더 깔끔하다고 생각했습니다.
-        - 그러나 UserStatus의 isOnline() 처럼 엔티티의 상태를 판단하는 메서드는 엔티티 내에서 유지하는 것이 적합하고, 코드 자체가 간결해 엔티티 내부에
-          포함해두는 게 맞다 생각돼 그대로 배치해뒀습니다.
+- [x]  커스텀 예외를 설계하고 구현하세요.
+    - 패키지명: com.sprint.mission.discodeit.exception[.{도메인}]
+    - [X]  ErrorCode Enum 클래스를 통해 예외 코드명과 메시지를 정의하세요.
+        - 아래는 예시입니다. 필요하다고 판단되는 다양한 코드를 정의하세요.
+        - 예시 (6ag3lzl9i-image.png)
+    - [x]  모든 예외의 기본이 되는 DiscodeitException 클래스를 정의하세요.
+        - 클래스 다이어그램 (j5vtp941a-image.png)
+        - details는 예외 발생 상황에 대한 추가정보를 저장하기 위한 속성입니다.
+            - 예시
+            - 조회 시도한 사용자의 ID 정보
+            - 업데이트 시도한 PRIVATE 채널의 ID 정보
+    - [x]  DiscodeitException을 상속하는 주요 도메인 별 메인 예외 클래스를 정의하세요.
+        - UserException, ChannelException 등
+        - 실제로 활용되는 클래스라기보다는 예외 클래스의 계층 구조를 명확하게 하기 위한 클래스 입니다.
+    - [x]  도메인 메인 예외 클래스를 상속하는 구체적인 예외 클래스를 정의하세요.
+        - UserNotFoundException, UserAlreadyExistException 등 필요한 예외를 정의하세요.
+        - 예시(a6f585icy-image.png)
+- [X]  기존에 구현했던 예외를 커스텀 예외로 대체하세요.
+    - NoSuchElementException
+    - IllegalArgumentException
+    - …
+- [x]  ErrorResponse를 통해 일관된 예외 응답을 정의하세요.
+    - 클래스 다이어그램 (3gqeampkw-image.png)
+        - int status: HTTP 상태코드
+        - String exceptionType: 발생한 예외의 클래스 이름
+- [x]  앞서 정의한 ErrorResponse와 @RestControllerAdvice를 활용해 예외를 처리하는 예외 핸들러를 구현하세요.
+    - 모든 핸들러는 일관된 응답(ErrorResponse)을 가져야 합니다.
 
-        - 데이터를 전달받을 때
-            - 가독성, 유연함, 불변 객체 생성, 롬복 어노테이션 등의 이점을 고려해 **빌더 패턴**을 선택
+### 유효성 검사
 
+- [x] Spring Validation 의존성을 추가하세요.
+- [X] 주요 Request DTO에 제약 조건 관련 어노테이션을 추구하세요.
+    - @NotNull, @NotBlank, @Size, @Email 등
+- [X] 컨트롤러에 @Valid 를 사용해 요청 데이터를 검증하세요.
+- [x] 검증 실패 시 발생하는 MethodArgumentNotValidException을 전역 예외 핸들러에서 처리하세요.
+- [x] 유효성 검증 실패 시 상세한 오류 메시지를 포함한 응답을 반환하세요.
+  errorResponse 로 반환하도록 해놓는다.
 
-- [x] ERD의 외래키 제약 조건과 연관관계 매핑 정보의 부모-자식 관계를 고려해 영속성 전이와 고아 객체를 정의하세요.
-    - cascade, orphanRemoval
+### Actuator
 
-### 레포지토리와 서비스에 JPA 도입하기
+- [x] Spring Boot Actuator 의존성을 추가하세요.
+- [x] 기본 Actuator 엔트포인트를 설정하세요.
+    - health, info, metrics, loggers
+- [x] Actuator info를 위한 애플리케이션 정보를 추가하세요.
+    - 애플리케이션 이름: Discodeit
+    - 애플리케이션 버전: 1.7.0
+    - 자바 버전: 17
+    - 스프링 부트 버전: 3.4.0
+    - 주요 설정 정보
+        - 데이터소스: url, 드라이버 클래스 이름
+        - jpa: ddl-auto
+        - storage 설정: type, path
+        - multipart 설정: max-file-size, max-request-size
+- [x] Spring Boot 서버를 실행 후 각종 정보를 확인해보세요.
+    - /actuator/info
+    - /actuator/metrics
+    - /actuator/health
+    - /actuator/loggers
 
-- [x] 기존의 Repository 인터페이스를 JPARepository로 정의하고 쿼리메소드로 대체하세요.
-    - FileRepository와 JCFRepository 구현체는 삭제합니다.
-- [x] 영속성 컨텍스트의 특징에 맞추어 서비스 레이어를 수정해보세요.
-    - 힌트: 트랜잭션, 영속성 전이, 변경 감지, 지연로딩
+### 단위 테스트
 
-### DTO 적극 도입하기
+- [X] 서비스 레이어의 주요 메소드에 대한 단위 테스트를 작성하세요.
+    - [X] 다음 서비스의 핵심 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
+        - [x] UserService: create, update, delete 메소드
+        - [X] ChannelService: create(PUBLIC, PRIVATE), update, delete, findByUserId 메소드
+        - [x] MessageService: create, update, delete, findByChannelId 메소드
+    - [x] Mockito를 활용해 Repository 의존성을 모의(mock)하세요.
+    - [ ] BDDMockito를 활용해 테스트 가독성을 높이세요.
 
-- [X] Entity를 Controller 까지 그대로 노출했을 때 발생할 수 있는 문제점에 대해 정리해보세요. DTO를 적극 도입했을 때 보일러플레이트 코드가 많아지지만,
-  그럼에도 불구하고 어떤 이점이 있는지 알 수 있을거에요.(이 내용은 PR에 첨부해주세요.)
-    - 힌트
-        - Entity와 API의 결합
-        - 프로덕션 환경에서는 성능을 고려해 OSIV를 false로 설정하는 경우가 대부분
-        - 양방향 연관관계 시 순환 참조
-        - 민감한 데이터
+### 슬라이스 테스트
 
----
+- [x] 레포지토리 레이어의 슬라이스 테스트를 작성하세요.
+    - [x] @DataJpaTest를 활용해 테스트를 구현하세요.
+    - [x] 테스트 환경을 구성하는 프로파일을 구성하세요.
+        - [x] application-test.yaml을 생성하세요.
+        - [x] 데이터소스는 H2 인메모리 데이터 베이스를 사용하고, PostgreSQL 호환 모드로 설정하세요.
+        - [x] H2 데이터베이스를 위해 필요한 의존성을 추가하세요.
+        - [x] 테스트 시작 시 스키마를 새로 생성하도록 설정하세요.
+        - [x] 디버깅에 용이하도록 로그 레벨을 적절히 설정하세요.
+    - [x] 테스트 실행 간 test 프로파일을 활성화 하세요.
+        - [X] JPA Audit 기능을 활성화 하기 위해 테스트 클래스에 @EnableJpaAuditing을 추가하세요.
+        - [x] 주요 레포지토리(User, Channel, Message)의 주요 쿼리 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
+            - [x] 커스텀 쿼리 메소드
+            - [x] 페이징 및 정렬 메소드
+            - (channel 엔 두 개 다 없어서 x)
+- [X] 컨트롤러 레이어의 슬라이스 테스트를 작성하세요.
+    - [x]  @WebMvcTest를 활용해 테스트를 구현하세요.
+    - [X]  WebMvcTest에서 자동으로 등록되지 않는 유형의 Bean이 필요하다면 @Import를 활용해 추가하세요.
+        - 예시 @Import({ErrorCodeStatusMapper.class})
+    - [△]  주요 컨트롤러(User, Channel, Message)에 대해 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
+    - [X]  MockMvc를 활용해 컨트롤러를 테스트하세요.
+    - [X]  서비스 레이어를 모의(mock)하여 컨트롤러 로직만 테스트하세요.
+    - [X]  JSON 응답을 검증하는 테스트를 포함하세요.
 
-        Entity와 API의 결합
-            - API 스펙이 도메인 모델(그 중 Entity)에 종속된다.
-            - Entity 구조 변경시 API 응답도 변경될 가능성이 크다.
-                => 클라이언트가 Entity 구조에 의존하게 되어 유지보수가 어려워진다.
+----
 
-        OSIV(Open Session In View)* 설정
-            - spring.jpa.open-in-view=false 로 설정해두면,
-                - Controller에서 Lazy Loading된 필드를 조회할 때 LazyInitializationException 이 발생할 수도 있다.
-                - (DTO를 사용하면 필요한 데이터만 미리 조회해서 문제 방지 가능)
+### 통합 테스트
 
-            * OSIV란 영속성 컨텍스트를 Controller까지 열어두는 설정
-            true일시 Controller에서 Entity의 Lazy 필드를 접근할 수 있다.
+- [X] 통합 테스트 환경을 구성하세요.
+    - [X] @SpringBootTest를 활용해 Spring 애플리케이션 컨텍스트를 로드하세요.
+    - [X] H2 인메모리 데이터베이스를 활용하세요.
+    - [X] 테스트용 프로파일을 구성하세요.
+- [ ] 주요 API 엔드포인트에 대한 통합 테스트를 작성하세요.
+    - [ ] 주요 API에 대해 최소 2개 이상의 테스트 케이스를 작성하세요.
+        - [ ] 사용자 관련 API (생성V, 수정, 삭제, 목록 조회)
+        - [ ] 채널 관련 API (생성(공개V), 수정, 삭제V)
+        - [ ] 메시지 관련 API (생성, 수정V, 삭제, 목록 조회)
+    - [x] 각 테스트는 @Transactional을 활용해 독립적으로 실행하세요.
 
-        순환 참조
-            - 양방향 연관관계를 가진 엔티티 -> JSON 으로 변환할 때 StackOverflow 가 발생할 수도 있다.
-            - (DTO를 사용하면 필요한 데이터만 선택적으로 제공해서 순환 참조 문제 해결)
-
-        민감한 데이터 노출 위험
-            - Entity 에 노출되면 안 되는 데이터가 포함되어있을 수 있다.
-            - (DTO를 사용하면 필요한 데이터만 선별적으로 제공 가능하여 보안성 강화)
-
----
-
-- [x] 다음의 클래스 다이어그램을 참고하여 DTO를 정의하세요.(hd4c6g1of-image.png)
-- [x]  Entity를 DTO로 매핑하는 로직을 책임지는 Mapper 컴포넌트를 정의해 반복되는 코드를 줄여보세요.(buo7cmjvp-image.png)
-    - 패키지명: com.sprint.mission.discodeit.mapper
-
-### BinaryContent 저장 로직 고도화
-
-데이터베이스에 이미지와 같은 파일을 저장하면 성능 상 불리한 점이 많습니다.
-따라서 실제 바이너리 데이터는 별도의 공간에 저장하고, 데이터베이스에는 바이너리 데이터에 대한 메타
-정보(파일명, 크기, 유형 등)만 저장하는 것이 좋습니다.
-
-- [X]  BinaryContent 엔티티는 파일의 메타 정보(fileName, size, contentType)만 표현하도록 bytes 속성을 제거하세요.
-- [X]  BinaryContent의 byte[] 데이터 저장을 담당하는 인터페이스를 설계하세요.
-  저장 매체의 확장성(로컬 저장소, 원격 저장소)을 고려해 인터페이스부터 설계합니다.
-- 패키지명: com.sprint.mission.discodeit.storage
-- 클래스 다이어그램(nqt5zw2pk-image.png)
-- BinaryContentStorage
-    - 바이너리 데이터의 저장/로드를 담당하는 컴포넌트입니다.
-    - UUID put(UUID, byte[])
-        - UUID 키 정보를 바탕으로 byte[] 데이터를 저장합니다.
-        - UUID는 BinaryContent의 Id 입니다.
-    - InputStream get(UUID)
-        - 키 정보를 바탕으로 byte[] 데이터를 읽어 InputStream 타입으로 반환합니다.
-        - UUID는 BinaryContent의 Id 입니다.
-    - ResponseEntity<?> download(BinaryContentDto)
-        - HTTP API로 다운로드 기능을 제공합니다.
-        - BinaryContentDto 정보를 바탕으로 파일을 다운로드할 수 있는 응답을 반환합니다.
-- [x]  서비스 레이어에서 기존에 BinaryContent를 저장하던 로직을 BinaryContentStorage를 활용하도록 리팩토링하세요.
-
-- [x]  BinaryContentController에 파일을 다운로드하는 API를 추가하고, BinaryContentStorage에 로직을 위임하세요.
-
-- 엔드포인트: GET /api/binaryContents/{binaryContentId}/download
-    - 요청
-        - 값: BinaryContentId // 전달받아야 하는 값
-        - 방식: Query Parameter
-          // 이 부분은 의도 파악이 안됩니다 무슨 말인지?!...
-          Id를 이미 Path에서 받고 있는데 방식은 쿼리 파라미터를 받아오라는 게?
-
-    - 응답: ResponseEntity<?>
-    - 클래스 다이어그램 (5qwe2kqno-image.png)
-
-- [x]  로컬 디스크 저장 방식으로 BinaryContentStorage 구현체를 구현하세요.
-    - 클래스 다이어그램 (skptrmm5p-image.png)
-    - [x]  discodeit.storage.type 값이 local 인 경우에만 Bean으로 등록되어야 합니다.
-        - > application.yml(애플리케이션 속성 모음) type에 local 로 지정, Appconfig 을 통해 Bean을 지정
-    - [x] Path root
-        - 로컬 디스크의 루트 경로입니다.
-        - discodeit.storage.local.root-path 설정값을 정의하고, 이 값을 통해 주입합니다.
-        - > 직접 코드에서 지정하는 게 아니라 appliaiton.yml에 루트 지정 + yml 속성 값 불러와서 이용
-    - [x] void init()
-        - 루트 디렉토리를 초기화합니다. // @PostConstruct 어노테이션 이용
-        - Bean이 생성되면 자동으로 호출되도록 합니다.
-    - [x] Path resolvePath(UUID)
-        - 파일의 실제 저장 위치에 대한 규칙을 정의합니다.
-            - 파일 저장 위치 규칙 예시: {root}/{UUID}
-        - put, get 메소드에서 호출해 일관된 파일 경로 규칙을 유지합니다.
-    - [x] ResponseEntity<Resource> donwload(BinaryContentDto)
-        - get 메소드를 통해 파일의 바이너리 데이터를 조회합니다.
-        - BinaryContentDto와 바이너리 데이터를 활용해 ResponseEntity<Resource> 응답을 생성 후 반환합니다.
-
-### 페이징과 정렬
-
-- [x] 메시지 목록을 조회할 때 다음의 조건에 따라 페이지네이션 처리를 해보세요.
-    - 50개씩 최근 메시지 순으로 조회합니다.
-    - 총 메시지가 몇개인지 알 필요는 없습니다.
-
-- [X] 일관된 페이지네이션 응답을 위해 제네릭을 활용해 DTO로 구현하세요.
-    - 패키지명: com.sprint.mission.discodeit.dto.response
-    - 클래스 다이어그램 (wj4q7nhn3-image.png)
-        - content: 실제 데이터입니다.
-        - number: 페이지 번호입니다.
-        - size: 페이지의 크기입니다.
-        - totalElements: T 데이터의 총 갯수를 의미하며, null일 수 있습니다.
-
-- [X] Slice 또는 Page 객체로부터 DTO를 생성하는 Mapper를 구현하세요.
-    - 패키지명: com.sprint.mission.discodeit.mapper
-    - (x7qjncxm0-image.png)
-    - 확장성을 위해 제네릭 메소드로 구현하세요.
+----
 
 ### 심화 요구사항
 
-### N+1 문제
-
-- [ ] N+1 문제가 발생하는 쿼리를 찾고 해결해보세요.
-
-### 읽기전용 트랜잭션 활용
-
-- [ ] 프로덕션 환경에서는 OSIV를 비활성화하는 경우가 많습니다. 이때 서비스 레이어의 조회 메소드에서 발생할 수 있는 문제를 식별하고, 읽기 전용 트랜잭션을 활용해 문제를
-  해결해보세요.
-
-  OSIV 비활성화하기
-
-            spring:
-            jpa:
-            open-in-view: false
-
-### 페이지네이션 최적화
-
-- [ ] 오프셋 페이지네이션과 커서 페이지네이션 방식의 차이에 대해 정리해보세요.
-
-### MapStruct 적용
-
-- [X] Entity와 DTO를 매핑하는 보일러플레이트 코드를 MapStruct 라이브러리를 활용해 간소화해보세요.
-
 ## 주요 변경사항
 
-1. Channel-User 도메인 삭제
-   그리고 삭제하면서 생긴 문제들 전체적으로 리팩토링
+1. 메시지(Message) 기능이 동작할 수 있도록 변경
 
-   베이스 코드에서는 Channel-User 관계 도메인 대신 ReadStatus를 통해서 Channel:User (N:N)관계를 Channel:ReadStatus (1:N),
-   User:ReadStatus (1:N) 로 분리한 것을 확인하고, 유사하게 수정했습니다.
-   *Channel-User도, ReadStatus도 User, Channel을 참조한다는 점에서 동일한 것으로 판단했고, ReadStatus 쪽을 재활용한 것으로 이해했습니다.
-   ReadStatus 도메인의 역할은 "유저가 채널의 메세지를 읽었느냐" 이므로,
-   효율의 관점에서는 ReadStatus를 재활용이 이득이고, 책임분리 및 유지보수 관점에서는 Channel-User과 같은 관계 도메인을 생성하는 게 옳다고 느껴집니다.
+- Entity 설정 문제로 정상적으로 동작하지 않았음.
 
 ## 스크린샷
 
 ## 멘토에게
 
-User, Channel 를 생성하는 테스트만 진행했고
-Message, BinaryContent, ReadStatus, Auth 테스트를 진행못해봤습니다.
-Message의 경우 id가 null로 전달된다는 오류가 뜨는데, 깊게 들어가서 어느 부분이 문제인지 아직 파악하지 못했습니다.
+1. 서비스 단 로깅 (Service Logging)
+
+- 비즈니스 로직의 핵심 이벤트를 기록
+- 검증 로직에서 문제 발생 시 WARN 레벨로 로깅
+- 현재 INFO에서는 ID를 남기지 않도록 설정했으나, 어떤 방식이 적절한 걸까요...? 노출해도 되는 정보와 아닌 정보가 궁금합니다!
+
+2. warn과 error
+
+- "이미 존재하는 이름"과 같은 곳은 warn을, "유저를 찾지 못함" 에는 error을 설정했는데, 두루뭉싫하게만 느껴지고 아직 정확히 어디에 warn 을 쓰고 error 을
+  써야하는지 구분이 잘 되지 않습니다. 정의 외의 이해하기 쉬운 기준이 있을까요?
+
+3. base7 코드 관련 질문
+
+- base7 코드에서 확인해보니 User 를 생성할 때 UserStatus, BinaryContent 를 생성하는데, Service 단의 create 로직을 들고오지 않고 직접
+  도메인을 생성하는 것으로 확인했는데, 어떤 방법이 더 효율적인지도 궁금하고 멘토님이라면 둘 중 어떤 방법을 택하는지도 궁급합니다.
+  Service 단의 로직은 DTO 를 반환해서, 해당 방법을 이용할시 User 필드에 등록하기 위해 toEntity 라는 변환 작업이 필요하다는 생각을 했었는데, 그 방법보다
+  base7 코드에서 제공하는 방식이 보다 편하다고 느껴지기도 하면서 그렇다면 Service 단의 create 로직을 사용하지 않는데, 왜 해당 메서드를 제작한 걸까? 하는
+  생각도 듭니다.
+
+- base 7 코드에서는 user 에 userStatus 를 지정하지 않던데
+  저는 위와 같이 했을 때 toDto 쪽에서 문제가 생기던데,
+  코드를 어떻게 이해보면 될까요?
+

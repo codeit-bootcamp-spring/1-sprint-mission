@@ -1,14 +1,18 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +27,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserApi {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
@@ -31,41 +35,26 @@ public class UserController {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> createUser(
       @Valid @RequestPart(value = "userCreateRequest") UserCreateRequest userCreateRequest,
-      @RequestPart(value = "binaryContent", required = false) MultipartFile file) throws Exception {
+      @RequestPart(value = "binaryContent", required = false) MultipartFile file) {
 
     /* 유저 생성 요청(Request) */
     log.info("유저 생성 요청(Request): username={}, hasProfileImage={}",
         userCreateRequest.username(),
         file != null);
 
-    // 프로필 이미지 처리 
-    /* TODO(멘토님께) : 삼항 연산자를 쓰면 가독성이 떨어진다는 이야기를 들었는데,
-     *  아래(주석 처리)와 같이 구현하는 게 좋을까요, 아니면 이런 식(삼항 연산자 이용)으로 구현하는 것도 추천될 수 있을까요?
-     */
-    BinaryContentCreateRequest binaryContentCreateRequest =
-        (file != null) ? new BinaryContentCreateRequest(file) : null;
+    // 프로필 이미지 처리
+    Optional<BinaryContentCreateRequest> profileRequest =
+        Optional.ofNullable(file).flatMap(this::resolveProfileRequest);
 
-    if (binaryContentCreateRequest != null) {
+    if (profileRequest.isPresent()) {
       log.debug("프로필 이미지 생성 : filename={}, size={}, contentType={}",
-          binaryContentCreateRequest.fileName(),
-          binaryContentCreateRequest.size(),
-          binaryContentCreateRequest.contentType());
+          file.getName(),
+          file.getSize(),
+          file.getContentType());
     }
 
-    /**
-     BinaryContentCreateRequest binaryContentCreateRequest;
-     if (file != null) {
-     binaryContentCreateRequest = new BinaryContentCreateRequest(file);
-     log.debug("프로필 이미지 생성 요청(Request): filename={}, size={}, contentType={}",
-     binaryContentCreateRequest.fileName(), binaryContentCreateRequest.size(),
-     binaryContentCreateRequest.contentType());
-     } else {
-     binaryContentCreateRequest = null;
-     }
-     **/
-
     // 유저 생성
-    UserDto userDto = userService.createUser(userCreateRequest, binaryContentCreateRequest);
+    UserDto userDto = userService.createUser(userCreateRequest, profileRequest);
     /* 유저 생성 응답(Response) */
     log.info("유저 생성 응답(Response): username={}, HttpStatus={} ",
         userDto.username(),
@@ -76,7 +65,7 @@ public class UserController {
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
       @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile file) throws Exception {
+      @RequestPart(value = "profile", required = false) MultipartFile file) {
     log.info(
         "유저 수정 요청(Request): usernameChanged={}, emailChanged={}, passwordChanged={}, hasProfileImage={}",
         userUpdateRequest.newUsername() != null,
@@ -86,24 +75,25 @@ public class UserController {
     );
 
     // 새로운 프로필 이미지 처리
-    BinaryContentCreateRequest binaryContentCreateRequest =
-        (file != null) ? new BinaryContentCreateRequest(file) : null;
-    if (binaryContentCreateRequest != null) {
+    Optional<BinaryContentCreateRequest> profileRequest =
+        Optional.ofNullable(file).flatMap(this::resolveProfileRequest);
+
+    if (profileRequest.isPresent()) {
       log.debug("프로필 이미지 생성 : filename={}, size={}, contentType={}",
-          binaryContentCreateRequest.fileName(),
-          binaryContentCreateRequest.size(),
-          binaryContentCreateRequest.contentType());
+          file.getName(),
+          file.getSize(),
+          file.getContentType());
     }
 
     // 유저 수정
-    UserDto userDto = userService.updateUserInfo(userId, userUpdateRequest,
-        binaryContentCreateRequest);
+    UserDto userDto = userService.updateUserInfo(userId, userUpdateRequest, profileRequest);
     log.info("유저 수정 응답(Response): username={}, HttpStatus={} ",
         userDto.username(),
         HttpStatus.OK);
     return ResponseEntity.ok(userDto);
 
   }
+
 
   @PatchMapping(value = "/{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStateByUserId(@PathVariable UUID userId,
@@ -132,4 +122,22 @@ public class UserController {
     return ResponseEntity.ok(userService.showAllUsers());
   }
 
+  private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profile) {
+    if (profile.isEmpty()) {
+      return Optional.empty();
+    } else {
+      try {
+        BinaryContentCreateRequest binaryContentCreateRequest =
+            new BinaryContentCreateRequest(
+                profile.getOriginalFilename(),
+                profile.getSize(),
+                profile.getContentType(),
+                profile.getBytes()
+            );
+        return Optional.of(binaryContentCreateRequest);
+      } catch (IOException e) {
+        throw new RuntimeException();
+      }
+    }
+  }
 }

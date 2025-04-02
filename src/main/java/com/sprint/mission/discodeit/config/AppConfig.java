@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
   @Bean
-  @ConditionalOnProperty(name = "discodeit.stroage.type", havingValue = "local")
+  @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
   public BinaryContentStorage binaryContentStorage() {
     return new LocalBinaryContentStorage();
   }
