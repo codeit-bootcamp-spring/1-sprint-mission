@@ -1,42 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
-import javax.persistence.*;
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
-@Table(name = "read_statuses")
-public class ReadStatus implements Serializable {
+@Table(
+    name = "read_statuses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    }
+)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private UUID id;
-
-  @Column(name = "created_at", nullable = false)
-  private Instant createdAt;
-
-  @Column(name = "updated_at")
-  private Instant updatedAt;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", columnDefinition = "uuid")
   private User user;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "channel_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
   private Channel channel;
-
-  @Column(name = "last_read_at", nullable = false)
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastReadAt;
 
   public ReadStatus(User user, Channel channel, Instant lastReadAt) {
-    this.createdAt = Instant.now();
     this.user = user;
     this.channel = channel;
     this.lastReadAt = lastReadAt;
@@ -45,7 +42,6 @@ public class ReadStatus implements Serializable {
   public void update(Instant newLastReadAt) {
     if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
       this.lastReadAt = newLastReadAt;
-      this.updatedAt = Instant.now();
     }
   }
 }
