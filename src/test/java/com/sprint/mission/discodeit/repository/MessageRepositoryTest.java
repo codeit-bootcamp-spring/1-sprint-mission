@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -24,6 +25,7 @@ import com.sprint.mission.discodeit.entity.Message;
 @DataJpaTest
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@EnableJpaAuditing
 class MessageRepositoryTest {
 
 	@Autowired
@@ -50,6 +52,21 @@ class MessageRepositoryTest {
 
 	@Test
 	@Sql(scripts = {"/user/users.sql", "/channel/channels.sql", "/message/messages.sql"})
+	void 특정_채널의_메시지를_조회할_때_데이터가_없으면_빈_슬라이스를_반환한다() {
+		// given
+		UUID channelId = UUID.fromString("99999999-9999-9999-9999-999999999999"); // 존재하지 않는 채널
+		Instant fixedCreatedAt = Instant.parse("2025-05-01T00:00:00Z");
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
+		// when
+		Slice<Message> messages = messageRepository.findAllByChannelIdWithAuthor(channelId, fixedCreatedAt, pageable);
+
+		// then
+		assertThat(messages).isEmpty();
+	}
+
+	@Test
+	@Sql(scripts = {"/user/users.sql", "/channel/channels.sql", "/message/messages.sql"})
 	void 특정_채널의_마지막_메시지_시간을_조회할_수_있다() {
 		// given
 		UUID channelId = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -59,6 +76,19 @@ class MessageRepositoryTest {
 
 		// then
 		assertThat(lastMessageAt).isPresent();
+	}
+
+	@Test
+	@Sql(scripts = {"/user/users.sql", "/channel/channels.sql", "/message/messages.sql"})
+	void 특정_채널의_마지막_메시지를_조회할_때_데이터가_없으면_Optional_Empty를_반환한다() {
+		// given
+		UUID channelId = UUID.fromString("99999999-9999-9999-9999-999999999999"); // 존재하지 않는 채널
+
+		// when
+		Optional<Instant> lastMessageAt = messageRepository.findLastMessageAtByChannelId(channelId);
+
+		// then
+		assertThat(lastMessageAt).isEmpty();
 	}
 
 	@Test
@@ -75,4 +105,20 @@ class MessageRepositoryTest {
 		List<Message> messages = messageRepository.findAll();
 		assertThat(messages).noneMatch(m -> m.getChannel().getId().equals(channelId));
 	}
+
+	@Test
+	@Sql(scripts = {"/user/users.sql", "/channel/channels.sql", "/message/messages.sql"})
+	void 특정_채널의_모든_메시지를_삭제할_때_데이터가_없으면_영향을_받지_않는다() {
+		// given
+		UUID channelId = UUID.fromString("99999999-9999-9999-9999-999999999999"); // 존재하지 않는 채널
+
+		// when
+		messageRepository.deleteAllByChannelId(channelId);
+		entityManager.flush();
+
+		// then
+		List<Message> messages = messageRepository.findAll();
+		assertThat(messages).isNotEmpty(); // 기존 메시지가 남아 있어야 함
+	}
+
 }
