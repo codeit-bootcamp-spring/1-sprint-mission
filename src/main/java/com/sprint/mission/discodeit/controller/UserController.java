@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
 
@@ -40,6 +42,8 @@ public class UserController {
   ) {
     Optional<BinaryContentCreateDTO> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
+
+    log.info("Received Created user with name: {}", userCreateDTO.name());
     UserDto createdUser = userService.createUser(userCreateDTO, profileRequest);
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -53,6 +57,7 @@ public class UserController {
       @RequestPart UserUpdateDTO userUpdateDTO,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.info("Received Updating user with ID : {}", id);
     Optional<BinaryContentCreateDTO> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     return ResponseEntity.ok(userService.updateUser(id, userUpdateDTO, profileRequest));
@@ -61,6 +66,7 @@ public class UserController {
   // 사용자 삭제
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteUser(@PathVariable("id") UUID id) {
+    log.info("Received Delete user with ID : {}", id);
     userService.deleteUser(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("User deleted");
   }

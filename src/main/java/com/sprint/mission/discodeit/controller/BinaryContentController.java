@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binarycontents")
+@Slf4j
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
@@ -35,8 +37,10 @@ public class BinaryContentController {
     return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds));
   }
 
+  //파일 다운로드
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> download(@RequestParam("id") UUID binaryContentId) {
+    log.info("Received Downloading binary content with id {}", binaryContentId);
     BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
     return ResponseEntity.ok(binaryContentStorage.download(binaryContentDto)); //로직 위임
   }

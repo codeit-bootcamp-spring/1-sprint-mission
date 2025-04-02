@@ -18,7 +18,7 @@ spring:
         use_sql_comments: true  # SQL에 주석 추가 (디버깅 용이)
     logging:
       level:
-        org.hibernate.SQL: debug  # Hibernate SQL 로그 레벨 설정
+        org.hibernate.SQL: info  # Hibernate SQL 로그 레벨 설정
         org.hibernate.type.descriptor.sql.BasicBinder: trace  # 바인딩된 파라미터 출력
     database: postgresql
 

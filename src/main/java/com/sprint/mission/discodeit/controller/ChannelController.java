@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,16 +24,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/channel")
 @RequiredArgsConstructor
+@Slf4j
 public class ChannelController {
 
   private final ChannelService channelService;
   private final ChannelMapper channelMapper;
 
-  //TODO: 반환을 DTO로 고치기.
   // 공개 채널 생성
   @PostMapping
   public ResponseEntity<ChannelDto> createPublicChannel(
       @RequestBody ChannelCreateDTO channelCreateDTO) {
+    log.info("Received: createPublicChannel");
     return ResponseEntity.ok(channelService.createPublicChannel(channelCreateDTO));
   }
 
@@ -40,6 +42,7 @@ public class ChannelController {
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> createPrivateChannel(
       @RequestBody PrivateChannelCreateDTO channelCreateDTO) {
+    log.info("Received: createPrivateChannel");
     return ResponseEntity.ok(channelService.createPrivateChannel(channelCreateDTO));
   }
 
@@ -47,6 +50,7 @@ public class ChannelController {
   @PatchMapping("/{id}")
   public ResponseEntity<String> updateChannel(@PathVariable("id") UUID id,
       @RequestBody ChannelUpdateDTO channelUpdateDTO) {
+    log.info("Received: updateChannel");
     channelService.update(channelUpdateDTO);
     return ResponseEntity.status(HttpStatus.OK).body("Channel updated");
   }
@@ -54,6 +58,7 @@ public class ChannelController {
   // 채널 삭제
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteChannel(@PathVariable("id") UUID id) {
+    log.info("Received: deleteChannel");
     channelService.deleteChannel(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Channel deleted");
   }

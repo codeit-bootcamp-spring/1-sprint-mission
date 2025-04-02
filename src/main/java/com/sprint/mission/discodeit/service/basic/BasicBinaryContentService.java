@@ -13,10 +13,12 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
 @Service
+@Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
@@ -37,11 +39,19 @@ public class BasicBinaryContentService implements BinaryContentService {
         .contentType(binaryContentCreateDTO.contentType())
         .build();
 
-    //파일 메타 정보를 DB에 저장
-    //bytes를 로컬에 저장
-    binaryContentRepository.save(binaryContent);
-    binaryContentStorage.put(binaryContent.getId(), bytes);
-    return binaryContentMapper.toDto(binaryContent);
+    try {
+      //파일 메타 정보를 DB에 저장
+      binaryContentRepository.save(binaryContent);
+      //bytes를 로컬에 저장
+      binaryContentStorage.put(binaryContent.getId(), bytes);
+      log.info("File created successfully with ID: {} and file name: {}", binaryContent.getId(),
+          binaryContent.getFileName());
+      return binaryContentMapper.toDto(binaryContent);
+    } catch (Exception e) {
+      log.error("Error: File with ID: {} creating failed: {}", binaryContent.getId(),
+          e.getMessage());
+      throw e;
+    }
   }
 
   @Override

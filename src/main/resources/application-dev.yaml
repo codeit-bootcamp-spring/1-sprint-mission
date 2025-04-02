@@ -1,0 +1,30 @@
+spring:
+  profiles: dev
+  application:
+    name: discodeit
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit  # PostgreSQL DB 주소
+    username: discodeit_user                         # DB 사용자
+    password: discodeit1234                          # DB 비밀번호
+    driver-class-name: org.postgresql.Driver         # PostgreSQL 드라이버
+
+  jpa:
+    hibernate:
+      ddl-auto: none   # DDL로 직접 만들 예정 / 테이블 생성: create, update, none
+    show-sql: true        # (옵션) SQL 로그 출력
+    properties:
+      hibernate:
+        format_sql: true  # SQL을 보기 좋게 포맷
+        highlight_sql: true
+        use_sql_comments: true  # SQL에 주석 추가 (디버깅 용이)
+    logging:
+      level:
+        org.hibernate.SQL: debug  # Hibernate SQL 로그 레벨 설정-개발 환경에서 상세한 정보 출력
+        org.hibernate.type.descriptor.sql.BasicBinder: trace  # 바인딩된 파라미터 출력
+    database: postgresql
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage

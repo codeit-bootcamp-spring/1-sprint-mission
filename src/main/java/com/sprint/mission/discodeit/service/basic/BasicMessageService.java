@@ -25,13 +25,14 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
-
+@Slf4j
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -64,6 +65,7 @@ public class BasicMessageService implements MessageService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("Message's Image :{} created", binaryContent.getId());
           return binaryContent;
         })
         .toList();
@@ -73,8 +75,11 @@ public class BasicMessageService implements MessageService {
         .content(messageCreateDTO.content())
         .channel(foundChannel)
         .author(foundUser)
-        .attachments(messageCreateDTO.attachments()).build();
+        .attachments(attachments)
+        .build();
 
+    log.debug("DEBUG: Message created : {}", message);
+    log.info("Message created with id : {}", message.getId());
     return messageMapper.toDto(messageRepository.save(message));
   }
 
@@ -109,11 +114,14 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new EntityNotFoundException("Message not found"));
 
     message.updateContent(messageUpdateDTO.content());
+    log.debug("DEBUG: Message updated : {}", message);
+    log.info("Message updated with id : {}", message.getId());
     return messageMapper.toDto(messageRepository.save(message));
   }
 
   @Override
   public void deleteMessage(UUID msgID) {
     messageRepository.deleteById(msgID);
+    log.info("Message deleted with id : {}", msgID);
   }
 }

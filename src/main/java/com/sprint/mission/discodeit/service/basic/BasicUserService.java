@@ -20,10 +20,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
+@Slf4j
 
 public class BasicUserService implements UserService {
 
@@ -40,9 +42,11 @@ public class BasicUserService implements UserService {
   public UserDto createUser(UserCreateDTO userCreateDTO,
       Optional<BinaryContentCreateDTO> optionalProfileCreateRequest) {
     if (userRepository.existsByUsername(userCreateDTO.name())) {
+      log.info("Username already exists : {}", userCreateDTO.name());
       throw new IllegalArgumentException("이미 존재하는 이름입니다. ");
     }
     if (userRepository.existsByEmail(userCreateDTO.email())) {
+      log.info("Email already exists : {}", userCreateDTO.email());
       throw new IllegalArgumentException("이미 존재하는 이메일입니다. ");
     }
 
@@ -56,6 +60,7 @@ public class BasicUserService implements UserService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("Profile created with ID : {} ", binaryContent.getId());
           return binaryContent;
         })
         .orElse(null);
@@ -67,6 +72,8 @@ public class BasicUserService implements UserService {
         .profile(nullableProfile)
         .build();
 
+    log.debug("DEBUG: User created : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
+    log.info("User created successfully with ID: {}", user.getId());
     return userMapper.toDto(userRepository.save(user));
   }
 
@@ -113,6 +120,7 @@ public class BasicUserService implements UserService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("Profile image created with ID : {} ", binaryContent.getId());
           return binaryContent;
         })
         .orElse(null);
@@ -121,12 +129,15 @@ public class BasicUserService implements UserService {
 
     user.updateUser(userUpdateDTO.newName(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword(),
         nullableProfile);
+    log.debug("DEBUG: User updated : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
+    log.info("User update successfully with ID : {} ", user.getId());
     return userMapper.toDto(userRepository.save(user));
   }
 
   @Override
   public void deleteUser(UUID userID) {
     userRepository.deleteById(userID);
+    log.info("User deleted successfully with ID: {}", userID);
   }
 
   @Override

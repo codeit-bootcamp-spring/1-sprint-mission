@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -18,14 +19,15 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
+@Slf4j
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  private final ReadStatusRepository readStatusRepository;
   private final ChannelMapper channelMapper;
   //Service
   private final ReadStatusService readStatusService;
@@ -38,6 +40,8 @@ public class BasicChannelService implements ChannelService {
         .type(ChannelType.PUBLIC)
         .build();
 
+    log.debug("DEBUG: Create public channel: {}", channel);
+    log.info("Create public channel with ID: {}", channel.getId());
     return channelMapper.toDto(channelRepository.save(channel));
   }
 
@@ -50,10 +54,12 @@ public class BasicChannelService implements ChannelService {
         .type(ChannelType.PRIVATE)
         .build();
 
-    //TODO: 순서? 트랜잭션 어노테이션 설정 보기.
-    Channel channel1 = channelRepository.save(channel);
+    Channel savedChannel = channelRepository.save(channel);
     createReadStatus(channel, channelCreateDTO);
-    return channelMapper.toDto(channel1);
+
+    log.debug("Create private channel: {}", channel);
+    log.info("Create private channel with ID: {}", savedChannel.getId());
+    return channelMapper.toDto(savedChannel);
   }
 
 
@@ -61,8 +67,11 @@ public class BasicChannelService implements ChannelService {
   private void createReadStatus(Channel channel, PrivateChannelCreateDTO channelCreateDTO) {
     List<UUID> userIDList = channelCreateDTO.getUserList();
     for (UUID uuid : userIDList) {
-      System.out.println("ReadStatus created");
-      readStatusService.create(new ReadStatusCreateDTO(channel.getId(), uuid));
+      ReadStatusDto readStatusDto = readStatusService.create(
+          new ReadStatusCreateDTO(channel.getId(), uuid));
+      log.debug("DEBUG: Create read status for user: {} , userStatusId: {}", uuid,
+          readStatusDto.id());
+      log.info("ReadStatus created with ID: {} ", readStatusDto.id());
     }
   }
 
@@ -113,16 +122,20 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel update(ChannelUpdateDTO channelUpdateDTO) {
     if (findDTO(channelUpdateDTO.uuid()).getType() == ChannelType.PRIVATE) {
+      log.info("Private channel cannot be updated");
       throw new IllegalArgumentException("PRIVATE  채널은 수정할 수 없습니다.");
     }
     Channel channel = channelRepository.findById(channelUpdateDTO.uuid()).orElseThrow(()
         -> new NoSuchElementException("channel not found"));
     channel.updateName(channelUpdateDTO.name());
+    log.debug("DEBUG: Update channel: {}", channel);
+    log.info("Update channel with ID: {}", channel.getId());
     return channelRepository.save(channel);
   }
 
   @Override
   public void deleteChannel(UUID id) {
     channelRepository.deleteById(id);
+    log.info("Delete channel with ID: {}", id);
   }
 }
