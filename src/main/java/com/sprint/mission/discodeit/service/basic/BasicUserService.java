@@ -104,6 +104,9 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional
   public void delete(UUID id) {
+    if (!userRepository.existsById(id)) {
+      throw new UserNotFoundException(id);
+    }
     //userStatus ddl on delete cascade, profile jpa delete cascade
     userRepository.deleteById(id);
     log.info("사용자 삭제 완료 id: {}", id);
