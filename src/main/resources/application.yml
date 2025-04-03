@@ -1,6 +1,7 @@
 spring:
   application:
-    name: discodeit
+    name: Discodeit
+
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit  # PostgreSQL DB 주소
     username: discodeit_user                         # DB 사용자
@@ -27,3 +28,40 @@ discodeit:
     type: local
     local:
       root-path: .discodeit/storage
+
+## Actuator 엔드포인트 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: always  # health 상세 정보 노출
+    loggers:
+      enabled: true         # 로그 레벨 변경 가능하도록 활성화
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring:
+    boot:
+      version: 3.4.0
+  settings:
+    datasource:
+      url: ${spring.datasource.url}
+      driver: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
