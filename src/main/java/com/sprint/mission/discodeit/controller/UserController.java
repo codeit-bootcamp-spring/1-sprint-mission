@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserController implements UserApi {
@@ -32,12 +34,11 @@ public class UserController implements UserApi {
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> createUser(
       @RequestPart("user") CreateUserRequest request,
-      @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+      @RequestPart(value = "file", required = false) MultipartFile file
+  ) throws IOException {
 
-    CreateBinaryContentRequest binaryRequest = file != null
-        ? new CreateBinaryContentRequest(file.getOriginalFilename(), file.getContentType(),
-        file.getBytes())
-        : null;
+    CreateBinaryContentRequest binaryRequest = file != null ? new CreateBinaryContentRequest(
+        file.getOriginalFilename(), file.getContentType(), file.getBytes()) : null;
 
     UserResponse userResponse = userService.createUser(request, Optional.ofNullable(binaryRequest));
     return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
@@ -46,9 +47,8 @@ public class UserController implements UserApi {
   @Override
   @GetMapping("/{id}")
   public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
-    return userService.findUserById(id)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return userService.findUserById(id).map(ResponseEntity::ok).orElseGet(
+        () -> ResponseEntity.notFound().build());
   }
 
   @Override
@@ -68,24 +68,23 @@ public class UserController implements UserApi {
   @Override
   @PatchMapping(value = "{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> updateUser(
-      @PathVariable UUID id,
-      @RequestPart("user") UpdateUserRequest request,
-      @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
+      @PathVariable UUID id, @RequestPart("user") UpdateUserRequest request,
+      @RequestPart(value = "file", required = false) MultipartFile file
+  ) throws IOException {
 
-    CreateBinaryContentRequest binaryRequest = file != null
-        ? new CreateBinaryContentRequest(file.getOriginalFilename(), file.getContentType(),
-        file.getBytes())
-        : null;
+    CreateBinaryContentRequest binaryRequest = file != null ? new CreateBinaryContentRequest(
+        file.getOriginalFilename(), file.getContentType(), file.getBytes()) : null;
 
-    return userService.updateUser(id, request, Optional.ofNullable(binaryRequest))
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return userService.updateUser(id, request, Optional.ofNullable(binaryRequest)).map(
+        ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @Override
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatusResponse> updateUserUserStatus(
-      @PathVariable UUID userId, @RequestBody UpdateUserStatusRequest request) {
+      @PathVariable UUID userId,
+      @RequestBody UpdateUserStatusRequest request
+  ) {
     return ResponseEntity.ok(userStatusService.update(userId, request));
   }
 }

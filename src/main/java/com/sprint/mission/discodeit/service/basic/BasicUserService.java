@@ -19,11 +19,12 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -48,6 +49,8 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = new UserStatus(Instant.now());
     user.setUserStatus(userStatus);
     userStatus.setUser(user);
+    log.info("USER_CREATED - {} | - | 이름: {}, 이메일: {}", user.getId(), user.getUsername(),
+        user.getEmail());
     return UserMapper.INSTANCE.userToUserResponse(userRepository.save(user));
   }
 
@@ -55,8 +58,7 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public List<UserResponse> findAllUsers() {
     return userRepository.findWithStatusAndProfile().stream()
-        .map(UserMapper.INSTANCE::userToUserResponse)
-        .toList();
+        .map(UserMapper.INSTANCE::userToUserResponse).toList();
   }
 
   @Override
@@ -77,6 +79,7 @@ public class BasicUserService implements UserService {
       optionalRequest.map(this::saveBinaryContent).ifPresent(user::setProfileImage);
       userRepository.save(user);
 
+      log.info("USER_UPDATED - {} | 변경된 이메일: {}", user.getId(), user.getEmail());
       return UserMapper.INSTANCE.userToUserResponse(user);
     });
   }
@@ -92,6 +95,7 @@ public class BasicUserService implements UserService {
         userStatusRepository.deleteById(user.getUserStatus().getId());
       }
       userRepository.deleteById(user.getId());
+      log.warn("USER_DELETED - {}", user.getId());
     });
   }
 

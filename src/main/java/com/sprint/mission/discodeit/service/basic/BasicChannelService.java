@@ -16,10 +16,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -34,6 +36,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = getOrCreateChannel(request.channelName());
 
     channel.addUserToChannel(user);
+    log.info("CHANNEL_CREATED - {} | 채널명: {}", channel.getId(), channel.getChannelName());
 
     return ChannelMapper.INSTANCE.toChannelResponse(channel);
   }
@@ -83,6 +86,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
     channel.updateChannelName(request.newName());
     channelRepository.save(channel);
+    log.info("CHANNEL_UPDATED - {} | 변경된 이름: {}", channel.getId(), channel.getChannelName());
     return ChannelMapper.INSTANCE.toChannelResponse(channel);
   }
 
@@ -91,6 +95,7 @@ public class BasicChannelService implements ChannelService {
   public void deleteChannel(UUID uuid) {
     try {
       channelRepository.deleteById(uuid);
+      log.warn("CHANNEL_DELETED - {} ", uuid);
     } catch (EmptyResultDataAccessException ignored) {
     }
   }
@@ -103,6 +108,7 @@ public class BasicChannelService implements ChannelService {
     List<User> users = request.userIds().stream().map(userService::getUserById).toList();
 
     users.forEach(channel::addUserToChannel);
+    log.info("CHANNEL_CREATED - {} | 채널명: {}", channel.getId(), channel.getChannelName());
 
     return ChannelMapper.INSTANCE.toChannelResponse(channelRepository.save(channel));
   }

@@ -21,12 +21,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -41,6 +43,8 @@ public class BasicMessageService implements MessageService {
     Channel channel = channelService.getChannel(request.channelID());
     User author = userService.getUserById(request.authorID());
     Message newMessage = new Message(request.text(), author, channel);
+    log.info("MESSAGE_CREATED - {} | {} | 내용: \"{}\"", author.getId(), newMessage.getId(),
+        newMessage.getText());
     return MessageMapper.INSTANCE.toMessageResponse(messageRepository.save(newMessage));
   }
 
@@ -91,6 +95,8 @@ public class BasicMessageService implements MessageService {
     return messageRepository.findById(id)
         .map(message -> {
           message.updateText(request.text());
+          log.info("MESSAGE_EDITED - {} | {} | 변경 내용: \"{}\"", id, message.getId(),
+              message.getText());
           return messageRepository.save(message);
         })
         .map(MessageMapper.INSTANCE::toMessageResponse).orElseThrow(
