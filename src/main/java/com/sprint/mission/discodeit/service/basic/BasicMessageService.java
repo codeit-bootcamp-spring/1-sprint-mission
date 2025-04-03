@@ -21,6 +21,7 @@ import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -136,6 +137,9 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public void delete(UUID id) {
+    if (!messageRepository.existsById(id)) {
+      throw new MessageNotFoundException(id);
+    }
     //binaryContent ddl - on delete cascade
     messageRepository.deleteById(id);
     log.info("메시지 삭제 완료 id: {}", id);

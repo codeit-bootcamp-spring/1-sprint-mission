@@ -10,6 +10,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import lombok.NoArgsConstructor;
@@ -37,6 +38,7 @@ public class User extends BaseUpdatableEntity {
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
+  @Builder
   public User(String username, String email, String password, BinaryContent profile) {
 
     this.username = username;
