@@ -44,6 +44,7 @@ management:
     env:
       enabled: true
 
+# TODO: 파일 크기 등 설정하기!
 info:
   app:
     name: Discodeit
