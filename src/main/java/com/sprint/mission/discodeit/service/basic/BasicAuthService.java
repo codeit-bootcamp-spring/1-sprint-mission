@@ -25,6 +25,7 @@ public class BasicAuthService implements AuthService {
         .filter(user -> authUserDTO.name().equals(user.getUsername())
             && authUserDTO.password().equals(user.getPassword()))
         .findFirst()
+        //TODO: 에러 처리
         .orElseThrow(() -> new LoginFailedException("로그인 실패"));
 
     return userMapper.toDto(targetUser);
