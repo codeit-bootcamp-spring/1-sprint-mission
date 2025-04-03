@@ -18,7 +18,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
-checkstyle.xml
+#checkstyle.xml
 schema.sql
 .idea
 *.iws

@@ -35,6 +35,8 @@ dependencies {
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql:42.6.0'
+    // Docker - 최신 버전 사용
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.4'
 }
 
 tasks.named('test') {
@@ -43,7 +45,7 @@ tasks.named('test') {
 
 checkstyle {
     toolVersion = '1.0' // Checkstyle 버전
-    configFile = rootProject.file('checkstyle.xml') // Checkstyle 설정 파일 경로
+    configFile = file('/app/checkstyle.xml') // Checkstyle 설정 파일 경로
 }
 
 // 이하 필요시에만 사용
