@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.user.UserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
@@ -39,14 +39,14 @@ public class BasicUserService implements UserService {
 
   @Transactional
   @Override
-  public UserDto createUser(UserCreateDTO userCreateDTO,
-      Optional<BinaryContentCreateDTO> optionalProfileCreateRequest) {
-    if (userRepository.existsByUsername(userCreateDTO.name())) {
-      log.info("Username already exists : {}", userCreateDTO.name());
+  public UserDto createUser(UserRequest userRequest,
+      Optional<BinaryContentRequest> optionalProfileCreateRequest) {
+    if (userRepository.existsByUsername(userRequest.name())) {
+      log.info("Username already exists : {}", userRequest.name());
       throw new IllegalArgumentException("이미 존재하는 이름입니다. ");
     }
-    if (userRepository.existsByEmail(userCreateDTO.email())) {
-      log.info("Email already exists : {}", userCreateDTO.email());
+    if (userRepository.existsByEmail(userRequest.email())) {
+      log.info("Email already exists : {}", userRequest.email());
       throw new IllegalArgumentException("이미 존재하는 이메일입니다. ");
     }
 
@@ -66,9 +66,9 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     User user = User.builder()
-        .username(userCreateDTO.name())
-        .email(userCreateDTO.email())
-        .password(userCreateDTO.password())
+        .username(userRequest.name())
+        .email(userRequest.email())
+        .password(userRequest.password())
         .profile(nullableProfile)
         .build();
 
@@ -108,7 +108,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto updateUser(
       UUID userID, UserUpdateDTO userUpdateDTO,
-      Optional<BinaryContentCreateDTO> optionalProfileCreateRequest) {
+      Optional<BinaryContentRequest> optionalProfileCreateRequest) {
 
     //nullable한 프로필
     BinaryContent nullableProfile = optionalProfileCreateRequest

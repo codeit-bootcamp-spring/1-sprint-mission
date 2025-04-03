@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
@@ -33,10 +32,10 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusService readStatusService;
 
   @Override
-  public ChannelDto createPublicChannel(ChannelCreateDTO channelCreateDTO) {
+  public ChannelDto createPublicChannel(PublicChannelRequest publicChannelRequest) {
     Channel channel = Channel.builder()
-        .channelName(channelCreateDTO.name())
-        .description(channelCreateDTO.description())
+        .channelName(publicChannelRequest.name())
+        .description(publicChannelRequest.description())
         .type(ChannelType.PUBLIC)
         .build();
 
@@ -47,7 +46,7 @@ public class BasicChannelService implements ChannelService {
 
   @Transactional
   @Override
-  public ChannelDto createPrivateChannel(PrivateChannelCreateDTO channelCreateDTO) {
+  public ChannelDto createPrivateChannel(PrivateChannelRequest channelCreateDTO) {
     Channel channel = Channel.builder()
         .channelName(channelCreateDTO.getName())
         .description(channelCreateDTO.getDescription())
@@ -64,11 +63,11 @@ public class BasicChannelService implements ChannelService {
 
 
   //ReadStatus서비스에서 ReadStatus를 만드는 함수
-  private void createReadStatus(Channel channel, PrivateChannelCreateDTO channelCreateDTO) {
+  private void createReadStatus(Channel channel, PrivateChannelRequest channelCreateDTO) {
     List<UUID> userIDList = channelCreateDTO.getUserList();
     for (UUID uuid : userIDList) {
       ReadStatusDto readStatusDto = readStatusService.create(
-          new ReadStatusCreateDTO(channel.getId(), uuid));
+          new ReadStatusRequest(channel.getId(), uuid));
       log.debug("DEBUG: Create read status for user: {} , userStatusId: {}", uuid,
           readStatusDto.id());
       log.info("ReadStatus created with ID: {} ", readStatusDto.id());

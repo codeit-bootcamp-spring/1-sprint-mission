@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -34,12 +34,12 @@ public class BasicReadStatusService implements ReadStatusService {
 
   //PRIVATE 채널시에만 수행
   @Override
-  public ReadStatusDto create(ReadStatusCreateDTO readStatusCreateDTO) {
+  public ReadStatusDto create(ReadStatusRequest readStatusRequest) {
 
-    User user = userRepository.findById(readStatusCreateDTO.userId()).orElseThrow(
+    User user = userRepository.findById(readStatusRequest.userId()).orElseThrow(
         () -> new NoSuchElementException("user not found"));
 
-    Channel channel = channelRepository.findById(readStatusCreateDTO.channelId()).orElseThrow(
+    Channel channel = channelRepository.findById(readStatusRequest.channelId()).orElseThrow(
         () -> new NoSuchElementException("channel not found"));
 
     //TODO: lastReadAt의 전달시점 고려

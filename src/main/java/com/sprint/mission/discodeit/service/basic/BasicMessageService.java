@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.message.MessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
@@ -47,13 +47,13 @@ public class BasicMessageService implements MessageService {
 
   @Transactional
   @Override
-  public MessageDto createMessage(MessageCreateDTO messageCreateDTO,
-      List<BinaryContentCreateDTO> attachmentRequests) {
-    Channel foundChannel = channelRepository.findById(messageCreateDTO.channelId()).orElseThrow(()
-        -> new NoSuchElementException(messageCreateDTO.channelId() + "does not exist"));
+  public MessageDto createMessage(MessageRequest messageRequest,
+      List<BinaryContentRequest> attachmentRequests) {
+    Channel foundChannel = channelRepository.findById(messageRequest.channelId()).orElseThrow(()
+        -> new NoSuchElementException(messageRequest.channelId() + "does not exist"));
 
-    User foundUser = userRepository.findById(messageCreateDTO.userId()).orElseThrow(()
-        -> new NoSuchElementException(messageCreateDTO.userId() + "does not exist"));
+    User foundUser = userRepository.findById(messageRequest.userId()).orElseThrow(()
+        -> new NoSuchElementException(messageRequest.userId() + "does not exist"));
 
     List<BinaryContent> attachments = attachmentRequests.stream()
         .map(attachmentRequest -> {
@@ -72,7 +72,7 @@ public class BasicMessageService implements MessageService {
 
     //builder를 통한 message만들기
     Message message = Message.builder()
-        .content(messageCreateDTO.content())
+        .content(messageRequest.content())
         .channel(foundChannel)
         .author(foundUser)
         .attachments(attachments)

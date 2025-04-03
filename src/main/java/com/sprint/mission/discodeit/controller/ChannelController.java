@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -33,15 +34,15 @@ public class ChannelController {
   // 공개 채널 생성
   @PostMapping
   public ResponseEntity<ChannelDto> createPublicChannel(
-      @RequestBody ChannelCreateDTO channelCreateDTO) {
+      @RequestBody @Valid PublicChannelRequest publicChannelRequest) {
     log.info("Received: createPublicChannel");
-    return ResponseEntity.ok(channelService.createPublicChannel(channelCreateDTO));
+    return ResponseEntity.ok(channelService.createPublicChannel(publicChannelRequest));
   }
 
   // 비공개 채널 생성
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> createPrivateChannel(
-      @RequestBody PrivateChannelCreateDTO channelCreateDTO) {
+      @RequestBody @Valid PrivateChannelRequest channelCreateDTO) {
     log.info("Received: createPrivateChannel");
     return ResponseEntity.ok(channelService.createPrivateChannel(channelCreateDTO));
   }
@@ -49,7 +50,7 @@ public class ChannelController {
   // 공개 채널 정보 수정
   @PatchMapping("/{id}")
   public ResponseEntity<String> updateChannel(@PathVariable("id") UUID id,
-      @RequestBody ChannelUpdateDTO channelUpdateDTO) {
+      @RequestBody @Valid ChannelUpdateDTO channelUpdateDTO) {
     log.info("Received: updateChannel");
     channelService.update(channelUpdateDTO);
     return ResponseEntity.status(HttpStatus.OK).body("Channel updated");

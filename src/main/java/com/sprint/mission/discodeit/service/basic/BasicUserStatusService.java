@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
@@ -26,12 +26,12 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserStatusMapper userStatusMapper;
 
   @Override
-  public UserStatusDto create(UserStatusCreateDTO userStatusCreateDTO) {
-    User user = userRepository.findById(userStatusCreateDTO.userId()).orElseThrow(
+  public UserStatusDto create(UserStatusRequest userStatusRequest) {
+    User user = userRepository.findById(userStatusRequest.userId()).orElseThrow(
         () -> new NoSuchElementException("User not found"));
 
     //해당 User에 대한 UserStatus 객체 존재 검증
-    if (userStatusRepository.existsByUserId(userStatusCreateDTO.userId())) {
+    if (userStatusRepository.existsByUserId(userStatusRequest.userId())) {
       throw new NoSuchElementException("해당 사용자에 대한 UserStatus가 이미 존재합니다.");
     }
 

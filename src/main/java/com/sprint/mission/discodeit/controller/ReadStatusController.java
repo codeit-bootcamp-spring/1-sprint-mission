@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -27,8 +27,8 @@ public class ReadStatusController {
   // 메시지 수신 정보 생성 (POST /readstatus)
   @PostMapping
   public ResponseEntity<ReadStatusDto> create(
-      @RequestBody ReadStatusCreateDTO readStatusCreateDTO) {
-    return ResponseEntity.ok(readStatusService.create(readStatusCreateDTO));
+      @RequestBody ReadStatusRequest readStatusRequest) {
+    return ResponseEntity.ok(readStatusService.create(readStatusRequest));
   }
 
   // 메시지 수신 정보 업데이트 (PUT /readstatus/{readStatusId})

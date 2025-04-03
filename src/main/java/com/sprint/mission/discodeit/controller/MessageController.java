@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.message.MessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,14 +41,14 @@ public class MessageController {
   // 메시지 전송
   @PostMapping
   public ResponseEntity<MessageDto> createMessage(
-      @RequestPart("messageCreateRequest") MessageCreateDTO messageCreateRequest,
+      @RequestPart("messageCreateRequest") @Valid MessageRequest messageRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    List<BinaryContentCreateDTO> attachmentRequests = Optional.ofNullable(attachments)
+    List<BinaryContentRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
               try {
-                return new BinaryContentCreateDTO(
+                return new BinaryContentRequest(
                     file.getOriginalFilename(),
                     file.getSize(),
                     file.getContentType(),
@@ -60,7 +61,7 @@ public class MessageController {
             .toList())
         .orElse(new ArrayList<>());
 
-    MessageDto createdMessage = messageService.createMessage(messageCreateRequest,
+    MessageDto createdMessage = messageService.createMessage(messageRequest,
         attachmentRequests);
 
     return ResponseEntity

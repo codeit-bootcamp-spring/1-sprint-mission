@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.dto.binarycontent;
 
 
-public record BinaryContentCreateDTO(
+public record BinaryContentRequest(
     String fileName,
     Long size,
     String contentType,

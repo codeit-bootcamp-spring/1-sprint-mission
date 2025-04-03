@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.user.UserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -37,14 +38,14 @@ public class UserController {
   // 사용자 등록
   @PostMapping
   public ResponseEntity<UserDto> createUser(
-      @RequestPart UserCreateDTO userCreateDTO,
+      @RequestPart @Valid UserRequest userRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    Optional<BinaryContentCreateDTO> profileRequest = Optional.ofNullable(profile)
+    Optional<BinaryContentRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
 
-    log.info("Received Created user with name: {}", userCreateDTO.name());
-    UserDto createdUser = userService.createUser(userCreateDTO, profileRequest);
+    log.info("Received Created user with name: {}", userRequest.name());
+    UserDto createdUser = userService.createUser(userRequest, profileRequest);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdUser);
@@ -54,11 +55,11 @@ public class UserController {
   @PatchMapping("/{id}")
   public ResponseEntity<UserDto> updateUser(
       @PathVariable("id") UUID id,
-      @RequestPart UserUpdateDTO userUpdateDTO,
+      @RequestPart @Valid UserUpdateDTO userUpdateDTO,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     log.info("Received Updating user with ID : {}", id);
-    Optional<BinaryContentCreateDTO> profileRequest = Optional.ofNullable(profile)
+    Optional<BinaryContentRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     return ResponseEntity.ok(userService.updateUser(id, userUpdateDTO, profileRequest));
   }
@@ -93,12 +94,12 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.OK).body(updatedStatus);
   }
 
-  private Optional<BinaryContentCreateDTO> resolveProfileRequest(MultipartFile profileFile) {
+  private Optional<BinaryContentRequest> resolveProfileRequest(MultipartFile profileFile) {
     if (profileFile.isEmpty()) {
       return Optional.empty();
     } else {
       try {
-        BinaryContentCreateDTO binaryContentCreateRequest = new BinaryContentCreateDTO(
+        BinaryContentRequest binaryContentCreateRequest = new BinaryContentRequest(
             profileFile.getOriginalFilename(),
             profileFile.getSize(),
             profileFile.getContentType(),
