@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.exception;
 
+import java.time.Instant;
+import java.util.Map;
+
 public class UserAlreadyExistsException extends UserException {
 
-  public UserAlreadyExistsException(String message) {
-    super(message);
+  public UserAlreadyExistsException(Instant timestamp, ErrorCode errorCode,
+      Map<String, Object> details) {
+    super(timestamp, errorCode, details);
   }
 }

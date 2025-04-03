@@ -1,8 +1,13 @@
 package com.sprint.mission.discodeit.exception;
 
-public class LoginFailedException extends RuntimeException {
+import java.time.Instant;
+import java.util.Map;
 
-  public LoginFailedException(String message) {
-    super(message);
+public class LoginFailedException extends DiscodeitException {
+
+
+  public LoginFailedException(Instant timestamp, ErrorCode errorCode,
+      Map<String, Object> details) {
+    super(timestamp, errorCode, details);
   }
 }

@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.exception;
 
-public class PrivateChannelUpdateException extends RuntimeException {
+import java.time.Instant;
+import java.util.Map;
 
-  public PrivateChannelUpdateException(String message) {
-    super(message);
+public class PrivateChannelUpdateException extends ChannelException {
+
+  public PrivateChannelUpdateException(Instant timestamp, ErrorCode errorCode,
+      Map<String, Object> details) {
+    super(timestamp, errorCode, details);
   }
 }
