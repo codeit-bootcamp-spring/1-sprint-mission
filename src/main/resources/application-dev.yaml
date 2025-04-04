@@ -23,6 +23,11 @@ spring:
         org.hibernate.SQL: DEBUG
         org.hibernate.orm.jdbc.bind: trace
 
+logging:
+  level:
+    root: info
+    com.sprint.mission.discodeit: debug
+
 discodeit:
   storage:
     type: local
