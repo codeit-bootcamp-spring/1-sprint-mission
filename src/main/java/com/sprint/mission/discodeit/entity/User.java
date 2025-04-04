@@ -62,7 +62,6 @@ public class User extends BaseUpdatableEntity {
     this.email = email;
     this.password = password;
     this.profile = profile;
-    //this.profileId = profileId;
   }
 
 }
