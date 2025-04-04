@@ -7,6 +7,6 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 public class UserAlreadyExistsException extends UserException {
 
 	public UserAlreadyExistsException(Map<String, Object> details) {
-		super(ErrorCode.EMPLOYEE_ALREADY_EXISTS, details);
+		super(ErrorCode.USER_ALREADY_EXISTS, details);
 	}
 }

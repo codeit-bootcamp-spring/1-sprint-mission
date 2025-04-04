@@ -52,10 +52,12 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 
     // === 테스트 ===
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {

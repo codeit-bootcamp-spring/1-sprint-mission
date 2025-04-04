@@ -72,7 +72,6 @@ class UserServiceTest {
 		UUID userId = UUID.randomUUID();
 		UserUpdateRequest request = new UserUpdateRequest("newusername", "newemail@example.com", "newpassword");
 		User existingUser = new User("oldusername", "oldemail@example.com", "oldpassword", null);
-		User updatedUser = new User("newusername", "newemail@example.com", "newpassword", null);
 		UserDto updatedUserDto = new UserDto(userId, "newusername", "newemail@example.com", null, true);
 
 		given(userRepository.findById(userId)).willReturn(Optional.of(existingUser));

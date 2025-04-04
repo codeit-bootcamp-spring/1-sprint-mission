@@ -212,10 +212,11 @@ class UserControllerTest {
 		UserStatusUpdateRequest request = new UserStatusUpdateRequest(Instant.now());
 		UserStatusDto responseDto = new UserStatusDto(userId, userId, Instant.now());
 
+		//when
 		when(userStatusService.updateByUserId(eq(userId), any(UserStatusUpdateRequest.class)))
 			.thenReturn(responseDto);
 
-		// when & then
+		// then
 		mockMvc.perform(
 				MockMvcRequestBuilders.patch("/api/users/{userId}/userStatus", userId.toString())
 					.contentType(MediaType.APPLICATION_JSON)
