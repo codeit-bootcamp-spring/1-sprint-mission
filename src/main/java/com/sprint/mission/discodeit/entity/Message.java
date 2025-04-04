@@ -9,9 +9,11 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 
@@ -43,6 +45,7 @@ public class Message extends BaseUpdatableEntity {
   )
   private List<BinaryContent> attachments = new ArrayList<>();
 
+  @Builder
   public Message(String content, User author, Channel channel) {
     this.content = content;
     this.author = author;
@@ -61,6 +64,5 @@ public class Message extends BaseUpdatableEntity {
       throw new IllegalArgumentException("입력한 메시지: " + content + "가 기존 값과 같습니다.");
     }
   }
-
 
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -20,7 +21,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity {
@@ -49,5 +49,13 @@ public class Channel extends BaseUpdatableEntity {
       throw new IllegalArgumentException("입력한 설명: " + description + "이 기존 값과 같습니다.");
     }
   }
-  
+
+  @Builder
+  public Channel(String name, String description, ChannelType channelType) {
+    this.name = name;
+    this.description = description;
+    this.channelType = channelType;
+  }
+
+
 }
