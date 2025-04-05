@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.ReadStatusApiDocs;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
-import com.sprint.mission.discodeit.dto.ReadStatusRequest;
-import com.sprint.mission.discodeit.dto.ReadStatusResponse;
+import com.sprint.mission.discodeit.dto.request.ReadStatusRequest;
+import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class ReadStatusController implements ReadStatusApiDocs {
   @PostMapping
   @Override
   public ResponseEntity<CustomApiResponse<ReadStatusResponse>> createReadStatus(
-      @RequestBody ReadStatusRequest.Create readStatusRequest) {
+      @Valid @RequestBody ReadStatusRequest.Create readStatusRequest) {
 
     log.info("POST /api/read-status");
     return ResponseEntity.status(HttpStatus.CREATED)
@@ -36,7 +37,7 @@ public class ReadStatusController implements ReadStatusApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<ReadStatusResponse>> updateReadStatus(
       @PathVariable UUID readStatusId,
-      @RequestBody ReadStatusRequest.Update readStatusRequest) {
+      @Valid @RequestBody ReadStatusRequest.Update readStatusRequest) {
 
     log.info("PUT /api/read-status/{}", readStatusId);
     return ResponseEntity.ok(

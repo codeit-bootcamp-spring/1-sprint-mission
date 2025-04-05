@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserStatusRequest;
-import com.sprint.mission.discodeit.dto.UserStatusResponse;
+import com.sprint.mission.discodeit.dto.request.UserStatusRequest;
+import com.sprint.mission.discodeit.dto.response.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.BusinessException;
-import com.sprint.mission.discodeit.global.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.global.exception.userstatus.UserStatusAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.userstatus.UserStatusNotFoundException;
@@ -14,8 +12,6 @@ import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sun.jdi.request.DuplicateRequestException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +63,7 @@ public class BasicUserStatusService implements UserStatusService {
     findUserByUserIdOrThrow(userId);
     UserStatus userStatus = findByUserIdOrThrow(userId);
 
-    userStatus.updateLastActiveAt(request.newLastActiveAt());
+    userStatus.updateLastActiveAt(request.getNewLastActiveAt());
     return userStatusMapper.entityToDto(userStatusRepository.save(userStatus));
   }
 

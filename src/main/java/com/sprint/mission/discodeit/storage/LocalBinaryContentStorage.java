@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.storage;
 
-import com.sprint.mission.discodeit.dto.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.BusinessException;
 import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentOperationException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

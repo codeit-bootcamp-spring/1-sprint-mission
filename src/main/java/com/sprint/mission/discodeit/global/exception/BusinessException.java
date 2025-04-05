@@ -17,7 +17,7 @@ public class BusinessException extends RuntimeException {
   }
 
   public BusinessException(ErrorCode errorCode, Map<String, Object> details) {
-    super(errorCode.getMessage());
+    super(errorCode.getMessage(), null, false, false);
     this.timestamp = Instant.now();
     this.errorCode = errorCode;
     this.details = details;

@@ -3,9 +3,10 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.controller.docs.MessageApiDocs;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
-import com.sprint.mission.discodeit.dto.MessageRequest;
-import com.sprint.mission.discodeit.dto.MessageResponse;
+import com.sprint.mission.discodeit.dto.request.MessageRequest;
+import com.sprint.mission.discodeit.dto.response.MessageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class MessageController implements MessageApiDocs {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
       MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<CustomApiResponse<MessageResponse>> createMessage(
-      @RequestPart(value = "messageCreateRequest") MessageRequest.Create messageRequest,
+      @Valid @RequestPart(value = "messageCreateRequest") MessageRequest.Create messageRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> files
   ) {
     log.info("POST /api/messages");
@@ -42,7 +43,7 @@ public class MessageController implements MessageApiDocs {
       MediaType.APPLICATION_JSON_VALUE})
   public ResponseEntity<CustomApiResponse<MessageResponse>> updateMessage(
       @PathVariable UUID messageId,
-      @RequestBody MessageRequest.Update messageRequest
+      @Valid @RequestBody MessageRequest.Update messageRequest
   ) {
     log.info("PUT /api/messages/{}", messageId);
     return ResponseEntity.ok(

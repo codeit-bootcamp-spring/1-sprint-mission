@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.ChannelApiDocs;
-import com.sprint.mission.discodeit.dto.ChannelRequest;
-import com.sprint.mission.discodeit.dto.ChannelResponse;
+import com.sprint.mission.discodeit.dto.request.ChannelRequest;
+import com.sprint.mission.discodeit.dto.response.ChannelResponse;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,9 @@ public class ChannelController implements ChannelApiDocs {
   @PostMapping("/public")
   @Override
   public ResponseEntity<CustomApiResponse<ChannelResponse>> createPublicChannel(
-      @RequestBody ChannelRequest.CreatePublic publicChannelRequest) {
+      @Valid @RequestBody ChannelRequest.CreatePublic publicChannelRequest) {
 
-    log.info("POST /api/channels/public - channel: {}", publicChannelRequest.name());
+    log.info("POST /api/channels/public - channel: {}", publicChannelRequest.getName());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CustomApiResponse.created(channelService.createPublicChannel(publicChannelRequest)));
   }
@@ -35,7 +36,7 @@ public class ChannelController implements ChannelApiDocs {
   @PostMapping("/private")
   @Override
   public ResponseEntity<CustomApiResponse<ChannelResponse>> createPrivateChannel(
-      @RequestBody ChannelRequest.CreatePrivate privateChannelRequest) {
+      @Valid @RequestBody ChannelRequest.CreatePrivate privateChannelRequest) {
 
     log.info("POST /api/channels/private");
     return ResponseEntity.status(HttpStatus.CREATED)
@@ -47,7 +48,7 @@ public class ChannelController implements ChannelApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<ChannelResponse>> updatePublicChannel(
       @PathVariable UUID channelId,
-      @RequestBody ChannelRequest.Update publicChannelRequest
+      @Valid @RequestBody ChannelRequest.Update publicChannelRequest
   ) {
 
     log.info("PUT /api/channels/public/{}", channelId);

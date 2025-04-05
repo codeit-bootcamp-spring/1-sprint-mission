@@ -2,12 +2,13 @@ package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.UserApiDocs;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
-import com.sprint.mission.discodeit.dto.UserRequest;
-import com.sprint.mission.discodeit.dto.UserResponse;
-import com.sprint.mission.discodeit.dto.UserStatusRequest;
-import com.sprint.mission.discodeit.dto.UserStatusResponse;
+import com.sprint.mission.discodeit.dto.request.UserRequest;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.request.UserStatusRequest;
+import com.sprint.mission.discodeit.dto.response.UserStatusResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,10 +40,10 @@ public class UserController implements UserApiDocs {
       MediaType.APPLICATION_JSON_VALUE})
   @Override
   public ResponseEntity<CustomApiResponse<UserResponse>> createUser(
-      @RequestPart("user") UserRequest userRequest,
+      @Valid @RequestPart("user") UserRequest.Create userRequest,
       @RequestPart(value = "image", required = false) MultipartFile userProfileImage
   ) {
-    log.info("POST /api/users - user: {}", userRequest.name());
+    log.info("POST /api/users - user: {}", userRequest.getUsername());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CustomApiResponse.created(userService.createUser(userRequest, userProfileImage)));
   }
@@ -52,7 +53,7 @@ public class UserController implements UserApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<UserResponse>> updateUser(
       @PathVariable UUID userId,
-      @RequestPart("user") UserRequest userRequest,
+      @Valid @RequestPart("user") UserRequest.Update userRequest,
       @RequestPart(value = "image", required = false) MultipartFile userProfileImage
   ) {
 
@@ -75,7 +76,7 @@ public class UserController implements UserApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<UserStatusResponse>> updateUserStatus(
       @PathVariable UUID userId,
-      @RequestBody UserStatusRequest.Update request
+      @Valid @RequestBody UserStatusRequest.Update request
   ) {
     return ResponseEntity.ok(
         CustomApiResponse.success(userStatusService.updateByUserId(userId, request))

@@ -1,25 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelRequest;
-import com.sprint.mission.discodeit.dto.ChannelResponse;
-import com.sprint.mission.discodeit.dto.ReadStatusRequest;
+import com.sprint.mission.discodeit.dto.request.ChannelRequest;
+import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.request.ReadStatusRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.BusinessException;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.validation.ChannelValidator;
 import jakarta.transaction.Transactional;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -36,24 +32,19 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  private final ChannelValidator channelValidator;
   private final ChannelMapper channelMapper;
-  private final MessageRepository messageRepository;
   private final ReadStatusService readStatusService;
   private final UserRepository userRepository;
 
   @Override
   @Transactional
   public ChannelResponse createPublicChannel(ChannelRequest.CreatePublic request) {
-    if (channelValidator.isValidName(request.name())) {
-      Channel newChannel = Channel.createChannel(Channel.ChannelType.PUBLIC, request.name(),
-          request.description());
-      channelRepository.save(newChannel);
+    Channel newChannel = Channel.createChannel(Channel.ChannelType.PUBLIC, request.getName(),
+        request.getDescription());
+    channelRepository.save(newChannel);
 
-      log.info("Created public channel - id: {}", newChannel.getId());
-      return channelMapper.entityToDto(newChannel);
-    }
-    return null;
+    log.info("Created public channel - id: {}", newChannel.getId());
+    return channelMapper.entityToDto(newChannel);
   }
 
   @Override
@@ -62,7 +53,7 @@ public class BasicChannelService implements ChannelService {
     Channel newChannel = Channel.createChannel(Channel.ChannelType.PRIVATE, null, null);
     channelRepository.save(newChannel);
 
-    for (UUID userId : request.participantIds()) {
+    for (UUID userId : request.getParticipantIds()) {
       readStatusService.create(
           new ReadStatusRequest.Create(userId, newChannel.getId(), newChannel.getCreatedAt()));
     }
@@ -96,15 +87,11 @@ public class BasicChannelService implements ChannelService {
           Map.of("id", id));
     }
 
-    if (channelValidator.isValidName(request.name()) && channelValidator.isValidName(
-        request.description())) {
-      Optional.ofNullable(request.name()).ifPresent(channel::updateName);
-      Optional.ofNullable(request.description()).ifPresent(channel::updateDescription);
+    Optional.ofNullable(request.getName()).ifPresent(channel::updateName); // TODO : 같은지 확인
+    Optional.ofNullable(request.getDescription()).ifPresent(channel::updateDescription);
 
-      log.info("Updated public channel - id: {}", channel.getId());
-      return channelMapper.entityToDto(channel);
-    }
-    return null;
+    log.info("Updated public channel - id: {}", channel.getId());
+    return channelMapper.entityToDto(channel);
   }
 
   @Override
