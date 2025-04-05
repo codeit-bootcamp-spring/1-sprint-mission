@@ -39,3 +39,36 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java:
+      version: 17
+    springboot:
+      version: 3.4.0
+    datasource:
+      url: jdbc:postgresql://localhost:5432/discodeit
+      driver-class-name: org.postgresql.Driver
+    jpa:
+      ddl-auto: none
+    storage:
+      type: local
+      path: ./discodeit/storage
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
