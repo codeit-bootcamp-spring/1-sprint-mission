@@ -18,7 +18,7 @@ spring:
     init:
       mode: always
       schema-locations: classpath:schema-test.sql
-      #data-locations: classpath:data-test.sql  #초기 데이터 삽입용
+      data-locations: classpath:data-test.sql  #초기 데이터 삽입용
 
 logging:
   level:
