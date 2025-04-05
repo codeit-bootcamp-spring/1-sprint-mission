@@ -16,7 +16,6 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.validator.MessageValidator;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -24,18 +23,19 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
-  private final MessageValidator validator;
   private final MessageMapper messageMapper;
 
   private final BinaryContentService binaryContentService;
@@ -52,11 +52,8 @@ public class BasicMessageService implements MessageService {
       List<MultipartFile> fileAttachments) {
     User author = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
-
     Channel channel = channelRepository.findById(messageCreateRequest.channelId())
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
-
-    validator.validate(messageCreateRequest.content());
 
     List<BinaryContent> attachments = Optional.ofNullable(fileAttachments)
         .map(files -> files.stream()
@@ -68,10 +65,11 @@ public class BasicMessageService implements MessageService {
             .toList()
         ).orElseGet(Collections::emptyList);
 
-    return messageMapper.toDto(
-        messageRepository.save(
-            new Message(messageCreateRequest.content(), channel, author, attachments))
-    );
+    Message message = new Message(messageCreateRequest.content(), channel, author, attachments);
+    Message savedMessage = messageRepository.save(message);
+    log.info("Message entity saved: id = {}", savedMessage.getId());
+
+    return messageMapper.toDto(savedMessage);
   }
 
   @Override
@@ -109,8 +107,10 @@ public class BasicMessageService implements MessageService {
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
+
     if (request.newContent() != null) {
       message.updateContent(request.newContent());
+      log.info("Message entity updated - content changed: id = {}", message.getId());
     }
 
     return messageMapper.toDto(message);
@@ -122,7 +122,8 @@ public class BasicMessageService implements MessageService {
     if (!messageRepository.existsById(messageId)) {
       throw new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다.");
     }
-
     messageRepository.deleteById(messageId);
+
+    log.info("Message entity deleted: id = {}", messageId);
   }
 }
