@@ -28,7 +28,7 @@ public class BinaryContentController implements BinaryContentApiDocs {
       @PathVariable(value = "binaryContentId") UUID fileId
   ) {
     return ResponseEntity.ok(
-        CustomApiResponse.success(binaryContentService.findByIdOrThrow(fileId)));
+        CustomApiResponse.success(binaryContentService.findById(fileId)));
   }
 
   @GetMapping
@@ -43,6 +43,6 @@ public class BinaryContentController implements BinaryContentApiDocs {
   @Override
   public ResponseEntity<?> downloadFile(@PathVariable UUID binaryContentId) {
     log.info("GET /api/binaryContents/{}/download - download attempt for file", binaryContentId);
-    return binaryContentStorage.download(binaryContentService.findByIdOrThrow(binaryContentId));
+    return binaryContentStorage.download(binaryContentService.findById(binaryContentId));
   }
 }

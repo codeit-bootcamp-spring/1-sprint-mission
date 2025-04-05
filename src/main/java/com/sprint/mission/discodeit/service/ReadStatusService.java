@@ -13,8 +13,6 @@ public interface ReadStatusService {
 
   ReadStatusResponse findById(UUID id);
 
-  ReadStatus findByIdOrThrow(UUID id);
-
   List<ReadStatusResponse> findAllByUserId(UUID userId);
 
   List<ReadStatusResponse> findAllByChannelId(UUID channelId);

@@ -7,7 +7,10 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.BusinessException;
+import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.global.exception.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -16,6 +19,8 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
 import jakarta.transaction.Transactional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +74,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelResponse> findAllByUserId(UUID userId) { // N + 1;
     User user = userRepository.findById(userId).orElseThrow(() ->
-        new RestApiException(ErrorCode.USER_NOT_FOUND, "id: " + userId));
+        new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
 
     return channelRepository.findAllByUserIdOrType(userId, ChannelType.PUBLIC).stream()
         .map(channelMapper::entityToDto)
@@ -87,7 +92,8 @@ public class BasicChannelService implements ChannelService {
     Channel channel = findByIdOrThrow(id);
 
     if (channel.getType() == Channel.ChannelType.PRIVATE) {
-      throw new RestApiException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED, "id : " + id);
+      throw new PrivateChannelUpdateException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED,
+          Map.of("id", id));
     }
 
     if (channelValidator.isValidName(request.name()) && channelValidator.isValidName(
@@ -110,7 +116,8 @@ public class BasicChannelService implements ChannelService {
 
   private Channel findByIdOrThrow(UUID id) {
     return channelRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "id : " + id));
+        .orElseThrow(
+            () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, Map.of("id", id)));
   }
 
 }

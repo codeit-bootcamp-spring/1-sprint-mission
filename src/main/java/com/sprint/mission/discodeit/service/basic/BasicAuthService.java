@@ -1,28 +1,20 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.BusinessException;
+import com.sprint.mission.discodeit.global.exception.auth.AuthenticationFailedException;
+import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +26,12 @@ public class BasicAuthService implements AuthService {
 
   public UserResponse login(UserRequest.Login request) {
     User findUser = userRepository.findByUsername(request.username())
-        .orElseThrow(() -> new RestApiException(ErrorCode.LOGIN_FAILED,
-            "User does not exist, or entered the wrong ID"));
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,
+            Map.of("userName", request.username())));
 
     if (!findUser.getPassword().equals(request.password())) {
-      throw new RestApiException(ErrorCode.LOGIN_FAILED, "Entered the wrong password.");
+      throw new AuthenticationFailedException(ErrorCode.LOGIN_FAILED,
+          Map.of("userName", request.username()));
     }
 
     log.info("Login success - userId: {}", findUser.getId());

@@ -11,7 +11,7 @@ public interface BinaryContentService {
 
   BinaryContentResponse create(MultipartFile file);
 
-  BinaryContentResponse findByIdOrThrow(UUID id);
+  BinaryContentResponse findById(UUID id);
 
   List<BinaryContentResponse> findAllByIdIn(List<UUID> ids);
 

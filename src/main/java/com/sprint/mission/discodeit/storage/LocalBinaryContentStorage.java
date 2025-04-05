@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.BusinessException;
+import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentOperationException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -39,8 +40,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       try {
         Files.createDirectories(root);
       } catch (IOException e) {
-        throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
-            "Failed to initialize local Binary content storage");
+        throw new BinaryContentOperationException(ErrorCode.BINARY_STORAGE_INIT_FAILED);
       }
     }
   }
@@ -52,7 +52,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     ) {
       fileOutputStream.write(bytes);
     } catch (IOException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to save binary content.");
+      throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
     }
     return id;
   }
@@ -60,14 +60,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Override
   public InputStream get(UUID id) {
     if (!Files.exists(root)) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
-          "Failed to read binary content: No binary content available to read.");
+      throw new BinaryContentOperationException(ErrorCode.BINARY_READ_FAILED);
     }
     try {
       return new FileInputStream(resolvePath(id).toFile());
     } catch (FileNotFoundException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
-          "Failed to create stream: File not found.");
+      throw new BinaryContentOperationException(ErrorCode.STREAM_CREATION_FAILED);
     }
   }
 

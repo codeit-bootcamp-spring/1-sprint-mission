@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.validation.Impl;
 
 
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.BusinessException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.validation.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -20,37 +20,37 @@ public class UserValidatorImpl implements UserValidator {
 
   @Override
   public boolean isValidName(String name) {
-    if (name.isBlank()) {
-      throw new RestApiException(ErrorCode.USER_NAME_REQUIRED, "name=" + name);
-    } else if (name.length() < 2) {
-      throw new RestApiException(ErrorCode.USER_NAME_TOO_SHORT,
-          "name=" + name);
-    } else if (userRepository.existsByUsername(name)) {
-      throw new RestApiException(ErrorCode.USER_NAME_ALREADY_EXIST,
-          "name= " + name);
-    }
+//    if (name.isBlank()) {
+//      throw new BusinessException(ErrorCode.USER_NAME_REQUIRED, "name=" + name);
+//    } else if (name.length() < 2) {
+//      throw new BusinessException(ErrorCode.USER_NAME_TOO_SHORT,
+//          "name=" + name);
+//    } else if (userRepository.existsByUsername(name)) {
+//      throw new BusinessException(ErrorCode.USER_NAME_ALREADY_EXIST,
+//          "name= " + name);
+//    }
     return true;
   }
 
   @Override
   public boolean isValidEmail(String email) {
-    if (!email.matches(EMAIL_REGEX)) {
-      throw new RestApiException(ErrorCode.USER_EMAIL_FORMAT_NOT_MATCH,
-          "email=" + email);
-    } else if (userRepository.existsByEmail(email)) {
-      throw new RestApiException(ErrorCode.USER_EMAIL_ALREADY_EXIST,
-          "email=" + email);
-    }
+//    if (!email.matches(EMAIL_REGEX)) {
+//      throw new BusinessException(ErrorCode.USER_EMAIL_FORMAT_NOT_MATCH,
+//          "email=" + email);
+//    } else if (userRepository.existsByEmail(email)) {
+//      throw new BusinessException(ErrorCode.USER_EMAIL_ALREADY_EXIST,
+//          "email=" + email);
+//    }
     return true;
   }
 
   @Override
   public boolean isValidPassword(String password) {
-    if (password.isBlank()) {
-      throw new RestApiException(ErrorCode.USER_PASSWORD_REQUIRED, "");
-    } else if (password.length() < 6) {
-      throw new RestApiException(ErrorCode.USER_PASSWORD_TOO_SHORT, "");
-    }
+//    if (password.isBlank()) {
+//      throw new BusinessException(ErrorCode.USER_PASSWORD_REQUIRED, "");
+//    } else if (password.length() < 6) {
+//      throw new BusinessException(ErrorCode.USER_PASSWORD_TOO_SHORT, "");
+//    }
     return true;
   }
 }

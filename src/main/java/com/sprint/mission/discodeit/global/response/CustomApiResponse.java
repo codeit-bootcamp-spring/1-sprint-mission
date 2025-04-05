@@ -48,12 +48,11 @@ public class CustomApiResponse<T> {
         .build();
   }
 
-  public static <T> CustomApiResponse<T> failure(ErrorResponse errorResponse) {
-    return CustomApiResponse.<T>builder()
-        .httpStatus(errorResponse.getHttpStatus())
-        .success(false)
-        .error(errorResponse)
-        .build();
-  }
+//  public static <T> CustomApiResponse<T> failure(ErrorResponse errorResponse) {
+//    return CustomApiResponse.<T>builder()
+//        .success(false)
+//        .error(errorResponse)
+//        .build();
+//  }
 
 }

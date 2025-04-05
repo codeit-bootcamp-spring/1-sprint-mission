@@ -5,20 +5,24 @@ import com.sprint.mission.discodeit.dto.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.BusinessException;
+import com.sprint.mission.discodeit.global.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.global.exception.userstatus.UserStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.global.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sun.jdi.request.DuplicateRequestException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Slf4j
@@ -32,11 +36,13 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusResponse create(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + userId));
+
+    User user = findUserByUserIdOrThrow(userId);
     if (userStatusRepository.existsByUserId(userId)) {
-      throw new DuplicateRequestException("UserStatus already exists");
+      throw new UserStatusAlreadyExistsException(ErrorCode.USER_STATUS_IS_ALREADY_EXIST,
+          Map.of("userId", userId));
     }
+
     UserStatus newUserStatus = UserStatus.createUserStatus(user);
     log.info("Created UserStatus - id: {}", newUserStatus.getId());
     return userStatusMapper.entityToDto(userStatusRepository.save(newUserStatus));
@@ -44,28 +50,23 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusResponse findById(UUID id) {
-    UserStatus userStatus = userStatusRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "id : " + id));
+    UserStatus userStatus = findByIdOrThrow(id);
     return userStatusMapper.entityToDto(userStatus);
   }
 
   @Override
   public UserStatusResponse findByUserId(UUID userId) {
-    User user = userRepository.findById(userId).orElseThrow(() ->
-        new RestApiException(ErrorCode.USER_NOT_FOUND, "id :" + userId));
-    UserStatus userStatus = userStatusRepository.findByUserId(userId)
-        .orElseThrow(
-            () -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
+    findUserByUserIdOrThrow(userId);
+    UserStatus userStatus = findByUserIdOrThrow(userId);
+
     return userStatusMapper.entityToDto(userStatus);
   }
 
   @Override
   public UserStatusResponse updateByUserId(UUID userId, UserStatusRequest.Update request) {
-    User user = userRepository.findById(userId).orElseThrow(() ->
-        new RestApiException(ErrorCode.USER_NOT_FOUND, "id :" + userId));
-    UserStatus userStatus = userStatusRepository.findByUserId(userId)
-        .orElseThrow(
-            () -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
+    findUserByUserIdOrThrow(userId);
+    UserStatus userStatus = findByUserIdOrThrow(userId);
+
     userStatus.updateLastActiveAt(request.newLastActiveAt());
     return userStatusMapper.entityToDto(userStatusRepository.save(userStatus));
   }
@@ -79,11 +80,33 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public void deleteById(UUID id) {
+    findByIdOrThrow(id);
     userStatusRepository.deleteById(id);
   }
 
   @Override
   public void deleteByUserId(UUID userId) {
+    findByUserIdOrThrow(userId);
     userStatusRepository.deleteByUserId(userId);
+  }
+
+  private UserStatus findByIdOrThrow(UUID id) {
+    return userStatusRepository.findById(id)
+        .orElseThrow(
+            () -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND,
+                Map.of("id", id)));
+  }
+
+  private UserStatus findByUserIdOrThrow(UUID userId) {
+    return userStatusRepository.findById(userId)
+        .orElseThrow(
+            () -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND,
+                Map.of("userId", userId)));
+  }
+
+  private User findUserByUserIdOrThrow(UUID userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(
+            () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
   }
 }

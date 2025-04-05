@@ -6,7 +6,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.BusinessException;
+import com.sprint.mission.discodeit.global.exception.binarycontent.FileConversionException;
+import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -111,14 +113,16 @@ public class BasicUserService implements UserService {
 
   private User findByIdOrThrow(UUID id) {
     return userRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "id : " + id));
+        .orElseThrow(
+            () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("id", id)));
   }
 
   private byte[] convertToBytes(MultipartFile imageFile) {
     try {
       return imageFile.getBytes();
     } catch (IOException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "변환 실패");
+      throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR,
+          Map.of("fileName", imageFile.getOriginalFilename()));
     }
   }
 

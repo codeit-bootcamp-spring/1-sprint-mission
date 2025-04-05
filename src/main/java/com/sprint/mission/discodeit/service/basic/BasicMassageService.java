@@ -8,7 +8,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.BusinessException;
+import com.sprint.mission.discodeit.global.exception.binarycontent.FileConversionException;
+import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -20,6 +24,8 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +38,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -52,10 +57,14 @@ public class BasicMassageService implements MessageService {
   public MessageResponse createMessage(MessageRequest.Create request,
       List<MultipartFile> messageFiles) {
 
-    User user = userRepository.findById(request.userId()).orElseThrow(() ->
-        new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + request.userId()));
-    Channel channel = channelRepository.findById(request.channelId()).orElseThrow(() ->
-        new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "channelId : " + request.channelId()));
+    UUID userId = request.userId();
+    UUID channelId = request.channelId();
+
+    User user = userRepository.findById(userId).orElseThrow(() ->
+        new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
+
+    Channel channel = channelRepository.findById(channelId).orElseThrow(() ->
+        new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
 
     if (messageValidator.inValidContent(request.content())) {
       Message message = Message.createMessage(request.content(), channel, user);
@@ -82,7 +91,7 @@ public class BasicMassageService implements MessageService {
   @Override
   public PageResponse<MessageResponse> findAllByChannelId(UUID channelId) {
     channelRepository.findById(channelId).orElseThrow(() ->
-        new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "id : " + channelId));
+        new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
 
     Pageable pageable = PageRequest.of(0, 50, Sort.by("createdAt").descending());
     Slice<Message> slice = messageRepository.findAllByChannelId(channelId, pageable);
@@ -119,14 +128,16 @@ public class BasicMassageService implements MessageService {
 
   private Message findByIdOrThrow(UUID id) {
     return messageRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(ErrorCode.MESSAGE_NOT_FOUND, "id : " + id));
+        .orElseThrow(
+            () -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("id", id)));
   }
 
   private byte[] convertToBytes(MultipartFile imageFile) {
     try {
       return imageFile.getBytes();
     } catch (IOException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "변환 실패");
+      throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR,
+          Map.of("fileName", imageFile.getOriginalFilename()));
     }
   }
 }
