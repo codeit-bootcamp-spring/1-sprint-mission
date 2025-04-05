@@ -48,6 +48,10 @@ public class Channel extends BaseUpdatableEntity {
         }
     }
 
+    public boolean isPrivate() {
+        return this.type == ChannelType.PRIVATE;
+    }
+
     @Override
     public String toString() {
         return String.format(

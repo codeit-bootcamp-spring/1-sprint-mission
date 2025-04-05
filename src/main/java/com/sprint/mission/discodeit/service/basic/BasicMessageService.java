@@ -8,6 +8,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotfoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -19,7 +23,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -51,9 +55,15 @@ public class BasicMessageService implements MessageService {
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> fileAttachments) {
     User author = userRepository.findById(messageCreateRequest.authorId())
-        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
+        .orElseThrow(() -> new UserNotFoundException(
+            ErrorCode.USER_NOT_FOUND,
+            Map.of("userId", messageCreateRequest.authorId())
+        ));
     Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
+        .orElseThrow(() -> new ChannelNotFoundException(
+            ErrorCode.CHANNEL_NOT_FOUND,
+            Map.of("channelId", messageCreateRequest.channelId())
+        ));
 
     List<BinaryContent> attachments = Optional.ofNullable(fileAttachments)
         .map(files -> files.stream()
@@ -77,7 +87,10 @@ public class BasicMessageService implements MessageService {
   public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
         .map(messageMapper::toDto)
-        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
+        .orElseThrow(() -> new MessageNotfoundException(
+            ErrorCode.MESSAGE_NOT_FOUND,
+            Map.of("messageId", messageId)
+        ));
   }
 
   @Override
@@ -85,7 +98,10 @@ public class BasicMessageService implements MessageService {
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
       Pageable pageable) {
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
+      throw new ChannelNotFoundException(
+          ErrorCode.CHANNEL_NOT_FOUND,
+          Map.of("channelId", channelId)
+      );
     }
 
     Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
@@ -106,7 +122,10 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
+        .orElseThrow(() -> new MessageNotfoundException(
+            ErrorCode.MESSAGE_NOT_FOUND,
+            Map.of("messageId", messageId)
+        ));
 
     if (request.newContent() != null) {
       message.updateContent(request.newContent());
@@ -120,7 +139,10 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public void delete(UUID messageId) {
     if (!messageRepository.existsById(messageId)) {
-      throw new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다.");
+      throw new MessageNotfoundException(
+          ErrorCode.MESSAGE_NOT_FOUND,
+          Map.of("messageId", messageId)
+      );
     }
     messageRepository.deleteById(messageId);
 

@@ -8,6 +8,9 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -15,7 +18,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +64,10 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   public ChannelDto find(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
+        .orElseThrow(() -> new ChannelNotFoundException(
+            ErrorCode.CHANNEL_NOT_FOUND,
+            Map.of("channelId", channelId)
+        ));
 
     return channelMapper.toDto(channel);
   }
@@ -85,7 +91,17 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
+        .orElseThrow(() -> new ChannelNotFoundException(
+            ErrorCode.CHANNEL_NOT_FOUND,
+            Map.of("channelId", channelId)
+        ));
+
+    if (channel.isPrivate()) {
+      throw new PrivateChannelUpdateException(
+          ErrorCode.PRIVATE_CHANNEL_UPDATE,
+          Map.of("channelId", channel.getId())
+      );
+    }
 
     if (request.newName() != null) {
       channel.updateName(request.newName());
@@ -103,7 +119,10 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public void delete(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
+      throw new ChannelNotFoundException(
+          ErrorCode.CHANNEL_NOT_FOUND,
+          Map.of("channelId", channelId)
+      );
     }
     channelRepository.deleteById(channelId);
 

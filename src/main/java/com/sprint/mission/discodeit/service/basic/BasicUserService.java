@@ -5,13 +5,17 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +58,10 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public UserDto find(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
+        .orElseThrow(() -> new UserNotFoundException(
+            ErrorCode.USER_NOT_FOUND,
+            Map.of("userId", userId)
+        ));
 
     return userMapper.toDto(user);
   }
@@ -73,7 +80,10 @@ public class BasicUserService implements UserService {
   @Transactional
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile file) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
+        .orElseThrow(() -> new UserNotFoundException(
+            ErrorCode.USER_NOT_FOUND,
+            Map.of("userId", userId)
+        ));
 
     BinaryContent profile = Optional.ofNullable(file)
         .flatMap(binaryContentService::resolveProfileRequest)
@@ -108,7 +118,10 @@ public class BasicUserService implements UserService {
   @Transactional
   public void delete(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
+      throw new UserNotFoundException(
+          ErrorCode.USER_NOT_FOUND,
+          Map.of("userId", userId)
+      );
     }
     userRepository.deleteById(userId);
 
@@ -118,7 +131,10 @@ public class BasicUserService implements UserService {
   @Override
   public void validateDuplicateName(String username) {
     if (userRepository.existsByUsername(username)) {
-      throw new IllegalArgumentException("[ERROR] 이미 존재하는 사용자 이름입니다.");
+      throw new DuplicateUsernameException(
+          ErrorCode.DUPLICATE_USERNAME,
+          Map.of("username", username)
+      );
     }
     log.debug("Username validation passed for {}", username);
   }
@@ -126,7 +142,10 @@ public class BasicUserService implements UserService {
   @Override
   public void validateDuplicateEmail(String email) {
     if (userRepository.existsByEmail(email)) {
-      throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일입니다.");
+      throw new DuplicateEmailException(
+          ErrorCode.DUPLICATE_EMAIL,
+          Map.of("email", email)
+      );
     }
     log.debug("Email validation passed for {}", email);
   }

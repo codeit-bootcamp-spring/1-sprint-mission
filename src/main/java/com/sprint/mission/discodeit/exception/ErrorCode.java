@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public enum ErrorCode {
   USER_NOT_FOUND("USER_001", "사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   DUPLICATE_USERNAME("USER_002", "존재하는 사용자 이름입니다.", HttpStatus.CONFLICT),
@@ -24,17 +26,5 @@ public enum ErrorCode {
     this.code = code;
     this.message = message;
     this.httpStatus = httpStatus;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public HttpStatus getHttpStatus() {
-    return httpStatus;
   }
 }
