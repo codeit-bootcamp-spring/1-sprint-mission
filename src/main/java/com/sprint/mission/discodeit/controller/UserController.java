@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -35,23 +37,37 @@ public class UserController {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(@Valid @RequestPart UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
+    UserDto user = userService.create(userCreateRequest, profile);
+    log.info("POST /api/users - create user: id = {}", user.id());
+    log.info("POST /api/users - create profile: id = {} with userId = {}",
+        user.profile() != null ? user.profile().id() : "none",
+        user.id());
+
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(userService.create(userCreateRequest, profile));
+        .body(user);
   }
 
-  @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<UserDto> update(@PathVariable UUID userId,
+  @PatchMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<UserDto> update(@PathVariable UUID id,
       @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile) {
+    UserDto user = userService.update(id, userUpdateRequest, profile);
+    log.info("PATCH /api/users/{id} - update user: id = {}", user.id());
+    log.info("PATCH /api/users/{id} - update profile: profileId = {} with userId = {}",
+        user.profile() != null ? user.profile().id() : "none",
+        user.id());
+
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(userService.update(userId, userUpdateRequest, profile));
+        .body(user);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable UUID id) {
     userService.delete(id);
+    log.info("DELETE /api/users/{id} - delete user: id = {}", id);
+
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();

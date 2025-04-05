@@ -10,22 +10,22 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.validator.UserValidator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserValidator validator;
   private final UserMapper userMapper;
 
   private final BinaryContentService binaryContentService;
@@ -34,7 +34,6 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional
   public UserDto create(UserCreateRequest userRequest, MultipartFile file) {
-    validator.validate(userRequest.username(), userRequest.email());
     validateDuplicateName(userRequest.username());
     validateDuplicateEmail(userRequest.email());
 
@@ -44,10 +43,11 @@ public class BasicUserService implements UserService {
         .flatMap(dto -> binaryContentRepository.findById(dto.id()))
         .orElse(null);
 
-    return userMapper.toDto(
-        userRepository.save(
-            new User(userRequest.username(), userRequest.email(), userRequest.password(), profile))
-    );
+    User user = new User(userRequest.username(), userRequest.email(), userRequest.password(), profile);
+    User savedUser = userRepository.save(user);
+    log.info("User entity saved: id = {}", savedUser.getId());
+
+    return userMapper.toDto(savedUser);
   }
 
   @Override
@@ -83,19 +83,22 @@ public class BasicUserService implements UserService {
 
     if (userUpdateRequest.newUsername() != null) {
       validateDuplicateName(userUpdateRequest.newUsername());
-      validator.validateName(userUpdateRequest.newUsername());
       user.updateName(userUpdateRequest.newUsername());
+      log.info("User entity updated - username changed: id = {}", user.getId());
     }
     if (userUpdateRequest.newEmail() != null) {
       validateDuplicateEmail(userUpdateRequest.newEmail());
-      validator.validateEmail(userUpdateRequest.newEmail());
       user.updateEmail(userUpdateRequest.newEmail());
+      log.info("User entity updated - email changed: id = {}", user.getId());
     }
     if (userUpdateRequest.newPassword() != null && !userUpdateRequest.newPassword().isBlank()) {
       user.updatePassword(userUpdateRequest.newPassword());
+      log.info("User entity updated - password changed: id = {}", user.getId());
     }
     if (profile != null) {
       user.updateProfile(profile);
+      log.info("User entity updated - profile changed: profileId = {}, with userId = {}",
+          profile.getId(), user.getId());
     }
 
     return userMapper.toDto(user);
@@ -107,16 +110,24 @@ public class BasicUserService implements UserService {
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
     }
+    log.info("User entity deleted: id = {}", userId);
+
     userRepository.deleteById(userId);
   }
 
   @Override
-  public void validateDuplicateName(String name) {
-    userRepository.findAll().forEach(user -> user.validateDuplicateName(name));
+  public void validateDuplicateName(String username) {
+    if (userRepository.existsByUsername(username)) {
+      throw new IllegalArgumentException("[ERROR] 이미 존재하는 사용자 이름입니다.");
+    }
+    log.debug("Username validation passed for {}", username);
   }
 
   @Override
   public void validateDuplicateEmail(String email) {
-    userRepository.findAll().forEach(user -> user.validateDuplicateEmail(email));
+    if (userRepository.existsByEmail(email)) {
+      throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일입니다.");
+    }
+    log.debug("Email validation passed for {}", email);
   }
 }
