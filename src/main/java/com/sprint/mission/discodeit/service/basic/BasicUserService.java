@@ -110,9 +110,9 @@ public class BasicUserService implements UserService {
     if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
     }
-    log.info("User entity deleted: id = {}", userId);
-
     userRepository.deleteById(userId);
+
+    log.info("User entity deleted: id = {}", userId);
   }
 
   @Override

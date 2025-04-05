@@ -13,21 +13,21 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.validator.ChannelValidator;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  private final ChannelValidator validator;
   private final ChannelMapper channelMapper;
 
   private final ReadStatusService readStatusService;
@@ -36,22 +36,25 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public ChannelDto create(PublicChannelCreateRequest request) {
-    return channelMapper.toDto(
-        channelRepository.save(
-            new Channel(Channel.ChannelType.PUBLIC, request.name(), request.description()))
-    );
+    Channel channel = new Channel(Channel.ChannelType.PUBLIC, request.name(), request.description());
+    Channel savedChannel = channelRepository.save(channel);
+    log.info("Channel(public) entity saved: id = {}", savedChannel.getId());
+
+    return channelMapper.toDto(savedChannel);
   }
 
   @Override
   @Transactional
   public ChannelDto create(PrivateChannelCreateRequest request) {
-    Channel channel = channelRepository.save(new Channel(Channel.ChannelType.PRIVATE, null, null));
+    Channel channel = new Channel(Channel.ChannelType.PRIVATE, null, null);
+    Channel savedChannel = channelRepository.save(channel);
+    log.info("Channel(private) entity saved: id = {}", savedChannel.getId());
 
     request.participantsIds().stream()
         .map(userId -> ReadStatusCreateRequest.from(channel.getId(), userId, Instant.MIN))
         .forEach(readStatusService::create);
 
-    return channelMapper.toDto(channel);
+    return channelMapper.toDto(savedChannel);
   }
 
   @Override
@@ -83,13 +86,14 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
+
     if (request.newName() != null) {
-      validator.validateName(request.newName());
       channel.updateName(request.newName());
+      log.info("Channel entity updated - name changed: id = {}", channel.getId());
     }
     if (request.newDescription() != null) {
-      validator.validateName(request.newDescription());
       channel.updateDescription(request.newDescription());
+      log.info("Channel entity updated - description changed: id = {}", channel.getId());
     }
 
     return channelMapper.toDto(channel);
@@ -102,5 +106,7 @@ public class BasicChannelService implements ChannelService {
       throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
     }
     channelRepository.deleteById(channelId);
+
+    log.info("Channel entity deleted: id = {}", channelId);
   }
 }

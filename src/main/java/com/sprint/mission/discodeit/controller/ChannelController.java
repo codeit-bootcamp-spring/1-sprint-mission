@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
@@ -29,28 +31,39 @@ public class ChannelController {
 
     @PostMapping("/public")
     public ResponseEntity<ChannelDto> create(@Valid @RequestBody PublicChannelCreateRequest request) {
+        ChannelDto channel = channelService.create(request);
+        log.info("POST /api/channels/public - create channel: id = {}", channel.id());
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(channelService.create(request));
+            .body(channel);
     }
 
     @PostMapping("/private")
     public ResponseEntity<ChannelDto> create(@RequestBody PrivateChannelCreateRequest request) {
+        ChannelDto channel = channelService.create(request);
+        log.info("POST /api/channels/private - create channel: id = {}", channel.id());
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(channelService.create(request));
+            .body(channel);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ChannelDto> update(@PathVariable UUID id, @RequestBody PublicChannelUpdateRequest request) {
+        ChannelDto channel = channelService.update(id, request);
+        log.info("PATCH /api/channels/{id} - update channel: id = {}", channel.id());
+
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(channelService.update(id, request));
+            .body(channel);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         channelService.delete(id);
+        log.info("DELETE /api/channels/{id} - update channel: id = {}", id);
+
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .build();
