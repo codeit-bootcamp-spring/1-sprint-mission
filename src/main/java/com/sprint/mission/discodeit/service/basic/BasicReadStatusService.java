@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.read_status.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -26,6 +27,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
+  private final ReadStatusMapper readStatusMapper;
 
   @Transactional
   @Override
@@ -44,7 +46,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     ReadStatus readStatus = new ReadStatus(channel, user);
     readStatusRepository.save(readStatus);
-    return ReadStatusDto.fromEntity(readStatus);
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Transactional(readOnly = true)
@@ -52,7 +54,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusDto find(UUID readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> new NoSuchElementException("수신정보가 존재하지 않습니다."));
-    return ReadStatusDto.fromEntity(readStatus);
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Transactional(readOnly = true)
@@ -60,7 +62,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public List<ReadStatusDto> findAllByUserId(UUID userId) {
     List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
     return readStatuses.stream()
-        .map(ReadStatusDto::fromEntity)
+        .map(readStatusMapper::toDto)
         .toList();
   }
 
@@ -72,7 +74,7 @@ public class BasicReadStatusService implements ReadStatusService {
         .orElseThrow(() -> new NoSuchElementException("수신정보가 존재하지 않습니다."));
     readStatus.update(newLastReadAt);
     readStatusRepository.save(readStatus);
-    return ReadStatusDto.fromEntity(readStatus);
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Transactional

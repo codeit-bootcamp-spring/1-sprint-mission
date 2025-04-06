@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -34,13 +34,13 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
-  private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentService binaryContentService;
   private final ChannelService channelService;
+  private final MessageMapper messageMapper;
 
   @Transactional
   @Override
-  public Message create(MessageCreateRequest messageCreateRequest,
+  public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
     Channel channel = channelRepository.findById(messageCreateRequest.channelId())
         .orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
@@ -57,7 +57,7 @@ public class BasicMessageService implements MessageService {
     }
 
     List<BinaryContent> binaryContents = Optional.ofNullable(attachments)
-        .filter(list -> !list.isEmpty()) // 리스트가 비어있지 않은 경우만 처리
+        .filter(list -> !list.isEmpty())
         .map(files -> files.stream()
             .map(this::resolveAttachment)
             .toList())
@@ -68,7 +68,8 @@ public class BasicMessageService implements MessageService {
         writer,
         messageCreateRequest.content(),
         binaryContents);
-    return messageRepository.save(message);
+    messageRepository.save(message);
+    return messageMapper.toDto(message);
   }
 
   private BinaryContent resolveAttachment(MultipartFile file) {
@@ -87,14 +88,14 @@ public class BasicMessageService implements MessageService {
   public List<MessageDto> findByChannel(UUID channelId) {
     List<Message> messages = messageRepository.findByChannelId(channelId);
     return messages.stream()
-        .map(MessageDto::fromEntity)
+        .map(messageMapper::toDto)
         .toList();
   }
 
 
   @Transactional
   @Override
-  public Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+  public MessageDto update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
 
@@ -103,7 +104,8 @@ public class BasicMessageService implements MessageService {
     }
 
     message.update(messageUpdateRequest.newContent());
-    return messageRepository.save(message);
+    messageRepository.save(message);
+    return messageMapper.toDto(message);
   }
 
   @Transactional

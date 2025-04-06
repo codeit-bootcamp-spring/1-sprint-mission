@@ -5,8 +5,6 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusUpdateRequest;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -33,8 +31,8 @@ public class UserController {
       @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    User user = userService.create(userCreateRequest, profile);
-    return ResponseEntity.status(HttpStatus.CREATED).body(UserDto.createEntity(user));
+    UserDto creatUser = userService.create(userCreateRequest, profile);
+    return ResponseEntity.status(HttpStatus.CREATED).body(creatUser);
   }
 
   @PutMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -43,9 +41,8 @@ public class UserController {
       @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    User user = userService.update(userId, userUpdateRequest, profile);
-    UserStatus userStatus = userStatusService.findByUserId(userId);
-    return ResponseEntity.status(HttpStatus.OK).body(UserDto.fromEntity(user, userStatus));
+    UserDto updateUser = userService.update(userId, userUpdateRequest, profile);
+    return ResponseEntity.status(HttpStatus.OK).body(updateUser);
   }
 
   @DeleteMapping(value = "/{userId}")

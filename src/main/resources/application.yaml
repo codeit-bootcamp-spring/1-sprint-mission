@@ -31,9 +31,9 @@ logging:
     org:
       springframework:
         orm:
-          jpa: DEBUG
-        hibernate: DEBUG
-        sql: DEBUG
+          jpa: info
+        hibernate: info
+        sql: info
 
 springdoc:
   api-docs:

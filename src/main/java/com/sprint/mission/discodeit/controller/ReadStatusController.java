@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.read_status.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.read_status.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.read_status.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,21 +21,21 @@ public class ReadStatusController {
   private final ReadStatusService readStatusService;
 
   @PostMapping(value = "")
-  public ResponseEntity<ReadStatus> createReadStatus(
+  public ResponseEntity<ReadStatusDto> createReadStatus(
       @Valid @RequestBody ReadStatusCreateRequest request) {
-    ReadStatus createdReadStatus = readStatusService.create(request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(createdReadStatus);
+        .body(readStatusService.create(request));
   }
 
   @GetMapping(value = "/{userId}")
-  public ResponseEntity<List<ReadStatus>> getUserReadStatuses(@PathVariable("userId") UUID userId) {
+  public ResponseEntity<List<ReadStatusDto>> getUserReadStatuses(
+      @PathVariable("userId") UUID userId) {
     return ResponseEntity.status(HttpStatus.OK).body(readStatusService.findAllByUserId(userId));
   }
 
   @PutMapping(value = "/{readStatusId}")
-  public ResponseEntity<ReadStatus> updateReadStatus(
+  public ResponseEntity<ReadStatusDto> updateReadStatus(
       @PathVariable("readStatusId") UUID readStatusId,
       @Valid @RequestBody ReadStatusUpdateRequest request) {
     return ResponseEntity.status(HttpStatus.OK)

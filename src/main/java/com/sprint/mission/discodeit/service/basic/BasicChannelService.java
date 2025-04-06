@@ -6,17 +6,14 @@ import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.Instant;
-import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +29,7 @@ public class BasicChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final ReadStatusRepository readStatusRepository;
-  private final MessageRepository messageRepository;
+  private final ChannelMapper channelMapper;
 
   @Transactional
   @Override
@@ -44,7 +41,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(ChannelType.PUBLIC, publicChannelCreateRequest.channelName(),
         publicChannelCreateRequest.description());
     channelRepository.save(channel);
-    return toDto(channel);
+    return channelMapper.toDto(channel);
   }
 
   @Transactional
@@ -60,7 +57,7 @@ public class BasicChannelService implements ChannelService {
       readStatusRepository.save(readStatus);
     });
 
-    return toDto(createdChannel);
+    return channelMapper.toDto(createdChannel);
   }
 
   @Transactional(readOnly = true)
@@ -68,7 +65,7 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto find(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
-    return toDto(channel);
+    return channelMapper.toDto(channel);
   }
 
   @Transactional(readOnly = true)
@@ -76,7 +73,7 @@ public class BasicChannelService implements ChannelService {
   public List<ChannelDto> findPublicAll() {
     return channelRepository.findAll().stream()
         .filter(channel -> channel.getType() == ChannelType.PUBLIC)
-        .map(this::toDto)
+        .map(channelMapper::toDto)
         .toList();
   }
 
@@ -92,7 +89,7 @@ public class BasicChannelService implements ChannelService {
             channel.getType().equals(ChannelType.PUBLIC)
                 || mySubscribedChannelIds.contains(channel.getId())
         )
-        .map(this::toDto)
+        .map(channelMapper::toDto)
         .toList();
   }
 
@@ -106,7 +103,7 @@ public class BasicChannelService implements ChannelService {
     channel.update(publicChannelUpdateRequest.newName(),
         publicChannelUpdateRequest.newDescription());
     channelRepository.save(channel);
-    return toDto(channel);
+    return channelMapper.toDto(channel);
   }
 
   @Transactional
@@ -130,21 +127,6 @@ public class BasicChannelService implements ChannelService {
           .toList();
     }
     return List.of();
-  }
-
-  private Instant getLastMessageAt(UUID channelId) {
-    return messageRepository.findByChannelId(channelId)
-        .stream()
-        .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
-        .map(Message::getCreatedAt)
-        .limit(1)
-        .findFirst()
-        .orElse(Instant.MIN);
-  }
-
-  private ChannelDto toDto(Channel channel) {
-    return ChannelDto.fromEntity(channel, getParticipantIds(channel.getId()),
-        getLastMessageAt(channel.getId()));
   }
 
 }

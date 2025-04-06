@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user_status.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.user_status.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -20,10 +22,11 @@ public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
+  private final UserStatusMapper userStatusMapper;
 
   @Transactional
   @Override
-  public UserStatus create(UserStatusCreateRequest request) {
+  public UserStatusDto create(UserStatusCreateRequest request) {
     User user = userRepository.findById(request.userId())
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
@@ -32,26 +35,28 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     UserStatus userStatus = new UserStatus(user, request.lastActiveAt());
-    return userStatusRepository.save(userStatus);
+    userStatusRepository.save(userStatus);
+    return userStatusMapper.toDto(userStatus);
   }
 
 
   @Transactional
   @Override
-  public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+  public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
 
     userStatus.update(request.newLastActiveAt());
 
-    return userStatus;
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public UserStatus findByUserId(UUID userStatusId) {
-    return userStatusRepository.findById(userStatusId)
+  public UserStatusDto find(UUID userStatusId) {
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Transactional

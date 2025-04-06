@@ -7,11 +7,13 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +35,12 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
+  private final UserMapper userMapper;
 
   @Transactional
   @Override
-  public User create(UserCreateRequest userCreateRequest, MultipartFile profile) {
+  public UserDto create(UserCreateRequest userCreateRequest, MultipartFile profile) {
     if (!isValidEmail(userCreateRequest.email())) {
       throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
     }
@@ -61,12 +65,11 @@ public class BasicUserService implements UserService {
         userCreateRequest.password(),
         nullableProfile,
         null);
+
     userRepository.save(user);
-
-    UserStatus userStatus = new UserStatus(user, Instant.EPOCH);
+    UserStatus userStatus = new UserStatus(user, Instant.now());
     userStatusRepository.save(userStatus);
-
-    return user;
+    return userMapper.toDto(user);
   }
 
   @Transactional(readOnly = true)
@@ -74,10 +77,7 @@ public class BasicUserService implements UserService {
   public UserDto find(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
-    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
-
-    return UserDto.fromEntity(user, userStatus);
+    return userMapper.toDto(user);
   }
 
   @Transactional(readOnly = true)
@@ -85,17 +85,13 @@ public class BasicUserService implements UserService {
   public List<UserDto> findAll() {
     return userRepository.findAll()
         .stream()
-        .map(user -> {
-          UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-              .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
-          return UserDto.fromEntity(user, userStatus);
-        })
+        .map(userMapper::toDto)
         .toList();
   }
 
   @Transactional
   @Override
-  public User update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile profile) {
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile profile) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
@@ -129,7 +125,8 @@ public class BasicUserService implements UserService {
     });
 
     user.update(userUpdateRequest.newUserName(), userUpdateRequest.newEmail());
-    return userRepository.save(user);
+    userRepository.save(user);
+    return userMapper.toDto(user);
   }
 
 
@@ -139,7 +136,6 @@ public class BasicUserService implements UserService {
     userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-    userStatusRepository.deleteById(userId);
     userRepository.deleteById(userId);
   }
 
