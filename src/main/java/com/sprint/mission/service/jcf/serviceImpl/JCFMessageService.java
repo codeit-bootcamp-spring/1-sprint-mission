@@ -1,4 +1,4 @@
-package com.sprint.mission.service.jcf.main;
+package com.sprint.mission.service.jcf.serviceImpl;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
@@ -19,7 +19,6 @@ import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.jcf.addOn.BinaryServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,5 @@
 package com.sprint.mission.unit;
+
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.UserMapper;
@@ -6,8 +7,10 @@ import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.BinaryService;
-import com.sprint.mission.service.jcf.main.UserServiceSupporter;
+import com.sprint.mission.service.jcf.serviceImpl.JCFUserService;
+import com.sprint.mission.service.jcf.supporter.UserServiceSupporter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,14 +20,15 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -39,6 +43,7 @@ public class UserServiceTest {
     @InjectMocks
     private UserServiceSupporter userServiceSupporter;
 
+
     @Test
     @DisplayName("회원가입 성공")
     void duplicateTest() {
@@ -48,8 +53,8 @@ public class UserServiceTest {
         when(binaryService.create(any(BinaryContentDtoForCreate.class))).thenAnswer((invocation) -> {
             BinaryContentDtoForCreate binaryDto = invocation.getArgument(0);
             BinaryContent profile = binaryContentMapper.toEntity(binaryDto);
-            ReflectionTestUtils.setField(profile, "id", UUID.randomUUID());
-            ReflectionTestUtils.setField(profile, "createdAt", Instant.now());
+            setField(profile, "id", UUID.randomUUID());
+            setField(profile, "createdAt", Instant.now());
             return profile;
         });
 
@@ -80,8 +85,8 @@ public class UserServiceTest {
 
         //when //then
         assertThatThrownBy(() ->
-                        userServiceSupporter.isDuplicateNameEmail(userList, "중복 될 이름1", "icb444@naver.com"))
-                        .isInstanceOf(CustomException.class);
+                userServiceSupporter.isDuplicateNameEmail(userList, "중복 될 이름1", "icb444@naver.com"))
+                .isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -100,5 +105,41 @@ public class UserServiceTest {
 
     private MockMultipartFile getMockFile() {
         return new MockMultipartFile("파일 1", "thisIsMockFile.png", "image/png", "mockFile".getBytes());
+    }
+
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private JCFUserService userService;
+
+    @Test
+    @DisplayName("Delete 실패 - userId에 맞는 user가 존재하지 않음")
+    void deleteFail() {
+        // when
+        UUID userId = UUID.randomUUID();
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.delete(userId))
+                .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    @DisplayName("Delete 성공")
+    void deleteSuccess() {
+        // given
+        UUID userId = UUID.randomUUID();
+        User user = new User("지울 이름1", "비밀번호1", "이메일1", null);
+        setField(user, "id", userId);
+        setField(user, "createdAt", Instant.now());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        // when
+        userService.delete(userId);
+
+        // then
+        verify(userRepository, times(1)).delete(user);
     }
 }

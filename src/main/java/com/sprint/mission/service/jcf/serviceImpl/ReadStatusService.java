@@ -1,12 +1,10 @@
-package com.sprint.mission.service.jcf.addOn;
+package com.sprint.mission.service.jcf.serviceImpl;
 
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.ReadStatusMapper;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
-import com.sprint.mission.dto.response.ReadStatusDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.User;

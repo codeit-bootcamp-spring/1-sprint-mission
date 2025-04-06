@@ -1,4 +1,4 @@
-package com.sprint.mission.service.jcf.main;
+package com.sprint.mission.service.jcf.supporter;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
@@ -10,7 +10,6 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.BinaryService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

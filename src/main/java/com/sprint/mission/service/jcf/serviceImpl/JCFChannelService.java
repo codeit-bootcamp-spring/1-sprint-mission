@@ -1,4 +1,4 @@
-package com.sprint.mission.service.jcf.main;
+package com.sprint.mission.service.jcf.serviceImpl;
 
 
 import com.sprint.mission.common.exception.CustomException;
@@ -10,7 +10,6 @@ import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.BaseEntity;
 import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;

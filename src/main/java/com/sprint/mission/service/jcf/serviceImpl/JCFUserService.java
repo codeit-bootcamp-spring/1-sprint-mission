@@ -1,27 +1,21 @@
-package com.sprint.mission.service.jcf.main;
+package com.sprint.mission.service.jcf.serviceImpl;
 
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.BinaryContentMapper;
-import com.sprint.mission.dto.UserMapper;
-import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
-import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.UserDtoForCreate;
-import com.sprint.mission.service.jcf.addOn.BinaryServiceImpl;
-import com.sprint.mission.service.jcf.addOn.UserStatusService;
+import com.sprint.mission.service.jcf.supporter.UserServiceSupporter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j @Service
