@@ -9,7 +9,7 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.BinaryContentRepository;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.repository.UserStatusRepository;
-import com.sprint.mission.service.jcf.addOn.BinaryService;
+import com.sprint.mission.service.jcf.addOn.BinaryServiceImpl;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
 import jakarta.persistence.EntityManager;
@@ -71,7 +71,7 @@ public class UserUserStatusCascadeTest {
     @Autowired
     private UserMapper userMapper;
     @Autowired
-    private BinaryService binaryService;
+    private BinaryServiceImpl binaryService;
 
 
     @DisplayName("BinaryContent 생성 테스트")

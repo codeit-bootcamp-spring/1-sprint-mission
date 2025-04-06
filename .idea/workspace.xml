@@ -5,13 +5,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/mock/UserJpaTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/resources/application-test.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/BinaryService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/UserServiceSupporter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/UserValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/application-prod.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/logback-spring.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/ChannelServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/MessageServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/UserServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/resources/insert_users.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/BaseEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/BaseEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/aop/usedAOP/BasicTrace.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/aop/usedAOP/BasicTrace.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/common/exception/CustomErrorAdvice.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/common/exception/CustomErrorAdvice.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/BinaryContentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/BinaryContentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/BinaryContentDtoForCreate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/BinaryContentDtoForCreate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/BinaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/BinaryServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFMessageService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/mock/UserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/mock/UserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/AnnotationTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/ChannelTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/MessageTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/StatusTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/UserTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/cascade/ChannelCascadeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/cascade/ChannelCascadeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/cascade/UserUserStatusCascadeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/cascade/UserUserStatusCascadeTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/CustomErrorTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/fetchJoin/AllChannel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/fetchJoinpractice/AllChannel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/mapper/MapperTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/mock/UserJpaTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/mock/UserTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/practice/AssertJTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/practice/JUnitTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/application-test.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,6 +145,9 @@
     "JUnit.UserJpaTest.executor": "Run",
     "JUnit.UserJpaTest.saveTest.executor": "Run",
     "JUnit.UserRepoTest.userEqualsHashCodeTest.executor": "Run",
+    "JUnit.UserServiceTest.duplicateTest.executor": "Run",
+    "JUnit.UserServiceTest.isDuplicateEmail.executor": "Run",
+    "JUnit.UserServiceTest.isDuplicateName.executor": "Run",
     "JUnit.UserTest.cascadeUserAndUserStatusTest.executor": "Run",
     "JUnit.UserTest.createTest.executor": "Run",
     "JUnit.UserTest.delete.executor": "Run",
@@ -145,7 +177,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.DiscodeitApplication.executor": "Run",
-    "git-widget-placeholder": "Merging part2-이요한-sprint7",
+    "git-widget-placeholder": "part2-이요한-sprint7",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/tdd/study/build.gradle",
@@ -190,14 +222,14 @@
       <recent name="com.sprint.mission.entity" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.sprint.mission.service.jcf.main" />
+      <recent name="com.sprint.mission.unit" />
       <recent name="com.sprint.mission.practice" />
       <recent name="com.sprint.mission.dto.response" />
       <recent name="com.sprint.mission.dto.mappedDto" />
-      <recent name="com.sprint.mission.dto.request" />
-      <recent name="com.sprint.mission.service" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.UserJpaTest.saveTest">
+  <component name="RunManager" selected="JUnit.UserServiceTest.duplicateTest">
     <configuration name="UserJpaTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
@@ -209,22 +241,6 @@
       <option name="PACKAGE_NAME" value="com.sprint.mission.mock" />
       <option name="MAIN_CLASS_NAME" value="com.sprint.mission.mock.UserJpaTest" />
       <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UserJpaTest.createTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.mock.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.mock" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.mock.UserJpaTest" />
-      <option name="METHOD_NAME" value="createTest" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -245,33 +261,49 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserTest.createTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UserServiceTest.duplicateTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.mock.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.mock" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.mock.UserTest" />
-      <option name="METHOD_NAME" value="createTest" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
+      <option name="METHOD_NAME" value="duplicateTest" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserTest.duplicateNameTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UserServiceTest.isDuplicateEmail" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.mock.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.mock" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.mock.UserTest" />
-      <option name="METHOD_NAME" value="duplicateNameTest" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
+      <option name="METHOD_NAME" value="isDuplicateEmail" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserServiceTest.isDuplicateName" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.unit.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
+      <option name="METHOD_NAME" value="isDuplicateName" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -286,11 +318,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UserServiceTest.duplicateTest" />
+        <item itemvalue="JUnit.UserServiceTest.isDuplicateName" />
+        <item itemvalue="JUnit.UserServiceTest.isDuplicateEmail" />
         <item itemvalue="JUnit.UserJpaTest.saveTest" />
         <item itemvalue="JUnit.UserJpaTest" />
-        <item itemvalue="JUnit.UserTest.duplicateNameTest" />
-        <item itemvalue="JUnit.UserTest.createTest" />
-        <item itemvalue="JUnit.UserJpaTest.createTest" />
       </list>
     </recent_temporary>
   </component>

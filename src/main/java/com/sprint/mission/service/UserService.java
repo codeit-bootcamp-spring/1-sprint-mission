@@ -22,5 +22,4 @@ public interface UserService {
     User findById(UUID id);
     List<User> findAll();
     void delete(UUID userId);
-    void isDuplicateNameEmail(String name, String email);
 }

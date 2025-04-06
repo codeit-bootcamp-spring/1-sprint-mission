@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   servlet:
     multipart:
       enabled: true
@@ -9,6 +9,8 @@ spring:
   threads:
     virtual:
       enabled: true
+---
+spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -23,7 +25,7 @@ spring:
     properties:
       hibernate:
         jdbc:
-            batch_size: 50
+          batch_size: 50
         order_inserts: true
         order_updates: true
         format_sql: true
@@ -41,7 +43,7 @@ discodeit:
   storage:
     type: local
     local.root-path : "C:\\binary-storage"
-  #repository:
+    #repository:
     #type: jcf
     #file-directory: .discodeit
 
@@ -53,6 +55,7 @@ decorator:
 
 logging:
   level:
-    org.hibernate.sql : DEBUG
+    org.hibernate.sql : info
+
 #    org.hibernate.type.descriptor.sql : TRACE
 

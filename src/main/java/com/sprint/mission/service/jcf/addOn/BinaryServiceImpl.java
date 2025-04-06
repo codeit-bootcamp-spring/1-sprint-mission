@@ -7,6 +7,7 @@ import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.BinaryContentRepository;
+import com.sprint.mission.service.BinaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,28 +20,28 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class BinaryService {
+public class BinaryServiceImpl implements BinaryService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
 
 
+    @Override
     public BinaryContent create(BinaryContentDtoForCreate request){
-        //binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
-        BinaryContent createdBinaryContent = binaryContentMapper.toEntity(request);
-        log.info("Create binary content: {}", createdBinaryContent);
         BinaryContent savedUser = binaryContentRepository.save(binaryContentMapper.toEntity(request));
         binaryContentStorage.put(savedUser.getId(), request.bytes());
         return savedUser;
     }
 
     @Transactional(readOnly = true)
+    @Override
     public BinaryContent findById(UUID id){
         return binaryContentRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
     }
 
+    @Override
     public void deleteById(UUID binaryId) {
         if (!binaryContentRepository.existsById(binaryId)) throw new CustomException(ErrorCode.NO_SUCH_BINARY);
         else {
@@ -49,6 +50,7 @@ public class BinaryService {
     }
 
     @Transactional(readOnly = true)
+    @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
         return binaryContentRepository.findAllById(binaryContentIds);
     }

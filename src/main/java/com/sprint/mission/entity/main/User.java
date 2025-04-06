@@ -60,10 +60,4 @@ public class User extends BaseUpdatableEntity{
         this.email = newEmail;
         return this;
     }
-
-    public void assetName(){
-        if (this.username.contains("example")) {
-            throw new IllegalArgumentException("이름에 example이 포함될 수 없습니다.");
-        }
-    }
 }

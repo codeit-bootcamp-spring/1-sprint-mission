@@ -11,10 +11,9 @@ import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.UserService;
-import com.sprint.mission.service.jcf.addOn.BinaryService;
+import com.sprint.mission.service.jcf.addOn.BinaryServiceImpl;
 import com.sprint.mission.service.jcf.addOn.ReadStatusService;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -110,7 +109,7 @@ public class ChannelCascadeTest {
 
 
     @Autowired
-    private BinaryService binaryService;
+    private BinaryServiceImpl binaryService;
 
     @Autowired
     private UserMapper userMapper;
