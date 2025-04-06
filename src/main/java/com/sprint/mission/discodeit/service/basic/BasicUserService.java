@@ -167,7 +167,7 @@ public class BasicUserService implements UserService {
   @Override
   public void delete(UUID userId) {
     log.info("[UserService] 사용자 삭제 시작 id: {}", userId);
-    if (userRepository.existsById(userId)) {
+    if (!userRepository.existsById(userId)) {
       throw new UserNotFoundException(Map.of("id", userId));
     }
     userRepository.deleteById(userId);
