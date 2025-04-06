@@ -66,7 +66,7 @@ public class BasicChannelService implements ChannelService {
         ChannelCategory.TEXT, createPublicChannelDto.description());
     Channel createdChannel = channelRepository.save(channel);
     log.info("Public 채널 생성 완료: channelId = {}", createdChannel.getId());
-    return channelMapper.toDto(channel);
+    return channelMapper.toDto(createdChannel);
   }
 
   @Override
