@@ -31,9 +31,6 @@ public class JCFUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
-    private final BinaryServiceImpl profileService;
-    private final UserMapper userMapper;
-    private final BinaryContentMapper binaryContentMapper;
     private final UserServiceSupporter userServiceSupporter;
 
     @Override
