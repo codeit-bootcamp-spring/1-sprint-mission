@@ -1,5 +1,13 @@
 spring:
   #profiles: dev
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+
+
 
   datasource:
     driver-class-name: org.postgresql.Driver
