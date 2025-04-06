@@ -11,6 +11,7 @@ import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.BinaryService;
 import com.sprint.mission.service.jcf.serviceImpl.JCFUserService;
 import com.sprint.mission.service.jcf.supporter.UserServiceSupporter;
+import com.sprint.mission.unit.util.MockFileFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,8 @@ import static org.springframework.test.util.ReflectionTestUtils.*;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
+    private final MockFileFactory mockFileFactory = new MockFileFactory();
+
     @Spy
     private BinaryContentMapper binaryContentMapper = Mappers.getMapper(BinaryContentMapper.class);
     @Spy
@@ -48,7 +51,7 @@ public class UserServiceTest {
     @DisplayName("회원가입 성공")
     void duplicateTest() {
         UserDtoForCreate dto = new UserDtoForCreate("test1", "비밀번호486", "icb6999@naver.com");
-        MockMultipartFile mockFile = getMockFile();
+        MockMultipartFile mockFile = mockFileFactory.getMockFileList(1).getFirst();
 
         when(binaryService.create(any(BinaryContentDtoForCreate.class))).thenAnswer((invocation) -> {
             BinaryContentDtoForCreate binaryDto = invocation.getArgument(0);
@@ -102,11 +105,6 @@ public class UserServiceTest {
                 userServiceSupporter.isDuplicateNameEmail(userList, "유저 444", "중복 이메일"))
                 .isInstanceOf(CustomException.class);
     }
-
-    private MockMultipartFile getMockFile() {
-        return new MockMultipartFile("파일 1", "thisIsMockFile.png", "image/png", "mockFile".getBytes());
-    }
-
 
     @Mock
     private UserRepository userRepository;

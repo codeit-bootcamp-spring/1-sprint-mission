@@ -18,6 +18,7 @@ import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
+import com.sprint.mission.service.BinaryService;
 import com.sprint.mission.service.MessageService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,8 +40,7 @@ public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-    private final BinaryServiceImpl binaryService;
-    private final BinaryContentStorage binaryContentStorage;
+    private final BinaryService binaryService;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
 
@@ -52,17 +52,11 @@ public class JCFMessageService implements MessageService {
 
         Channel writtenPlace = channelRepository.findById(responseDto.channelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
-
         Message createdMessage = messageMapper.toEntity(writtenPlace, author, responseDto.content());
 
-        log.info("attachmentsDto: {}", binaryContentDtoForCreateList);
-        if (!binaryContentDtoForCreateList.isEmpty()) {
-            binaryContentDtoForCreateList.forEach(bcd -> {
-                BinaryContent createdBinaryContent = binaryService.create(bcd);
-                binaryContentStorage.put(createdBinaryContent.getId(), bcd.bytes());
-                log.info("메시지의 생성된 BinaryContent: {}", createdBinaryContent);
-            });
-        }
+        List<BinaryContent> binaryContentList = binaryContentDtoForCreateList.stream().map(binaryService::create).toList();
+
+        createdMessage.getMessageAttachments().addAll(binaryContentList);
         return messageRepository.save(createdMessage);
     }
 
