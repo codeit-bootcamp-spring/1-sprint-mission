@@ -6,6 +6,7 @@ import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.ChannelMapper;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
+import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.BaseEntity;
@@ -45,6 +46,7 @@ public class JCFChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
     private final MessageRepository messageRepository;
+    private final ReadStatusService readStatusService;
 
 
     @Override
@@ -55,13 +57,11 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateDTO request) {
         Channel createdChannel = channelRepository.save(channelMapper.toPrivateEntity(PRIVATE));
-        request.participantIds().stream()
-                .map(userId -> {
-                    User participatingUser = userRepository.findById(userId)
-                            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
-                    return new ReadStatus(participatingUser, createdChannel, createdChannel.getCreatedAt());
-                })// 나중에
-                .forEach(readStatusRepository::save);
+        List<UUID> userIdList = request.participantIds();
+        userIdList.forEach(userId -> {
+            ReadStatusCreateRequest readStatusCreateDTO = new ReadStatusCreateRequest(userId, createdChannel.getId(), createdChannel.getCreatedAt());
+            readStatusService.create(readStatusCreateDTO);
+        });
         return createdChannel;
     }
 
@@ -92,7 +92,7 @@ public class JCFChannelService implements ChannelService {
         List<Channel> participatingPrivateChannel = readStatusList.stream().map(ReadStatus::getChannel).toList();
 
         List<ChannelDto> channelDtoList = new ArrayList<>();
-        participatingPrivateChannel.forEach((channel)->{
+        participatingPrivateChannel.forEach((channel) -> {
             // 채널별 ReadStauts들 가져오기
             // 쿼리2
             Instant lastMessageAt = messageRepository.findTop1ByChannel_IdOrderByCreatedAtDesc(channel.getId())
