@@ -91,9 +91,9 @@ class BasicUserServiceTest {
       given(userRepository.existsByUsername("홍길동")).willReturn(true);
 
       // when & then
-      assertThrows(DuplicateUsernameException.class, () -> {
-        userService.create(userRequest, null);
-      });
+      assertThrows(DuplicateUsernameException.class,
+          () -> userService.create(userRequest, null)
+      );
     }
 
     @Test
@@ -109,9 +109,9 @@ class BasicUserServiceTest {
       given(userRepository.existsByEmail("hong@codeit.com")).willReturn(true);
 
       // when & then
-      assertThrows(DuplicateEmailException.class, () -> {
-        userService.create(userRequest, null);
-      });
+      assertThrows(DuplicateEmailException.class,
+          () -> userService.create(userRequest, null)
+      );
     }
   }
 
@@ -162,9 +162,9 @@ class BasicUserServiceTest {
       given(userRepository.findById(nonExistentUserId)).willReturn(Optional.empty());
 
       // when & then
-      assertThrows(UserNotFoundException.class, () -> {
-        userService.update(nonExistentUserId, updateRequest, null);
-      });
+      assertThrows(UserNotFoundException.class,
+          () -> userService.update(nonExistentUserId, updateRequest, null)
+      );
     }
   }
 
@@ -198,9 +198,9 @@ class BasicUserServiceTest {
       given(userRepository.existsById(nonExistentUserId)).willReturn(false);
 
       // when & then
-      assertThrows(UserNotFoundException.class, () -> {
-        userService.delete(nonExistentUserId);
-      });
+      assertThrows(UserNotFoundException.class,
+          () -> userService.delete(nonExistentUserId)
+      );
     }
   }
 }
