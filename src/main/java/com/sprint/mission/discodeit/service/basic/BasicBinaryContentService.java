@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +33,7 @@ public class BasicBinaryContentService extends BinaryContentMapper implements Bi
   public BinaryContentDto create(UUID contentId, MultipartFile file) {
 
     if (!binaryContentRepository.existsById(contentId)) {
-      throw new NoSuchElementException("파일이 첨부되지 않았습니다. 파일을 첨부해주세요");
+      throw new BinaryContentNotFoundException(null);
     }
 
     byte[] data = null;
@@ -56,7 +56,7 @@ public class BasicBinaryContentService extends BinaryContentMapper implements Bi
   @Override
   public BinaryContentDto find(UUID contentId) {
     BinaryContent binaryContent = binaryContentRepository.findById(contentId)
-        .orElseThrow(() -> new NoSuchElementException("해당 파일이 존재하지 않습니다."));
+        .orElseThrow(() -> new BinaryContentNotFoundException(null));
     return toDto(binaryContent);
   }
 
@@ -76,7 +76,7 @@ public class BasicBinaryContentService extends BinaryContentMapper implements Bi
   @Override
   public void delete(UUID contentId) {
     if (!binaryContentRepository.existsById(contentId)) {
-      throw new NoSuchElementException("해당 파일이 존재하지 않습니다.");
+      throw new BinaryContentNotFoundException(null);
     }
     binaryContentRepository.deleteById(contentId);
   }

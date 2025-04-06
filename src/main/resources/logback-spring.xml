@@ -26,8 +26,10 @@
     </appender>
 
     <!-- 로깅 레벨 설정 -->
-    <logger name="org.hibernate.SQL" level="DEBUG" />
-    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" />
+    <logger name="org.hibernate" level="INFO"/>
+    <logger name="sun.rmi" level="INFO"/>
+    <logger name="javax.management" level="INFO"/>
+
 
     <!-- 루트 로거 설정 (콘솔 + 파일) -->
     <root level="INFO">

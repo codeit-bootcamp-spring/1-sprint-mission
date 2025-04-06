@@ -8,6 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentGetFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentSaveFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.DirectoryInitFailedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,9 +24,10 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
+
   private final Path root;
 
-  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath) {
+  public LocalBinaryContentStorage(@Value("${user.dir}/uploads") String rootPath) {
     this.root = Path.of(rootPath); // @Value는 문자열 주입이니까 String으로 받고 Path.of()로 Path로 변환
     init();
   }
@@ -33,7 +37,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       Files.createDirectories(root);
     } catch (IOException e) {
-      throw new RuntimeException("파일 디렉토리 초기화에 실패했습니다.");
+      throw new DirectoryInitFailedException(null);
     }
   }
 
@@ -46,7 +50,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
           StandardOpenOption.TRUNCATE_EXISTING); // 그 경로에 wirte (파일 쓰기)
       return contentId;
     } catch (IOException e) {
-      throw new RuntimeException("파일 저장에 실패했습니다: " + contentId, e);
+      throw new BinaryContentSaveFailedException(null);
     }
   }
 
@@ -55,7 +59,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       return Files.newInputStream(resolvePath(contentId));
     } catch (IOException e) {
-      throw new RuntimeException("파일을 얻지 못했습니다: " + contentId, e);
+      throw new BinaryContentGetFailedException(null);
     }
   }
   /* [ try문 안에 이렇게 쓸 수도 있음 java.io 기반 (구식) ]
@@ -65,7 +69,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentDto dto) {
-    Path filePath = resolvePath(dto.id());
+    Path filePath = resolvePath(dto.getId());
 
     // 파일 존재 여부 체크
     if (!Files.exists(filePath)) {

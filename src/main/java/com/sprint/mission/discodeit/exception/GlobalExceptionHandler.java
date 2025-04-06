@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -82,7 +83,20 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.BAD_REQUEST.value())
             .build();
     return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
+            .status(HttpStatus.BAD_REQUEST) // TODO : e.getStatusCode().value()로 수정?
+            .body(errorResponse);
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
+    ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("VALIDATION_FAILED_ERROR")
+            .message("유효성 검증에 실패했습니다.")
+            .exceptionType(e.getClass().getSimpleName())
+            .status(e.getStatusCode().value())
+            .build();
+    return ResponseEntity
+            .status(e.getStatusCode())
             .body(errorResponse);
   }
 

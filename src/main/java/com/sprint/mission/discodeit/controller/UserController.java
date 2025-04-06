@@ -16,11 +16,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+
+import com.sprint.mission.discodeit.validator.ProfileFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 @ResponseBody
 @RestController
@@ -43,28 +47,16 @@ public class UserController {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
-  private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
 
   @PostMapping(
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
   )
   public ResponseEntity<UserDto> create(
       @ModelAttribute UserCreateRequest userCreateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
+      @RequestPart(value = "profile", required = false)
+      @ProfileFile(message = "이미지 파일만 설정할 수 있습니다.")
+      MultipartFile profile
   ) {
-    String username = userCreateRequest.username();
-    String email = userCreateRequest.email();
-
-    if (userRepository.existsByUsername(username) || userRepository.existsByEmail(email)) {
-      throw new IllegalArgumentException("해당 회원이 이미 존재합니다.");
-    }
-
-    Optional<BinaryContentDto> profileRequest = Optional.empty();
-    if (profile != null) {
-      profileRequest = resolveProfileRequest(profile);
-    }
-
     UserDto createdUser = userService.create(userCreateRequest, Optional.ofNullable(profile));
 
     return ResponseEntity
@@ -87,11 +79,10 @@ public class UserController {
   public ResponseEntity<UserDto> update(
       @PathVariable UUID userId,
       @ModelAttribute UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
+      @RequestPart(value = "profile", required = false)
+      @ProfileFile(message = "이미지 파일만 설정할 수 있습니다.")
+      MultipartFile profile
   ) {
-    if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException("해당 회원을 찾을 수 없습니다.");
-    }
 
     UserDto updatedUser = userService.update(userId, userUpdateRequest,
         Optional.ofNullable(profile));
@@ -102,9 +93,6 @@ public class UserController {
 
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> delete(@PathVariable UUID userId) {
-    if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException("해당 회원을 찾을 수 없습니다.");
-    }
     userService.delete(userId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -135,9 +123,6 @@ public class UserController {
       @PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest userStatusUpdateRequest
   ) {
-    userStatusRepository.findByUserId(userId)
-        .orElseThrow(() -> new NoSuchElementException("해당 user status를 찾을 수 없습니다."));
-
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
     return ResponseEntity
         .status(HttpStatus.OK)

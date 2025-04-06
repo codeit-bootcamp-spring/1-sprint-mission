@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.dto.request;
 
+import lombok.Builder;
+import lombok.Getter;
+
 import java.util.List;
 import java.util.UUID;
 
-public record PrivateChannelCreateRequest(
-    List<UUID> participantIds // TODO찐: array<String> 형으로 수정
-) {
-
+@Getter
+@Builder
+public class PrivateChannelCreateRequest {
+    List<UUID> participantIds;
 }

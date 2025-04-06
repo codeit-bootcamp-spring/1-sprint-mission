@@ -6,17 +6,18 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.Instant;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,26 +29,18 @@ public class BasicUserService extends UserMapper implements UserService {
 
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
-
+  private final BinaryContentStorage binaryContentStorage;
 
   @Transactional
   @Override
-  // TODO : 회원이 입력할 수 있는 값만 따로 dto로 묶어 전달
   public UserDto create(UserCreateRequest request,
       Optional<MultipartFile> nullableFile) {
-    // TODO : 1. 발생 가능한 예외를 먼저 생각하기 -> 예외 처리 : email과 username 검색 => 이존회
-    // TODO : 2. dto -> 변수 할당 3. 객체 생성 4. repository.save
-    String email = request.email();
+    String email = request.getEmail();
     if (userRepository.existsByEmail(email)) {
-      throw new IllegalArgumentException("이미 존재하는 회원입니다.");
-      // TODO : '예외 처리'라는 건 예외를 해결하는 게 아니라, 프로그램이 종료되지 않도록 예외 상황을 출력/상태코드 반환해서 알리는 게 목적임. 예외 해결은 예외 처리 개념이 아니라 그냥 애초에 예외를 방지하는 로직을 쓰는 것으로 수행.
-      // TODO : 예외 발생 -> 메인/Controller 단에서 처리 안하면 JVM으로 넘어가서 프로그램 종료될 수 있음 -> ExceptionHandler에서 처리해주기
-      // TODO : @ControllerAdive, @ExceptionHandler
+      throw new UserAlreadyExistException(null); // TODO : details 어떤식으로 전달해야될지 모르겠음
     }
 
     // 프로필 이미지 설정
-    // TODO : 이해 1. .map의 기능, 문법 2. Optional 문법 -> ok
-    // TODO : 프로필 정보를 받았어 그런데 회원 객체 생성시 프로필 객체가 필요해 -> 프로필을 겟하는 로직을 써야겠네
     MultipartFile file = nullableFile.orElse(null);
     BinaryContent profile = BinaryContent.builder()
         .fileName(file.getOriginalFilename())
@@ -61,10 +54,9 @@ public class BasicUserService extends UserMapper implements UserService {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    binaryContentStorage.put(profile.getId(), data);
 
-    String username = request.username();
-    String password = request.password();
+    String username = request.getUsername();
+    String password = request.getPassword();
     User newUser = User.builder()
         .username(username)
         .email(email)
@@ -73,6 +65,7 @@ public class BasicUserService extends UserMapper implements UserService {
         .build();
     User user = userRepository.save(newUser);
     UserDto createdUser = toDto(user);
+    binaryContentStorage.put(profile.getId(), data); // 레포지토리 save를 '먼저' 해야 id가 생성되고, id가 있으니 이 경로로 put이 가능해짐
 
     // 생성된 회원 user status 설정
     Instant lastActiveAt = Instant.now();
@@ -90,7 +83,7 @@ public class BasicUserService extends UserMapper implements UserService {
     // 반환타입이 UserDto니까, mapper을 이용해 Optional의 null이 아닌 경우인 user 변수를 dto로 변경해서 return
     return userRepository.findById(userId)
         .map(user -> toDto(user))
-        .orElseThrow(() -> new NoSuchElementException("아이디가" + userId + "인 회원이 존재하지 않습니다."));
+        .orElseThrow(() -> new UserNotFoundException(null));
   }
 
   @Override
@@ -108,15 +101,15 @@ public class BasicUserService extends UserMapper implements UserService {
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<MultipartFile> nullableFile) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("아이디가 " + userId + "인 회원이 존재하지 않습니다."));
+        .orElseThrow(() -> new UserNotFoundException(null));
 
-    String newUsername = userUpdateRequest.newUsername();
-    String newEmail = userUpdateRequest.newEmail();
+    String newUsername = userUpdateRequest.getNewUsername();
+    String newEmail = userUpdateRequest.getNewEmail();
     if (userRepository.existsByEmail(newEmail)) {
-      throw new IllegalArgumentException("이메일이 " + newEmail + "인 회원이 이미 존재합니다.");
+      throw new UserAlreadyExistException(null);
     }
     if (userRepository.existsByUsername(newUsername)) {
-      throw new IllegalArgumentException("이름이 " + newUsername + "인 회원이 이미 존재합니다.");
+      throw new UserAlreadyExistException(null);
     }
 
     MultipartFile file = nullableFile.orElse(null);
@@ -144,7 +137,7 @@ public class BasicUserService extends UserMapper implements UserService {
 
     binaryContentRepository.save(newProfile);
 
-    String newPassword = userUpdateRequest.newPassword();
+    String newPassword = userUpdateRequest.getNewPassword();
     user.update(newUsername, newEmail, newPassword, newProfile);
 
     return toDto(user);
@@ -155,7 +148,7 @@ public class BasicUserService extends UserMapper implements UserService {
   @Override
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("아이디가 " + userId + "인 회원이 존재하지 않습니다."));
+        .orElseThrow(() -> new UserNotFoundException(null));
 
     Optional.ofNullable(user.getProfile()).map(BinaryContent::getId)
         .ifPresent(

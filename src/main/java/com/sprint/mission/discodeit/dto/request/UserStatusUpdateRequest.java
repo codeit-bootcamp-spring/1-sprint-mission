@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.dto.request;
 
+import lombok.Builder;
+import lombok.Getter;
 import java.time.Instant;
 
-public record UserStatusUpdateRequest(
-    Instant newLastActiveAt // TODO찐: date-time으로 수정
-) {
-
+@Getter
+@Builder
+public class UserStatusUpdateRequest {
+    Instant newLastActiveAt; // TODO찐: date-time으로 수정
 }

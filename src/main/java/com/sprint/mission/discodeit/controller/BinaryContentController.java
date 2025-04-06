@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 @RestController
 @ResponseBody
@@ -28,7 +30,6 @@ public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
-  private final BinaryContentRepository binaryContentRepository;
 
   @GetMapping
   public ResponseEntity<List<BinaryContentDto>> findAll(@RequestParam List<UUID> binaryContentIds) {

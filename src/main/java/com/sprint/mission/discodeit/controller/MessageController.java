@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
+@Validated
 @RequiredArgsConstructor
 @RestController
 @ResponseBody
@@ -73,7 +75,7 @@ public class MessageController {
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest request) {
-    messageService.update(messageId, request.requesterId(), request);
+    messageService.update(messageId, request.getRequesterId(), request);
     return ResponseEntity
         .status(HttpStatus.OK)
         .build();

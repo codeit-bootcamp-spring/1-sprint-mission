@@ -1,14 +1,20 @@
 package com.sprint.mission.discodeit.dto.data;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.UUID;
 
-public record UserDto(
-    UUID id,
-    String username,
-    String email,
-    BinaryContentDto profile,
-    Boolean online
-) {
-
-}
-
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDto{
+    UUID id;
+    String username;
+    String email;
+    BinaryContentDto profile;
+    Boolean online;
+        }

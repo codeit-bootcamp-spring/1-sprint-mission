@@ -9,6 +9,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -40,34 +43,34 @@ public class BasicMessageService extends MessageMapper implements MessageService
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentDto> requests) {
 
-    UUID channelId = messageCreateRequest.channelId();
-    UUID userId = messageCreateRequest.authorId();
+    UUID channelId = messageCreateRequest.getChannelId();
+    UUID userId = messageCreateRequest.getAuthorId();
 
-    String content = messageCreateRequest.content();
+    String content = messageCreateRequest.getContent();
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("해당 회원을 찾을 수 없습니다."));
+        .orElseThrow(() -> new UserNotFoundException(null));
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("해당 채널을 찾을 수 없습니다."));
+        .orElseThrow(() -> new ChannelNotFoundException(null));
     List<BinaryContent> attachments = binaryContentRepository.findAllByIdIn(
-        requests.stream().map((bc) -> bc.id()).toList());
+        requests.stream().map((bc) -> bc.getId()).toList());
 
     if (!channelRepository.existsById(channelId)) {
-      throw new NoSuchElementException("아이디가 " + channelId + "인 채널이 존재하지 않습니다.");
+      throw new UserNotFoundException(null);
     }
     if (!userRepository.existsById(userId)) {
-      throw new NoSuchElementException("아이디가" + userId + "인 회원이 존재하지 않습니다.");
+      throw new UserNotFoundException(null);
     }
 
     // 다수의 첨부파일 등록
     List<UUID> attachmentIds = new ArrayList<>(); // id를 저장하기 위한 리스트
 
     for (BinaryContentDto attachmentRequest : requests) {
-      String fileName = attachmentRequest.fileName();
-      String contentType = attachmentRequest.contentType();
-      int size = attachmentRequest.size();
+      String fileName = attachmentRequest.getFileName();
+      String contentType = attachmentRequest.getContentType();
+      int size = attachmentRequest.getSize();
       byte[] data = new byte[size];
 
-      binaryContentStorage.put(attachmentRequest.id(), data);
+      binaryContentStorage.put(attachmentRequest.getId(), data);
 
       BinaryContent binaryContent = BinaryContent.builder()
           .fileName(fileName)
@@ -136,12 +139,12 @@ public class BasicMessageService extends MessageMapper implements MessageService
     // mR.findById~ 는 Optional 타입이라 그냥 Message 타입인 .getAuthorId() 직접 호출이 안됨
     //  -> **.orElseThrow()로 null이 아닐 경우를 벗겨주고 Message 타입 변수에 넣어주는 작업
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("메세지가 존재하지 않아 수정할 수 없습니다."));
+        .orElseThrow(() -> new MessageNotFoundException(null));
 
     if (!message.getUser().getId().equals(requesterId)) {
       System.out.println("메세지를 수정할 권한이 없습니다.");
     }
-    String newContent = request.newContent();
+    String newContent = request.getNewContent();
     message.update(newContent);
     return toDto(message); // 전에는 toDto(messageRepository.save(message))였음.
   }

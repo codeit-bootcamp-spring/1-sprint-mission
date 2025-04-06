@@ -1,5 +1,5 @@
 plugins {
-    id 'checkstyle'
+//    id 'checkstyle'
     id 'java'
     id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.7'
@@ -35,18 +35,22 @@ dependencies {
     // JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.postgresql:postgresql:42.6.0'
-    // Docker - 최신 버전 사용
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.4'
+//    // Docker - 최신 버전 사용
+//    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.4'
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-checkstyle {
-    toolVersion = '1.0' // Checkstyle 버전
-    configFile = file('/app/checkstyle.xml') // Checkstyle 설정 파일 경로
-}
+//checkstyle {
+//    toolVersion = '10.12.4' // Checkstyle 버전
+//    configFile = file('checkstyle.xml') // Checkstyle 설정 파일 경로
+//}
 
 // 이하 필요시에만 사용
 tasks.withType(Checkstyle) {

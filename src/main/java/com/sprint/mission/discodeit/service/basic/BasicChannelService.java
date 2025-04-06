@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -26,8 +28,8 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
   @Override
   public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
     // 1. 파라미터 예외처리, 변수에 넣기 2. 객체 만들기 3. repository.save
-    String channelName = request.name();
-    String channelDescription = request.description();
+    String channelName = request.getName();
+    String channelDescription = request.getDescription();
     Channel channel = Channel.builder()
         .name(channelName)
         .description(channelDescription)
@@ -46,7 +48,7 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
         .type(ChannelType.PRIVATE)
         .build();
     Channel createdChannel = channelRepository.save(channel);
-    for (UUID userId : request.participantIds()) {
+    for (UUID userId : request.getParticipantIds()) {
       ReadStatus readStatus = ReadStatus.builder()
           .channel(createdChannel)
           .lastReadAt(createdChannel.getCreatedAt())
@@ -61,7 +63,7 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
   public ChannelDto find(UUID channelId) {
     return channelRepository.findById(channelId)
         .map(this::toDto)
-        .orElseThrow(() -> new IllegalArgumentException("해당 채널이 존재하지 않습니다."));
+        .orElseThrow(() -> new ChannelNotFoundException(null));
   }
 
 
@@ -89,12 +91,12 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     // private 채널이면 수정할 수 없다는 말
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("해당 채널을 찾을 수 없습니다."));
+        .orElseThrow(() -> new ChannelNotFoundException(null));
     if (channel.getType().equals(ChannelType.PRIVATE)) {
-      throw new IllegalArgumentException("private 채널은 수정할 수 없습니다.");
+      throw new PrivateChannelUpdateException(null);
     }
-    String newName = request.newName();
-    String newDescription = request.newDescription();
+    String newName = request.getNewName();
+    String newDescription = request.getNewDescription();
     channel.update(newName, newDescription);
     return toDto(
         channel); // TODO 변경 감지(Dirty Checking) : save 안해줘도 JPA가 변경사항을 감지해서 트랜잭션이 끝날 때 자동으로 UPDATE 쿼리 실행
@@ -107,7 +109,7 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
     // 삭제 전에 채널 정보 가져오기 (로그를 위해)
     Optional<Channel> channelToDelete = channelRepository.findById(channelId);
     if (channelToDelete.isEmpty()) {
-      throw new NoSuchElementException("해당 채널을 찾을 수 없습니다.");
+      throw new ChannelNotFoundException(null);
     }
     // 관련 도메인 데이터 삭제
     readStatusRepository.deleteAllByChannelId(channelId);
