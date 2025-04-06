@@ -6,7 +6,7 @@ import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
-import com.sprint.mission.service.jcf.addOn.BinaryServiceImpl;
+import com.sprint.mission.service.jcf.serviceImpl.BinaryServiceImpl;
 
 import java.util.List;
 import java.util.UUID;

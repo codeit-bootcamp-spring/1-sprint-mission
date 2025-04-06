@@ -10,7 +10,7 @@ import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.UserService;
-import com.sprint.mission.service.jcf.addOn.UserStatusService;
+import com.sprint.mission.service.jcf.serviceImpl.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

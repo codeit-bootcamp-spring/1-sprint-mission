@@ -14,7 +14,7 @@ import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.UserService;
-import com.sprint.mission.service.jcf.addOn.ReadStatusService;
+import com.sprint.mission.service.jcf.serviceImpl.ReadStatusService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
