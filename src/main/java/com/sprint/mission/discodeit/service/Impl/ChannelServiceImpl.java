@@ -144,11 +144,6 @@ public class ChannelServiceImpl implements ChannelService {
   @Transactional
   @Override
   public ChannelDto create(ChannelDto channelDTO) {
-    User creator = userRepository.findById(channelDTO.getUserId())
-        .orElseThrow(() -> {
-          log.error("유저를 찾을 수 없습니다: {}", channelDTO.getUserId());
-          return new RestApiException(DomainErrorCode.USER_NOT_FOUND, "User not found");
-        });
 
     // 채널 타입 처리 - 타입이 없거나 유효하지 않은 경우 기본값으로 PUBLIC 설정
     ChannelType channelType;
@@ -163,10 +158,11 @@ public class ChannelServiceImpl implements ChannelService {
       channelType = ChannelType.PUBLIC;
     }
 
-    Channel channel = new Channel(
-        channelDTO.getName(),
-        channelDTO.getDescription(),
-        channelType);
+    Channel channel = Channel.builder()
+        .name(channelDTO.getName())
+        .description(channelDTO.getDescription())
+        .type(channelType)
+        .build();
 
     Channel saved = channelRepository.save(channel);
     return channelMapper.toDto(saved);

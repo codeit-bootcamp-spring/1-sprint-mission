@@ -12,4 +12,5 @@ public interface MessageService {
     List<MessageDto> getChannelMessages(UUID channelId);
     List<MessageDto> findAllByChannelId(UUID channelId);
     List<MessageDto> findAll();
+    MessageDto getMessageById(UUID id);
 }

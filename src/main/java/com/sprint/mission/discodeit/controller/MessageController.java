@@ -32,7 +32,20 @@ public class MessageController {
     public ResponseEntity<List<MessageDto>> channelMessages() {
         List<MessageDto> messages = messageService.findAll();
         return ResponseEntity.ok(messages);
+    }
 
+    @Operation(summary = "메시지 조회", description = "ID로 메시지 조회")
+    @GetMapping("/{id}")
+    public ResponseEntity<MessageDto> getMessageById(@PathVariable UUID id) {
+        MessageDto message = messageService.getMessageById(id);
+        return ResponseEntity.ok(message);
+    }
+    
+    @Operation(summary = "채널별 메시지 조회", description = "채널 ID로 메시지 목록 조회")
+    @GetMapping("/channels/{channelId}/messages")
+    public ResponseEntity<List<MessageDto>> getChannelMessages(@PathVariable UUID channelId) {
+        List<MessageDto> messages = messageService.getChannelMessages(channelId);
+        return ResponseEntity.ok(messages);
     }
 
     @Operation(summary = "메시지 삭제", description = "메시지 삭제")
@@ -47,13 +60,7 @@ public class MessageController {
     public ResponseEntity<MessageDto> updateMessage(
             @PathVariable UUID id,
             @Valid @RequestBody MessageDto messageDto) {
-        try {
-            MessageDto updateMessage = messageService.updateMessage(id, messageDto);
-            return ResponseEntity.ok(updateMessage);
-        }
-        catch (Exception e) {
-            log.error("메시지 수정 중 오류 발생 : {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        MessageDto updateMessage = messageService.updateMessage(id, messageDto);
+        return ResponseEntity.ok(updateMessage);
     }
 }

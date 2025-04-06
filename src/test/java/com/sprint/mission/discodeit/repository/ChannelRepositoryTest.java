@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,170 +13,179 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles("test")
 class ChannelRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+  @Autowired
+  private TestEntityManager entityManager;
 
-    @Autowired
-    private ChannelRepository channelRepository;
+  @Autowired
+  private ChannelRepository channelRepository;
 
-    @Test
-    @DisplayName("공개 채널 저장 후 조회 테스트")
-    void saveAndFindPublicChannel() {
-        // Given
-        Channel channel = Channel.builder()
-                .name("테스트 공개 채널")
-                .description("테스트 설명")
-                .type(ChannelType.PUBLIC)
-                .build();
+  private Channel testPublicChannel;
+  private Channel testPrivateChannel;
 
-        // When
-        Channel savedChannel = entityManager.persistAndFlush(channel);
-        Optional<Channel> foundChannel = channelRepository.findById(savedChannel.getId());
+  @BeforeEach
+  void setUp() {
+    // 테스트 데이터 생성
+    testPublicChannel = Channel.builder()
+        .name("테스트 공개 채널")
+        .description("테스트 설명")
+        .type(ChannelType.PUBLIC)
+        .build();
 
-        // Then
-        assertTrue(foundChannel.isPresent());
-        assertEquals(channel.getName(), foundChannel.get().getName());
-        assertEquals(channel.getDescription(), foundChannel.get().getDescription());
-        assertEquals(channel.getType(), foundChannel.get().getType());
-    }
+    testPrivateChannel = Channel.builder()
+        .name("테스트 비공개 채널")
+        .description("테스트 설명")
+        .type(ChannelType.PRIVATE)
+        .build();
 
-    @Test
-    @DisplayName("비공개 채널 저장 후 조회 테스트")
-    void saveAndFindPrivateChannel() {
-        // Given
-        Channel channel = Channel.builder()
-                .name("테스트 비공개 채널")
-                .description("테스트 설명")
-                .type(ChannelType.PRIVATE)
-                .build();
+    entityManager.flush();
+  }
 
-        // When
-        Channel savedChannel = entityManager.persistAndFlush(channel);
-        Optional<Channel> foundChannel = channelRepository.findById(savedChannel.getId());
+  @Test
+  @DisplayName("공개 채널 저장 테스트")
+  void save_PublicChannel() {
+    // When
+    Channel savedChannel = channelRepository.save(testPublicChannel);
+    entityManager.flush();
+    entityManager.clear();
 
-        // Then
-        assertTrue(foundChannel.isPresent());
-        assertEquals(channel.getName(), foundChannel.get().getName());
-        assertEquals(channel.getDescription(), foundChannel.get().getDescription());
-        assertEquals(channel.getType(), foundChannel.get().getType());
-    }
+    // Then
+    Channel foundChannel = entityManager.find(Channel.class, savedChannel.getId());
+    assertThat(foundChannel).isNotNull();
+    assertThat(foundChannel.getName()).isEqualTo("테스트 공개 채널");
+    assertThat(foundChannel.getDescription()).isEqualTo("테스트 설명");
+    assertThat(foundChannel.getType()).isEqualTo(ChannelType.PUBLIC);
+  }
 
-    @Test
-    @DisplayName("모든 채널 찾기 테스트")
-    void findAllChannels() {
-        // Given
-        Channel channel1 = Channel.builder()
-                .name("테스트 채널 1")
-                .description("테스트 설명 1")
-                .type(ChannelType.PUBLIC)
-                .build();
-        
-        Channel channel2 = Channel.builder()
-                .name("테스트 채널 2")
-                .description("테스트 설명 2")
-                .type(ChannelType.PRIVATE)
-                .build();
+  @Test
+  @DisplayName("비공개 채널 저장 테스트")
+  void save_PrivateChannel() {
+    // When
+    Channel savedChannel = channelRepository.save(testPrivateChannel);
+    entityManager.flush();
+    entityManager.clear();
 
-        entityManager.persist(channel1);
-        entityManager.persist(channel2);
-        entityManager.flush();
+    // Then
+    Channel foundChannel = entityManager.find(Channel.class, savedChannel.getId());
+    assertThat(foundChannel).isNotNull();
+    assertThat(foundChannel.getName()).isEqualTo("테스트 비공개 채널");
+    assertThat(foundChannel.getDescription()).isEqualTo("테스트 설명");
+    assertThat(foundChannel.getType()).isEqualTo(ChannelType.PRIVATE);
+  }
 
-        // When
-        List<Channel> channels = channelRepository.findAll();
+  @Test
+  @DisplayName("ID로 채널 조회 테스트")
+  void findById_Success() {
+    // Given
+    Channel savedChannel = entityManager.persistAndFlush(testPublicChannel);
+    entityManager.clear();
 
-        // Then
-        assertFalse(channels.isEmpty());
-        assertTrue(channels.size() >= 2);
-        assertTrue(channels.stream().anyMatch(c -> c.getName().equals("테스트 채널 1")));
-        assertTrue(channels.stream().anyMatch(c -> c.getName().equals("테스트 채널 2")));
-    }
+    // When
+    Optional<Channel> foundChannel = channelRepository.findById(savedChannel.getId());
 
-    @Test
-    @DisplayName("채널 삭제 테스트")
-    void deleteChannel() {
-        // Given
-        Channel channel = Channel.builder()
-                .name("삭제할 채널")
-                .description("삭제 테스트")
-                .type(ChannelType.PUBLIC)
-                .build();
+    // Then
+    assertThat(foundChannel).isPresent();
+    assertThat(foundChannel.get().getName()).isEqualTo("테스트 공개 채널");
+    assertThat(foundChannel.get().getType()).isEqualTo(ChannelType.PUBLIC);
+  }
 
-        Channel savedChannel = entityManager.persistAndFlush(channel);
+  @Test
+  @DisplayName("모든 채널 조회 테스트")
+  void findAll_Success() {
+    // Given
+    entityManager.persistAndFlush(testPublicChannel);
+    entityManager.persistAndFlush(testPrivateChannel);
+    entityManager.clear();
 
-        // When
-        channelRepository.deleteById(savedChannel.getId());
-        entityManager.flush();
-        
-        Optional<Channel> foundChannel = channelRepository.findById(savedChannel.getId());
+    // When
+    List<Channel> channels = channelRepository.findAll();
 
-        // Then
-        assertFalse(foundChannel.isPresent());
-    }
+    // Then
+    assertThat(channels).isNotEmpty();
+    assertThat(channels.size()).isGreaterThanOrEqualTo(2);
+    assertThat(channels).anyMatch(c -> c.getName().equals("테스트 공개 채널"));
+    assertThat(channels).anyMatch(c -> c.getName().equals("테스트 비공개 채널"));
+  }
 
-    @Test
-    @DisplayName("채널 타입으로 채널 찾기 테스트")
-    void findChannelsByType() {
-        // Given
-        Channel publicChannel1 = Channel.builder()
-                .name("공개 채널 1")
-                .description("공개 채널 설명 1")
-                .type(ChannelType.PUBLIC)
-                .build();
-        
-        Channel publicChannel2 = Channel.builder()
-                .name("공개 채널 2")
-                .description("공개 채널 설명 2")
-                .type(ChannelType.PUBLIC)
-                .build();
-        
-        Channel privateChannel = Channel.builder()
-                .name("비공개 채널")
-                .description("비공개 채널 설명")
-                .type(ChannelType.PRIVATE)
-                .build();
+  @Test
+  @DisplayName("채널 삭제 테스트")
+  void deleteById_Success() {
+    // Given
+    Channel savedChannel = entityManager.persistAndFlush(testPublicChannel);
+    entityManager.clear();
 
-        entityManager.persist(publicChannel1);
-        entityManager.persist(publicChannel2);
-        entityManager.persist(privateChannel);
-        entityManager.flush();
+    // When
+    channelRepository.deleteById(savedChannel.getId());
+    entityManager.flush();
+    entityManager.clear();
 
-        // When
-        List<Channel> publicChannels = channelRepository.findByType(ChannelType.PUBLIC);
-        List<Channel> privateChannels = channelRepository.findByType(ChannelType.PRIVATE);
+    // Then
+    Channel deletedChannel = entityManager.find(Channel.class, savedChannel.getId());
+    assertThat(deletedChannel).isNull();
+  }
 
-        // Then
-        assertTrue(publicChannels.size() >= 2);
-        assertTrue(privateChannels.size() >= 1);
-        assertTrue(publicChannels.stream().allMatch(c -> c.getType() == ChannelType.PUBLIC));
-        assertTrue(privateChannels.stream().allMatch(c -> c.getType() == ChannelType.PRIVATE));
-    }
+  @Test
+  @DisplayName("채널 업데이트 테스트")
+  void update_Success() {
+    // Given
+    Channel savedChannel = entityManager.persistAndFlush(testPublicChannel);
 
-    @Test
-    @DisplayName("채널 이름으로 채널 찾기 테스트")
-    void findChannelsByName() {
-        // Given
-        String channelName = "특별한 채널 이름";
-        
-        Channel channel = Channel.builder()
-                .name(channelName)
-                .description("특별한 설명")
-                .type(ChannelType.PUBLIC)
-                .build();
+    // When
+    savedChannel.setName("수정된 채널명");
+    savedChannel.setDescription("수정된 설명");
+    channelRepository.save(savedChannel);
+    entityManager.flush();
+    entityManager.clear();
 
-        entityManager.persist(channel);
-        entityManager.flush();
+    // Then
+    Channel updatedChannel = entityManager.find(Channel.class, savedChannel.getId());
+    assertThat(updatedChannel).isNotNull();
+    assertThat(updatedChannel.getName()).isEqualTo("수정된 채널명");
+    assertThat(updatedChannel.getDescription()).isEqualTo("수정된 설명");
+  }
 
-        // When
-        List<Channel> foundChannels = channelRepository.findByNameContaining(channelName);
+  @Test
+  @DisplayName("채널 타입으로 채널 찾기 테스트")
+  void findByType_Success() {
+    // Given
+    entityManager.persistAndFlush(testPublicChannel);
+    entityManager.persistAndFlush(testPrivateChannel);
+    entityManager.clear();
 
-        // Then
-        assertFalse(foundChannels.isEmpty());
-        assertTrue(foundChannels.stream().anyMatch(c -> c.getName().equals(channelName)));
-    }
+    // When
+    List<Channel> publicChannels = channelRepository.findByType(ChannelType.PUBLIC);
+    List<Channel> privateChannels = channelRepository.findByType(ChannelType.PRIVATE);
+
+    // Then
+    assertThat(publicChannels).isNotEmpty();
+    assertThat(privateChannels).isNotEmpty();
+    assertThat(publicChannels).allMatch(c -> c.getType() == ChannelType.PUBLIC);
+    assertThat(privateChannels).allMatch(c -> c.getType() == ChannelType.PRIVATE);
+  }
+
+  @Test
+  @DisplayName("채널 이름으로 채널 찾기 테스트")
+  void findByNameContaining_Success() {
+    // Given
+    String channelName = "특별한 채널 이름";
+    Channel channel = Channel.builder()
+        .name(channelName)
+        .description("특별한 설명")
+        .type(ChannelType.PUBLIC)
+        .build();
+    entityManager.persistAndFlush(channel);
+    entityManager.clear();
+
+    // When
+    List<Channel> foundChannels = channelRepository.findByNameContaining(channelName);
+
+    // Then
+    assertThat(foundChannels).isNotEmpty();
+    assertThat(foundChannels).anyMatch(c -> c.getName().equals(channelName));
+  }
 } 

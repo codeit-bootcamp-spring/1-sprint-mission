@@ -82,6 +82,10 @@ public class MessageServiceImpl implements MessageService {
   @Override
   @Transactional
   public void deleteMessage(UUID id) {
+    Message message = messageRepository.findById(id)
+        .orElseThrow(
+            () -> new RestApiException(DomainErrorCode.MESSAGE_NOT_FOUND, "Message not found"));
+    
     messageRepository.deleteById(id);
   }
 
@@ -91,5 +95,14 @@ public class MessageServiceImpl implements MessageService {
         .stream()
         .map(messageMapper::toDto)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public MessageDto getMessageById(UUID id) {
+    Message message = messageRepository.findById(id)
+        .orElseThrow(
+            () -> new RestApiException(DomainErrorCode.MESSAGE_NOT_FOUND, "Message not found"));
+    
+    return messageMapper.toDto(message);
   }
 }

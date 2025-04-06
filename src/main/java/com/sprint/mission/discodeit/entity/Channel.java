@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.*;
 
 @Getter @Setter
-@Entity @Builder
+@Entity
+@SuperBuilder
 @Table(name = "channels")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,16 +22,12 @@ public class Channel extends BaseUpdatableEntity {
     private ChannelType type;
 
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Message> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<ReadStatus> readStatuses = new ArrayList<>();
-
-    public Channel(String name, String description, ChannelType type) {
-        this.name = name;
-        this.description = description;
-        this.type = type;
-    }
 
     public void update(String name, String description, ChannelType channelType) {
         this.name = name;
