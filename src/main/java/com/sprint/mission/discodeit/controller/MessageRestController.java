@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/messages")
@@ -28,17 +31,20 @@ public class MessageRestController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public MessageResponse sendMessage(@Valid @RequestPart(value = "request", required = true) @NotNull @JsonProperty MessageRequest request,
                                        @RequestPart(value = "file", required = false) MultipartFile[] files) throws IOException {
-
+        log.info("message create request : {}", request);
         return messageService.messageCreate(request, files);
     }
 
     @Operation(summary = "message list", description = "메시지 리스트")
     @GetMapping
-    public List<MessageResponse> messageList() { return messageService.readAll(); }
+    public List<MessageResponse> messageList() {
+        log.info("message list");
+        return messageService.readAll(); }
 
     @Operation(summary = "message - channel list", description = "채널관련 메시지 리스트")
     @GetMapping("/{id}")
     public List<MessageResponse> channelMessageList(@PathVariable UUID id){
+        log.info("channel message list");
         return messageService.channelMessageReadAll(id);
     }
 
@@ -46,12 +52,14 @@ public class MessageRestController {
     @PutMapping(path = "/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public MessageResponse updateMessage(@PathVariable UUID id,
                                          @RequestBody MessageRequest request){
+        log.info("message update request : {}", request);
         return messageService.update(id, request);
     }
 
     @Operation(summary = "message delete", description = "메시지 삭제")
     @DeleteMapping("/{id}")
     public boolean deleteMessage(@PathVariable UUID id){
+        log.info("message delete request : {}", id);
         return messageService.delete(id);
     }
 }

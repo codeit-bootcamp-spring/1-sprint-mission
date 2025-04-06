@@ -6,8 +6,8 @@ import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.exception.ValidationException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -18,6 +18,8 @@ import com.sprint.mission.discodeit.validation.Impl.ValidatorImpl;
 import com.sprint.mission.discodeit.validation.Validator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +29,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-
+@Slf4j
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final Validator validator = new ValidatorImpl();
@@ -44,24 +46,23 @@ public class BasicUserService implements UserService {
     @Transactional
     @Override
     public UserResponse create(UserRequest request, MultipartFile file) throws IOException {
+        log.debug("유저 생성 시도");
 
         if(!validator.isValidEmail(request.email())){
-            System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
             throw new ValidationException("Invalid email format : " + request.email());
         }
 
         if(!validator.isValidPhoneNumber(request.phoneNumber())){
-            System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
             throw new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + request.phoneNumber());
         }
 
-//        User user = new User(request.username(), request.password(), request.email(), request.phoneNumber());
         User user = UserMapper.INSTANCE.toEntity(request);
         userRepository.save(user);
-//        userRepository.flush();
+        log.info("유저 등록 성공 - username: {}, id: {}", request.username(), user.getId());
 
         BinaryContent profileImage = null;
         if(file != null && !file.isEmpty()){
+            log.debug("유저 프로필 이미지 등록 시도 - username: {}, file: {}", request.username(), file);
             profileImage = new BinaryContent(user.getId(), file.getOriginalFilename(), file.getSize(), file.getContentType());
             //, file.getBytes()
 
@@ -69,29 +70,44 @@ public class BasicUserService implements UserService {
             user.setProfileImageId(profileImage.getId());
 
             binaryContentStorage.put(profileImage.getId(), file.getBytes());
+            log.info("유저 프로필 이미지 등록 완료 - username: {}, id: {}", request.username(), profileImage.getId());
         }
 
+        log.debug("읽음 상태 생성 시도");
         UserStatus userStatus = new UserStatus(user.getId());
         userStatusRepository.save(userStatus);
+        log.info("읽은 상태 생성 성공 - userStatus: {}", userStatus);
 
+        log.info("유저 등록 완료 - username: {}, id: {}, profileImageId: {}", request.username(), user.getId(), user.getProfileImageId());
         return UserMapper.INSTANCE.toDto(user, userStatus);
     }
 
     @Override
     public UserResponse readOne(UUID id) {
+        log.debug("유저 단건 조회 : id : {} ", id);
+
         try {
             User user = userRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다." + id));
+                    .orElseThrow(() -> {
+                        log.warn("유저 단건 조회 실패 - 저장되지 않았거나, 삭제된 id : {}", id);
+                        return new UserNotFoundException(id);
+                    });
 
+            log.info("유저 단건 조회 완료 - id : {} ", id);
             return UserMapper.INSTANCE.toDto(user, userStatusRepository.findByUserid(user.getId()));
         } catch (NullPointerException e){
-            throw new NullPointerException("ID를 찾을 수 없습니다." + e.getMessage());
+            throw new UserNotFoundException(id);
+            // log.warn("유저 단건 조회 실패- id 를 찾을 수 없음 : {} ", id);
+            // throw new NullPointerException("ID를 찾을 수 없습니다." + e.getMessage());
         }
     }
 
     @Override
     public List<UserResponse> readAll() {
+        log.debug("유저 전체 조회 시도");
+
         List<User> users = userRepository.findAll();
+        log.info("조회된 유저 개수 : {}", users.size());
 
         List<UserResponse> responses = users.stream().map(user -> {
                     try {
@@ -101,26 +117,29 @@ public class BasicUserService implements UserService {
                     }
                 })
                 .collect(Collectors.toList());
+
+        log.info("유저 조회 완료 - 총 {}개", responses.size());
         return responses;
     }
 
     @Override
     public UserResponse update(UUID id, UserRequest updatedUserReq) {
+        log.debug("유저 수정 요청 - id: {}, updateUser: {}", id, updatedUserReq);
+
         try {
             if(!validator.isValidEmail(updatedUserReq.email())){
-                System.out.println(updatedUserReq.username() + "님의 사용자 수정이 완료되지 않았습니다.");
-                System.out.println(new ValidationException("Invalid email format : " + updatedUserReq.email()));
-                return null;
+                throw new ValidationException("Invalid email format : " + updatedUserReq.email());
             }
 
             if(!validator.isValidPhoneNumber(updatedUserReq.phoneNumber())){
-                System.out.println(updatedUserReq.username() + "님의 사용자 수정이 완료되지 않았습니다.");
-                System.out.println(new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + updatedUserReq.phoneNumber()));
-                return null;
+                throw new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + updatedUserReq.phoneNumber());
             }
 
             User user = userRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다." + id));
+                    .orElseThrow(() -> {
+                        log.warn("유저 조회 실패 - 저장되지 않았거나, 삭제된 ID : {}", id);
+                        return new UserNotFoundException(id);
+                    });
 
             user.setUsername(updatedUserReq.username());
             user.setPassword(updatedUserReq.password());
@@ -129,21 +148,25 @@ public class BasicUserService implements UserService {
 
             userRepository.save(user);
 
-            System.out.println("업데이트가 완료되었습니다.");
+            log.info("유저 수정 성공 - id: {}", id);
             return UserMapper.INSTANCE.toDto(user, userStatusRepository.findByUserid(id));
 
-        } catch (ResourceNotFoundException e){
-            throw new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디 입니다." + id);
+        } catch (UserNotFoundException e){
+            throw new UserNotFoundException(id);
         }
     }
 
     @Override
     public boolean delete(UUID id) {
+        log.debug("유저 삭제 요청 - id: {}", id);
+
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("해당 ID의 사용자가 존재하지 않습니다 : " + id);
+            log.warn("유저 삭제 실패 - 없거나 삭제된 ID : {}", id);
+            throw new UserNotFoundException(id);
         }
 
         userRepository.deleteById(id);
+        log.info("유저 삭제 완료 - id: {}", id);
         return true;
     }
 }

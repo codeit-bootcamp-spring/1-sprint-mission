@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.exception;
 
-public class ValidationException extends BaseException{
-    private static final String ERROR_MESSAGE = "VALIDATION_ERROR";
+import java.util.Map;
 
-    public ValidationException(String message) {
-        super(message, ERROR_MESSAGE);
+public class ValidationException extends DiscodeitException {
+
+    public ValidationException(String requset) {
+        super(ErrorCode.VALIDATION_ERROR, Map.of("requset", requset));
     }
 }

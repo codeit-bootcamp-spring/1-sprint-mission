@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/files")
@@ -24,9 +27,11 @@ public class BinaryContentRestController {
     @GetMapping("/download/{id}")
     public ResponseEntity downloadProfileImage(@PathVariable UUID id) {
         //<byte[]>
+        log.info("downloadProfileImage id : {}", id);
         BinaryContent profileImage = binaryContentService.findById(id);
 
         if (profileImage == null || profileImage.getContentType() == null) {
+            log.info("profileImage is null");
             return ResponseEntity.notFound().build();
         }
 
