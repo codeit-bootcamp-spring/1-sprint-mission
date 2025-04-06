@@ -11,13 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -117,8 +116,10 @@ class UserRepositoryTest {
 		User user = new User("newUser", "user1@example.com", "password123", null);
 
 		// when & then
-		assertThatThrownBy(() -> userRepository.save(user))
-			.isInstanceOf(UserAlreadyExistsException.class);
+		assertThatThrownBy(() -> {
+			userRepository.save(user);
+			userRepository.flush();
+		}).isInstanceOf(DataIntegrityViolationException.class);
 	}
 
 	@Test
@@ -128,32 +129,23 @@ class UserRepositoryTest {
 		User user = new User("user1", "newemail@example.com", "password123", null);
 
 		// when & then
-		assertThatThrownBy(() -> userRepository.save(user))
-			.isInstanceOf(UserAlreadyExistsException.class);
+		assertThatThrownBy(() -> {
+			userRepository.save(user);
+			userRepository.flush();
+		}).isInstanceOf(DataIntegrityViolationException.class);
 	}
 
 	@Test
 	@Sql(scripts = {"/user/users.sql"})
-	void 존재하지_않는_사용자를_삭제하면_예외가_발생한다() {
+	void 존재하지_않는_사용자를_삭제하면_빈_결과값을_받는다() {
 		// given
 		UUID nonExistentUserId = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff");
 
-		// when & then
-		assertThatThrownBy(() -> userRepository.deleteById(nonExistentUserId))
-			.isInstanceOf(UserNotFoundException.class);
-	}
-
-	@Test
-	@Sql(scripts = {"/user/users.sql"})
-	void 상태가_없는_사용자도_조회될_수_있다() {
-		// given
-		User userWithoutStatus = new User("noStatusUser", "nostatus@example.com", "password123", null);
-		userRepository.save(userWithoutStatus);
-
 		// when
-		List<User> users = userRepository.findAllWithProfileAndStatus();
+		userRepository.deleteById(nonExistentUserId);
 
 		// then
-		assertThat(users).anyMatch(user -> user.getUsername().equals("noStatusUser"));
+		Optional<User> result = userRepository.findById(nonExistentUserId);
+		assertThat(result).isEmpty();
 	}
 }

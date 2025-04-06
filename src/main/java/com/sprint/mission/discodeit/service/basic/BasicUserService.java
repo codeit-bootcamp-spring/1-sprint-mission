@@ -139,7 +139,7 @@ public class BasicUserService implements UserService {
 	public void delete(UUID userId) {
 		log.info("Deleting user: id={}", userId);
 
-		if (userRepository.existsById(userId)) {
+		if (!userRepository.existsById(userId)) {
 			log.warn("User deletion failed: id={} not found", userId);
 			throw new UserNotFoundException(Map.of("userId", userId));
 		}
