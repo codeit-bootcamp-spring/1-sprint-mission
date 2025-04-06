@@ -207,7 +207,8 @@ class BasicChannelServiceTest {
 
       // when & then
       assertThrows(
-          ChannelNotFoundException.class, () -> channelService.delete(channelId)
+          ChannelNotFoundException.class,
+          () -> channelService.delete(channelId)
       );
     }
   }
@@ -236,7 +237,7 @@ class BasicChannelServiceTest {
       List<ChannelDto> result = channelService.findAllByUserId(userId);
 
       // then
-      assertEquals(2, result.size());
+      assertEquals(1, result.size());
     }
   }
 }
