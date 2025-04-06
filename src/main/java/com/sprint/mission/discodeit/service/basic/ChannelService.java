@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Channel.Type;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
@@ -39,7 +39,7 @@ public class ChannelService {
 
     String name = request.name();
     String description = request.description();
-    Channel channel = new Channel(ChannelType.PUBLIC, name, description);
+    Channel channel = new Channel(Type.PUBLIC, name, description);
 
     channelRepository.save(channel);
     log.info("공개 채널 생성 완료 - channelId: {}, name: {}", channel.getId(), request.name());
@@ -50,7 +50,7 @@ public class ChannelService {
   @Transactional
   public ChannelDto create(PrivateChannelCreateRequest request) {
     log.debug("비공개 채널 생성 서비스 진입 - participantIds: {}", request.participantIds());
-    Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+    Channel channel = new Channel(Type.PRIVATE, null, null);
     channelRepository.save(channel);
 
     List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
@@ -78,7 +78,7 @@ public class ChannelService {
         .map(Channel::getId)
         .toList();
 
-    return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
+    return channelRepository.findAllByTypeOrIdIn(Type.PUBLIC, mySubscribedChannelIds)
         .stream()
         .map(channelMapper::toDto)
         .toList();
@@ -97,7 +97,7 @@ public class ChannelService {
               log.warn("업데이트 실패 - 존재하지 않는 채널 - channelId: {}", channelId);
               throw new ChannelNotFoundException(channelId);
             });
-    if (channel.getType().equals(ChannelType.PRIVATE)) {
+    if (channel.getType().equals(Type.PRIVATE)) {
       log.warn("업데이트 실패 - 비공개 채널 업데이트 시도 - channelId: {}", channelId);
       throw new PrivateChannelUpdateException(channelId);
     }
