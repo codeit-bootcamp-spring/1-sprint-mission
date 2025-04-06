@@ -229,22 +229,7 @@
       <recent name="com.sprint.mission.dto.mappedDto" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.UserServiceTest.duplicateTest">
-    <configuration name="UserJpaTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.mock.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.mock" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.mock.UserJpaTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.UserServiceTest">
     <configuration name="UserJpaTest.saveTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
@@ -257,6 +242,21 @@
       <option name="MAIN_CLASS_NAME" value="com.sprint.mission.mock.UserJpaTest" />
       <option name="METHOD_NAME" value="saveTest" />
       <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.unit.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -318,11 +318,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UserServiceTest" />
         <item itemvalue="JUnit.UserServiceTest.duplicateTest" />
         <item itemvalue="JUnit.UserServiceTest.isDuplicateName" />
         <item itemvalue="JUnit.UserServiceTest.isDuplicateEmail" />
         <item itemvalue="JUnit.UserJpaTest.saveTest" />
-        <item itemvalue="JUnit.UserJpaTest" />
       </list>
     </recent_temporary>
   </component>
