@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -23,12 +23,14 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class BasicMessageService implements MessageService {
 
@@ -45,8 +47,9 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-    UUID channelId = messageCreateRequest.getChannelId();
-    UUID authorId = messageCreateRequest.getAuthorId();
+    log.debug("Create Message : {}", messageCreateRequest);
+    UUID channelId = messageCreateRequest.channelId();
+    UUID authorId = messageCreateRequest.authorId();
 
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
@@ -70,7 +73,7 @@ public class BasicMessageService implements MessageService {
         })
         .toList();
 
-    String content = messageCreateRequest.getContent();
+    String content = messageCreateRequest.content();
     Message message = new Message(
         content,
         channel,
@@ -85,6 +88,7 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   @Override
   public MessageDto find(UUID messageId) {
+    log.debug("find One Message : {} ", messageId);
     return messageRepository.findById(messageId)
         .map(messageMapper::toDto)
         .orElseThrow(
@@ -103,7 +107,7 @@ public class BasicMessageService implements MessageService {
     Instant nextCursor = null;
     if (!slice.getContent().isEmpty()) {
       nextCursor = slice.getContent().get(slice.getContent().size() - 1)
-          .getCreatedAt();
+          .createdAt();
     }
 
     return pageResponseMapper.fromSlice(slice, nextCursor);
@@ -112,7 +116,8 @@ public class BasicMessageService implements MessageService {
   @Transactional
   @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
-    String newContent = request.getNewContent();
+    log.debug("Update Message : {} ", request);
+    String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
@@ -123,6 +128,7 @@ public class BasicMessageService implements MessageService {
   @Transactional
   @Override
   public void delete(UUID messageId) {
+    log.debug("Delete Message : {} ", messageId);
     if (!messageRepository.existsById(messageId)) {
       throw new NoSuchElementException("Message with id " + messageId + " not found");
     }

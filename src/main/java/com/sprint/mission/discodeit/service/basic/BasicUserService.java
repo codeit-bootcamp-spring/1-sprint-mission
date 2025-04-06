@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
@@ -19,14 +19,17 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
@@ -35,8 +38,9 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    String username = userCreateRequest.getUsername();
-    String email = userCreateRequest.getEmail();
+    log.debug("create User :{} ", userCreateRequest);
+    String username = userCreateRequest.username();
+    String email = userCreateRequest.email();
 
     if (userRepository.existsByEmail(email)) {
       throw new IllegalArgumentException("User with email " + email + " already exists");
@@ -57,7 +61,7 @@ public class BasicUserService implements UserService {
           return binaryContent;
         })
         .orElse(null);
-    String password = userCreateRequest.getPassword();
+    String password = userCreateRequest.password();
 
     User user = new User(username, email, password, nullableProfile);
     Instant now = Instant.now();
@@ -69,6 +73,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserDto find(UUID userId) {
+    log.debug("Find one User : {}", userId);
     return userRepository.findById(userId)
         .map(userMapper::toDto)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
@@ -76,6 +81,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public List<UserDto> findAll() {
+    log.debug("Find All User : {}", userMapper);
     return userRepository.findAllWithProfileAndStatus()
         .stream()
         .map(userMapper::toDto)
@@ -86,11 +92,12 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    log.debug("Update User : {} ", userUpdateRequest);
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    String newUsername = userUpdateRequest.getNewUsername();
-    String newEmail = userUpdateRequest.getNewEmail();
+    String newUsername = userUpdateRequest.newUsername();
+    String newEmail = userUpdateRequest.newEmail();
     if (userRepository.existsByEmail(newEmail)) {
       throw new IllegalArgumentException("User with email " + newEmail + " already exists");
     }
@@ -112,7 +119,7 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    String newPassword = userUpdateRequest.getNewPassword();
+    String newPassword = userUpdateRequest.newPassword();
     user.update(newUsername, newEmail, newPassword, nullableProfile);
 
     return userMapper.toDto(user);
@@ -121,7 +128,8 @@ public class BasicUserService implements UserService {
   @Transactional
   @Override
   public void delete(UUID userId) {
-    if (userRepository.existsById(userId)) {
+    log.debug("Delete User : {}", userId);
+    if (!userRepository.existsById(userId)) {
       throw new NoSuchElementException("User with id " + userId + " not found");
     }
 

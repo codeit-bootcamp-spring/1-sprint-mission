@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
 
-import com.sprint.mission.discodeit.dto.user.userStatus.UserStatusDto;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
