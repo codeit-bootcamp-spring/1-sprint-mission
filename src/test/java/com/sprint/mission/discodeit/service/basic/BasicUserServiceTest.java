@@ -55,7 +55,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 생성 성공")
-    void create_success() {
+    void create_user_success() {
       // given
       UserCreateRequest userRequest = new UserCreateRequest(
           "홍길동",
@@ -65,7 +65,7 @@ class BasicUserServiceTest {
 
       User savedUser = new User("홍길동", "hong@codeit.com", "hong1234", null);
       ReflectionTestUtils.setField(savedUser, "id", UUID.randomUUID());
-      when(userRepository.save(any(User.class))).thenReturn(savedUser);
+      given(userRepository.save(any(User.class))).willReturn(savedUser);
 
       UserDto userDto = new UserDto(savedUser.getId(), "홍길동", "hong@codeit.com", null, true);
       given(userMapper.toDto(savedUser)).willReturn(userDto);
@@ -80,7 +80,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 생성 실패 - username 중복")
-    void create_failure_when_duplicate_username() {
+    void create_user_failure_when_duplicate_username() {
       // given
       UserCreateRequest userRequest = new UserCreateRequest(
           "홍길동",
@@ -98,7 +98,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 생성 실패 - email 중복")
-    void create_failure_when_duplicate_email() {
+    void create_user_failure_when_duplicate_email() {
       // given
       UserCreateRequest userRequest = new UserCreateRequest(
           "홍길동",
@@ -121,7 +121,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 수정 성공")
-    void update_success() {
+    void update_user_success() {
       // given
       UUID userId = UUID.randomUUID();
 
@@ -149,7 +149,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 수정 실패 - user not found")
-    void update_failure_when_user_not_found() {
+    void update_user_failure_when_user_not_found() {
       // given
       UUID nonExistentUserId = UUID.randomUUID();
 
@@ -174,7 +174,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 삭제 성공")
-    void update_success() {
+    void delete_user_success() {
       // given
       UUID userId = UUID.randomUUID();
 
@@ -192,7 +192,7 @@ class BasicUserServiceTest {
 
     @Test
     @DisplayName("사용자 삭제 실패 - user not found")
-    void delete_failure_when_user_not_found() {
+    void delete_user_failure_when_user_not_found() {
       // given
       UUID nonExistentUserId = UUID.randomUUID();
       given(userRepository.existsById(nonExistentUserId)).willReturn(false);
