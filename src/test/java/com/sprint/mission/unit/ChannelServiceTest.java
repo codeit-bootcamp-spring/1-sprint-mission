@@ -3,6 +3,137 @@ package com.sprint.mission.unit;
 //create, update, delete 메소드
 //핵심 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.dto.ChannelMapper;
+import com.sprint.mission.dto.request.ChannelDtoForUpdate;
+import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
+import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.ChannelType;
+import com.sprint.mission.repository.ChannelRepository;
+import com.sprint.mission.service.ChannelService;
+import com.sprint.mission.service.jcf.serviceImpl.JCFChannelService;
+import com.sprint.mission.service.jcf.serviceImpl.ReadStatusService;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static com.sprint.mission.entity.main.ChannelType.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.*;
+
+@ExtendWith(MockitoExtension.class)
 public class ChannelServiceTest {
+
+
+    @Spy
+    private ChannelMapper channelMapper = Mappers.getMapper(ChannelMapper.class);
+
+    @Mock
+    private ReadStatusService readStatusService;
+    @Mock
+    private ChannelRepository channelRepository;
+
+    @InjectMocks
+    private JCFChannelService channelService;
+
+    @Test
+    @DisplayName("Private 채널 생성 성공")
+    void createPrivateChannelSuccess() {
+        // given
+        List<UUID> userIdList = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            userIdList.add(UUID.randomUUID());
+        }
+        PrivateChannelCreateDTO requestDTO = new PrivateChannelCreateDTO(userIdList);
+        when(channelRepository.save(any(Channel.class))).thenAnswer(invocation -> {
+                    Channel savedChannel = invocation.getArgument(0);
+                    setField(savedChannel, "id", UUID.randomUUID());
+                    setField(savedChannel, "createdAt", Instant.now());
+                    return savedChannel;
+                }
+        );
+
+        // when
+        Channel channel = channelService.createPrivateChannel(requestDTO);
+
+        // then
+        assertThat(channel).isNotNull();
+        assertThat(channel.getChannelType()).isEqualTo(PRIVATE);
+        assertThat(channel.getName()).isNull();
+        assertThat(channel.getDescription()).isNull();
+    }
+
+    @Test
+    @DisplayName("Private 채널 생성 실패 - ReadStatus 생성 실패하면 Private 채널 생성도 실패")
+    void createPrivateChannelFail() {
+        // given
+        List<UUID> userIdList = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            userIdList.add(UUID.randomUUID());
+        }
+        PrivateChannelCreateDTO requestDTO = new PrivateChannelCreateDTO(userIdList);
+        when(channelRepository.save(any(Channel.class))).thenAnswer(invocation -> {
+                    Channel savedChannel = invocation.getArgument(0);
+                    setField(savedChannel, "id", UUID.randomUUID());
+                    setField(savedChannel, "createdAt", Instant.now());
+                    return savedChannel;
+                }
+        );
+        when(readStatusService.create(any())).thenThrow(new RuntimeException("ReadStatus 생성 실패"));
+
+        // when
+        assertThatThrownBy(() -> channelService.createPrivateChannel(requestDTO))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("ReadStatus 생성 실패");
+    }
+
+    @Test
+    @DisplayName("업데이트 실패 - PRIVATE 채널은 수정할 수 없음")
+    void updatePrivateChannelFail() {
+        // given
+        ChannelDtoForUpdate requestDTO = new ChannelDtoForUpdate("새로운 이름", "새로운 설명");
+        Channel channel = new Channel("testChannel", "testChannelName", PRIVATE);
+        setField(channel, "id", UUID.randomUUID());
+        setField(channel, "createdAt", Instant.now());
+        when(channelRepository.findById(any(UUID.class))).thenReturn(Optional.of(channel));
+
+        // when, then
+        assertThatThrownBy(() -> channelService.update(channel.getId(), requestDTO))
+                .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    @DisplayName("업데이트 성공")
+    void updatePrivateChannelSuccess() {
+        // given
+        ChannelDtoForUpdate requestDTO = new ChannelDtoForUpdate("새로운 이름", "새로운 설명");
+        Channel channel = new Channel("testChannel", "testChannelName", PUBLIC);
+        setField(channel, "id", UUID.randomUUID());
+        setField(channel, "createdAt", Instant.now());
+        when(channelRepository.findById(any(UUID.class))).thenReturn(Optional.of(channel));
+
+        // when
+        Channel updatedChannel = channelService.update(channel.getId(), requestDTO);
+
+        // then
+        assertThat(updatedChannel).isNotNull();
+        assertThat(updatedChannel.getName()).isEqualTo(requestDTO.name());
+        assertThat(updatedChannel.getDescription()).isEqualTo(requestDTO.description());
+    }
+
 }

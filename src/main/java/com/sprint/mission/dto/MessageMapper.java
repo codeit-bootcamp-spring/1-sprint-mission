@@ -21,6 +21,9 @@ public interface MessageMapper {
     @Mapping(target = "online", expression = "java(user.getStatus() != null ? user.getStatus().isOnline() : null)")
     UserDto userToUserDto(User user);
 
+    @Mapping(target = "channel", source = "channel")
+    @Mapping(target = "author", source = "author")
+    @Mapping(target = "content", source = "content")
     Message toEntity(Channel channel, User author, String content);
 
     //Message update(MessageDtoForUpdate updateDto, @MappingTarget Message updatingMessage);

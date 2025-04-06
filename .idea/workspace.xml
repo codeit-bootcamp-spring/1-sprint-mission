@@ -5,7 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/util/MockFileFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/util/ReflectionFieldSetter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/MessageMapperImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/MessageMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/MessageMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/JCFMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/JCFMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/ChannelServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/ChannelServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/MessageServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/MessageServiceTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/UserServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/UserServiceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -94,6 +102,11 @@
     "JUnit.AssertJTest.exceptionTest.executor": "Run",
     "JUnit.AssertJTest.usingAssertJ.executor": "Run",
     "JUnit.ChannelCascadeTest.deleteChannel.executor": "Run",
+    "JUnit.ChannelServiceTest.createPrivateChannelFail.executor": "Run",
+    "JUnit.ChannelServiceTest.createPrivateChannelSuccess.executor": "Run",
+    "JUnit.ChannelServiceTest.executor": "Run",
+    "JUnit.ChannelServiceTest.updatePrivateChannelFail.executor": "Run",
+    "JUnit.ChannelServiceTest.updatePrivateChannelSuccess.executor": "Run",
     "JUnit.ChannelTest.createChannelService.executor": "Run",
     "JUnit.ChannelTest.createPrivateService.executor": "Run",
     "JUnit.ChannelTest.createPublicService.executor": "Run",
@@ -101,6 +114,7 @@
     "JUnit.MapperTest.channelTypeTest.executor": "Run",
     "JUnit.MapperTest.privateChannelTypeTest.executor": "Run",
     "JUnit.MessageCascadeTest.cascade.executor": "Run",
+    "JUnit.MessageServiceTest.createSuccess.executor": "Run",
     "JUnit.MessageTest.createMessage.executor": "Run",
     "JUnit.MessageTest.setting.executor": "Run",
     "JUnit.MessageTest.updateMessage.executor": "Run",
@@ -197,8 +211,8 @@
       <recent name="com.sprint.mission.dto.mappedDto" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.UserServiceTest">
-    <configuration name="UserServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.MessageServiceTest.createSuccess">
+    <configuration name="ChannelServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
@@ -207,13 +221,13 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.ChannelServiceTest" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserServiceTest.delete" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ChannelServiceTest.createPrivateChannelFail" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
@@ -222,14 +236,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
-      <option name="METHOD_NAME" value="delete" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.ChannelServiceTest" />
+      <option name="METHOD_NAME" value="createPrivateChannelFail" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserServiceTest.duplicateTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ChannelServiceTest.updatePrivateChannelFail" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
@@ -238,14 +252,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
-      <option name="METHOD_NAME" value="duplicateTest" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.ChannelServiceTest" />
+      <option name="METHOD_NAME" value="updatePrivateChannelFail" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserServiceTest.isDuplicateEmail" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ChannelServiceTest.updatePrivateChannelSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
@@ -254,14 +268,14 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
-      <option name="METHOD_NAME" value="isDuplicateEmail" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.ChannelServiceTest" />
+      <option name="METHOD_NAME" value="updatePrivateChannelSuccess" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserServiceTest.isDuplicateName" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MessageServiceTest.createSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
@@ -270,8 +284,8 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="com.sprint.mission.unit" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.UserServiceTest" />
-      <option name="METHOD_NAME" value="isDuplicateName" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.MessageServiceTest" />
+      <option name="METHOD_NAME" value="createSuccess" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -286,11 +300,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.UserServiceTest" />
-        <item itemvalue="JUnit.UserServiceTest.delete" />
-        <item itemvalue="JUnit.UserServiceTest.duplicateTest" />
-        <item itemvalue="JUnit.UserServiceTest.isDuplicateName" />
-        <item itemvalue="JUnit.UserServiceTest.isDuplicateEmail" />
+        <item itemvalue="JUnit.MessageServiceTest.createSuccess" />
+        <item itemvalue="JUnit.ChannelServiceTest" />
+        <item itemvalue="JUnit.ChannelServiceTest.updatePrivateChannelSuccess" />
+        <item itemvalue="JUnit.ChannelServiceTest.updatePrivateChannelFail" />
+        <item itemvalue="JUnit.ChannelServiceTest.createPrivateChannelFail" />
       </list>
     </recent_temporary>
   </component>
@@ -402,7 +416,7 @@
       <workItem from="1743161059167" duration="590000" />
       <workItem from="1743174612793" duration="4000" />
       <workItem from="1743908908900" duration="346000" />
-      <workItem from="1743916978619" duration="1086000" />
+      <workItem from="1743916978619" duration="5434000" />
     </task>
     <servers />
   </component>
@@ -419,6 +433,13 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="com.sprint.mission.service.BinaryService$MockitoMock$EQQIpFil" memberName="mockitoInterceptor" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
