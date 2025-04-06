@@ -1,15 +1,14 @@
 package com.sprint.mission.discodeit.exception.user;
 
-import lombok.Getter;
-import org.springframework.http.HttpStatus;
+import java.time.Instant;
+import java.util.Map;
 
-public class UserException extends RuntimeException {
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 
-  @Getter
-  private final HttpStatus status;
+public class UserException extends DiscodeitException {
 
-  public UserException(String message, HttpStatus status) {
-    super(message);
-    this.status = status;
-  }
+	public UserException(String message, ErrorCode errorCode, Map<String, Object> details) {
+		super(message, errorCode, details);
+	}
 }

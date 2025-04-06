@@ -1,64 +1,59 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.user.UserNullOrEmptyArgumentException;
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Entity
+@Table(name = "users")
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class User implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
+public class User extends BaseUpdatableEntity {
 
-    @Serial
-    private static final long serialVersionUID = 7537036279213702953L;
+  @Column(length = 50, nullable = false, unique = true)
+  private String username;
+  @Column(length = 100, nullable = false, unique = true)
+  private String email;
+  @Column(length = 60, nullable = false)
+  private String password;
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
+  private BinaryContent profile;
+  @JsonManagedReference
+  @Setter(AccessLevel.PROTECTED)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final Instant updatedAt;
-    //
-    private final String username;
-    private final String email;
-    private final String password;
-    private final UUID profileId;   // BinaryContent
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
+  }
 
-    public static User createUser(String username, String email, String password, UUID profileId) {
-        return new User(UUID.randomUUID(), Instant.now(), null, username, email, password,
-            profileId);
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent newProfile) {
+    if (newUsername != null && !newUsername.equals(this.username)) {
+      this.username = newUsername;
     }
-
-    public User update(String username, String email, String password, UUID profileId) {
-        if (username == null || username.isBlank()) {
-            throw new UserNullOrEmptyArgumentException("User username cannot be null or empty");
-        }
-        if (email == null || email.isBlank()) {
-            throw new UserNullOrEmptyArgumentException("User email cannot be null or empty");
-        }
-        if (password == null || password.isBlank()) {
-            throw new UserNullOrEmptyArgumentException("User password cannot be null or empty");
-        }
-        if (profileId == null) {
-            throw new UserNullOrEmptyArgumentException("User profileId cannot be null or empty");
-        }
-
-        if (username.equals(this.username) &&
-            email.equals(this.email) &&
-            password.equals(this.password) &&
-            profileId.equals(this.profileId)) {
-            return this;
-        }
-
-        return new User(
-            this.id,
-            this.createdAt,
-            Instant.now(),
-            username,
-            email,
-            password,
-            profileId
-        );
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
     }
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
+    }
+    if (newProfile != null) {
+      this.profile = newProfile;
+    }
+  }
 }

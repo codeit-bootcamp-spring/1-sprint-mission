@@ -1,10 +1,15 @@
 package com.sprint.mission.discodeit.exception.channel;
 
-import org.springframework.http.HttpStatus;
+import static com.sprint.mission.discodeit.exception.ErrorCode.*;
+
+import java.time.Instant;
+import java.util.Map;
+
+import com.sprint.mission.discodeit.exception.ErrorCode;
 
 public class ChannelNotFoundException extends ChannelException {
 
-  public ChannelNotFoundException(String message) {
-    super(message, HttpStatus.NOT_FOUND);
-  }
+	public ChannelNotFoundException(String message, Instant timestamp, Map<String, Object> details) {
+		super(message, CHANNEL_NOT_FOUND, details);
+	}
 }

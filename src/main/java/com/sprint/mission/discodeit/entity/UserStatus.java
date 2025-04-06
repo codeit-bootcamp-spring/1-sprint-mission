@@ -1,55 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.user.UserStatusNullOrEmptyArgumentException;
-import java.io.Serial;
-import lombok.AccessLevel;
-import lombok.Getter;
-
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserStatus implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    @Serial
-    private static final long serialVersionUID = -4277133296957649622L;
+  @JsonBackReference
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant lastActiveAt;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final Instant updatedAt;
-    //
-    private final UUID userId;
-    private final Instant lastActiveAt;
+  public UserStatus(User user, Instant lastActiveAt) {
+    setUser(user);
+    this.lastActiveAt = lastActiveAt;
+  }
 
-    public static UserStatus createUserStatus(UUID userId, Instant lastActiveAt) {
-        return new UserStatus(UUID.randomUUID(), Instant.now(), null, userId, lastActiveAt);
+  public void update(Instant lastActiveAt) {
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
     }
+  }
 
-    public UserStatus update(Instant lastActiveAt) {
-        if (lastActiveAt == null) {
-            throw new UserStatusNullOrEmptyArgumentException("UserStatus lastActiveAt cannot be null");
-        }
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 
-        if (lastActiveAt.equals(this.lastActiveAt)) {
-            return this;
-        }
-
-        return new UserStatus(
-            this.id,
-            this.createdAt,
-            Instant.now(),
-            this.userId,
-            lastActiveAt
-        );
-    }
-
-    public Boolean isOnline() {
-        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
-
-        return lastActiveAt.isAfter(instantFiveMinutesAgo);
-    }
+  protected void setUser(User user) {
+    this.user = user;
+    user.setStatus(this);
+  }
 }

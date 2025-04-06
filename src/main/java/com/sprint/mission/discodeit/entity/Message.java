@@ -1,55 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.message.MessageNullOrEmptyArgumentException;
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
+@Entity
+@Table(name = "messages")
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class Message implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Message extends BaseUpdatableEntity {
 
-    @Serial
-    private static final long serialVersionUID = 5909559788184597939L;
+  @Column(columnDefinition = "text", nullable = false)
+  private String content;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
+  private Channel channel;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", columnDefinition = "uuid")
+  private User author;
+  @BatchSize(size = 100)
+  @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachments = new ArrayList<>();
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final Instant updatedAt;
-    //
-    private final String content;
-    //
-    private final UUID channelId;
-    private final UUID authorId;
-    private final List<UUID> attachmentIds;
+  public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
+    this.channel = channel;
+    this.content = content;
+    this.author = author;
+    this.attachments = attachments;
+  }
 
-    public static Message createMessage(String content, UUID channelId, UUID authorId,
-        List<UUID> attachmentIds) {
-        return new Message(UUID.randomUUID(), Instant.now(), null, content, channelId, authorId,
-            attachmentIds);
+  public void update(String newContent) {
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
     }
-
-    public Message update(String content) {
-        if (content == null || content.isBlank()) {
-            throw new MessageNullOrEmptyArgumentException("Message content cannot be null or empty");
-        }
-
-        if (content.equals(this.content)) {
-            return this;
-        }
-
-        return new Message(
-            this.id,
-            this.createdAt,
-            Instant.now(),
-            content,
-            this.channelId,
-            this.authorId,
-            this.attachmentIds
-        );
-    }
+  }
 }

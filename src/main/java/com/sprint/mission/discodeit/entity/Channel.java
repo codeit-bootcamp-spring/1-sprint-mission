@@ -1,53 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.channel.ChannelNullOrEmptyArgumentException;
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "channels")
 @Getter
-@RequiredArgsConstructor
-public class Channel implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
-    @Serial
-    private static final long serialVersionUID = 5914585350032631538L;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(length = 100)
+  private String name;
+  @Column(length = 500)
+  private String description;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final Instant updatedAt;
-    //
-    private final ChannelType type;
-    private final String name;
-    private final String description;
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 
-    public static Channel createChannel(ChannelType type, String name, String description) {
-        return new Channel(UUID.randomUUID(), Instant.now(), null, type, name, description);
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    public Channel update(String name, String description) {
-        if (name == null || name.isBlank()) {
-            throw new ChannelNullOrEmptyArgumentException("Channel name cannot be null or empty");
-        }
-
-        if (description == null || description.isBlank()) {
-            throw new ChannelNullOrEmptyArgumentException(
-                "Channel description cannot be null or empty");
-        }
-
-        if (name.equals(this.name) && description.equals(this.description)) {
-            return this;
-        }
-
-        return new Channel(
-            this.id,
-            this.createdAt,
-            Instant.now(),
-            this.type,
-            name,
-            description
-        );
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
+  }
 }
