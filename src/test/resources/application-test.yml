@@ -4,4 +4,4 @@ spring:
       mode: never
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create

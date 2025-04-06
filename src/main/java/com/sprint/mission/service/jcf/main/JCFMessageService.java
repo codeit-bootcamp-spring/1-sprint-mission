@@ -19,7 +19,7 @@ import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.jcf.addOn.BinaryService;
+import com.sprint.mission.service.jcf.addOn.BinaryServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-    private final BinaryService binaryService;
+    private final BinaryServiceImpl binaryService;
     private final BinaryContentStorage binaryContentStorage;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;

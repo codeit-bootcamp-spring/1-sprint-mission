@@ -13,7 +13,7 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.UserDtoForCreate;
-import com.sprint.mission.service.jcf.addOn.BinaryService;
+import com.sprint.mission.service.jcf.addOn.BinaryServiceImpl;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,21 +31,15 @@ public class JCFUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
-    private final BinaryService profileService;
+    private final BinaryServiceImpl profileService;
     private final UserMapper userMapper;
     private final BinaryContentMapper binaryContentMapper;
+    private final UserServiceSupporter userServiceSupporter;
 
     @Override
     public User create(UserDtoForCreate requestDTO, MultipartFile profile) {
-        isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
-
-        // 선택적 프로필 생성
-        Optional<BinaryContentDtoForCreate> profileDto = binaryContentMapper.convertFileToBinaryContentDto(profile);
-        User createdUser = profileDto.map((binaryDto) -> {
-            BinaryContent createdBinaryContent = profileService.create(binaryDto);
-            return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
-        }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
-        log.info("Create user의 profile : {}", createdUser.getProfile());
+        userServiceSupporter.isDuplicateNameEmail(findAll(), requestDTO.username(), requestDTO.email());
+        User createdUser = userServiceSupporter.createUser(requestDTO, profile);
         User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
         UserStatus userStatus = userStatusService.create(savedUser);
         return savedUser.assignStatus(userStatus);
@@ -54,12 +48,11 @@ public class JCFUserService implements UserService {
 
     @Override
     public User update(UUID userId, UserDtoForUpdate requestDTO) {
-        isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
+        userServiceSupporter.isDuplicateNameEmail(findAll(), requestDTO.username(), requestDTO.email());
         User updatingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
         return updatingUser.update(requestDTO.username(), requestDTO.password(), requestDTO.email());
-        //return userMapper.update(requestDTO, updatingUser);
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
@@ -84,42 +77,5 @@ public class JCFUserService implements UserService {
         User deletingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
         userRepository.delete(deletingUser);
-    }
-    //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
-    @Override
-    public void isDuplicateNameEmail(String username, String email) {
-        List<User> allUser = userRepository.findAll();
-
-        boolean isDuplicateName = allUser.stream()
-                .anyMatch(usr -> username.equals(usr.getUsername()));
-
-        if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
-
-        boolean isDuplicateEmail = allUser.stream()
-                .anyMatch(usr -> email.equals(usr.getEmail()));
-
-        if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
-//
-//        Future<?> isDuplicateNameF = ves.submit(() -> {
-//            boolean isDuplicateName = allUser.stream()
-//                    .anyMatch(user -> username.equals(user.getUsername()));
-//            if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
-//        });
-//
-//        Future<?> isDuplicateEmailF = ves.submit(() -> {
-//            boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));
-//            if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
-//        });
-//
-//        try {
-//            isDuplicateNameF.get();
-//            isDuplicateEmailF.get();
-//        } catch (ExecutionException e) {
-//            throw e.getCause() instanceof CustomException
-//                    ? (CustomException) e.getCause()
-//                    : new RuntimeException(e);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 }

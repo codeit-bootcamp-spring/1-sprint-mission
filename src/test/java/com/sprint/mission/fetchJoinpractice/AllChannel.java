@@ -1,4 +1,4 @@
-package com.sprint.mission.fetchJoin;
+package com.sprint.mission.fetchJoinpractice;
 
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.Channel;

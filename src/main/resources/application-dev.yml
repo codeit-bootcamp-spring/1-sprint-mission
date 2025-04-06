@@ -9,6 +9,8 @@ spring:
   threads:
     virtual:
       enabled: true
+---
+spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -53,6 +55,7 @@ decorator:
 
 logging:
   level:
-    org.hibernate.sql : DEBUG
+    org.hibernate.sql : debug
+
 #    org.hibernate.type.descriptor.sql : TRACE
 

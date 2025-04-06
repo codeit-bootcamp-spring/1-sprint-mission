@@ -61,6 +61,7 @@ dependencies {
 
 	// 테스트 코드에서도 MapStruct를 사용할 경우 추가
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
+	testImplementation "org.mockito:mockito-core:5.16.1"  // Mockito 라이브러리
 	testImplementation 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mockito:mockito-core:5.16.1'
