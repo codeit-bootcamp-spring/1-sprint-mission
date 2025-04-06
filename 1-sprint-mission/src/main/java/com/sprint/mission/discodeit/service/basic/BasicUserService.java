@@ -115,7 +115,7 @@ public class BasicUserService implements UserService {
       log.warn("수정 중 중복 사용자명 감지: {}", request.newUsername());
       throw new DuplicateUsernameException(request.newUsername());
     }
-    BinaryContent newProfile = user.getProfile();
+
     if (profileRequest.isPresent()) {
       log.debug("프로필 이미지 업데이트 감지 - 기존 이미지 삭제 후 새로 설정");
       profileRequest.ifPresent(binaryContentCreateRequest -> {
@@ -127,8 +127,9 @@ public class BasicUserService implements UserService {
     }
 
     user.update(request.newUsername(), request.newEmail(), request.newPassword(),
-        newProfile);
-    return userMapper.toDto(user);
+        user.getProfile());
+    User updateUser = userRepository.save(user);
+    return userMapper.toDto(updateUser);
   }
 
   @Transactional
@@ -151,9 +152,9 @@ public class BasicUserService implements UserService {
   }
 
   private BinaryContent createProfile(BinaryContentCreateRequest profileRequest) {
-    log.debug("프로필 BinaryContent 생성 - fileName: {}", profileRequest.fileName());
+    UUID storageId = binaryContentStorage.put(null, profileRequest.bytes());
     return new BinaryContent(
-        UUID.randomUUID(),
+        storageId,
         profileRequest.fileName(),
         (long) profileRequest.bytes().length,
         profileRequest.contentType()
