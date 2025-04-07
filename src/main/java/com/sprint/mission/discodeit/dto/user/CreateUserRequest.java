@@ -1,8 +1,21 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public record CreateUserRequest(
+    @NotBlank(message = "이름을 입력해주세요.")
+    @Size(max = 50, message = "최대 50자까지 입력할 수 있습니다. 일부 문자는 더 빨리 제한에 도달할 수 있어요.")
     String username,
+
+    @NotBlank(message = "이메일을 입력해주세요.")
+    @Email(message = "이메일 형식에 맞게 입력해주세요.")
+    @Size(max = 100, message = "최대 100자까지 입력할 수 있습니다.")
     String email,
+
+    @NotBlank(message = "비밀번호를 입력해주세요.")
+    @Size(max = 60, message = "최대 60자까지 입력할 수 있습니다. 일부 문자는 더 빨리 제한에 도달할 수 있어요.")
     String password
 ) {
   // record
