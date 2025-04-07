@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
-import com.sprint.mission.discodeit.dto.MessageRequest;
-import com.sprint.mission.discodeit.dto.MessageResponse;
+import com.sprint.mission.discodeit.dto.request.MessageRequest;
+import com.sprint.mission.discodeit.dto.response.MessageResponse;
 import com.sprint.mission.discodeit.global.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

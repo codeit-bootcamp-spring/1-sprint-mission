@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.docs;
 
-import com.sprint.mission.discodeit.dto.ChannelRequest;
-import com.sprint.mission.discodeit.dto.ChannelResponse;
+import com.sprint.mission.discodeit.dto.request.ChannelRequest;
+import com.sprint.mission.discodeit.dto.response.ChannelResponse;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

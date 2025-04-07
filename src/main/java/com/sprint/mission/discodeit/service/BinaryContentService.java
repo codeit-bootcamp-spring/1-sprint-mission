@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.BinaryContentResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,7 +10,7 @@ public interface BinaryContentService {
 
   BinaryContentResponse create(MultipartFile file);
 
-  BinaryContentResponse findByIdOrThrow(UUID id);
+  BinaryContentResponse findById(UUID id);
 
   List<BinaryContentResponse> findAllByIdIn(List<UUID> ids);
 

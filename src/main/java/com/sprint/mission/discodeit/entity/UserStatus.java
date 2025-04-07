@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.Getter;
 
@@ -20,8 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserStatus extends BaseUpdatableEntity {
 
-  @Transient
-  private final long ADDITIONAL_TIME_SECONDS = 60 * 5;
+  private static final long ADDITIONAL_TIME_SECONDS = 60 * 5;
 
   @OneToOne(cascade = CascadeType.REMOVE)
   @JoinColumn(name = "user_id", nullable = false)
@@ -44,7 +42,7 @@ public class UserStatus extends BaseUpdatableEntity {
   }
 
   public boolean isOnline() {
-    Instant ValidTime = this.lastActiveAt.plusSeconds(ADDITIONAL_TIME_SECONDS);
-    return ValidTime.compareTo(Instant.now()) > 0;
+    Instant validTime = this.lastActiveAt.plusSeconds(ADDITIONAL_TIME_SECONDS);
+    return validTime.compareTo(Instant.now()) > 0;
   }
 }

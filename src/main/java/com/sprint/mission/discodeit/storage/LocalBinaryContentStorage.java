@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.storage;
 
-import com.sprint.mission.discodeit.dto.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentOperationException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -39,8 +39,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       try {
         Files.createDirectories(root);
       } catch (IOException e) {
-        throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
-            "Failed to initialize local Binary content storage");
+        throw new BinaryContentOperationException(ErrorCode.BINARY_STORAGE_INIT_FAILED);
       }
     }
   }
@@ -52,7 +51,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     ) {
       fileOutputStream.write(bytes);
     } catch (IOException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to save binary content.");
+      throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
     }
     return id;
   }
@@ -60,34 +59,27 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Override
   public InputStream get(UUID id) {
     if (!Files.exists(root)) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
-          "Failed to read binary content: No binary content available to read.");
+      throw new BinaryContentOperationException(ErrorCode.BINARY_READ_FAILED);
     }
-    try (
-        InputStream fis = new FileInputStream(resolvePath(id).toFile());
-    ) {
-      return fis;
+    try {
+      return new FileInputStream(resolvePath(id).toFile());
     } catch (FileNotFoundException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
-          "Failed to create stream: File not found.");
-    } catch (IOException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR,
-          "Failed to create stream: The file may be corrupted.");
+      throw new BinaryContentOperationException(ErrorCode.STREAM_CREATION_FAILED);
     }
   }
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentResponse binaryContentResponse) {
+    //참고: "When using InputStreamResource, the underlying stream is closed automatically after the response is written."
     InputStream inputStream = get(binaryContentResponse.id());
     InputStreamResource resource = new InputStreamResource(inputStream);
 
+    log.info("Binary content download succeeded - id: {}", binaryContentResponse.id());
     return ResponseEntity.status(HttpStatus.OK)
         .header(
             HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\""
                 + binaryContentResponse.fileName() + "\"")
-//                + getExtension(binaryContentResponse.contentType()))
-//        .contentType(new MediaType(binaryContentResponse.contentType()))
         .contentType(MediaType.valueOf(binaryContentResponse.contentType()))
         .body(resource);
   }
@@ -96,10 +88,4 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     return root.resolve(uuid.toString());
   }
 
-  private String getExtension(String contentType) {
-    if (contentType == null || !contentType.contains("/")) {
-      return "";
-    }
-    return "." + contentType.substring(contentType.lastIndexOf("/") + 1);
-  }
 }

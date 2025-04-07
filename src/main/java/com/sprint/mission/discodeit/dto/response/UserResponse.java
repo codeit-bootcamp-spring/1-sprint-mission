@@ -1,12 +1,7 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.response;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import java.util.Optional;
-import lombok.AccessLevel;
 import lombok.Builder;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Builder

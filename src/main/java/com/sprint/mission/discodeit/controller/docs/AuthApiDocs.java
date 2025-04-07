@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
-import com.sprint.mission.discodeit.dto.UserRequest;
-import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.dto.request.UserRequest;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

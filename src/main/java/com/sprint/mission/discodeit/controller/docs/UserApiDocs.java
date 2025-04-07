@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
-import com.sprint.mission.discodeit.dto.UserRequest;
-import com.sprint.mission.discodeit.dto.UserResponse;
-import com.sprint.mission.discodeit.dto.UserStatusRequest;
-import com.sprint.mission.discodeit.dto.UserStatusResponse;
+import com.sprint.mission.discodeit.dto.request.UserRequest;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.request.UserStatusRequest;
+import com.sprint.mission.discodeit.dto.response.UserStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -30,7 +30,7 @@ public interface UserApiDocs {
       @ApiResponse(responseCode = "400", description = "유저 생성 실패")
   })
   ResponseEntity<CustomApiResponse<UserResponse>> createUser(
-      UserRequest userRequest,
+      UserRequest.Create userRequest,
       MultipartFile userProfileImage
   );
 
@@ -42,7 +42,7 @@ public interface UserApiDocs {
   })
   ResponseEntity<CustomApiResponse<UserResponse>> updateUser(
       UUID userId,
-      UserRequest userRequest,
+      UserRequest.Update userRequest,
       MultipartFile userProfileImage
   );
 

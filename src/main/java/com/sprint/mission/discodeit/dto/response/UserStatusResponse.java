@@ -1,9 +1,7 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.response;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.AccessLevel;
 import lombok.Builder;
 
 @Builder

@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.global.exception.binarycontent.FileConversionException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,15 +35,16 @@ public class BasicBinaryContentService implements BinaryContentService {
         file.getName(), file.getSize(), file.getContentType());
 
     BinaryContent newBinaryContent = binaryContentRepository.save(newFile);
+
     binaryContentStorage.put(newBinaryContent.getId(), convertToBytes(file));
-    log.info("Create User Profile : {}", newBinaryContent);
+
+    log.info("Save User Profile success - profileId: {}", newBinaryContent.getId());
     return binaryContentMapper.entityToDto(newBinaryContent);
   }
 
   @Override
-  public BinaryContentResponse findByIdOrThrow(UUID id) {
-    BinaryContent binaryContent = binaryContentRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(ErrorCode.BINARY_CONTENT_NOT_FOUND, "id :" + id));
+  public BinaryContentResponse findById(UUID id) {
+    BinaryContent binaryContent = findByIdOrThrow(id);
     return binaryContentMapper.entityToDto(binaryContent);
   }
 
@@ -54,8 +57,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public void deleteById(UUID id) {
-    binaryContentRepository.findById(id).orElseThrow(() ->
-        new RestApiException(ErrorCode.BINARY_CONTENT_NOT_FOUND, "id :" + id));
+    findByIdOrThrow(id);
     binaryContentRepository.deleteById(id);
   }
 
@@ -63,7 +65,12 @@ public class BasicBinaryContentService implements BinaryContentService {
     try {
       return imageFile.getBytes();
     } catch (IOException e) {
-      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "");
+      throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  private BinaryContent findByIdOrThrow(UUID id) {
+    return binaryContentRepository.findById(id).orElseThrow(() ->
+        new BinaryContentNotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND, Map.of("id", id)));
   }
 }
