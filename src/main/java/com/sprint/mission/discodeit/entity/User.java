@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -19,7 +22,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
 public class User extends BaseUpdatableEntity {
-
   @Column(length = 50, nullable = false, unique = true)
   private String username;
   @Column(length = 100, nullable = false, unique = true)
@@ -40,7 +42,6 @@ public class User extends BaseUpdatableEntity {
     this.password = password;
     this.profile = profile;
   }
-
   public void update(String newUsername, String newEmail, String newPassword,
       BinaryContent newProfile) {
     if (newUsername != null && !newUsername.equals(this.username)) {

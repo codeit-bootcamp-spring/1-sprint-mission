@@ -19,10 +19,23 @@ spring:
     #        default_batch_fetch_size: 100
     open-in-view: false
 
+  management:
+    endpoints:
+      web:
+        exposure:
+          include:
+            - "health"
+            - "info"
+            - "metrics"
+            - "loggers"
+    endpoint:
+      health:
+        show-details: "ALWAYS"
+
 
 logging:
   level:
-    org.hibernate.SQL: debug
+    org.hibernate.SQL: info
     org.hibernate.orm.jdbc.bind: trace
 
 discodeit:
