@@ -57,9 +57,9 @@ class UserServiceTest {
     String password = "password1";
     byte[] dummyBytes = "Hello, World!".getBytes();
 
-    testBinaryContent = new BinaryContent("test.txt", "text/plain", "/dummy/path", dummyBytes);
+    testBinaryContent = new BinaryContent("test.txt", "text/plain", "/dummy/path");
     testUser = new User(username, email, password);
-    testUser.updateProfileImage(testBinaryContent.getId());
+    testUser.setProfileImage(testBinaryContent);
 
     testRequest = new CreateUserRequest(username, email, password);
     testFileRequest = new CreateBinaryContentRequest("filename", ".jpg", dummyBytes);
@@ -70,7 +70,6 @@ class UserServiceTest {
   void testCreateUser() {
     // given
     when(userRepository.existsByUsername(testUser.getUsername())).thenReturn(false);
-    when(userRepository.existsByEmail(testUser.getEmail())).thenReturn(false);
     when(userRepository.save(any(User.class))).thenReturn(testUser);
     when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(testBinaryContent);
 
@@ -92,7 +91,6 @@ class UserServiceTest {
   void testCreateUserByDuplicateName() {
     // given
     when(userRepository.existsByUsername(testUser.getUsername())).thenReturn(true);
-    when(userRepository.existsByEmail(testUser.getEmail())).thenReturn(true);
 
     // when
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -111,10 +109,9 @@ class UserServiceTest {
 
     // when
     when(userRepository.existsByUsername(testUser.getUsername())).thenReturn(false);
-    when(userRepository.existsByEmail(testUser.getEmail())).thenReturn(false);
     when(userRepository.save(any(User.class))).thenReturn(testUser);
     when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(testBinaryContent);
-    when(userRepository.getUserById(testUser.getId())).thenReturn(testUser);
+    when(userRepository.findById(testUser.getId())).thenReturn(Optional.ofNullable(testUser));
 
     UserResponse savedUser = userService.createUser(testRequest, Optional.empty());
     Optional<UserResponse> result = userService.findUserById(savedUser.id());
@@ -132,10 +129,9 @@ class UserServiceTest {
 
     // when
     when(userRepository.existsByUsername(testUser.getUsername())).thenReturn(false);
-    when(userRepository.existsByEmail(testUser.getEmail())).thenReturn(false);
     when(userRepository.save(any(User.class))).thenReturn(testUser);
     when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(testBinaryContent);
-    when(userRepository.getUserById(testUser.getId())).thenReturn(testUser);
+    when(userRepository.findById(testUser.getId())).thenReturn(Optional.ofNullable(testUser));
 
     UserResponse savedUser = userService.createUser(testRequest, Optional.empty());
     Optional<UserResponse> result = userService.findUserById(savedUser.id());
@@ -162,10 +158,9 @@ class UserServiceTest {
 
     // when
     when(userRepository.existsByUsername(testUser.getUsername())).thenReturn(false);
-    when(userRepository.existsByEmail(testUser.getEmail())).thenReturn(false);
     when(userRepository.save(any(User.class))).thenReturn(testUser);
     when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(testBinaryContent);
-    when(userRepository.getUserById(testUser.getId())).thenReturn(testUser);
+    when(userRepository.findById(testUser.getId())).thenReturn(Optional.ofNullable(testUser));
 
     UserResponse savedUser = userService.createUser(testRequest, Optional.empty());
     Optional<UserResponse> result = userService.findUserById(savedUser.id());
@@ -181,7 +176,7 @@ class UserServiceTest {
     UUID nonExistingUserId = UUID.randomUUID();
 
     // when
-    when(userRepository.getUserById(nonExistingUserId)).thenReturn(null);
+    when(userRepository.findById(nonExistingUserId)).thenReturn(null);
     Optional<UserResponse> result = userService.findUserById(nonExistingUserId);
 
     // then

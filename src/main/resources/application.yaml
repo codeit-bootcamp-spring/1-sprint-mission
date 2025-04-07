@@ -30,4 +30,4 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: /path/to/storage/directory
+      root-path: .storage/directory
