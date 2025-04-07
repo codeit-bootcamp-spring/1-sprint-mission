@@ -66,18 +66,16 @@ public class UserServiceTest {
 	}
 
 	@Test
-	@Rollback(false)
-	public void givenInvalidUser_whenCreateUser_thenThrowException() {
-		User user = new User("johnDoe", "john@example.com", "password123", null);
-		userRepository.save(user);
-		userRepository.flush();
+	public void givenExistingUser_whenCreateUser_thenThrowException() {
+		// Given
 		UserCreateRequest request = new UserCreateRequest("johnDoe", "john@example.com", "password123");
-		Optional<BinaryContentCreateRequest> optionalProfile = Optional.empty();
+		given(userRepository.existsByEmail(request.email())).willReturn(true); // 수정된 부분
 
-		assertThrows(UserAlreadyExistException.class, () -> {
-			userService.create(request, optionalProfile);
-		});
+		// When & Then
+		assertThrows(UserAlreadyExistException.class, () -> userService.create(request, Optional.empty()));
+		verify(userRepository).existsByEmail(request.email());
 	}
+
 
 	@Test
 	public void updateUser_Success() {
