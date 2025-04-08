@@ -8,9 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class DiscodeitApplicationTests {
 
-
 	@Test
 	void contextLoads() {
 	}
-
 }

@@ -4,9 +4,6 @@ spring:
       enabled: true
       max-file-size: 20MB # 요청 파일 하나당 허용 사이즈
       max-request-size: 50MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
-  threads:
-    virtual:
-      enabled: true
 ---
 spring:
   datasource:
@@ -24,10 +21,16 @@ spring:
 
 discodeit:
   storage:
-    type: local
-    local.root-path : "C:\\binary-storage"
-    # 호스트 환경에?
+    type: ${STORAGE_TYPE:local}
+    local.root-path : ${DISCODEIT_STORAGE:"var/discodeit-storage"}
+
 logging:
   level:
     org.hibernate.sql : warn
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 

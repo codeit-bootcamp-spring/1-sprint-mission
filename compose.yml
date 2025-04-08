@@ -9,9 +9,12 @@ services:
       DB_NAME: discodeit
       DB_USERNAME: discodeit_user
       DB_PASSWORD: discodeit1234
+      SPRING_PROFILES_ACTIVE: prod
+      DISCODEIT_STORAGE: /var/discodeit-storage
+      STORAGE_TYPE: local
 
     depends_on:
-      my-db:
+      postgres-db:
         condition: service_healthy
 
   postgres-db:
