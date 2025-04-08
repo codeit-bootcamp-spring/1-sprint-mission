@@ -28,8 +28,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   private final Path root;
 
   // 루트 디렉토리 생성
-  public LocalBinaryContentStorage(@Value("${user.dir}/uploads") String rootPath) {
-    this.root = Path.of(rootPath); // @Value는 문자열 주입이니까 String으로 받고 Path.of()로 Path로 변환
+  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath) {
+    this.root = Path.of(rootPath); // rootPath는 String이니까 받고 Path.of()로 Path로 변환
     init();
   }
 
