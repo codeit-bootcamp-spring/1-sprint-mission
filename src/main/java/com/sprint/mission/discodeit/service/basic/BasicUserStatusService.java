@@ -52,6 +52,7 @@ public class BasicUserStatusService extends UserStatusMapper implements UserStat
     return toDto(userStatusRepository.save(userStatus));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public UserStatus find(UUID userStatusId) {
     return userStatusRepository.findById(userStatusId)
@@ -59,6 +60,7 @@ public class BasicUserStatusService extends UserStatusMapper implements UserStat
             () -> new UserNotFoundException(null));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<UserStatus> findAllByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {

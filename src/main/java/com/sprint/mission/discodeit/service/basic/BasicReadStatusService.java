@@ -76,6 +76,7 @@ public class BasicReadStatusService extends ReadStatusMapper implements ReadStat
 
   }
 
+  @Transactional(readOnly = true)
   @Override
   public ReadStatus find(UUID readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
@@ -83,6 +84,7 @@ public class BasicReadStatusService extends ReadStatusMapper implements ReadStat
     return readStatus;
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<ReadStatusDto> findAllByUserId(UUID userId) {
     // 파라미터인 회원이 존재하는지 봐야지

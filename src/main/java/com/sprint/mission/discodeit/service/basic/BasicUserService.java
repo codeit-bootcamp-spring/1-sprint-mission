@@ -81,6 +81,7 @@ public class BasicUserService extends UserMapper implements UserService {
     return createdUser;
   }
 
+  @Transactional(readOnly = true)
   @Override
   // TODO : 회원을 찾고 반환하는 값으로 password를 주진 않을 거잖아 -> 보안 차원의 DTO
   public UserDto find(UUID userId) {
@@ -90,6 +91,7 @@ public class BasicUserService extends UserMapper implements UserService {
         .orElseThrow(() -> new UserNotFoundException(null));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public List<UserDto> findAll() {
     return userRepository.findAll()

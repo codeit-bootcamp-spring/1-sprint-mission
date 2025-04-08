@@ -57,6 +57,7 @@ public class BasicBinaryContentService extends BinaryContentMapper implements Bi
     return toDto(binaryContentRepository.save(binaryContent));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public BinaryContentDto find(UUID contentId) {
     BinaryContent binaryContent = binaryContentRepository.findById(contentId)
@@ -64,7 +65,7 @@ public class BasicBinaryContentService extends BinaryContentMapper implements Bi
     return toDto(binaryContent);
   }
 
-
+  @Transactional(readOnly = true)
   @Override
   public List<BinaryContentDto> findAllByIdIn(List<UUID> contentIds) {
     List<BinaryContent> list = binaryContentRepository.findAllByIdIn(contentIds);

@@ -18,6 +18,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+    open-in-view: false
 logging:
   level:
     root: info # 기본 로깅 레벨
