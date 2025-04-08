@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -35,6 +36,8 @@ public class BasicMessageService extends MessageMapper implements MessageService
 
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
+  private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
   // FileBinaryContentRepository에 @Repository 추가하니까 밑줄 사라짐 -> 해당 레포지토리 구현체가 빈으로 등록됐다는 말
   // 즉, 생성자 생성 -> 빈 등록 (@R.A.C, @Service), 의존성 주입 -> "빈 저장소에서 해당 레포지토리 타입으로 검색 후, 구현체 빈을 갖고와 주입해주는데 " -> FileBinaryContentRepository가 빈 저장소에 없었으니까 오류였던 것.
 
@@ -107,29 +110,12 @@ public class BasicMessageService extends MessageMapper implements MessageService
 
   // 메세지 목록 조회
   @Override
-  public PageResponse<Message> findAllByChannelId(UUID channelId, int page) {
-    Pageable pageable = PageRequest.of(page, 50, Sort.by(Sort.Direction.DESC, "createdAt"));
-    Page<Message> msgPage = messageRepository.findAllByChannelId(channelId, pageable);
-
-    return new PageResponse<>(
-        msgPage.getContent(),
-        msgPage.getNumber(),
-        msgPage.getSize(),
-        msgPage.hasNext(),
-        msgPage.getTotalElements()
-    );
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+    Page<Message> messagePage = messageRepository.findAllByChannelId(channelId, pageable);
+    Page<MessageDto> messagePageDto = messagePage.map(message -> messageMapper.toDto(message));
+    return pageResponseMapper.fromPage(messagePageDto);
   }
-//  페이징 구현 전
-//  public List<Message> findAllByChannelId(UUID channelId) {
-//    List<Message> msgs = messageRepository.findAllByChannelId(channelId);
-//    if (msgs != null && !msgs.isEmpty()) {
-//      System.out.println("전체 메세지 목록: " + msgs);
-//      return msgs;
-//    } else {
-//      System.out.println("메세지 목록이 비어 있습니다.");
-//      return Collections.emptyList(); // 비어 있을 경우 빈 리스트 반환
-//    }
-//  }
+
 
   @Transactional
   @Override
