@@ -91,6 +91,7 @@ public class BasicMessageService extends MessageMapper implements MessageService
     }
   }
 
+  @Transactional(readOnly = true)
   @Override
   public Optional<Message> find(UUID messageId) {
     Optional<Message> msg = messageRepository.findById(messageId);
@@ -99,6 +100,7 @@ public class BasicMessageService extends MessageMapper implements MessageService
   }
 
   // 메세지 목록 조회
+  @Transactional(readOnly = true)
   @Override
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
     Page<Message> messagePage = messageRepository.findAllByChannelId(channelId, pageable);

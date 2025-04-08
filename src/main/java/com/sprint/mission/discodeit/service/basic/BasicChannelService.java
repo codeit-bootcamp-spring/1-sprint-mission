@@ -58,6 +58,7 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
     return toDto(createdChannel);
   }
 
+  @Transactional(readOnly = true)
   @Override
   // 가장 최근 메세지 정보를 담을 거니까 channelDto 반환.
   public ChannelDto find(UUID channelId) {
@@ -66,7 +67,7 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
         .orElseThrow(() -> new ChannelNotFoundException(null));
   }
 
-
+  @Transactional(readOnly = true)
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<Channel> publicChannels = channelRepository.findAll();

@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
@@ -13,12 +15,16 @@ public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
   // 처음 활동 상태 저장
   UserStatus save(UserStatus userStatus);
 
+  @EntityGraph(attributePaths = {"user"})
   Optional<UserStatus> findById(UUID userStatusId);
 
+  @EntityGraph(attributePaths = {"user"})
   Optional<UserStatus> findByUserId(UUID userId);
 
+  @EntityGraph(attributePaths = {"user"})
   List<UserStatus> findAll();
 
+  @EntityGraph(attributePaths = {"user"})
   List<UserStatus> findAllByUserId(UUID userId);
 
   boolean existsById(UUID userStatusId);
