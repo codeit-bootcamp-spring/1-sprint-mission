@@ -1,5 +1,6 @@
 services:
   discodeit-server:
+    container_name: discodeit-server
     build: .
     ports:
       - 8080:8080
@@ -18,6 +19,7 @@ services:
         condition: service_healthy
 
   postgres-db:
+    container_name: main-DB
     image: postgres
     environment:
       POSTGRES_USER: discodeit_user

@@ -1,8 +1,4 @@
-
--- Table: public.binary_contents
-
 -- DROP TABLE IF EXISTS public.binary_contents;
-
 CREATE TABLE IF NOT EXISTS public.binary_contents
 (
     id uuid NOT NULL,
@@ -13,11 +9,6 @@ CREATE TABLE IF NOT EXISTS public.binary_contents
     bytes bytea NOT NULL,
     CONSTRAINT binary_contents_pkey PRIMARY KEY (id)
 );
-
-
--- Table: public.users
-
--- DROP TABLE IF EXISTS public.users;
 
 CREATE TABLE IF NOT EXISTS public.users
 (
@@ -37,8 +28,6 @@ CREATE TABLE IF NOT EXISTS public.users
         ON DELETE SET NULL
 );
 
-
-
 CREATE TABLE IF NOT EXISTS public.channels(
     id uuid NOT NULL,
     created_at timestamp with time zone NOT NULL,
@@ -50,12 +39,6 @@ CREATE TABLE IF NOT EXISTS public.channels(
     CONSTRAINT channels_type_check
         CHECK (type::text = ANY (ARRAY['PUBLIC'::character varying, 'PRIVATE'::character varying]::text[]))
 );
-
-
-
--- Table: public.messages
-
--- DROP TABLE IF EXISTS public.messages;
 
 CREATE TABLE IF NOT EXISTS public.messages
 (
@@ -75,12 +58,6 @@ CREATE TABLE IF NOT EXISTS public.messages
         ON UPDATE NO ACTION
         ON DELETE CASCADE
 );
-
-
-
--- Table: public.read_statuses
-
--- DROP TABLE IF EXISTS public.read_statuses;
 
 CREATE TABLE IF NOT EXISTS public.read_statuses
 (
@@ -103,9 +80,6 @@ CREATE TABLE IF NOT EXISTS public.read_statuses
         ON DELETE CASCADE
 );
 
--- Table: public.user_statuses
-
--- DROP TABLE IF EXISTS public.user_statuses;
 
 CREATE TABLE IF NOT EXISTS public.user_statuses
 (
@@ -123,9 +97,6 @@ CREATE TABLE IF NOT EXISTS public.user_statuses
 );
 
 
--- Table: public.message_attachments
-
--- DROP TABLE IF EXISTS public.message_attachments;
 
 CREATE TABLE IF NOT EXISTS public.message_attachments
 (
@@ -140,6 +111,3 @@ CREATE TABLE IF NOT EXISTS public.message_attachments
         ON UPDATE NO ACTION
         ON DELETE CASCADE
 );
-
-
-
