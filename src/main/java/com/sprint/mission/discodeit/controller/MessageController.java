@@ -15,6 +15,9 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +45,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController {
 
   private final MessageService messageService;
-  private final ChannelRepository channelRepository;
-  private final UserRepository userRepository;
 
 
   @PostMapping(
@@ -93,23 +94,14 @@ public class MessageController {
 
   // 페이징 구현
   @GetMapping("/{channelId}")
-  public ResponseEntity<PageResponse<Message>> getMessages(
+  public ResponseEntity<PageResponse<MessageDto>> getMessages(
       @PathVariable UUID channelId,
-      @RequestParam(defaultValue = "0") int page) {
-
-    PageResponse<Message> messages = messageService.findAllByChannelId(channelId, page);
+      @PageableDefault(page=0, size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
+      @RequestParam
+      Pageable pageable) {
+    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, pageable);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(messages);
   }
-// 페이징 구현 전
-//  @GetMapping
-//  public ResponseEntity<List<Message>> findAllByChannelId(
-//      @RequestParam("channelId") UUID channelId) {
-//    List<Message> messages = messageService.findAllByChannelId(channelId);
-//    return ResponseEntity
-//        .status(HttpStatus.OK)
-//        .body(messages);
-//  }
-
 }
