@@ -4,8 +4,7 @@ CREATE TABLE binary_contents
     created_at   TIMESTAMPTZ  NOT NULL,
     file_name    VARCHAR(255) NOT NULL,
     size         BIGINT       NOT NULL,
-    content_type VARCHAR(100) NOT NULL,
-    bytes        bytea        NOT NULL
+    content_type VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE users
@@ -57,7 +56,7 @@ CREATE TABLE read_statuses
     updated_at   TIMESTAMPTZ,
     user_id      UUID        NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     channel_id   UUID        NOT NULL REFERENCES channels (id) ON DELETE CASCADE,
-    last_read_at TIMESTAMPTZ NOT NULL,
+    last_read_at TIMESTAMPTZ NULL,
     UNIQUE (user_id, channel_id)
 );
 

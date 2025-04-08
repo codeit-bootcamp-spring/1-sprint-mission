@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserDTO;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusUpdateRequest;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -29,23 +27,22 @@ public class UserController {
   private final UserStatusService userStatusService;
 
   @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<UserDTO> createUser(
+  public ResponseEntity<UserDto> createUser(
       @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    User user = userService.create(userCreateRequest, profile);
-    return ResponseEntity.status(HttpStatus.CREATED).body(UserDTO.createEntity(user));
+    UserDto creatUser = userService.create(userCreateRequest, profile);
+    return ResponseEntity.status(HttpStatus.CREATED).body(creatUser);
   }
 
   @PutMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<UserDTO> updateUser(
+  public ResponseEntity<UserDto> updateUser(
       @PathVariable("userId") UUID userId,
       @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    User user = userService.update(userId, userUpdateRequest, profile);
-    UserStatus userStatus = userStatusService.findByUserId(userId);
-    return ResponseEntity.status(HttpStatus.OK).body(UserDTO.fromEntity(user, userStatus));
+    UserDto updateUser = userService.update(userId, userUpdateRequest, profile);
+    return ResponseEntity.status(HttpStatus.OK).body(updateUser);
   }
 
   @DeleteMapping(value = "/{userId}")
@@ -55,7 +52,7 @@ public class UserController {
   }
 
   @GetMapping(value = "")
-  public ResponseEntity<List<UserDTO>> getAllUsers() {
+  public ResponseEntity<List<UserDto>> getAllUsers() {
     return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
   }
 

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -20,9 +20,9 @@ public record UserDTO(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),
-        user.getUserName(),
+        user.getUsername(),
         user.getEmail(),
-        user.getProfileId(),
+        user.getProfile() != null ? user.getProfile().getId() : null,
         false
     );
   }
@@ -32,9 +32,9 @@ public record UserDTO(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),
-        user.getUserName(),
+        user.getUsername(),
         user.getEmail(),
-        user.getProfileId(),
+        user.getProfile() != null ? user.getProfile().getId() : null,
         userStatus.isUserOnline()
     );
   }

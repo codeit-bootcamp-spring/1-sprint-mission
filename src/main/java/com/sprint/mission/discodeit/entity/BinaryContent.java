@@ -23,8 +23,6 @@ public class BinaryContent extends BaseEntity {
   private String fileName;
   @Column(name = "content_type", nullable = false)
   private String contentType;
-  @Column(name = "bytes", nullable = false)
-  private byte[] file;
   @Column(name = "size", nullable = false)
   private Long size;
 }

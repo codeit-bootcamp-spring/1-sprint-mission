@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
@@ -22,22 +22,22 @@ public class ChannelController {
   private final ChannelService channelService;
 
   @PostMapping(value = "/public")
-  public ResponseEntity<ChannelDTO> create(@Valid @RequestBody PublicChannelCreateRequest request) {
-    ChannelDTO channelDTO = channelService.create(request);
+  public ResponseEntity<ChannelDto> create(@Valid @RequestBody PublicChannelCreateRequest request) {
+    ChannelDto channelDTO = channelService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(channelDTO);
   }
 
   @PostMapping(value = "/private")
-  public ResponseEntity<ChannelDTO> create(@RequestBody PrivateChannelCreateRequest request) {
-    ChannelDTO channelDTO = channelService.create(request);
+  public ResponseEntity<ChannelDto> create(@RequestBody PrivateChannelCreateRequest request) {
+    ChannelDto channelDTO = channelService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(channelDTO);
   }
 
   @PatchMapping(value = "/{channelId}")
-  public ResponseEntity<ChannelDTO> updateChannel(
+  public ResponseEntity<ChannelDto> updateChannel(
       @PathVariable("channelId") UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
-    ChannelDTO channelDTO = channelService.update(channelId, request);
+    ChannelDto channelDTO = channelService.update(channelId, request);
     return ResponseEntity.status(HttpStatus.OK).body(channelDTO);
   }
 
@@ -50,12 +50,12 @@ public class ChannelController {
   }
 
   @GetMapping(value = "/{userId}")
-  public ResponseEntity<List<ChannelDTO>> getUserChannels(@PathVariable("userId") UUID userId) {
+  public ResponseEntity<List<ChannelDto>> getUserChannels(@PathVariable("userId") UUID userId) {
     return ResponseEntity.status(HttpStatus.OK).body(channelService.findAllByUserId(userId));
   }
 
   @GetMapping(value = "")
-  public ResponseEntity<List<ChannelDTO>> getPublicChannels() {
+  public ResponseEntity<List<ChannelDto>> getPublicChannels() {
     return ResponseEntity.status(HttpStatus.OK).body(channelService.findPublicAll());
   }
 
