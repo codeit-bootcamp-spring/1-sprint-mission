@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.*;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
-public class ReadStatusController {
+public class ReadStatusController implements ReadStatusApi {
 
   // 메시지 수신 정보에 --> ReadStatus 가 포함된다.
   private final ReadStatusService readStatusService;
