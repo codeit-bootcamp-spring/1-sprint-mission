@@ -1,0 +1,82 @@
+spring:
+  application:
+    name: discodeit
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+      
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+discodeit:
+  repository:
+    type: file
+    base-directory: user.dir
+    file-directory: .discodeit/data/
+    extension: .ser
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/data
+
+
+logging:
+  level:
+    root: INFO
+    com.sprint.mission.discodeit: INFO
+    com.sprint.mission.discodeit.controller: INFO
+    com.sprint.mission.discodeit.service: INFO
+    com.sprint.mission.discodeit.repository: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+    org.springframework.jdbc.core.JdbcTemplate: INFO
+    org.springframework.jdbc.core.StatementCreatorUtils: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: ALWAYS
+  info:
+    env:
+      enabled: true
+
+
+info:
+  application:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
+
