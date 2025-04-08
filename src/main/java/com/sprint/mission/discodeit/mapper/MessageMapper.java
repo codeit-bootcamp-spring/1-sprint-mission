@@ -27,7 +27,7 @@ public class MessageMapper {
   private BinaryContentMapper binaryContentMapper;
   private UserMapper userMapper;
 
-  protected MessageDto toDto(Message message) {
+  public MessageDto toDto(Message message) {
     // TODO 갖고있는게 userId 뿐이니까 레포지토리 이용해서 User 객체 겟
     User user = userRepository.findById(message.getUser().getId())
         .orElseThrow(() -> new NoSuchElementException("해당 회원을 찾을 수 없습니다."));

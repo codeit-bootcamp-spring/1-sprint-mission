@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoun
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class BasicBinaryContentService extends BinaryContentMapper implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
+
+  private final BinaryContentStorage binaryContentStorage;
+
 
   /*
   설계 :

@@ -34,7 +34,7 @@ public class ChannelMapper {
   private UserRepository userRepository;
   private UserMapper userMapper; // 이렇게 하니까 BinaryContentDto 타입의 profile을 new로 생성하고, 그 profile이 들어간 User타입의 participants를 또 생성하고 이를 위해 또 online 생성하고..하는 과정이 한줄로 간결화 됨.
 
-  protected ChannelDto toDto(Channel channel) {
+  public ChannelDto toDto(Channel channel) {
     // 1. lastMessageAt과 participantIds 포함한 채널dto 값 반환
     // 2. lastMessageAt과 participantIds 정의
     // 3. private만 participantIds 포함하도록

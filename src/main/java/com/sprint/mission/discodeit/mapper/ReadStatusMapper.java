@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 public class ReadStatusMapper {
 
-  protected ReadStatusDto toDto(ReadStatus readStatus) {
+  public ReadStatusDto toDto(ReadStatus readStatus) {
     return new ReadStatusDto(
         readStatus.getId(),
         readStatus.getUser().getId(),

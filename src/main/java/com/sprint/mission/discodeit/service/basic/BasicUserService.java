@@ -63,9 +63,11 @@ public class BasicUserService extends UserMapper implements UserService {
         .password(password)
         .profile(profile)
         .build();
-    User user = userRepository.save(newUser);
-    UserDto createdUser = toDto(user);
+
+    binaryContentRepository.save(profile);
     binaryContentStorage.put(profile.getId(), data); // 레포지토리 save를 '먼저' 해야 id가 생성되고, id가 있으니 이 경로로 put이 가능해짐
+
+    User user = userRepository.save(newUser);
 
     // 생성된 회원 user status 설정
     Instant lastActiveAt = Instant.now();
@@ -74,6 +76,8 @@ public class BasicUserService extends UserMapper implements UserService {
         .lastActiveAt(lastActiveAt)
         .build();
     userStatusRepository.save(userStatus);
+
+    UserDto createdUser = toDto(user);
     return createdUser;
   }
 

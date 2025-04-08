@@ -4,11 +4,7 @@ import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -16,7 +12,7 @@ import java.io.Serializable;
 // TODO @AllArgsConstructor, @Builder 쓰기 -> @Builder는 원하는 필드의 파라미터만 전달해서 객체 생성 가능
 // TODO 아니면 그냥 파라미터 생성자는 롬복쓰지말고 직접 만들어주기..
 
-
+@Setter
 @Getter
 @AllArgsConstructor
 @Builder

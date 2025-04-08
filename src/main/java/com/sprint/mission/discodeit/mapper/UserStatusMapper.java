@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 public class UserStatusMapper {
 
-  protected UserStatusDto toDto(UserStatus userStatus) {
+  public UserStatusDto toDto(UserStatus userStatus) {
     return new UserStatusDto(
         userStatus.getId(),
         userStatus.getUser().getId(),
