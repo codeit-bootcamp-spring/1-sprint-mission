@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: discodeit
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+
+logging:
+  level:
+    root: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: always
+
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    javaVersion: 17
+    springBootVersion: 3.4.0
+    datasource:
+      url: ${spring.datasource.url}
+      driverClassName: ${spring.datasource.driver-class-name}
+    jpaDdlAuto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      maxFileSize: ${spring.servlet.multipart.max-file-size}
+      maxRequestSize: ${spring.servlet.multipart.max-request-size}

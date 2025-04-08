@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- 로그 패턴 정의 -->
+  <property name="LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+  <!-- 로그 파일 경로 -->
+  <property name="LOG_PATH" value=".logs" />
+
+  <!-- Console 출력 설정 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일 출력 설정 (일자별 롤링) -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/discodeit.log</file>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 일자별 파일 롤링 -->
+      <fileNamePattern>${LOG_PATH}/discodeit.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+      <!-- 최대 30일 보관 -->
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 로그 레벨 및 appender 설정 -->
+  <root level="info">
+    <appender-ref ref="CONSOLE" />
+    <appender-ref ref="FILE" />
+  </root>
+
+  <!-- 프로젝트 패키지별 세부 로그 레벨 설정 가능 -->
+  <logger name="com.sprint.mission.discodeit" level="debug" />
+  <logger name="org.hibernate.SQL" level="debug" />
+  <logger name="org.hibernate.orm.jdbc.bind" level="trace" />
+
+</configuration>
