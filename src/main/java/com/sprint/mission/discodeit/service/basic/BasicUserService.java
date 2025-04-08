@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -45,11 +47,11 @@ public class BasicUserService implements UserService {
 
     if (userRepository.existsByEmail(email)) {
         log.warn("이메일 중복 - {}", email);
-      throw new IllegalArgumentException("User with email " + email + " already exists");
+        throw new UserAlreadyExistsException(username, email);
     }
     if (userRepository.existsByUsername(username)) {
         log.warn("⚠️ 사용자명 중복 - {}", username);
-      throw new IllegalArgumentException("User with username " + username + " already exists");
+        throw new UserAlreadyExistsException(username, email);
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
@@ -79,7 +81,8 @@ public class BasicUserService implements UserService {
   public UserDto find(UUID userId) {
     return userRepository.findById(userId)
         .map(userMapper::toDto)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+            .orElseThrow(() -> new UserNotFoundException(userId));
+
   }
 
   @Override
@@ -96,17 +99,17 @@ public class BasicUserService implements UserService {
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     log.info("사용자 수정 요청 - userId: {}", userId);
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+            .orElseThrow(() -> new UserNotFoundException(userId));
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
     if (userRepository.existsByEmail(newEmail)) {
       log.warn("이메일 중복 - {}", newEmail);
-      throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+        throw new IllegalArgumentException("중복 이메일입니다.");
     }
     if (userRepository.existsByUsername(newUsername)) {
       log.warn("사용자명 중복 - {}", newUsername);
-      throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+        throw new IllegalArgumentException("중복 이메일입니다.");
     }
 
     optionalProfileCreateRequest.ifPresent(req ->

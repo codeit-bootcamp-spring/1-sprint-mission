@@ -1,35 +1,42 @@
 package com.sprint.mission.discodeit.exception;
 
-import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.Instant;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<String> handleException(IllegalArgumentException e) {
-    e.printStackTrace();
+  @ExceptionHandler(DiscodeitException.class)
+  public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+            e.getTimestamp(),
+            e.getErrorCode().name(),
+            e.getErrorCode().getMessage(),
+            e.getDetails(),
+            e.getClass().getSimpleName(),
+            HttpStatus.BAD_REQUEST.value()
+    );
     return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
-        .body(e.getMessage());
-  }
-
-  @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<String> handleException(NoSuchElementException e) {
-    e.printStackTrace();
-    return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .body(e.getMessage());
+            .status(HttpStatus.BAD_REQUEST)
+            .body(errorResponse);
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleException(Exception e) {
-    e.printStackTrace();
+  public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+            Instant.now(),
+            "INTERNAL_SERVER_ERROR",
+            e.getMessage(),
+            null,
+            e.getClass().getSimpleName(),
+            HttpStatus.INTERNAL_SERVER_ERROR.value()
+    );
     return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(e.getMessage());
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(errorResponse);
   }
 }

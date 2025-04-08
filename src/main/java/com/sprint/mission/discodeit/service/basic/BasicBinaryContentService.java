@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicBinaryContentService implements BinaryContentService {
@@ -25,6 +27,9 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   @Override
   public BinaryContentDto create(BinaryContentCreateRequest request) {
+    log.info("📥 파일 업로드 요청 - fileName: {}, contentType: {}, size: {} bytes",
+            request.fileName(), request.contentType(), request.bytes().length);
+
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
@@ -36,6 +41,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     binaryContentRepository.save(binaryContent);
     binaryContentStorage.put(binaryContent.getId(), bytes);
 
+    log.info("✅ 파일 업로드 완료 - binaryContentId: {}", binaryContent.getId());
     return binaryContentMapper.toDto(binaryContent);
   }
 
@@ -57,9 +63,12 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   @Override
   public void delete(UUID binaryContentId) {
+    log.info("🗑️ 파일 삭제 요청 - binaryContentId: {}", binaryContentId);
     if (!binaryContentRepository.existsById(binaryContentId)) {
+      log.warn("❌ 삭제 시도된 파일 없음 - binaryContentId: {}", binaryContentId);
       throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
     }
     binaryContentRepository.deleteById(binaryContentId);
+    log.info("✅ 파일 삭제 완료 - binaryContentId: {}", binaryContentId);
   }
 }
