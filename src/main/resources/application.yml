@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: discodeit
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        default_schema: public
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+  cache:
+    disabled: true
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: /var/discodeit/storage
+
+

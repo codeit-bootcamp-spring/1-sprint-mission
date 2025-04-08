@@ -1,0 +1,34 @@
+<configuration>
+
+  <!-- 콘솔 로그 출력 설정 -->
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일 로그 출력 설정 -->
+  <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>.logs/discodeit.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>.logs/discodeit-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>  <!-- 30일간 로그 보관 -->
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 환경별 로깅 레벨 적용 -->
+  <logger name="com.discodeit" level="debug" additivity="false">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="File"/>
+  </logger>
+
+  <!-- 기본 로깅 레벨 -->
+  <root level="info">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="File"/>
+  </root>
+
+</configuration>

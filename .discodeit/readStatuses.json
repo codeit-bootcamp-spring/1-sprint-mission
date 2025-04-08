@@ -1,0 +1,34 @@
+{
+  "d8c6227a-6274-4b8c-ad20-ed3d467ce0fe" : {
+    "id" : "d8c6227a-6274-4b8c-ad20-ed3d467ce0fe",
+    "createdAt" : 1741151424.323721100,
+    "updatedAt" : 1741157185.448115200,
+    "userId" : "fb8ee9df-f6b6-4131-acc5-857338eb0387",
+    "channelId" : "4665f326-24bd-42c8-b3c0-f449625950a8",
+    "lastReadAt" : 1741157185.445000000
+  },
+  "aaf18358-9329-45d3-aa6c-89be2473c5ba" : {
+    "id" : "aaf18358-9329-45d3-aa6c-89be2473c5ba",
+    "createdAt" : 1741155447.506797300,
+    "updatedAt" : 1741155625.077211800,
+    "userId" : "bc53e999-39ef-49be-af9c-3fb0b1ab0e69",
+    "channelId" : "4665f326-24bd-42c8-b3c0-f449625950a8",
+    "lastReadAt" : 1741155625.072000000
+  },
+  "0044cfce-5098-4cee-9465-a10e35c5bb23" : {
+    "id" : "0044cfce-5098-4cee-9465-a10e35c5bb23",
+    "createdAt" : 1741155460.821541800,
+    "updatedAt" : 1741157182.614140900,
+    "userId" : "fb8ee9df-f6b6-4131-acc5-857338eb0387",
+    "channelId" : "edafe6bb-b20f-4efe-8e79-1c2ea3da11a8",
+    "lastReadAt" : 1741157182.609000000
+  },
+  "12b533cc-b352-4179-8312-714488eedc3e" : {
+    "id" : "12b533cc-b352-4179-8312-714488eedc3e",
+    "createdAt" : 1741155460.824543400,
+    "updatedAt" : null,
+    "userId" : "bc53e999-39ef-49be-af9c-3fb0b1ab0e69",
+    "channelId" : "edafe6bb-b20f-4efe-8e79-1c2ea3da11a8",
+    "lastReadAt" : -31557014167219200.000000000
+  }
+}
