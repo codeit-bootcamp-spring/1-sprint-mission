@@ -15,7 +15,6 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
-import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 
@@ -43,7 +42,6 @@ public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageService messageService;
-    private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
     private final MessageRepository messageRepository;
     private final ReadStatusService readStatusService;
@@ -65,11 +63,6 @@ public class JCFChannelService implements ChannelService {
         return createdChannel;
     }
 
-
-    /**
-     * [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId [ ] PUBLIC 채널
-     * 목록은 전체 조회합니다. [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
-     */
     @Transactional(readOnly = true)
     @Override
     public Channel findById(UUID channelId) {
@@ -132,17 +125,6 @@ public class JCFChannelService implements ChannelService {
         }
         messageService.deleteAllByChannelId(channelId);
         channelRepository.delete(deletingChannel);
-    }
-
-    /**
-     * 중복 검증
-     */
-    public void validateDuplicateName(String name) {
-        boolean isDuplicate = channelRepository.findAll().stream()
-                .anyMatch(channel -> channel.getName().equals(name));
-        if (isDuplicate) {
-            throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
-        }
     }
 }
 

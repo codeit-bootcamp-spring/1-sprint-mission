@@ -23,7 +23,6 @@ public class UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
-    private final ExecutorService ves;
 
     public UserStatus create(User user) {
         if (userStatusRepository.existsByUser(user))

@@ -51,7 +51,7 @@ public class UserServiceTest {
     @DisplayName("회원가입 성공")
     void duplicateTest() {
         UserDtoForCreate dto = new UserDtoForCreate("test1", "비밀번호486", "icb6999@naver.com");
-        MockMultipartFile mockFile = mockFileFactory.getMockFileList(1).getFirst();
+        MockMultipartFile mockFile = mockFileFactory.getMockFileList(1).get(0);
 
         when(binaryService.create(any(BinaryContentDtoForCreate.class))).thenAnswer((invocation) -> {
             BinaryContentDtoForCreate binaryDto = invocation.getArgument(0);

@@ -141,7 +141,8 @@ public class JCFMessageService implements MessageService {
 
 
     private ScrollPosition getScrollPosition(Window<MessageDto> messageDtoWindow) {
-        MessageDto lastDto = messageDtoWindow.getContent().getLast();
+        List<MessageDto> content = messageDtoWindow.getContent();
+        MessageDto lastDto = content.get(content.size() - 1);
         Map<String, Object> keysetMap = new HashMap<>();
         keysetMap.put("createdAt", lastDto.createdAt());
         keysetMap.put("id", lastDto.id());

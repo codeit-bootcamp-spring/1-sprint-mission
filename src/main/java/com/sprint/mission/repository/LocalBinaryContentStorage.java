@@ -117,7 +117,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
      * BinaryContentDto와 바이너리 데이터를 활용해 ResponseEntity<Resource> 응답을 생성 후 반환
      */
     @Override
-    public ResponseEntity<Resource> download(BinaryContentDto content) {
+    public ResponseEntity<? extends Resource> download(BinaryContentDto content) {
         InputStream inputStream = this.get(content.id());
         Resource resource = new InputStreamResource(inputStream);
 

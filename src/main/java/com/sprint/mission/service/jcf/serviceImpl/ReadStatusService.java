@@ -29,7 +29,6 @@ public class ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
-    private final ExecutorService ves;
 
     public ReadStatus create(ReadStatusCreateRequest request) {
         User user = userRepository.findById(request.userId())
