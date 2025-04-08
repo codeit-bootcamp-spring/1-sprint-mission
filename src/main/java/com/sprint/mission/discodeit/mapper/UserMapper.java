@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 // UserMapper가 BinaryContentMapper를 사용 -> 메퍼라서 uses 이용
-@Mapper(componentModel = "spring", uses = BinaryContentMapper.class)
+@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class, UserStatusMapper.class})
 public interface UserMapper {
 
   // DTO 객체 반환
@@ -14,8 +14,6 @@ public interface UserMapper {
   // @Mapping(source = "profile", target = "profile") 에서
   // User 엔티티의 profile 필드를 BinaryContentMapper를 통해 BinaryContentDto로 변환하여 UserDto에 전달
   @Mapping(source = "profile", target = "profile")
-
-  // MapStruct 문서 5.3번, 중첩된 빈 매핑 제어
-  @Mapping(source = "userStatus.online", target = "online")
+  @Mapping(target = "online", expression = "java(user.getUserStatus().isOnline())")
   UserDto toDto(User user);
 }

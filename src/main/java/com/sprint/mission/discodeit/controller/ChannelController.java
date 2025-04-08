@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.*;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
@@ -21,8 +23,12 @@ public class ChannelController {
 
   @PostMapping(value = "/public")
   public ResponseEntity<ChannelDto> createPublicChannel(
-      @RequestBody ChannelPublicRequest channelPublicRequest) {
+      @Valid @RequestBody ChannelPublicRequest channelPublicRequest) {
+    log.info("공개 채널 생성 요청(Request): publicChannelName={}", channelPublicRequest.name());
 
+    log.info("공개 채널 생성 응답(Response): publicChannelName={}, HttpStatus={}",
+        channelPublicRequest.name(),
+        HttpStatus.CREATED);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelService.createPublicChannel(channelPublicRequest)); // 201
   }
@@ -30,27 +36,32 @@ public class ChannelController {
   @PostMapping(value = "/private")
   public ResponseEntity<ChannelDto> createPrivateChannel(
       @RequestBody ChannelPrivateRequest channelPrivateRequest) {
+    log.info("비공개 채널 생성 요청(Request)");
+
+    log.info("비공개 채널 생성 응답(Response): HttpStatus={}", HttpStatus.CREATED);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelService.createPrivateChannel(channelPrivateRequest)); // 201
   }
 
 
-  // 스프린트 미션 5 심화 조건 중 API 스펙을 준수를 위해 변경했지만,
-  // /public/{channelId}, /private/{channelId} 처럼 구분하는 건 어떨까요?
-  // 제가 느끼기에는 확장성은 조금 부족할지라도, 엔드포인트를 통해 public 채널인지 private 채널인지 확실히 구분할 수 있어 보여 좋아보이는데
-  // 위와 같은 엔드 포인트를 사용했을 때의 단점도 궁금합니다!(public, prviate 뿐만 아니라 type 더 추가되면 더 복잡해진다거나)
-  // 무엇보다 Public 채널을 업데이트하는 건데 엔드 포인트에 public이 붙지 않는 것도 고민되는 부분입니다.
   @PatchMapping(value = "/{channelId}")
-  public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable UUID channelId,
-      @RequestBody ChannelUpdateRequest channelUpdateRequest) {
+  public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable("channelId") UUID channelId,
+      @Valid @RequestBody ChannelUpdateRequest channelUpdateRequest) {
+    log.info("채널 수정 요청(Request): nameChanged={}, descriptionChanged={}",
+        channelUpdateRequest.newName() != null,
+        channelUpdateRequest.newDescription() != null
+    );
+
+    log.info("채널 수정 응답(Response): HttpStatus={}", HttpStatus.OK);
     return ResponseEntity.ok(channelService.updateChannel(channelId, channelUpdateRequest));
   }
 
-  // 궁금한게, Public 과 Private 채널을 만들 땐 /public, /private 엔드포인트로 들어오는데 삭제할 때는 id만 해놔도 되는지
   @DeleteMapping(value = "/{channelId}")
   public ResponseEntity<Void> deleteChannel(
-      @PathVariable UUID channelId) {
+      @PathVariable("channelId") UUID channelId) {
+    log.info("채널 삭제 요청(Request)");
     channelService.deleteChannelById(channelId);
+    log.info("채널 삭제 응답(Response): HttpStatus={}", HttpStatus.NO_CONTENT);
     return ResponseEntity.noContent().build(); // 204
   }
 

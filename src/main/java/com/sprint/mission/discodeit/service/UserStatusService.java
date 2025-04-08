@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.UserStatusDto;
-import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserStatusUpdateByUserIdRequest;
-import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 
 import jakarta.transaction.Transactional;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 

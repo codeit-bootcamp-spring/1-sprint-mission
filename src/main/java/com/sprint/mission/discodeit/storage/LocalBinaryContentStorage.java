@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
@@ -44,6 +46,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public UUID put(UUID id, byte[] bytes) {
+    log.info("파일 업로드 시도");
     // 파일 저장 경로 지정
     Path filePath = resolvePath(id);
     File file = filePath.toFile(); // Path 객체 -> File 객체
@@ -56,6 +59,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       e.printStackTrace();
       return null;
     }
+    log.info("파일 업로드 시도 성공");
     // 저장한 파일 UUID 반환
     return id;
   }

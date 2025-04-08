@@ -57,4 +57,8 @@ public class User extends BaseUpdatableEntity {
   public void updateProfile(BinaryContent newProfile) {
     this.profile = newProfile;
   }
+
+  public void updateUserStatus(UserStatus userStatus) {
+    this.userStatus = userStatus;
+  }
 }

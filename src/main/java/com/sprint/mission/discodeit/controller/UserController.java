@@ -1,87 +1,143 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.*;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.basic.AuthService;
+import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collection;
 import java.util.UUID;
 
+@Slf4j // 로깅을 위한 Lombok 어노테이션 추가
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserApi {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> createUser(
-      @RequestPart(value = "userCreateRequest") UserCreateRequest userCreateRequest,
-      // multipart/form-data 형식으로 요청보낼 때 파일의 키 이름을 "binaryContent"
-      @RequestPart(value = "binaryContent", required = false) MultipartFile file) throws Exception {
+      @Valid @RequestPart(value = "userCreateRequest") UserCreateRequest userCreateRequest,
+      @RequestPart(value = "binaryContent", required = false) MultipartFile file) {
 
-    BinaryContentCreateRequest binaryContentCreateRequest;
-    if (file != null) {
-      binaryContentCreateRequest = new BinaryContentCreateRequest(file);
-    } else {
-      binaryContentCreateRequest = null;
+    /* 유저 생성 요청(Request) */
+    log.info("유저 생성 요청(Request): username={}, hasProfileImage={}",
+        userCreateRequest.username(),
+        file != null);
+
+    // 프로필 이미지 처리
+    Optional<BinaryContentCreateRequest> profileRequest =
+        Optional.ofNullable(file).flatMap(this::resolveProfileRequest);
+
+    if (profileRequest.isPresent()) {
+      log.debug("프로필 이미지 생성 : filename={}, size={}, contentType={}",
+          file.getName(),
+          file.getSize(),
+          file.getContentType());
     }
 
-    UserDto userDto = userService.createUser(userCreateRequest, binaryContentCreateRequest);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(userDto); // 201
+    // 유저 생성
+    UserDto userDto = userService.createUser(userCreateRequest, profileRequest);
+    /* 유저 생성 응답(Response) */
+    log.info("유저 생성 응답(Response): username={}, HttpStatus={} ",
+        userDto.username(),
+        HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
-      @RequestPart(value = "userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) throws Exception {
+      @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequest userUpdateRequest,
+      @RequestPart(value = "profile", required = false) MultipartFile file) {
+    log.info(
+        "유저 수정 요청(Request): usernameChanged={}, emailChanged={}, passwordChanged={}, hasProfileImage={}",
+        userUpdateRequest.newUsername() != null,
+        userUpdateRequest.newEmail() != null,
+        userUpdateRequest.newPassword() != null,
+        file != null && !file.isEmpty()
+    );
 
-    BinaryContentCreateRequest binaryContentCreateRequest;
-    if (profile != null) {
-      binaryContentCreateRequest = new BinaryContentCreateRequest(profile);
-    } else {
-      binaryContentCreateRequest = null;
+    // 새로운 프로필 이미지 처리
+    Optional<BinaryContentCreateRequest> profileRequest =
+        Optional.ofNullable(file).flatMap(this::resolveProfileRequest);
+
+    if (profileRequest.isPresent()) {
+      log.debug("프로필 이미지 생성 : filename={}, size={}, contentType={}",
+          file.getName(),
+          file.getSize(),
+          file.getContentType());
     }
 
-    return ResponseEntity.ok(userService.updateUserInfo(userId, userUpdateRequest,
-        binaryContentCreateRequest)); // 스프린트 미션 5 심화 조건 중 API 스펙을 준수
+    // 유저 수정
+    UserDto userDto = userService.updateUserInfo(userId, userUpdateRequest, profileRequest);
+    log.info("유저 수정 응답(Response): username={}, HttpStatus={} ",
+        userDto.username(),
+        HttpStatus.OK);
+    return ResponseEntity.ok(userDto);
 
   }
 
-  @PatchMapping(value = "/{userId}/userStatus") // 스프린트 미션 5 심화 조건 중 API 스펙을 준수
+
+  @PatchMapping(value = "/{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStateByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
-    return ResponseEntity.ok(
-        userStatusService.updateUserStatusByUserId(userId, userStatusUpdateByUserIdRequest)); // 200
+
+    // 유저 상태 수정
+    UserStatusDto userStatusDto = userStatusService.updateUserStatusByUserId(userId,
+        userStatusUpdateByUserIdRequest);
+
+    return ResponseEntity.ok(userStatusDto);
   }
 
   @DeleteMapping(value = "/{userId}")
   public ResponseEntity<Void> deleteUser(@PathVariable("userId") UUID id) {
+    log.info("유저 삭제 요청(Request)");
+
+    // 유저 삭제
     userService.removeUserById(id);
-    // ResponseEntity.noContent().build() → 204 No Content
+    log.info("유저 삭제 응답(Response): HttpStatus={}", HttpStatus.NO_CONTENT);
     return ResponseEntity.noContent().build(); // 204
   }
 
   @GetMapping
   public ResponseEntity<List<UserDto>> findAllUsers() {
-    return ResponseEntity.ok(userService.showAllUsers()); // 200
+    // 유저 목록 조회
+    return ResponseEntity.ok(userService.showAllUsers());
   }
 
+  private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profile) {
+    if (profile.isEmpty()) {
+      return Optional.empty();
+    } else {
+      try {
+        BinaryContentCreateRequest binaryContentCreateRequest =
+            new BinaryContentCreateRequest(
+                profile.getOriginalFilename(),
+                profile.getSize(),
+                profile.getContentType(),
+                profile.getBytes()
+            );
+        return Optional.of(binaryContentCreateRequest);
+      } catch (IOException e) {
+        throw new RuntimeException();
+      }
+    }
+  }
 }
