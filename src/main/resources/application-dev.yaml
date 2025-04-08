@@ -1,0 +1,33 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: postgres
+    password: 4287
+
+#  sql:
+#    init:
+#      mode: always
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    #        default_batch_fetch_size: 100
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
