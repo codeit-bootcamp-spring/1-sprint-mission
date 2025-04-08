@@ -1,0 +1,27 @@
+spring:
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: none #create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-test.sql
+      data-locations: classpath:data-test.sql  #초기 데이터 삽입용
+
+logging:
+  level:
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
