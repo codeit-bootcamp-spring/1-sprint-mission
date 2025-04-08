@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: prod
   servlet:
     multipart:
       enabled: true
@@ -21,15 +19,7 @@ spring:
       mode: always  # 애플리케이션 실행 시 항상 schema.sql 실행
   jpa:
     hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        jdbc:
-          batch_size: 50
-        order_inserts: true
-        order_updates: true
-        format_sql: true
-        #dialect: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: none
     open-in-view: false
 
 springdoc:
@@ -47,15 +37,7 @@ discodeit:
     #type: jcf
     #file-directory: .discodeit
 
-
-decorator:
-  datasource:
-    p6spy:
-      enable-logging: true
-
 logging:
   level:
-    org.hibernate.sql : info
-
-#    org.hibernate.type.descriptor.sql : TRACE
+    org.hibernate.sql : warn
 

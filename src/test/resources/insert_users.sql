@@ -1,12 +1,12 @@
-DELETE
-FROM users;
-
-INSERT INTO users (id, created_at, updated_at, username, password, email, profile_id)
-VALUES (uuid_generate_v4(),
-        current_timestamp,
-        current_timestamp,
-        'testUser1',
-        '비밀번호 444',
-        'icb4444@naver.com',
-        NULL
-);
+-- DELETE
+-- FROM users;
+--
+-- INSERT INTO users (id, created_at, updated_at, username, password, email, profile_id)
+-- VALUES (uuid_generate_v4(),
+--         current_timestamp,
+--         current_timestamp,
+--         'testUser1',
+--         '비밀번호 444',
+--         'icb4444@naver.com',
+--         NULL
+-- );
