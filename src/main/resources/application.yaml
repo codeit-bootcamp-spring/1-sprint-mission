@@ -41,3 +41,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui
     enabled: true
+    
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage

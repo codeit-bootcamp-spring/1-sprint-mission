@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +33,6 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
-  private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
   private final UserMapper userMapper;
 
@@ -56,7 +54,16 @@ public class BasicUserService implements UserService {
     BinaryContent nullableProfile = Optional.ofNullable(profile)
         .filter(p -> !p.isEmpty())
         .flatMap(this::resolveProfileRequest)
-        .map(binaryContentService::create)
+        .map(profileImage -> {
+          String fileName = profileImage.fileName();
+          String contentType = profileImage.contentType();
+          byte[] bytes = profileImage.file();
+          BinaryContent binaryContent = new BinaryContent(fileName, contentType,
+              (long) bytes.length);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        })
         .orElse(null);
 
     User user = new User(
@@ -114,7 +121,16 @@ public class BasicUserService implements UserService {
     Optional<BinaryContent> newProfile = Optional.ofNullable(profile)
         .filter(p -> !p.isEmpty())
         .flatMap(this::resolveProfileRequest)
-        .map(binaryContentService::create);
+        .map(profileImage -> {
+          String fileName = profileImage.fileName();
+          String contentType = profileImage.contentType();
+          byte[] bytes = profileImage.file();
+          BinaryContent binaryContent = new BinaryContent(fileName, contentType,
+              (long) bytes.length);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        });
 
     newProfile.ifPresent(binaryContent -> {
       if (user.getProfile() != null) {
@@ -127,16 +143,6 @@ public class BasicUserService implements UserService {
     user.update(userUpdateRequest.newUserName(), userUpdateRequest.newEmail());
     userRepository.save(user);
     return userMapper.toDto(user);
-  }
-
-
-  @Transactional
-  @Override
-  public void delete(UUID userId) {
-    userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
-
-    userRepository.deleteById(userId);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
@@ -154,6 +160,15 @@ public class BasicUserService implements UserService {
     }
   }
 
+  @Transactional
+  @Override
+  public void delete(UUID userId) {
+    userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+
+    userRepository.deleteById(userId);
+  }
+  
   private boolean isValidEmail(String email) {
     return email.matches(EMAIL_REGEX);
   }

@@ -21,17 +21,6 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentMapper binaryContentMapper;
 
-  @Transactional
-  @Override
-  public BinaryContent create(BinaryContentCreateRequest request) {
-    Long size = (request.file() != null) ? (long) request.file().length : 0;
-    BinaryContent binaryContent = new BinaryContent(
-        request.fileName(),
-        request.contentType(),
-        size
-    );
-    return binaryContentRepository.save(binaryContent);
-  }
 
   @Transactional(readOnly = true)
   @Override

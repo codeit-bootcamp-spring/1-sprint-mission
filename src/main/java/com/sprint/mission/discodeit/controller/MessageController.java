@@ -27,8 +27,8 @@ public class MessageController {
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    Message message = messageService.create(messageCreateRequest, attachments);
-    return ResponseEntity.status(HttpStatus.CREATED).body(MessageDto.fromEntity(message));
+    MessageDto message = messageService.create(messageCreateRequest, attachments);
+    return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
   @PatchMapping(value = "/{messageId}")
@@ -36,8 +36,8 @@ public class MessageController {
       @PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request
   ) {
-    Message message = messageService.update(messageId, request);
-    return ResponseEntity.status(HttpStatus.OK).body(MessageDto.fromEntity(message));
+    MessageDto message = messageService.update(messageId, request);
+    return ResponseEntity.status(HttpStatus.OK).body(message);
   }
 
   @DeleteMapping(value = "/{messageId}/{writerId}")
