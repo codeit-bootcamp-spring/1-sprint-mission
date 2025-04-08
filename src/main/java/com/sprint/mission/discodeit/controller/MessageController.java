@@ -1,14 +1,18 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.data.BinaryContentStoreDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,28 +50,15 @@ public class MessageController {
 
   private final MessageService messageService;
 
-
   @PostMapping(
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE
   )
   public ResponseEntity<MessageDto> createMessage(
       @ModelAttribute MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
-      // MultipartFile : 스프링이 제공하는 인터페이스로 파일 업로드할 때 사용하는 객체, 아래 관련 메서드 사용함
   ) {
-    List<BinaryContentDto> attachmentRequests = Optional.ofNullable(attachments)
-        .map(files -> files.stream()
-            .map(file -> {
-              return new BinaryContentDto(
-                  UUID.randomUUID(),
-                  file.getOriginalFilename(),
-                  (int) file.getSize(), //getSize() -> long으로 반환
-                  file.getContentType()
-              );
-            })
-            .toList())
-        .orElse(new ArrayList<>());
-    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    List<BinaryContentStoreDto> attachmentRequest = BinaryContentMapper.toDtoFromMultipartFile(attachments);
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequest);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.data.BinaryContentStoreDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -25,9 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -44,58 +43,49 @@ public class BasicMessageService extends MessageMapper implements MessageService
   @Transactional
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
-      List<BinaryContentDto> requests) {
+                           List<BinaryContentStoreDto> attachments) {
 
+    // 요청 파라미터 값 곧 생성할 객체 변수에 넣어주기
     UUID channelId = messageCreateRequest.getChannelId();
     UUID userId = messageCreateRequest.getAuthorId();
-
-    String content = messageCreateRequest.getContent();
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(null));
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ChannelNotFoundException(null));
-    List<BinaryContent> attachments = binaryContentRepository.findAllByIdIn(
-        requests.stream().map((bc) -> bc.getId()).toList());
+    String content = messageCreateRequest.getContent();
 
-    if (!channelRepository.existsById(channelId)) {
-      throw new UserNotFoundException(null);
-    }
-    if (!userRepository.existsById(userId)) {
-      throw new UserNotFoundException(null);
-    }
+    // 첨부파일 1. DB에 메타정보 저장 2. 로컬 저장소에 바이너리 데이터 저장
+    List<BinaryContent> metaInfos = new ArrayList<>();
+    for (BinaryContentStoreDto request : attachments) {
+      String fileName = request.getFileName();
+      String contentType = request.getContentType();
+      int size = request.getSize();
+      BinaryContent metaInfo = BinaryContent.builder()
+              .fileName(fileName)
+              .size(size)
+              .contentType(contentType)
+              .build();
+      metaInfos.add(metaInfo);
+      binaryContentRepository.save(metaInfo);
 
-    // 다수의 첨부파일 등록
-    List<UUID> attachmentIds = new ArrayList<>(); // id를 저장하기 위한 리스트
-
-    for (BinaryContentDto attachmentRequest : requests) {
-      String fileName = attachmentRequest.getFileName();
-      String contentType = attachmentRequest.getContentType();
-      int size = attachmentRequest.getSize();
-      byte[] data = new byte[size];
-
-      binaryContentStorage.put(attachmentRequest.getId(), data);
-
-      BinaryContent binaryContent = BinaryContent.builder()
-          .fileName(fileName)
-          .size(size)
-          .contentType(contentType)
-          .build();
-      binaryContentRepository.save(binaryContent);
-      attachmentIds.add(binaryContent.getId());
+      byte[] data = request.getBytes();
+      UUID id = request.getId();
+      binaryContentStorage.put(id, data);
     }
 
+    // 메세지 생성 -> DB에 저장
     Message message = Message.builder()
         .content(content)
         .channel(channel)
         .user(user)
-        .attachments(attachments)
+        .attachments(metaInfos)
         .build();
-    Message msg = messageRepository.save(message);
+    Message createdMessage = messageRepository.save(message);
 
-    if (msg != null) {
-      MessageDto msgDto = toDto(msg);
-      System.out.println("생성된 메세지: " + msgDto);
-      return msgDto;
+    if (createdMessage != null) {
+      MessageDto createdMessageDto = toDto(createdMessage);
+      System.out.println("생성된 메세지: " + createdMessageDto);
+      return createdMessageDto;
     } else {
       return null;
     }
