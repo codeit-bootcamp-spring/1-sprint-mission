@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${USERNAME}
+    password: ${PASSWORD}
+    hikari:
+      maximum-pool-size: 4
+      connection-init-sql: SET TIME ZONE 'Asia/Seoul'
+
+logging:
+  level:
+    root: info
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+    com.sprint.mission.discodeit: info

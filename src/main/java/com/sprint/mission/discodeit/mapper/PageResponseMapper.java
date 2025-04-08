@@ -1,18 +1,30 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.entity.Message;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 
-@Mapper(componentModel = "spring", uses = MessageMapper.class)
+@Mapper(componentModel = "spring")
 public interface PageResponseMapper {
 
-  PageResponseMapper INSTANCE = Mappers.getMapper(PageResponseMapper.class);
+  default <T> PageResponse<T> fromSlice(Slice<T> slice, Object nextCursor) {
+    return new PageResponse<>(
+        slice.getContent(),
+        nextCursor,
+        slice.getSize(),
+        slice.hasNext(),
+        null
+    );
+  }
 
-  @Mapping(target = "content", source = "content")
-  PageResponse<MessageDto> fromPage(Page<Message> page);
+  default <T> PageResponse<T> fromPage(Page<T> page, Object nextCursor) {
+    return new PageResponse<>(
+        page.getContent(),
+        nextCursor,
+        page.getSize(),
+        page.hasNext(),
+        page.getTotalElements()
+    );
+  }
 }

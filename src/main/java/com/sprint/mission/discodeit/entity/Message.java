@@ -2,40 +2,37 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import java.time.Instant;
 import java.util.ArrayList;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "message")
+@Table(name = "messages")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Message extends BaseUpdatableEntity {
 
-  @ManyToOne()
-  @JoinColumn(name = "author_id")
-  private User author;
-
-  @ManyToOne()
-  @JoinColumn(name = "channel_id")
-  @NotNull
-  private Channel channel;
-
+  @Column(columnDefinition = "text", nullable = false)
   private String content;
-
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
+  private Channel channel;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", columnDefinition = "uuid")
+  private User author;
+  @BatchSize(size = 100)
+  @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
@@ -43,30 +40,16 @@ public class Message extends BaseUpdatableEntity {
   )
   private List<BinaryContent> attachments = new ArrayList<>();
 
-  public Message(User author, Channel channel, String content) {
-    super();
+  public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
+    this.channel = channel;
+    this.content = content;
+    this.author = author;
+    this.attachments = attachments;
   }
 
-  public void update(String newDetail) {
-    if (!newDetail.equals(this.content)) {
-      this.content = newDetail;
+  public void update(String newContent) {
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
     }
   }
-
-  public void addAttachment(BinaryContent attachment) {
-    if (attachment == null) {
-      throw new IllegalArgumentException(); // custom exception
-    }
-    this.attachments.add(attachment);
-    this.updateUpdatedAt();
-  }
-
-  public void deleteAttachment(BinaryContent attachment) {
-    if (attachment == null) {
-      throw new IllegalArgumentException();
-    }
-    this.attachments.remove(attachment);
-    this.updateUpdatedAt();
-  }
-
 }
