@@ -1,0 +1,52 @@
+server:
+  port: 7070
+
+spring:
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 500MB
+      enabled: true
+  datasource:
+    url: jdbc:h2:~/discodeit
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        highlight_sql: true
+        default_batch_fetch_size: 1000
+        generate_statistics: true;
+        use_sql_comments: true;
+    open-in-view: false
+logging:
+  level:
+    org.hibernate.SQL: debug
+    com.sprint.mission.discodeit: debug
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ~/Desktop/1-sprint-mission
+
+file:
+  #dir: C:/Users/leeco/Desktop/codeit_sprint/mission/1-sprint-mission/data_storage/
+  dir: ${user.home}/app_uploads/
+

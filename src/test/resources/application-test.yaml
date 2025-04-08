@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: Discodeit
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 500MB
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+        jdbc:
+          time_zone: UTC
+      type_descriptor:
+        sql_uuid: true
+    open-in-view: false
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+logging:
+  level:
+    root: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: DEBUG
+    com.discodeit: debug
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ${java.io.tmpdir}/discodeit-test
+
+file:
+  dir: ${java.io.tmpdir}/discodeit-test/uploads/
+
+server:
+  port: 0  # 랜덤 포트 사용 (테스트 시 포트 충돌 방지)

@@ -1,0 +1,122 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.2'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+ext {
+    springBootAdminVersion = "3.4.5"
+}
+
+bootJar {
+    archiveFileName = 'app.jar'
+}
+
+tasks.register('copyJarToDockerContext', Copy) {
+    dependsOn bootJar
+    from layout.buildDirectory.file("libs/app.jar")
+    into "."
+}
+
+group = 'com.sprint.mission'
+version = '0.0.2'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+
+    //Swagger
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.7.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    runtimeOnly 'com.h2database:h2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+
+    // queryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    // aws s3
+    implementation("software.amazon.awssdk:s3:2.31.14")
+    implementation("software.amazon.awssdk:protocol-core:2.31.14")
+}
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorPath = configurations.annotationProcessor
+    options.compilerArgs = [
+            '-Amapstruct.defaultComponentModel=spring',
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.suppressGeneratorVersionInfoComment=true'
+    ]
+}
+
+// 생성 소스 디렉토리를 명시적으로 지정
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// 생성 소스가 저장되는 디렉토리를 clean 태스크에 포함
+clean {
+    delete "build", "src/main/generated"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "de.codecentric:spring-boot-admin-dependencies:$springBootAdminVersion"
+    }
+}

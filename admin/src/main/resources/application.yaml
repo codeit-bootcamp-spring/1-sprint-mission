@@ -1,0 +1,6 @@
+# application.yaml
+spring:
+  application:
+    name: admin
+server:
+  port: 9090

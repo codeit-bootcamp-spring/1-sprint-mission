@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- .logs 로그 파일 -->
+  <property name="LOG_DIR" value="${user.dir}/.logs"/>
+
+  <!-- 출력 포맷 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>
+        <![CDATA[%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n]]></pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일 출력 설정 -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/application.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 일자별 롤링 -->
+      <fileNamePattern>${LOG_DIR}application.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>
+        <![CDATA[%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n]]></pattern>
+    </encoder>
+  </appender>
+
+  <springProfile name="prod">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </root>
+    <logger name="com.sprint.mission.discodeit" level="INFO"/>
+    <!--    <logger name="org.hibernate.SQL" level="DEBUG"/>-->
+  </springProfile>
+
+  <springProfile name="dev">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </root>
+    <logger name="com.sprint.mission.discodeit" level="DEBUG"/>
+    <!--    <logger name="org.hibernate.SQL" level="DEBUG"/>-->
+  </springProfile>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+</configuration>

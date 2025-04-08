@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 500MB
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        highlight_sql: true
+        default_batch_fetch_size: 1000
+        generate_statistics: true;
+        use_sql_comments: true;
+    open-in-view: false
+logging:
+  level:
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: debug
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ~/Desktop/1-sprint-mission
+
+file:
+  #dir: C:/Users/leeco/Desktop/codeit_sprint/mission/1-sprint-mission/data_storage/
+  dir: ${user.home}/app_uploads/
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics, loggers
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.2
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: org.postgresql.Driver
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
