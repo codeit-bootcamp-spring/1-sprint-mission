@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <!--  색상 넣는 코드-->
+  <conversionRule conversionWord="clr"
+    converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+  <!--  패턴정의-->
+  <property name="CONSOLE_LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%-5level) %cyan(%logger{36}) - %msg%n"/>
+
+  <property name="FILE_LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+  <!--  콘솔 출력-->
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!--  파일 저장-->
+  <property name="LOG_PATH" value="./.logs"/>
+
+
+  <!--  파일로 출력-->
+  <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/app.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 파일 이름 패턴 -->
+      <fileNamePattern>${LOG_PATH}/app-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <!-- 30일 보관 -->
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!--  ERROR, WARN, INFO, DEBUG-->
+  <root level="debug">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="FileAppender"/>
+  </root>
+
+</configuration>

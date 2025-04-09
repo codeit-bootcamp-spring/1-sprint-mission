@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DATABASE_PUBLIC_URL}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+
+  jpa:
+    show-sql: false
+
+server:
+  port: 80
+
+logging:
+  level:
+    root: info #운영 환경에서는 info
+    org.hibernate: INFO
+    com.sprint: info

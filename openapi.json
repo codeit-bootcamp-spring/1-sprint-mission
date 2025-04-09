@@ -1,0 +1,1332 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Discodeit API",
+    "description": "스프린트 미션 5 API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Messages",
+      "description": "메세지 관련 정보"
+    },
+    {
+      "name": "Read Statuses",
+      "description": "읽음 상태 정보"
+    },
+    {
+      "name": "User Status",
+      "description": "사용자 상태 관련 정보"
+    },
+    {
+      "name": "Users",
+      "description": "유저 관련 정보"
+    },
+    {
+      "name": "Binary Contents",
+      "description": "바이너리 파일 관련 정보"
+    },
+    {
+      "name": "Login",
+      "description": "관리자 로그인 관련 정보"
+    },
+    {
+      "name": "Channels",
+      "description": "채널 관련 정보"
+    }
+  ],
+  "paths": {
+    "/api/users/{userId}": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "사용자 정보 수정",
+        "description": "선택적 프로필 이미지와 함께 사용자 정보를 수정합니다.",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "수정할 사용자의 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "userUpdateRequest"
+                ],
+                "type": "object",
+                "properties": {
+                  "userUpdateRequest": {
+                    "type": "string",
+                    "description": "사용자 정보 수정 내용"
+                  },
+                  "profile": {
+                    "type": "string",
+                    "description": "선택적 새 프로필 이미지",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "사용자 정보 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "사용자를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "User with id {userId} not found"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "사용자 삭제",
+        "description": "특정 사용자를 삭제합니다.",
+        "operationId": "delete",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "삭제할 사용자의 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "사용자 삭제 성공"
+          },
+          "404": {
+            "description": "사용자를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "User with id {userId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/userStatus/updateOnline": {
+      "put": {
+        "tags": [
+          "User Status"
+        ],
+        "summary": "사용자 온라인 상태 업데이트",
+        "description": "특정 사용자의 온라인 상태를 업데이트합니다.",
+        "operationId": "updateOnlineStatus",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "상태를 업데이트할 사용자 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "사용자 상태 업데이트 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "사용자 상태를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "UserStatus with userId {userId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/{channelId}": {
+      "get": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "채널 ID로 조회",
+        "description": "특정 ID의 채널을 조회합니다.",
+        "operationId": "getChannelById",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "채널 ID로 채널 정보 출력",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "채널 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "채널을 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Channel with id {channelId} not found"
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "채널 수정",
+        "description": "기존 채널을 수정합니다.",
+        "operationId": "updateChannel",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "채널 ID로 정보 수정",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "채널 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "채널을 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Channel with id {channelId} not found"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "채널 삭제",
+        "description": "특정 채널을 삭제합니다.",
+        "operationId": "deleteChannel",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "path",
+            "description": "채널 ID로 채널 삭제",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "채널 삭제 성공"
+          },
+          "404": {
+            "description": "채널을 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Channel with id {channelId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "전체 사용자 조회",
+        "description": "모든 사용자를 조회합니다.",
+        "operationId": "findAll",
+        "responses": {
+          "200": {
+            "description": "사용자 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "사용자 생성",
+        "description": "선택적 프로필 이미지와 함께 새로운 사용자를 생성합니다.",
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "userCreateRequest"
+                ],
+                "type": "object",
+                "properties": {
+                  "userCreateRequest": {
+                    "type": "string",
+                    "description": "사용자 생성 정보"
+                  },
+                  "profile": {
+                    "type": "string",
+                    "description": "선택적 프로필 이미지",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "사용자 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 사용자 데이터",
+            "content": {
+              "*/*": {
+                "example": "User with email {email} already exists"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/readStatuses": {
+      "get": {
+        "tags": [
+          "Read Statuses"
+        ],
+        "summary": "사용자별 읽음 상태 조회",
+        "description": "특정 사용자의 모든 읽음 상태를 조회합니다.",
+        "operationId": "findAllByUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "읽음 상태를 조회할 사용자 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "읽음 상태 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Read Statuses"
+        ],
+        "summary": "읽음 상태 생성",
+        "description": "사용자와 채널에 대한 새로운 읽음 상태를 생성합니다.",
+        "operationId": "create_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadStatusCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "읽음 상태 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "채널별 메시지 조회",
+        "description": "특정 채널의 모든 메시지를 조회합니다.",
+        "operationId": "findAllByChannelId",
+        "parameters": [
+          {
+            "name": "channelId",
+            "in": "query",
+            "description": "채널 ID로 채널별 메세지들 조회",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "메시지 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "메시지 생성",
+        "description": "첨부 파일을 선택적으로 포함하여 새 메시지를 생성합니다.",
+        "operationId": "create_2",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "messageCreateRequest"
+                ],
+                "type": "object",
+                "properties": {
+                  "messageCreateRequest": {
+                    "type": "string",
+                    "description": "메시지 생성 정보"
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "description": "선택적 메시지 첨부 파일",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "메시지 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "잘못된 메시지 데이터",
+            "content": {
+              "*/*": {
+                "example": "Invalid message data format"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/public": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "공개 채널 생성",
+        "description": "새로운 공개 채널을 생성합니다.",
+        "operationId": "createPublicChannel",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "공개 채널 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels/private": {
+      "post": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "비공개 채널 생성",
+        "description": "새로운 비공개 채널을 생성합니다.",
+        "operationId": "createPrivateChannel",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "비공개 채널 생성 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "유저 로그인",
+        "description": "로그인",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "로그인 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "로그인 실패",
+            "content": {
+              "*/*": {
+                "example": "Wrong password"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/userStatus": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "사용자 상태 수정",
+        "description": "특정 사용자의 상태를 수정합니다.",
+        "operationId": "updateUserStatusByUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "상태를 수정할 사용자의 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserStatusUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "사용자 상태 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserStatus"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "사용자를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "User with id {userId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/readStatuses/{readStatusId}": {
+      "patch": {
+        "tags": [
+          "Read Statuses"
+        ],
+        "summary": "읽음 상태 수정",
+        "description": "특정 읽음 상태를 수정합니다.",
+        "operationId": "update_1",
+        "parameters": [
+          {
+            "name": "readStatusId",
+            "in": "path",
+            "description": "수정할 읽음 상태의 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadStatusUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "읽음 상태 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "읽음 상태를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "ReadStatus with id {readStatusId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/{messageId}": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "메시지 ID로 조회",
+        "description": "특정 ID의 메시지를 조회합니다.",
+        "operationId": "getMessageById",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "메세지 ID로 조회",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "메시지 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "메시지를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Message with id {messageId} not found"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "메시지 삭제",
+        "description": "특정 메시지를 삭제합니다.",
+        "operationId": "delete_1",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "메세지 ID로 삭제",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "메시지 삭제 성공"
+          },
+          "404": {
+            "description": "메시지를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Message with id {messageId} not found"
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "메시지 내용 수정",
+        "description": "특정 메시지의 내용을 수정합니다.",
+        "operationId": "update_2",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "description": "메세지 ID로 수정",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "메시지 수정 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "메시지를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Message with id {messageId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/userStatus/check": {
+      "get": {
+        "tags": [
+          "User Status"
+        ],
+        "summary": "사용자 상태 확인",
+        "description": "특정 사용자의 현재 상태를 조회합니다.",
+        "operationId": "checkUserStatus",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "상태를 확인할 사용자 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "사용자 상태 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "사용자 상태를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "UserStatus with userId {userId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/messages/author/{authorId}": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "작성자별 메시지 조회",
+        "description": "특정 작성자가 생성한 모든 메시지를 조회합니다.",
+        "operationId": "getMessagesByAuthorId",
+        "parameters": [
+          {
+            "name": "authorId",
+            "in": "path",
+            "description": "작성자 ID로 조회",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "메시지 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "메시지를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "Message with id {messageId} not found"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/channels": {
+      "get": {
+        "tags": [
+          "Channels"
+        ],
+        "summary": "전체 채널 조회",
+        "description": "모든 채널을 조회합니다.",
+        "operationId": "getAllChannels",
+        "responses": {
+          "200": {
+            "description": "채널 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/binaryContents": {
+      "get": {
+        "tags": [
+          "Binary Contents"
+        ],
+        "summary": "여러 바이너리 콘텐츠 조회",
+        "description": "여러 ID로 바이너리 콘텐츠를 조회합니다.",
+        "operationId": "findAllByIdIn",
+        "parameters": [
+          {
+            "name": "binaryContentIds",
+            "in": "query",
+            "description": "조회할 바이너리 콘텐츠 ID 목록",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "바이너리 콘텐츠 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinaryContentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/binaryContents/{binaryContentId}": {
+      "get": {
+        "tags": [
+          "Binary Contents"
+        ],
+        "summary": "바이너리 콘텐츠 조회",
+        "description": "개별 ID로 바이너리 파일을 조회합니다.",
+        "operationId": "getBinaryContent",
+        "parameters": [
+          {
+            "name": "binaryContentId",
+            "in": "path",
+            "description": "조회할 바이너리 콘텐츠의 ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "바이너리 콘텐츠 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinaryContentResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "바이너리 콘텐츠를 찾을 수 없음",
+            "content": {
+              "*/*": {
+                "example": "BinaryContent with id {binaryContentId} not found"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isCurrentlyLoggedIn": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profileImageId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UserStatusResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lastActivityAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isCurrentlyLoggedIn": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChannelResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChannelUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "newName": {
+            "type": "string"
+          },
+          "newDescription": {
+            "type": "string"
+          }
+        }
+      },
+      "ReadStatusResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lastReadAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReadStatusCreateRequest": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lastReadAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "content": {
+            "type": "string"
+          },
+          "authorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChannelCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PUBLIC",
+              "PRIVATE"
+            ]
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "UserStatus": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastActivityAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "currentlyLoggedIn": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserStatusUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "newLastActiveAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReadStatusUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "newLastReadAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MessageUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "newContent": {
+            "type": "string"
+          }
+        }
+      },
+      "BinaryContentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "fileNm": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

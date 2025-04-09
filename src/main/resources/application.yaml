@@ -1,0 +1,63 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: discodeit
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+logging:
+  level:
+    root: info #기본적으로 info 레벨로 설정
+    org.hibernate.SQL: debug #SQL 로그를 위한 레베 유지
+    org.hibernate.orm.jdbc.bind: trace
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers #엔트포인트
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+# Actuator
+info:
+  app:
+    name: Discodeit #애플리케이션 이름
+    version: 1.7.0 # 애플리케이션 버전
+    java:
+      version: 17 #자바 버전
+    spring-boot:
+      version: 3.4.0 # 스프링 부트 버전
+  datasource:
+    url: ${spring.datasource.url}
+    driver-class-name: ${spring.datasource.driver-class-name}
+  jpa:
+    hibernate:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+  storage:
+    type: ${discodeit.storage.type}
+    path: ${discodeit.storage.local.root-path}
+  multipart:
+    max-file-size: ${spring.servlet.multipart.maxFileSize}
+    max-request-size: ${spring.servlet.multipart.maxRequestSize}
