@@ -1,16 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.BinaryContentStoreDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.io.IOException;
@@ -57,8 +53,7 @@ public class MessageController {
       @ModelAttribute MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    List<BinaryContentStoreDto> attachmentRequest = BinaryContentMapper.toDtoFromMultipartFile(attachments);
-    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequest);
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachments);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);
