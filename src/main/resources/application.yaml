@@ -1,0 +1,71 @@
+spring:
+  profiles:
+    active: prod
+
+  application:
+    name: discodeit
+
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    #        default_batch_fetch_size: 100
+    open-in-view: false
+
+logging:
+  level:
+    org.hibernate.SQL: debug # 이 설정은 특정한 패키지(org.hibernate.SQL)에 대해서만 로그 레벨을 debug로 지정
+    org.hibernate.orm.jdbc.bind: trace #  Hibernate의 로그 레벨 중 하나로, JDBC 파라미터 바인딩에 관련된 매우 상세한 로그를 출력
+    root: info #애플리케이션 전체에 대한 기본 로그 레벨 설정
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+info:
+  name: Discodeit
+  version: 1.7.0
+  java-version: 17
+  spring-boot-version: 3.4.0
+  details:
+    datasource:
+      url: jdbc:postgresql://localhost:5432/discodeit
+      driver-class-name: org.postgresql.Driver
+    jpa:
+      ddl-auto: validate
+    storage:
+      type: local
+      path: .discodeit/storage
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
