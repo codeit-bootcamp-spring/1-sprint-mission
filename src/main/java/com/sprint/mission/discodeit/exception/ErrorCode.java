@@ -28,7 +28,8 @@ public enum ErrorCode {
   ELEMENTS_NOT_FOUND(404, "해당 리소스를 찾을 수 없습니다."),//no such EllementsException
   ILLEGAL_ARGUMENT(400, "잘못된 리소스가 전달되었습니다."),//IllegalArgumentException
   INTERNAL_SERVER_ERROR(500, "서버 에러입니다."),
-  DUPLICATE_ENTITY(400, "이미 존재하는 엔티티입니다.");//EntityExistsException
+  DUPLICATE_ENTITY(400, "이미 존재하는 엔티티입니다."),//EntityExistsException
+  VALID_ERROR(400, "유효하지 않은 값입니다.");//MethodArgumentNotValidException
 
   private final int status;
   private final String message;

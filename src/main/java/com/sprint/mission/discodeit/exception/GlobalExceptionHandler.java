@@ -4,6 +4,7 @@ import jakarta.persistence.EntityExistsException;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpServerErrorException.InternalServerError;
@@ -74,5 +75,19 @@ public class GlobalExceptionHandler {
     );
     return ResponseEntity.status(ErrorCode.DUPLICATE_ENTITY.getStatus()).body(errorResponse);
   }
+
+  //MethodArgumentNotValidException
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+      MethodArgumentNotValidException e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+        ErrorCode.VALID_ERROR.getStatus(),
+        e.getClass().getSimpleName(),
+        ErrorCode.VALID_ERROR.name(),
+        e.getBindingResult().getFieldError().getDefaultMessage() //너무 길어서 message만 나오게함.
+    );
+    return ResponseEntity.status(ErrorCode.VALID_ERROR.getStatus()).body(errorResponse);
+  }
+
 }
 
