@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.docs.ReadStatusControllerDocs;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class ReadStatusController implements ReadStatusControllerDocs {
     private final ReadStatusService readStatusService;
 
     @PostMapping
-    public CustomApiResponse<ReadStatusResponseDto> createReadStatus(@RequestBody ReadStatusRequestDto readStatusReqDto) {
+    public CustomApiResponse<ReadStatusResponseDto> createReadStatus(@Valid @RequestBody ReadStatusRequestDto readStatusReqDto) {
         return CustomApiResponse.created(readStatusService.create(readStatusReqDto));
     }
 

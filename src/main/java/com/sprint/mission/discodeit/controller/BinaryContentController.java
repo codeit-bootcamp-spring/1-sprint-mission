@@ -22,13 +22,4 @@ public class BinaryContentController implements BinaryContentControllerDocs {
         return binaryContentService.download(fileId);
     }
 
-//    @GetMapping("/profile")
-//    public ResponseEntity<byte[]> getProfileByUserId(@RequestParam UUID userId) throws IOException {
-//        return binaryContentService.getProfileImageAsResponse(userId);
-//    }
-//
-//    @GetMapping(path = "/message", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-//    public ResponseEntity<byte[]> getContentsByMessageId(@RequestParam UUID messageId) throws IOException {
-//        return binaryContentService.getMessageImageAsResponse(messageId);
-//    }
 }

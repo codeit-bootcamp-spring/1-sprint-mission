@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -33,7 +32,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusResponseDto find(UUID readStatusId) {
-        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new CustomException(ErrorCode.FAILED_TO_LOAD_DATA));
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new ReadStatusNotFoundException(readStatusId) {
+        });
         return readStatusMapper.toResponseDto(readStatus);
     }
 
@@ -48,10 +48,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     @Override
     public ReadStatusResponseDto update(UUID readStatusId, Instant lastReadAt) {
-        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new CustomException(ErrorCode.FAILED_TO_LOAD_DATA));
-        if (readStatus == null) {
-            throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
-        }
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
         // 마지막에 읽은 것만 업데이트 하면 됨
         readStatus.updateLastReadAt(lastReadAt);
         return readStatusMapper.toResponseDto(readStatus);
@@ -60,7 +57,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     @Override
     public ReadStatusResponseDto delete(UUID readStatusId) {
-        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new CustomException(ErrorCode.FAILED_TO_LOAD_DATA));
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
         readStatusRepository.delete(readStatus);
         return readStatusMapper.toResponseDto(readStatus);
     }

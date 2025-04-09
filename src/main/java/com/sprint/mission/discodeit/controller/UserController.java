@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class UserController implements UserControllerDocs {
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public CustomApiResponse<UserResponseDto> createUser(
-            @RequestPart("user") UserSignupRequestDto reqUserDto,
+            @Valid @RequestPart("user") UserSignupRequestDto reqUserDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws IOException {
         return CustomApiResponse.created(userService.create(reqUserDto, profile));

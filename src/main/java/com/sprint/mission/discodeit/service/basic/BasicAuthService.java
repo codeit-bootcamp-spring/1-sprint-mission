@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserSignInDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.auth.LoginFailedException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -28,6 +27,6 @@ public class BasicAuthService implements AuthService {
             user.getUserStatus().updateLastActiveAt();  // 변경 감지
             return userMapper.toResponseDto(user);
         }
-        throw new CustomException(ErrorCode.LOGIN_FAILED);
+        throw new LoginFailedException(loginDTO.username());
     }
 }

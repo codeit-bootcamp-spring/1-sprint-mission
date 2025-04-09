@@ -2,6 +2,23 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+ext {
+    springBootAdminVersion = "3.4.5"
 }
 
 group = 'com.sprint.mission'
@@ -24,18 +41,29 @@ repositories {
 }
 
 dependencies {
+    // spring web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
     // jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // spring boot admin (client)
+    implementation 'de.codecentric:spring-boot-admin-starter-client'
 
     // lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // MapStruct
     implementation 'org.mapstruct:mapstruct:1.6.3'
@@ -43,8 +71,12 @@ dependencies {
 
     // postgreSQL
     runtimeOnly 'org.postgresql:postgresql'
+}
 
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+dependencyManagement {
+    imports {
+        mavenBom "de.codecentric:spring-boot-admin-dependencies:$springBootAdminVersion"
+    }
 }
 
 tasks.named('test') {

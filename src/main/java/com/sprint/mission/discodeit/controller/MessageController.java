@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.message.MessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class MessageController implements MessageControllerDocs {
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public CustomApiResponse<MessageResponseDto> createMessage(
-            @RequestPart("message") MessageRequestDto messageReqDto,
+            @Valid @RequestPart("message") MessageRequestDto messageReqDto,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) throws IOException {
         return CustomApiResponse.created(messageService.create(messageReqDto, attachments));
     }

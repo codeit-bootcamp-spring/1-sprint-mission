@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -39,7 +39,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     @Override
     public UserStatusResponseDto update(UUID userId, UserStatusRequestDto userStatusRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.FAILED_TO_LOAD_DATA));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         UserStatus userStatus = userStatusRepository.findByUser(user);
         userStatus.updateLastActiveAt(userStatusRequestDto.newLastActiveAt());
 
@@ -49,7 +49,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     @Override
     public UserStatusResponseDto delete(UUID userStatusId) {
-        UserStatus userStatus = userStatusRepository.findById(userStatusId).orElseThrow(() -> new CustomException(ErrorCode.FAILED_TO_LOAD_DATA));
+        UserStatus userStatus = userStatusRepository.findById(userStatusId).orElseThrow(() -> new UserStatusNotFoundException(userStatusId));
         userStatusRepository.delete(userStatus);
         return userStatusMapper.toResponseDto(userStatus);
     }

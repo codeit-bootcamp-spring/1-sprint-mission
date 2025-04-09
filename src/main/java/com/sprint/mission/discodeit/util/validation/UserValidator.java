@@ -4,8 +4,9 @@ import com.sprint.mission.discodeit.common.Phone;
 import com.sprint.mission.discodeit.dto.user.UserSignupRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.user.RegionCodeCanNotNullException;
+import com.sprint.mission.discodeit.exception.user.UserValidationException;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -14,27 +15,27 @@ public class UserValidator implements Validator<User, UserSignupRequestDto, User
     @Override
     public void validateCreate(UserSignupRequestDto entity) {
         if (!ValidatorExp.USERNAME.matches(entity.username())) {
-            throw new CustomException(ErrorCode.INVALID_USERNAME);
+            throw new UserValidationException(ErrorCode.INVALID_USERNAME, entity.username());
         }
 
         if (!ValidatorExp.NICKNAME.matches(entity.nickname())) {
-            throw new CustomException(ErrorCode.INVALID_NICKNAME);
+            throw new UserValidationException(ErrorCode.INVALID_NICKNAME, entity.nickname());
         }
 
         if (!ValidatorExp.PASSWORD.matches(entity.password())) {
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+            throw new UserValidationException(ErrorCode.INVALID_PASSWORD, entity.password());
         }
 
         if (!ValidatorExp.PHONE.matches(entity.phone())) {
-            throw new CustomException(ErrorCode.INVALID_PHONENUM);
+            throw new UserValidationException(ErrorCode.INVALID_PHONENUM, entity.phone());
         }
 
         if (!ValidatorExp.EMAIL.matches(entity.email())) {
-            throw new CustomException(ErrorCode.INVALID_EMAIL);
+            throw new UserValidationException(ErrorCode.INVALID_EMAIL, entity.email());
         }
 
         if (StringUtils.isBlank(entity.regionCode().name())) {
-            throw new CustomException(ErrorCode.REGION_CODE_IS_NOT_NULL);
+            throw new RegionCodeCanNotNullException();
         }
     }
 

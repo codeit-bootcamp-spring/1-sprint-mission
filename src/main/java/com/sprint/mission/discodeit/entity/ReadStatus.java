@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
@@ -15,6 +16,7 @@ import java.time.Instant;
  * - 사용자 별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "read_statuses",
         uniqueConstraints = {
                 @UniqueConstraint(name = "unique_user_channel", columnNames = {"user_id", "channel_id"})

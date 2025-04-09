@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelRequestDto;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +21,12 @@ public class ChannelController implements ChannelControllerDocs {
     private final ChannelService channelService;
 
     @PostMapping("/public")
-    public CustomApiResponse<ChannelResponseDto> createPublicChannel(@RequestBody PublicChannelRequestDto channelReqDto) {
+    public CustomApiResponse<ChannelResponseDto> createPublicChannel(@Valid @RequestBody PublicChannelRequestDto channelReqDto) {
         return CustomApiResponse.created(channelService.createPublicChannel(channelReqDto));
     }
 
     @PostMapping("/private")
-    public CustomApiResponse<ChannelResponseDto> createPrivateChannel(@RequestBody PrivateChannelRequestDto channelReqDto) {
+    public CustomApiResponse<ChannelResponseDto> createPrivateChannel(@Valid @RequestBody PrivateChannelRequestDto channelReqDto) {
         return CustomApiResponse.created(channelService.createPrivateChannel(channelReqDto));
     }
 

@@ -1,0 +1,39 @@
+<!-- logback-spring.xml -->
+<!--로그 세팅-->
+<configuration>
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+    <!--    로그 경로 설정-->
+    <property name="LOG_PATH" value=".logs"/>
+
+    <!--    콘솔로 출력-->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} [%X{requestId} | %X{method} | %X{uri}]
+                - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--    파일로 출력-->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} [%X{requestId} | %X{method} | %X{uri}]
+                - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--  최상위 root 로거 레벨: INFO  -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <!--  패키지별 다른 레벨 설정: 디버그가 필요한 Service-->
+    <!--  <logger name="com.codeit.sb01hrbankteam04.domain.file.service" level="DEBUG"/>-->
+</configuration>

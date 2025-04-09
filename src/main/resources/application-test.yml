@@ -1,0 +1,39 @@
+# TEST
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  h2:
+    console:
+      enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # sql initialize를 사용하지 않을 것
+  sql:
+    init:
+      mode: never
+
+# 테스트용이기에 DEBUG로 확인
+logging:
+  level:
+    root: debug
+    com.sprint.mission.discodeit: debug
+    org:
+      hibernate:
+        sql: debug
+        type:
+          descriptor:
+            sql: debug
