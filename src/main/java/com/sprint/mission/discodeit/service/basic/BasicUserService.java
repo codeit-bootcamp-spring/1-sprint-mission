@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.error.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -106,7 +107,7 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("Need to specify a valid user id");
     }
     return userRepository.findById(uuid)
-        .orElseThrow(() -> new EntityNotFoundException("User with ID " + uuid + " not found"));
+        .orElseThrow(UserNotFoundException::new);
   }
 
   private BinaryContent saveBinaryContent(CreateBinaryContentRequest profileRequest) {
