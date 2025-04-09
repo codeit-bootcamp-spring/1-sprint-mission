@@ -40,11 +40,11 @@ public class ChannelMapper {
 
     Instant lastMessageAt = Instant.MIN; // 초기값은 가장 과거의 시간인 .MIN으로 초기화
     Pageable pageable = PageRequest.of(0, 1, Sort.by("createdAt").descending());
-    Page<Message> msgs = messageRepository.findAllByChannelId(channel.getId(), pageable);
+    Page<Message> messages = messageRepository.findAllByChannelId(channel.getId(), pageable);
     
-    if (!msgs.isEmpty()) {
+    if (!messages.isEmpty()) {
       // 가장 최근 메시지를 가져오고, 그 메시지의 createdAt 값을 lastMessageAt에 설정
-      lastMessageAt = msgs.getContent().get(0).getCreatedAt();
+      lastMessageAt = messages.getContent().get(0).getCreatedAt();
     }
 
     List<UUID> participantIds = new ArrayList<>();

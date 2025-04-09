@@ -70,9 +70,9 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
   @Transactional(readOnly = true)
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
-    List<Channel> publicChannels = channelRepository.findAll();
+    List<Channel> allChannels = channelRepository.findAll();
     List<ChannelDto> returnChannels = new ArrayList<>();
-    for (Channel channel : publicChannels) {
+    for (Channel channel : allChannels) {
       if (channel.getType().equals(Channel.ChannelType.PUBLIC)) {
         returnChannels.add(toDto(channel));
       } else if (channel.getType().equals(Channel.ChannelType.PRIVATE)) {
