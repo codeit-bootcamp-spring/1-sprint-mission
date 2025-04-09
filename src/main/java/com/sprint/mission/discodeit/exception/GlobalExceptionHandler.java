@@ -1,35 +1,46 @@
 package com.sprint.mission.discodeit.exception;
 
-import org.springframework.http.HttpStatus;
+import com.sprint.mission.discodeit.dto.response.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.NoSuchElementException;
-
-@ControllerAdvice
-@ResponseBody
+@Slf4j
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<String> handleException(IllegalArgumentException e) {
-    return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
-        .body(e.getMessage());
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+      MethodArgumentNotValidException methodArgumentNotValidException
+  ) {
+    log.error("Not Valid Exception", methodArgumentNotValidException);
+
+    ErrorResponse errorResponse = ErrorResponse.of(methodArgumentNotValidException);
+    return ResponseEntity.status(errorResponse.getStatus()).body(errorResponse);
   }
 
-  @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<String> handleException(NoSuchElementException e) {
+  @ExceptionHandler(DiscodeitException.class)
+  protected ResponseEntity<ErrorResponse> handleDiscodeitException(
+      DiscodeitException discodeitException
+  ) {
+    log.error("Discodeit Exception ", discodeitException);
+
+    ErrorResponse errorResponse = ErrorResponse.of(discodeitException);
     return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .body(e.getMessage());
+        .status(errorResponse.getStatus())
+        .body(errorResponse);
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleException(Exception e) {
-    return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(e.getMessage());
+  public ResponseEntity<ErrorResponse> handleException(Exception exception) {
+    log.error("Exception ", exception);
+
+    ErrorResponse errorResponse = ErrorResponse.ofUnknown(exception);
+    return ResponseEntity.
+        status(errorResponse.getStatus())
+        .body(errorResponse);
   }
+
 }
