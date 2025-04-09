@@ -32,6 +32,12 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
   @Column(nullable = false, length = 10)
   private ChannelType type;
 
+  public enum ChannelType {
+    PUBLIC,
+    PRIVATE
+  }
+
+
   public void update(String name, String description) {
     this.name = name;
     this.description = description;
