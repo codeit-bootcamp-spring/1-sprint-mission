@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.response;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,7 @@ import lombok.Setter;
 public class PageResponse<T> {
 
   List<T> content;
-  int number;
+  Object nextCursor;
   int size;
   boolean hasNext;
   Long totalElements;

@@ -8,13 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PageResponseMapper {
 
-  /**
-   * Slice 객체로부터 PageResponse DTO를 생성합니다.
-   *
-   * @param slice 변환할 Slice 객체
-   * @param <T>   데이터 타입
-   * @return 생성된 PageResponse 객체
-   */
+
   public <T> PageResponse<T> fromSlice(Slice<T> slice) {
     return new PageResponse<>(
         slice.getContent(),
@@ -25,17 +19,11 @@ public class PageResponseMapper {
     );
   }
 
-  /**
-   * Page 객체로부터 PageResponse DTO를 생성합니다.
-   *
-   * @param page 변환할 Page 객체
-   * @param <T>  데이터 타입
-   * @return 생성된 PageResponse 객체
-   */
-  public <T> PageResponse<T> fromPage(Page<T> page) {
+
+  public static <T> PageResponse<T> fromPage(Page<T> page, String nextCursor) {
     return new PageResponse<>(
         page.getContent(),
-        page.getNumber(),
+        nextCursor,
         page.getSize(),
         page.hasNext(),
         page.getTotalElements()
