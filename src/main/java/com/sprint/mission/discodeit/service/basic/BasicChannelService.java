@@ -8,13 +8,15 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -106,9 +108,9 @@ public class BasicChannelService implements ChannelService {
 
   //기존의 read private선언?
   @Override
-  public Channel findById(UUID id) {
-    return channelRepository.findById(id).orElseThrow(()
-        -> new NoSuchElementException("Channel not found"));
+  public Channel findById(UUID channelId) {
+    return channelRepository.findById(channelId).orElseThrow(()
+        -> new ChannelNotFoundException(Map.of("요청된 Channel ID: ", channelId)));
   }
 
   @Override
@@ -122,10 +124,10 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto update(ChannelUpdateRequest channelUpdateRequest, UUID channelId) {
     if (findDTO(channelId).getType() == ChannelType.PRIVATE) {
       log.info("Private channel cannot be updated");
-      throw new IllegalArgumentException("PRIVATE  채널은 수정할 수 없습니다.");
+      throw new PrivateChannelUpdateException(Map.of("PV Channel ID:", channelId));
     }
     Channel channel = channelRepository.findById(channelId).orElseThrow(()
-        -> new NoSuchElementException("channel not found"));
+        -> new ChannelNotFoundException(Map.of("요청된 Channel ID: ", channelId)));
     channel.updateName(channelUpdateRequest.name());
     log.debug("DEBUG: Update channel: {}", channel);
     log.info("Update channel with ID: {}", channelId);

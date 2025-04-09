@@ -38,7 +38,7 @@ public enum ErrorCode {
   }
 
   public String getMessage() {
-    return message;
+    return this.message;
   }
 
 }
