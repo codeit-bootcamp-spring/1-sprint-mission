@@ -65,7 +65,7 @@ public class UserController {
   }
 
   @PatchMapping(
-      value = "/{userId}",
+      value = "/{user-id}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
   )
   /*
@@ -77,7 +77,7 @@ public class UserController {
     -> POST (multipart/form-data) 요청이면 바디에서 값을 받는다!
    */
   public ResponseEntity<UserDto> update(
-      @PathVariable UUID userId,
+      @PathVariable("user-id") UUID userId,
       @ModelAttribute UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false)
       @ProfileFile(message = "이미지 파일만 설정할 수 있습니다.")
@@ -91,8 +91,8 @@ public class UserController {
         .body(updatedUser);
   }
 
-  @DeleteMapping("/{userId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+  @DeleteMapping("/{user-id}")
+  public ResponseEntity<Void> delete(@PathVariable("user-id") UUID userId) {
     userService.delete(userId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -107,9 +107,9 @@ public class UserController {
         .body(allUsers);
   }
 
-  @PostMapping("/{userId}/userStatus")
+  @PostMapping("/{user-id}/user-status")
   public ResponseEntity<UserStatusDto> createUserStatusByUserId(
-      @PathVariable UUID userId,
+      @PathVariable("user-id") UUID userId,
       @RequestBody UserStatusCreateRequest userStatusCreateRequest
   ) {
     UserStatusDto userStatusDto = userStatusService.create(userStatusCreateRequest);
@@ -118,9 +118,9 @@ public class UserController {
         .body(userStatusDto);
   }
 
-  @PatchMapping("/{userId}/userStatus")
+  @PatchMapping("/{user-id}/user-status")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
-      @PathVariable UUID userId,
+      @PathVariable("user-id") UUID userId,
       @RequestBody UserStatusUpdateRequest userStatusUpdateRequest
   ) {
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, userStatusUpdateRequest);

@@ -41,8 +41,8 @@ public class ChannelController {
         .body(createdChannel);
   }
 
-  @PatchMapping("/{channelId}")
-  public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
+  @PatchMapping("/{channel-id}")
+  public ResponseEntity<ChannelDto> update(@PathVariable("channel-id") UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
     ChannelDto updatedChannel = channelService.update(channelId, request);
     return ResponseEntity
@@ -50,8 +50,8 @@ public class ChannelController {
         .body(updatedChannel);
   }
 
-  @DeleteMapping("/{channelId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
+  @DeleteMapping("/{channel-id}")
+  public ResponseEntity<Void> delete(@PathVariable("channel-id") UUID channelId) {
     channelService.delete(channelId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -60,7 +60,7 @@ public class ChannelController {
 
 
   @GetMapping
-  public ResponseEntity<List<ChannelDto>> findAll(@RequestParam UUID userId) {
+  public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("user-id") UUID userId) {
     List<ChannelDto> channels = channelService.findAllByUserId(userId);
     return ResponseEntity
         .status(HttpStatus.OK)

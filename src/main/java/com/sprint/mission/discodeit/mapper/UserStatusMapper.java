@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @NoArgsConstructor
+// MapStruct 이용해보기
 public class UserStatusMapper {
 
   public UserStatusDto toDto(UserStatus userStatus) {

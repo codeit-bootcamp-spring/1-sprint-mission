@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @ResponseBody
-@RequestMapping("/api/readStatuses")
+@RequestMapping("/api/read-statuses")
 public class ReadStatusController {
 
   private final ReadStatusService readStatusService;
@@ -31,8 +31,8 @@ public class ReadStatusController {
         .body(createdReadStatus);
   }
 
-  @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatusDto> update(@PathVariable UUID readStatusId,
+  @PatchMapping("/{read-status-id}")
+  public ResponseEntity<ReadStatusDto> update(@PathVariable("read-status-id") UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest request) {
     ReadStatusDto readStatusDto = readStatusService.update(readStatusId, request);
     return ResponseEntity
@@ -41,7 +41,7 @@ public class ReadStatusController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam UUID userId) {
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("user-id") UUID userId) {
     List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
     return ResponseEntity
         .status(HttpStatus.OK)
