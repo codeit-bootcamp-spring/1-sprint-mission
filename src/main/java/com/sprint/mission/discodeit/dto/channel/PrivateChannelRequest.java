@@ -1,0 +1,35 @@
+package com.sprint.mission.discodeit.dto.channel;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class PrivateChannelRequest {
+
+  @NotBlank(message = "채널 이름을 입력해야합니다.")
+  @Size(min = 1, max = 20, message = "채널 이름은 20자 이하여야합니다.")
+  private String name;
+
+  @Size(max = 100, message = "채널 설명은 100자 이하여야합니다.")
+  private String description;
+
+  @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+  private List<UUID> userList;
+
+  //UUID 오류 나서 String으로 받고, 사용할 때 UUID로 변환
+  public PrivateChannelRequest(String name,
+      @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+      List<String> userList) {
+    this.name = name;
+    this.userList = userList.stream().map(UUID::fromString).collect(Collectors.toList());
+  }
+}

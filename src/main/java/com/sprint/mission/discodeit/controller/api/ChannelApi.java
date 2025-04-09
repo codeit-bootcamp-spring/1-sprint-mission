@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelRequestDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,10 +14,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
-
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.ResponseEntity;
 
 @Tag(name = "Channel", description = "Channel API")
 public interface ChannelApi {
@@ -30,7 +29,7 @@ public interface ChannelApi {
       )
   })
   ResponseEntity<Channel> create(
-      @Parameter(description = "Public Channel 생성 정보") ChannelCreateDTO request
+      @Parameter(description = "Public Channel 생성 정보") PublicChannelRequest request
   );
 
   @Operation(summary = "Private Channel 생성")
@@ -41,7 +40,7 @@ public interface ChannelApi {
       )
   })
   ResponseEntity<Channel> create(
-      @Parameter(description = "Private Channel 생성 정보") PrivateChannelCreateDTO request
+      @Parameter(description = "Private Channel 생성 정보") PrivateChannelRequest request
   );
 
   @Operation(summary = "Channel 정보 수정")
@@ -61,7 +60,7 @@ public interface ChannelApi {
   })
   ResponseEntity<Channel> update(
       @Parameter(description = "수정할 Channel ID") UUID channelId,
-      @Parameter(description = "수정할 Channel 정보") ChannelUpdateDTO request
+      @Parameter(description = "수정할 Channel 정보") ChannelUpdateRequest request
   );
 
   @Operation(summary = "Channel 삭제")
@@ -82,10 +81,10 @@ public interface ChannelApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "Channel 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChannelRequestDTO.class)))
+          content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChannelDto.class)))
       )
   })
-  ResponseEntity<List<ChannelRequestDTO>> findAll(
+  ResponseEntity<List<ChannelDto>> findAll(
       @Parameter(description = "조회할 User ID") UUID userId
   );
 }

@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.service;
 
 
 import com.sprint.mission.discodeit.dto.auth.AuthUserDTO;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 
 public interface AuthService {
 
-    User isUserExist(AuthUserDTO authUserDTO);
+  UserDto isUserExist(AuthUserDTO authUserDTO);
 
 }

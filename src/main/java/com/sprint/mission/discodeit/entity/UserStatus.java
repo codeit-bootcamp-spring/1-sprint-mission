@@ -1,28 +1,21 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateDTO;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.UUID;
-import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Table(name = "user_statuses")
@@ -61,8 +54,8 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
     return false;
   }
 
-  public void update(UserStatusUpdateDTO userStatusUpdateDTO) {
-    this.lastAccessedAt = userStatusUpdateDTO.time();
+  public void update(UserStatusUpdateRequest userStatusUpdateRequest) {
+    this.lastAccessedAt = userStatusUpdateRequest.time();
     update();
     isOnline();
   }

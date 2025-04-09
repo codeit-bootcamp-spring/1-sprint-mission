@@ -1,0 +1,32 @@
+<configuration>
+  <!-- 로그 파일 저장 경로 설정 -->
+  <property name="LOG_PATH" value=".logs"/>
+
+  <!-- 콘솔 출력 설정 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <!-- 콘솔 출력 패턴 설정 -->
+      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일 출력 설정 -->
+  <appender name="FILE"
+    class="ch.qos.logback.core.rolling.RollingFileAppender"> <!-- RollingFileAppender는 많은 양의 로그를 백업할 때 사용-->
+    <file>${LOG_PATH}/application.log</file>  <!-- 로그 파일 경로 -->
+
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/application-%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory> <!-- 최근 30일치 로그만 유지 -->
+    </rollingPolicy>
+  </appender>
+
+  <root level="info">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+</configuration>
