@@ -1,0 +1,450 @@
+2025-04-01 19:46:04.628 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.7 with PID 9818 (/Users/kimsangho/Desktop/sprintMission/1-sprint-mission/build/classes/java/main started by kimsangho in /Users/kimsangho/Desktop/sprintMission/1-sprint-mission)
+2025-04-01 19:46:04.631 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "default"
+2025-04-01 19:46:05.801 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-01 19:46:05.869 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 57 ms. Found 6 JPA repository interfaces.
+2025-04-01 19:46:06.258 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+2025-04-01 19:46:06.265 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+2025-04-01 19:46:06.266 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+2025-04-01 19:46:06.266 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+2025-04-01 19:46:06.293 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+2025-04-01 19:46:06.293 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1606 ms
+2025-04-01 19:46:06.337 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+2025-04-01 19:46:06.399 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7bf018dd
+2025-04-01 19:46:06.400 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+2025-04-01 19:46:06.442 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-01 19:46:06.466 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+2025-04-01 19:46:06.507 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+2025-04-01 19:46:06.692 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-01 19:46:06.751 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.17
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-01 19:46:07.263 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-01 19:46:07.320 [main] ERROR o.s.o.j.LocalContainerEntityManagerFactoryBean - Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+2025-04-01 19:46:07.320 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+2025-04-01 19:46:07.320 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+2025-04-01 19:46:07.323 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+2025-04-01 19:46:07.325 [main] INFO  o.a.catalina.core.StandardService    - Stopping service [Tomcat]
+2025-04-01 19:46:07.334 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-04-01 19:46:07.344 [main] ERROR o.s.boot.SpringApplication           - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:288)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:204)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: jakarta.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:431)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1849)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1798)
+	... 15 common frames omitted
+Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateTable(AbstractSchemaValidator.java:136)
+	at org.hibernate.tool.schema.internal.GroupedSchemaValidatorImpl.validateTables(GroupedSchemaValidatorImpl.java:46)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.performValidation(AbstractSchemaValidator.java:99)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.doValidation(AbstractSchemaValidator.java:77)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:289)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419)
+	... 19 common frames omitted
+2025-04-01 19:47:11.189 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.7 with PID 10620 (/Users/kimsangho/Desktop/sprintMission/1-sprint-mission/build/classes/java/main started by kimsangho in /Users/kimsangho/Desktop/sprintMission/1-sprint-mission)
+2025-04-01 19:47:11.191 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "default"
+2025-04-01 19:47:11.621 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-01 19:47:11.655 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 28 ms. Found 6 JPA repository interfaces.
+2025-04-01 19:47:11.942 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+2025-04-01 19:47:11.948 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+2025-04-01 19:47:11.949 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+2025-04-01 19:47:11.949 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+2025-04-01 19:47:11.974 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+2025-04-01 19:47:11.974 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 761 ms
+2025-04-01 19:47:12.016 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+2025-04-01 19:47:12.069 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@61b838f2
+2025-04-01 19:47:12.069 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+2025-04-01 19:47:12.107 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-01 19:47:12.133 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+2025-04-01 19:47:12.149 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+2025-04-01 19:47:12.298 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-01 19:47:12.358 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.17
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-01 19:47:12.798 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-01 19:47:12.827 [main] ERROR o.s.o.j.LocalContainerEntityManagerFactoryBean - Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+2025-04-01 19:47:12.827 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+2025-04-01 19:47:12.827 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+2025-04-01 19:47:12.830 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+2025-04-01 19:47:12.831 [main] INFO  o.a.catalina.core.StandardService    - Stopping service [Tomcat]
+2025-04-01 19:47:12.839 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-04-01 19:47:12.847 [main] ERROR o.s.boot.SpringApplication           - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:288)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:204)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: jakarta.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:431)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1849)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1798)
+	... 15 common frames omitted
+Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateTable(AbstractSchemaValidator.java:136)
+	at org.hibernate.tool.schema.internal.GroupedSchemaValidatorImpl.validateTables(GroupedSchemaValidatorImpl.java:46)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.performValidation(AbstractSchemaValidator.java:99)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.doValidation(AbstractSchemaValidator.java:77)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:289)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419)
+	... 19 common frames omitted
+2025-04-01 19:47:43.035 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.7 with PID 10964 (/Users/kimsangho/Desktop/sprintMission/1-sprint-mission/build/classes/java/main started by kimsangho in /Users/kimsangho/Desktop/sprintMission/1-sprint-mission)
+2025-04-01 19:47:43.036 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "default"
+2025-04-01 19:47:43.426 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-01 19:47:43.459 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 28 ms. Found 6 JPA repository interfaces.
+2025-04-01 19:47:43.750 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+2025-04-01 19:47:43.756 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+2025-04-01 19:47:43.757 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+2025-04-01 19:47:43.757 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+2025-04-01 19:47:43.780 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+2025-04-01 19:47:43.781 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 726 ms
+2025-04-01 19:47:43.825 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+2025-04-01 19:47:43.871 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@25c1f5ee
+2025-04-01 19:47:43.872 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+2025-04-01 19:47:43.927 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-01 19:47:43.954 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+2025-04-01 19:47:43.972 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+2025-04-01 19:47:44.125 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-01 19:47:44.179 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.17
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-01 19:47:44.650 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-01 19:47:44.687 [main] ERROR o.s.o.j.LocalContainerEntityManagerFactoryBean - Failed to initialize JPA EntityManagerFactory: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+2025-04-01 19:47:44.687 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+2025-04-01 19:47:44.687 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+2025-04-01 19:47:44.690 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+2025-04-01 19:47:44.691 [main] INFO  o.a.catalina.core.StandardService    - Stopping service [Tomcat]
+2025-04-01 19:47:44.698 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-04-01 19:47:44.706 [main] ERROR o.s.boot.SpringApplication           - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:288)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:204)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: jakarta.persistence.PersistenceException: [PersistenceUnit: default] Unable to build Hibernate SessionFactory; nested exception is org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:431)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1849)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1798)
+	... 15 common frames omitted
+Caused by: org.hibernate.tool.schema.spi.SchemaManagementException: Schema-validation: missing table [binary_contents]
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.validateTable(AbstractSchemaValidator.java:136)
+	at org.hibernate.tool.schema.internal.GroupedSchemaValidatorImpl.validateTables(GroupedSchemaValidatorImpl.java:46)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.performValidation(AbstractSchemaValidator.java:99)
+	at org.hibernate.tool.schema.internal.AbstractSchemaValidator.doValidation(AbstractSchemaValidator.java:77)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:289)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1421)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35)
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1506)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419)
+	... 19 common frames omitted
+2025-04-01 19:50:03.023 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.7 with PID 12391 (/Users/kimsangho/Desktop/sprintMission/1-sprint-mission/build/classes/java/main started by kimsangho in /Users/kimsangho/Desktop/sprintMission/1-sprint-mission)
+2025-04-01 19:50:03.024 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "default"
+2025-04-01 19:50:03.417 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-01 19:50:03.449 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 27 ms. Found 6 JPA repository interfaces.
+2025-04-01 19:50:03.731 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+2025-04-01 19:50:03.738 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+2025-04-01 19:50:03.739 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+2025-04-01 19:50:03.739 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+2025-04-01 19:50:03.763 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+2025-04-01 19:50:03.764 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 722 ms
+2025-04-01 19:50:03.809 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+2025-04-01 19:50:03.867 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5c82031b
+2025-04-01 19:50:03.868 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+2025-04-01 19:50:03.910 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-01 19:50:03.939 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+2025-04-01 19:50:03.957 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+2025-04-01 19:50:04.109 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-01 19:50:04.171 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.17
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-01 19:50:04.624 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-01 19:50:04.630 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+2025-04-01 19:50:04.631 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists FKsd1m8rb8jcpbcnb7rpdue7ctc
+2025-04-01 19:50:04.632 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists FKj7twd218e2gqw9cmlhwvo1rth
+2025-04-01 19:50:04.632 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists FKowtlim26svclkatusptbgi7u1
+2025-04-01 19:50:04.633 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists FK3u3ckbhwq9se1cmopk2pq05b2
+2025-04-01 19:50:04.633 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists FKa38ri44ml4gfdpklx4ahqr8gd
+2025-04-01 19:50:04.633 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists FKml3k4wr9sj5yxrmj6d0aoib2e
+2025-04-01 19:50:04.633 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists FK4lfl3ei2ubchgcxrrpo3pw4mm
+2025-04-01 19:50:04.633 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists FKtbudycgrip49xdptogmhfqnso
+2025-04-01 19:50:04.636 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+2025-04-01 19:50:04.637 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+2025-04-01 19:50:04.637 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+2025-04-01 19:50:04.637 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+2025-04-01 19:50:04.637 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+2025-04-01 19:50:04.637 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+2025-04-01 19:50:04.637 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+2025-04-01 19:50:04.671 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+2025-04-01 19:50:04.689 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type varchar(255) not null check (type in ('PUBLIC','PRIVATE')),
+        primary key (id)
+    )
+2025-04-01 19:50:04.702 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+2025-04-01 19:50:04.713 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text not null,
+        primary key (id)
+    )
+2025-04-01 19:50:04.720 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp with time zone not null,
+        last_read_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id),
+        unique (user_id, channel_id)
+    )
+2025-04-01 19:50:04.729 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp with time zone not null,
+        last_active_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+2025-04-01 19:50:04.742 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+2025-04-01 19:50:04.745 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+2025-04-01 19:50:04.751 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+2025-04-01 19:50:04.752 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+2025-04-01 19:50:04.754 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+2025-04-01 19:50:04.755 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+2025-04-01 19:50:04.756 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+2025-04-01 19:50:04.758 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+2025-04-01 19:50:04.759 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+2025-04-01 19:50:04.762 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-01 19:50:04.887 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-01 19:50:05.225 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-04-01 19:50:05.425 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+2025-04-01 19:50:05.436 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+2025-04-01 19:50:05.442 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 2.688 seconds (process running for 3.07)
+2025-04-01 19:50:20.808 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-01 19:50:20.814 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+2025-04-01 19:50:20.819 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-01 19:50:20.821 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+2025-04-01 19:50:20.823 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+2025-04-01 19:50:27.439 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.7 with PID 12638 (/Users/kimsangho/Desktop/sprintMission/1-sprint-mission/build/classes/java/main started by kimsangho in /Users/kimsangho/Desktop/sprintMission/1-sprint-mission)
+2025-04-01 19:50:27.441 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "default"
+2025-04-01 19:50:27.808 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-01 19:50:27.839 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 26 ms. Found 6 JPA repository interfaces.
+2025-04-01 19:50:28.122 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+2025-04-01 19:50:28.128 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+2025-04-01 19:50:28.129 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+2025-04-01 19:50:28.129 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+2025-04-01 19:50:28.160 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+2025-04-01 19:50:28.160 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 702 ms
+2025-04-01 19:50:28.202 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+2025-04-01 19:50:28.257 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@15a8cebd
+2025-04-01 19:50:28.258 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+2025-04-01 19:50:28.295 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-01 19:50:28.322 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+2025-04-01 19:50:28.339 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+2025-04-01 19:50:28.470 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-01 19:50:28.529 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.17
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-01 19:50:29.003 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-01 19:50:29.033 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-01 19:50:29.132 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-01 19:50:29.461 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-04-01 19:50:29.650 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+2025-04-01 19:50:29.661 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+2025-04-01 19:50:29.668 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 2.482 seconds (process running for 2.868)
+2025-04-01 19:50:34.047 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-01 19:50:34.053 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+2025-04-01 19:50:34.058 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-01 19:50:34.061 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+2025-04-01 19:50:34.063 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
