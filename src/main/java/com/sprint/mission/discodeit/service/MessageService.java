@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.UUID;
 public interface MessageService {
 
   MessageDto create(MessageCreateRequest messageCreateRequest,
-                    List<BinaryContentStoreDto> binaryContentCreateRequests);
+                    List<MultipartFile> attachments);
 
   Optional<Message> find(UUID id);
 

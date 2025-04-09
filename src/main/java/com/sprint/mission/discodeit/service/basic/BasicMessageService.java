@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
@@ -42,7 +44,7 @@ public class BasicMessageService extends MessageMapper implements MessageService
   @Transactional
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
-                           List<BinaryContentStoreDto> attachments) {
+                           List<MultipartFile> attachments) {
 
     // 요청 파라미터 값 곧 생성할 객체 변수에 넣어주기
     UUID channelId = messageCreateRequest.getChannelId();
@@ -54,8 +56,10 @@ public class BasicMessageService extends MessageMapper implements MessageService
     String content = messageCreateRequest.getContent();
 
     // 첨부파일 1. DB에 메타정보 저장 2. 로컬 저장소에 바이너리 데이터 저장
+    List<BinaryContentStoreDto> attachmentRequest = BinaryContentMapper.toDtoFromMultipartFile(attachments);
+
     List<BinaryContent> metaInfos = new ArrayList<>();
-    for (BinaryContentStoreDto request : attachments) {
+    for (BinaryContentStoreDto request : attachmentRequest) {
       String fileName = request.getFileName();
       String contentType = request.getContentType();
       int size = request.getSize();
