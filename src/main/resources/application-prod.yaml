@@ -1,3 +1,27 @@
+
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeitdb_prod
+    username: root
+    password: Abcd123@
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    #        default_batch_fetch_size: 100
+
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: trace
+=======
 spring:
   datasource:
     url: jdbc:mysql://prod-db:3306/codeitdb
@@ -6,4 +30,3 @@ spring:
 
 logging:
   level:
-    root: info
