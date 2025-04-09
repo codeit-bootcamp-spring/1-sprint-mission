@@ -1,0 +1,59 @@
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: /path/to/storage
+
+spring:
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+  output:
+    ansi:
+      enabled: always
+  #  sql:
+  #    init:
+  #      mode: always
+  #      schema-locations: classpath:schema.sql
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB  # 업로드할 파일 최대 크기
+      max-request-size: 10MB
+
+logging:
+  level:
+    root: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers, env
+#  endpoint:
+#    health:
+#      show-details: always
+
+info:
+  app.name: Discodeit
+  app.version: 1.7.0
+  java-version: 17
+  spring-boot-version: 3.4.2
+  datasource-url: ${spring.datasource.url}
+  ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+  storage-type: ${discodeit.storage.type}
+  storage-path: ${discodeit.storage.local.root-path}

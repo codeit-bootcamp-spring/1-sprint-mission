@@ -1,0 +1,83 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.readstatus.UserAlreadyMemberException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.Interface.UserStatusService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class BasicUserStatusService implements UserStatusService {
+
+  private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
+
+
+  @Override
+  @Transactional
+  public UserStatus create(UserStatusCreateRequestDto request) {
+    User user = userRepository.findById(request.getUserId())
+        .orElseThrow(UserNotFoundException::new);
+
+    Optional<UserStatus> existingStatus = userStatusRepository.findByUserId(request.getUserId());
+    if (existingStatus.isPresent()) {
+      throw new UserAlreadyMemberException();
+    }
+    UserStatus userStatus = new UserStatus(user, request.getCreatedAt());
+    System.out.println("userStatus 생성:" + userStatus.getId());
+    return userStatusRepository.save(userStatus);
+  }
+
+  @Override
+  public UserStatus find(UUID id) {
+    return userStatusRepository.findById(id)
+        .orElseThrow(UserStatusNotFoundException::new);
+  }
+
+  @Override
+  public List<UserStatus> findAll() {
+    return userStatusRepository.findAll();
+  }
+
+  @Override
+  @Transactional
+  public void update(UUID userStatusId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+        .orElseThrow(UserStatusNotFoundException::new);
+    userStatus.update(request.getNewLastActiveAt());
+    userStatusRepository.save(userStatus);
+  }
+
+  @Override
+  @Transactional
+  public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(UserStatusNotFoundException::new);
+    userStatus.update(request.getNewLastActiveAt());
+    return userStatusRepository.save(userStatus);
+  }
+
+
+  @Override
+  @Transactional
+  public void deleteByUserId(UUID userId) {
+    if (!userStatusRepository.existsById(userId)) {
+      throw new UserStatusNotFoundException();
+    }
+    userStatusRepository.deleteByUserId(userId);
+  }
+}
