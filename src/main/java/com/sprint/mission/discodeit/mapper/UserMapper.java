@@ -25,6 +25,10 @@ public class UserMapper {
 
   private Boolean getOnline(User user) {
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+    if (userStatus == null) {
+      // 아직 생성되지 않은 경우(최초 User생성)는 기본값 false로 간주
+      return false;
+    }
     return userStatus.isOnline();
   }
 }

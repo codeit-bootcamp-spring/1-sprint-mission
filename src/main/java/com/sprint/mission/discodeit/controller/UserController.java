@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
-import com.sprint.mission.discodeit.dto.user.UserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.service.UserService;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
-  
+
   private final UserService userService;
 
   // 사용자 등록
@@ -54,7 +54,7 @@ public class UserController {
   @PatchMapping("/{id}")
   public ResponseEntity<UserDto> updateUser(
       @PathVariable("id") UUID id,
-      @RequestPart @Valid UserUpdateDTO userUpdateDTO,
+      @RequestPart(value = "userUpdateRequest") @Valid UserUpdateDTO userUpdateDTO,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     log.info("Received Updating user with ID : {}", id);

@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(LoginFailedException.class)
-  public ResponseEntity<String> loginFailedException(LoginFailedException e) {
-    return new ResponseEntity<>("로그인에 실패하였습니다.", HttpStatus.UNAUTHORIZED);
+  public ResponseEntity<ErrorResponse> loginFailedException(LoginFailedException e) {
+    ErrorResponse response = new ErrorResponse(e.getErrorCode().getStatus(),
+        e.getClass().getSimpleName(), e.getErrorCode().name(), e.getErrorCode().getMessage(),
+        e.getDetails());
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
   }
 }
+

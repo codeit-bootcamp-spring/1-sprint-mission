@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -37,6 +37,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     UserStatus userStatus = UserStatus.builder()
         .user(user)
+        .lastAccessedAt(userStatusRequest.lastAccessedAt())
         .build();
 
     return userStatusMapper.toDto(userStatusRepository.save(userStatus));

@@ -1,12 +1,22 @@
 package com.sprint.mission.discodeit.exception;
 
-import java.time.Instant;
 import java.util.Map;
 
-public class MessageException extends DiscodeitException {
+public abstract class MessageException extends DiscodeitException {
 
-  public MessageException(Instant timestamp, ErrorCode errorCode,
-      Map<String, Object> details) {
-    super(timestamp, errorCode, details);
+  protected MessageException(ErrorCode errorCode, String message, Map<String, Object> details) {
+    super(errorCode, message, details);
+  }
+
+  protected MessageException(ErrorCode errorCode, String message) {
+    super(errorCode, message);
+  }
+
+  protected MessageException(ErrorCode errorCode, Map<String, Object> details) {
+    super(errorCode, details);
+  }
+
+  protected MessageException(ErrorCode errorCode) {
+    super(errorCode);
   }
 }

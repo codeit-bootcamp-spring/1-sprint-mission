@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelRequest;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -68,7 +68,7 @@ public class BasicChannelService implements ChannelService {
     for (UUID uuid : userIDList) {
       ReadStatusDto readStatusDto = readStatusService.create(
           new ReadStatusRequest(channel.getId(), uuid));
-      log.debug("DEBUG: Create read status for user: {} , userStatusId: {}", uuid,
+      log.debug("DEBUG: Create read status for user: {} , readStatusId: {}", uuid,
           readStatusDto.id());
       log.info("ReadStatus created with ID: {} ", readStatusDto.id());
     }

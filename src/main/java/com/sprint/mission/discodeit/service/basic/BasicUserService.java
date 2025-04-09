@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
-import com.sprint.mission.discodeit.dto.user.UserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -72,9 +74,17 @@ public class BasicUserService implements UserService {
         .profile(nullableProfile)
         .build();
 
+    UserDto userDto = userMapper.toDto(userRepository.save(user));
+    //userStatusRequest생성
+    UserStatusRequest userStatusRequest = UserStatusRequest.builder()
+        .userId(user.getId())
+        .lastAccessedAt(Instant.now())
+        .build();
+    userStatusService.create(userStatusRequest);
+
     log.debug("DEBUG: User created : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
     log.info("User created successfully with ID: {}", user.getId());
-    return userMapper.toDto(userRepository.save(user));
+    return userDto;
   }
 
   @Override
