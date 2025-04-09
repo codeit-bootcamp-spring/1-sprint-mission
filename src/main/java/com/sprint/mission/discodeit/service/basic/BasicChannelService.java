@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
@@ -119,17 +119,17 @@ public class BasicChannelService implements ChannelService {
 
   //update
   @Override
-  public Channel update(ChannelUpdateDTO channelUpdateDTO) {
-    if (findDTO(channelUpdateDTO.uuid()).getType() == ChannelType.PRIVATE) {
+  public ChannelDto update(ChannelUpdateRequest channelUpdateRequest, UUID channelId) {
+    if (findDTO(channelId).getType() == ChannelType.PRIVATE) {
       log.info("Private channel cannot be updated");
       throw new IllegalArgumentException("PRIVATE  채널은 수정할 수 없습니다.");
     }
-    Channel channel = channelRepository.findById(channelUpdateDTO.uuid()).orElseThrow(()
+    Channel channel = channelRepository.findById(channelId).orElseThrow(()
         -> new NoSuchElementException("channel not found"));
-    channel.updateName(channelUpdateDTO.name());
+    channel.updateName(channelUpdateRequest.name());
     log.debug("DEBUG: Update channel: {}", channel);
-    log.info("Update channel with ID: {}", channel.getId());
-    return channelRepository.save(channel);
+    log.info("Update channel with ID: {}", channelId);
+    return channelMapper.toDto(channelRepository.save(channel));
   }
 
   @Override

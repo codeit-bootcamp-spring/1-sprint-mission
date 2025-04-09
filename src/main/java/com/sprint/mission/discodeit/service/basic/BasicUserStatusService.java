@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
@@ -67,17 +67,17 @@ public class BasicUserStatusService implements UserStatusService {
 
 
   @Override
-  public UserStatusDto update(UUID id, UserStatusUpdateDTO userStatusUpdateDTO) {
+  public UserStatusDto update(UUID id, UserStatusUpdateRequest userStatusUpdateRequest) {
     UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(
         () -> new NoSuchElementException("userStatus not found"));
-    userStatus.update(userStatusUpdateDTO);
+    userStatus.update(userStatusUpdateRequest);
     return userStatusMapper.toDto(userStatusRepository.save(userStatus));
   }
 
   @Override
-  public UserStatus updateByUserId(UUID userID, UserStatusUpdateDTO userStatusUpdateDTO) {
+  public UserStatus updateByUserId(UUID userID, UserStatusUpdateRequest userStatusUpdateRequest) {
     UserStatus userStatus = userStatusRepository.findByUserId(userID);
-    userStatus.update(userStatusUpdateDTO);
+    userStatus.update(userStatusUpdateRequest);
     userStatusRepository.save(userStatus);
     return userStatus;
   }

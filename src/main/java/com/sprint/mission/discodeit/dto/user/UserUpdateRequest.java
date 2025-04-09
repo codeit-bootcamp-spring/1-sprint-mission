@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.dto.user;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
-public record UserUpdateDTO
+public record UserUpdateRequest
     (
         @Size(min = 2, max = 10, message = "이름은 2자 이상, 10자 이하로 입력해야 합니다.")
         String newName,

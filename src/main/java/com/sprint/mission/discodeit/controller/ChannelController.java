@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelRequest;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
@@ -48,12 +48,13 @@ public class ChannelController {
   }
 
   // 공개 채널 정보 수정
+  //TODO: dto수정하고, 반환타입 dto로
   @PatchMapping("/{id}")
-  public ResponseEntity<String> updateChannel(@PathVariable("id") UUID id,
-      @RequestBody @Valid ChannelUpdateDTO channelUpdateDTO) {
+  public ResponseEntity<ChannelDto> updateChannel(@PathVariable("id") UUID id,
+      @RequestBody @Valid ChannelUpdateRequest channelUpdateRequest) {
     log.info("Received: updateChannel");
-    channelService.update(channelUpdateDTO);
-    return ResponseEntity.status(HttpStatus.OK).body("Channel updated");
+    return ResponseEntity.ok(
+        channelService.update(channelUpdateRequest, id));
   }
 
   // 채널 삭제

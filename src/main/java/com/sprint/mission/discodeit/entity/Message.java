@@ -41,7 +41,7 @@ public class Message extends BaseUpdatableEntity implements Serializable {
   private Channel channel;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "author_id")
   private User author;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

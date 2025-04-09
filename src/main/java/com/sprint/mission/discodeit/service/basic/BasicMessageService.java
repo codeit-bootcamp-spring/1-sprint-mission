@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
-import com.sprint.mission.discodeit.dto.message.MessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -109,11 +109,11 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public MessageDto update(UUID id, MessageUpdateDTO messageUpdateDTO) {
+  public MessageDto update(UUID id, MessageUpdateRequest messageUpdateRequest) {
     Message message = messageRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Message not found"));
 
-    message.updateContent(messageUpdateDTO.content());
+    message.updateContent(messageUpdateRequest.content());
     log.debug("DEBUG: Message updated : {}", message);
     log.info("Message updated with id : {}", message.getId());
     return messageMapper.toDto(messageRepository.save(message));

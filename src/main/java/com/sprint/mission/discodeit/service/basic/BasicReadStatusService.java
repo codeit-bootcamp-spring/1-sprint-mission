@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateDTO;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -75,8 +75,8 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public ReadStatusDto update(ReadStatusUpdateDTO readStatusUpdateDTO) {
-    ReadStatus readStatus = readStatusRepository.findById(readStatusUpdateDTO.id()).orElseThrow(
+  public ReadStatusDto update(ReadStatusUpdateRequest readStatusUpdateRequest) {
+    ReadStatus readStatus = readStatusRepository.findById(readStatusUpdateRequest.id()).orElseThrow(
         () -> new NoSuchElementException("ReadStatus not found")
     );
     readStatus.update();

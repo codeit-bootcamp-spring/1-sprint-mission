@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
-import com.sprint.mission.discodeit.dto.message.MessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
@@ -72,9 +72,9 @@ public class MessageController {
   // 메시지 수정
   @PatchMapping("/{id}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable("id") UUID id,
-      @RequestBody MessageUpdateDTO messageUpdateDTO) {
+      @RequestBody MessageUpdateRequest messageUpdateRequest) {
 
-    return ResponseEntity.ok(messageService.update(id, messageUpdateDTO)
+    return ResponseEntity.ok(messageService.update(id, messageUpdateRequest)
     );
   }
 

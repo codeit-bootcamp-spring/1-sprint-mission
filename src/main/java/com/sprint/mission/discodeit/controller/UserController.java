@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserRequest;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -54,13 +54,13 @@ public class UserController {
   @PatchMapping("/{id}")
   public ResponseEntity<UserDto> updateUser(
       @PathVariable("id") UUID id,
-      @RequestPart(value = "userUpdateRequest") @Valid UserUpdateDTO userUpdateDTO,
+      @RequestPart(value = "userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     log.info("Received Updating user with ID : {}", id);
     Optional<BinaryContentRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    return ResponseEntity.ok(userService.updateUser(id, userUpdateDTO, profileRequest));
+    return ResponseEntity.ok(userService.updateUser(id, userUpdateRequest, profileRequest));
   }
 
   // 사용자 삭제
@@ -87,9 +87,10 @@ public class UserController {
 
   // 사용자 온라인 상태 업데이트
   @PatchMapping("/{id}/online")
-  public ResponseEntity<UserStatusUpdateDTO> updateUserStatus(@PathVariable("id") UUID id,
-      @RequestBody UserStatusUpdateDTO userStatusUpdateDTO) {
-    UserStatusUpdateDTO updatedStatus = userService.updateUserStatus(id, userStatusUpdateDTO);
+  public ResponseEntity<UserStatusUpdateRequest> updateUserStatus(@PathVariable("id") UUID id,
+      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+    UserStatusUpdateRequest updatedStatus = userService.updateUserStatus(id,
+        userStatusUpdateRequest);
     return ResponseEntity.status(HttpStatus.OK).body(updatedStatus);
   }
 

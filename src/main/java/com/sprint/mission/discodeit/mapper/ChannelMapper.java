@@ -43,7 +43,6 @@ public class ChannelMapper {
   }
 
   private List<UserDto> getUserDtoList(Channel channel) {
-    //TODO: userDto를 이용해서 반환하기.
     if (channel.getType() == ChannelType.PRIVATE) {
       List<User> userList = readStatusRepository.findAllUserIdByChannelId(channel.getId()).stream()
           .map(userRepository::findById)

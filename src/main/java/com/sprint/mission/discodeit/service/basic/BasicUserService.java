@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserRequest;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -117,7 +117,7 @@ public class BasicUserService implements UserService {
   @Transactional
   @Override
   public UserDto updateUser(
-      UUID userID, UserUpdateDTO userUpdateDTO,
+      UUID userID, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentRequest> optionalProfileCreateRequest) {
 
     //nullable한 프로필
@@ -137,7 +137,8 @@ public class BasicUserService implements UserService {
 
     User user = findbyId(userID);
 
-    user.updateUser(userUpdateDTO.newName(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword(),
+    user.updateUser(userUpdateRequest.newName(), userUpdateRequest.newEmail(),
+        userUpdateRequest.newPassword(),
         nullableProfile);
     log.debug("DEBUG: User updated : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
     log.info("User update successfully with ID : {} ", user.getId());
@@ -151,12 +152,12 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserStatusUpdateDTO updateUserStatus(UUID id,
-      UserStatusUpdateDTO userUserStatusUpdateDTO) {
-    UserStatusUpdateDTO userStatusUpdateDTO = new UserStatusUpdateDTO(
-        userUserStatusUpdateDTO.time());
-    userStatusService.updateByUserId(id, userStatusUpdateDTO);
-    return userUserStatusUpdateDTO;
+  public UserStatusUpdateRequest updateUserStatus(UUID id,
+      UserStatusUpdateRequest userUserStatusUpdateRequest) {
+    UserStatusUpdateRequest userStatusUpdateRequest = new UserStatusUpdateRequest(
+        userUserStatusUpdateRequest.time());
+    userStatusService.updateByUserId(id, userStatusUpdateRequest);
+    return userUserStatusUpdateRequest;
   }
 
 }
