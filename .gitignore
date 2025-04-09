@@ -203,6 +203,8 @@ ehthumbs_vista.db
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/java,macos,windows,intellij
+#.env.dev 환경변수 파일들
+.env
+.env.*
 
 

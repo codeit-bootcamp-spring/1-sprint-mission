@@ -1,12 +1,15 @@
-erver:
-  port: 8081
+server:
+  port: 8080
 
 spring:
   datasource:
-    url: jdbc:postgresql://prod-host:5432/discodeit
+    url: jdbc:postgresql://host.docker.internal:5432/discodeit
     username: discodeit_prod
     password: discodeit_prod_1234
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: never
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
