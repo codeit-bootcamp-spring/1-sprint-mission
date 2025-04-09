@@ -86,7 +86,7 @@
 25-04-14 13:23:28.853 [RMI TCP Connection(3)-127.0.0.1] INFO  o.s.web.servlet.DispatcherServlet    - Initializing Servlet 'dispatcherServlet'
 25-04-14 13:23:28.855 [RMI TCP Connection(3)-127.0.0.1] INFO  o.s.web.servlet.DispatcherServlet    - Completed initialization in 2 ms
 25-04-14 13:23:44.762 [http-nio-8080-exec-5] INFO  c.s.m.d.service.Impl.AuthServiceImpl - [로그인 진행] 이메일: 'd'
-25-04-14 13:23:44.819 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL                    - 
+25-04-14 13:23:44.819 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL                    -
     select
         u1_0.id,
         u1_0.created_at,
