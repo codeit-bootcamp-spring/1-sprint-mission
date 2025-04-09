@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.execption.channel.CannotUpdatePrivateChannelException;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelRequest;
@@ -8,7 +9,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.global.error.execption.channel.CannotUpdatePrivateChannelException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.validator.ChannelValidator;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -97,7 +98,7 @@ public class BasicChannelService implements ChannelService {
     Channel foundChannel = channelValidator.validateChannelExistsByChannelId(channelId);
 
     if (foundChannel.isPrivate()) {
-      throw new CannotUpdatePrivateChannelException("id: " + foundChannel.getId());
+      throw new CannotUpdatePrivateChannelException(Map.of("channelId", foundChannel.getId()));
     }
 
     foundChannel.updateChannelInfo(updateChannelRequest.newName(),

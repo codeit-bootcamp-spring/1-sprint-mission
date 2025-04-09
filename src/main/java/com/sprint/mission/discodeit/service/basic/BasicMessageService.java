@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.execption.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.common.util.MultipartFileConverter;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
@@ -8,8 +10,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.global.error.execption.message.MessageNotFoundException;
-import com.sprint.mission.discodeit.global.util.MultipartFileConverter;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -21,6 +21,7 @@ import com.sprint.mission.discodeit.validator.UserValidator;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -113,6 +114,6 @@ public class BasicMessageService implements MessageService {
 
   private Message findMessageById(UUID messageId) {
     return messageRepository.findMessageById(messageId)
-        .orElseThrow(() -> new MessageNotFoundException("id: " + messageId));
+        .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
   }
 }

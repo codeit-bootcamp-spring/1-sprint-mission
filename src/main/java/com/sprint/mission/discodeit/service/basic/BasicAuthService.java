@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.util.TimeUtil;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusByUserIdRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.global.util.TimeUtil;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserStatusService;

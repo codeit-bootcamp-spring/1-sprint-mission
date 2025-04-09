@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.base;
 
-import com.sprint.mission.discodeit.global.util.TimeUtil;
+import com.sprint.mission.discodeit.common.util.TimeUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

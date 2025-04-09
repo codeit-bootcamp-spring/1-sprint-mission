@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.validator;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.global.error.execption.userStatus.UserStatusAlreadyExistException;
-import com.sprint.mission.discodeit.global.error.execption.userStatus.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.execption.userStatus.UserStatusAlreadyExistException;
+import com.sprint.mission.discodeit.execption.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,17 +18,17 @@ public class UserStatusValidator {
 
   public UserStatus validateUserStatusExistsById(UUID userStatusId) {
     return userStatusRepository.findUserStatusById(userStatusId)
-        .orElseThrow(() -> new UserStatusNotFoundException("id: " + userStatusId));
+        .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userStatusId", userStatusId)));
   }
 
   public UserStatus validateUserStatusExistsByUser(User user) {
     return userStatusRepository.findUserStatusByUser(user)
-        .orElseThrow(() -> new UserStatusNotFoundException("id: " + user.getId()));
+        .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", user.getId())));
   }
 
   public void validateDuplicateByUser(User user) {
     if (userStatusRepository.findUserStatusByUser(user).isPresent()) {
-      throw new UserStatusAlreadyExistException("userId: " + user.getId());
+      throw new UserStatusAlreadyExistException(Map.of("userId", user.getId()));
     }
   }
 }

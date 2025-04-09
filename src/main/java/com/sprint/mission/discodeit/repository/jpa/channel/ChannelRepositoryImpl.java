@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jpa.channel;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +27,6 @@ public class ChannelRepositoryImpl implements ChannelRepository {
   @Override
   public List<Channel> findAllChannels() {
     return channelRepository.findAll();
-  }
-
-  @Override
-  public List<Channel> findAccessibleChannels(User user) {
-    return null;
   }
 
   @Override

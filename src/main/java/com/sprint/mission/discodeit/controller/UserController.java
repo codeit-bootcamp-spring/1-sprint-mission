@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusByUserIdRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class UserController implements UserApi {
 
   @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> createUser(
-      @RequestPart("userCreateRequest") CreateUserRequest createUserRequest,
+      @RequestPart("userCreateRequest") @Valid CreateUserRequest createUserRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileImage) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(userService.createUser(createUserRequest, profileImage));
@@ -44,7 +45,7 @@ public class UserController implements UserApi {
   @PatchMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> updateUser(
       @PathVariable UUID id,
-      @RequestPart(value = "userUpdateRequest") UpdateUserRequest updateUserRequest,
+      @RequestPart(value = "userUpdateRequest") @Valid UpdateUserRequest updateUserRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileImage) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userService.updateUser(id, updateUserRequest, profileImage));
@@ -65,7 +66,7 @@ public class UserController implements UserApi {
   @PatchMapping(value = "/{id}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @PathVariable UUID id,
-      @RequestBody UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
+      @RequestBody @Valid UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userStatusService.updateUserStatusByUserId(id, updateUserStatusByUserIdRequest));
   }

@@ -1,0 +1,40 @@
+# application.yaml
+discodeit:
+  repository:
+    type: jcf   # jcf | file
+  storage:
+    type: local
+    local:
+      root-path: data/binary
+
+spring:
+  datasource:
+    username: sa
+    password:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true # SQL 포맷팅
+        highlight_sql: true # ANSI 코드에 색을 나타낸다
+        use_sql_comments: true # SQL 내부에 /* */ 주석 추가
+        default_batch_fetch_size: 10 # Pagination -> postgreSQL에서는 IN이 아닌 ANY로
+  h2:
+    console:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+  sql:
+    init:
+      mode: never  # schema.sql 자동 실행 방지
+  main:
+    allow-bean-definition-overriding: true
+
+logging:
+  level:
+    root: info
