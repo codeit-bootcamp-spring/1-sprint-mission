@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
+import jakarta.persistence.EntityExistsException;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -60,6 +61,18 @@ public class GlobalExceptionHandler {
         e.getMessage()
     );
     return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()).body(errorResponse);
+  }
+
+  //EntityExistsException 핸들러
+  @ExceptionHandler(EntityExistsException.class)
+  public ResponseEntity<ErrorResponse> handleEntityExistsException(EntityExistsException e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+        ErrorCode.DUPLICATE_ENTITY.getStatus(),
+        e.getClass().getSimpleName(),
+        ErrorCode.DUPLICATE_ENTITY.name(),
+        e.getMessage()
+    );
+    return ResponseEntity.status(ErrorCode.DUPLICATE_ENTITY.getStatus()).body(errorResponse);
   }
 }
 

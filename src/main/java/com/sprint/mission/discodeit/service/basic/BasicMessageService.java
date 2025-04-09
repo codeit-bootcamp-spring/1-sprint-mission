@@ -9,6 +9,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -17,11 +20,10 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,10 +52,10 @@ public class BasicMessageService implements MessageService {
   public MessageDto createMessage(MessageRequest messageRequest,
       List<BinaryContentRequest> attachmentRequests) {
     Channel foundChannel = channelRepository.findById(messageRequest.channelId()).orElseThrow(()
-        -> new NoSuchElementException(messageRequest.channelId() + "does not exist"));
+        -> new ChannelNotFoundException(Map.of("요청된 channel ID: ", messageRequest.channelId())));
 
     User foundUser = userRepository.findById(messageRequest.userId()).orElseThrow(()
-        -> new NoSuchElementException(messageRequest.userId() + "does not exist"));
+        -> new UserNotFoundException(Map.of("User ID: ", messageRequest.userId())));
 
     List<BinaryContent> attachments = attachmentRequests.stream()
         .map(attachmentRequest -> {
@@ -86,7 +88,8 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageDto findById(UUID id) {
     Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Message not found"));
+        .orElseThrow(() -> new MessageNotFoundException(Map.of("Message ID: ", id)));
+
     return messageMapper.toDto(message);
   }
 
@@ -94,6 +97,10 @@ public class BasicMessageService implements MessageService {
   @Override
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
       Pageable pageable) {
+
+    if (!channelRepository.existsById(channelId)) {
+      throw new ChannelNotFoundException(Map.of("Channel ID", channelId));
+    }
     Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
             Optional.ofNullable(createAt).orElse(Instant.now()),
             pageable)
@@ -111,8 +118,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageDto update(UUID id, MessageUpdateRequest messageUpdateRequest) {
     Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Message not found"));
-
+        .orElseThrow(() -> new MessageNotFoundException(Map.of("Message ID: ", id)));
     message.updateContent(messageUpdateRequest.content());
     log.debug("DEBUG: Message updated : {}", message);
     log.info("Message updated with id : {}", message.getId());

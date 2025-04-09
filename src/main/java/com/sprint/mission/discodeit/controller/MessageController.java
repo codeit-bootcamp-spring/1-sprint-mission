@@ -88,7 +88,7 @@ public class MessageController {
   // 채널 ID로 메시지 목록 조회
   @GetMapping("/{id}")
   public ResponseEntity<PageResponse<MessageDto>> getMessagesByChannelId(
-      @RequestParam("id") UUID id,
+      @PathVariable("id") UUID id,
       @RequestParam(value = "cursor", required = false) Instant cursor,
       @PageableDefault(
           size = 50,
