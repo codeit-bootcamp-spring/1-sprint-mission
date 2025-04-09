@@ -8,4 +8,8 @@ public class UserAlreadyExistsException extends UserException {
   public UserAlreadyExistsException(Map<String, Object> details) {
     super(ErrorCode.DUPLICATE_USER, details);
   }
+
+  public UserAlreadyExistsException(String message, Map<String, Object> details) {
+    super(ErrorCode.DUPLICATE_USER, message, details);
+  }
 }

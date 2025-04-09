@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -17,7 +19,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,11 +47,11 @@ public class BasicUserService implements UserService {
       Optional<BinaryContentRequest> optionalProfileCreateRequest) {
     if (userRepository.existsByUsername(userRequest.name())) {
       log.info("Username already exists : {}", userRequest.name());
-      throw new IllegalArgumentException("이미 존재하는 이름입니다. ");
+      throw new UserAlreadyExistsException(Map.of("유저이름: ", userRequest.name()));
     }
     if (userRepository.existsByEmail(userRequest.email())) {
       log.info("Email already exists : {}", userRequest.email());
-      throw new IllegalArgumentException("이미 존재하는 이메일입니다. ");
+      throw new UserAlreadyExistsException(Map.of("이메일: ", userRequest.email()));
     }
 
     //nullable한 프로필
@@ -90,15 +92,14 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto findUserDTO(UUID userId) {
     User user = userRepository.findById(userId).orElseThrow(
-        () -> new NoSuchElementException("user Not found"));
+        () -> new UserNotFoundException(Map.of("유저 ID: ", userId.toString())));
     return userMapper.toDto(user);
   }
 
   //내부 사용전용
   private User findbyId(UUID userId) {
     return userRepository.findById(userId).orElseThrow(
-        () -> new NoSuchElementException("user Not found")
-    );
+        () -> new UserNotFoundException(Map.of("유저 ID: ", userId.toString())));
   }
 
   private List<User> findAll() {
