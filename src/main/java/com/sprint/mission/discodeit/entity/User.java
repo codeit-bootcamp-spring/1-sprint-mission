@@ -1,42 +1,81 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
-public class User {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+@Entity
+@Table(name = "users")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseUpdatableEntity {
 
-    private String username;
+  @Column(unique = true, nullable = false)
+  private String username;
 
-    public User(String username) {
-        this.id = UUID.randomUUID();
-        this.username = username;
-        this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-        this.updatedAt = createdAt;
+  @Column(unique = true, nullable = false)
+  private String email;
+
+  @Column(nullable = false)
+  private String password;
+
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
+
+  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Message> messages = new ArrayList<>();
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
+
+
+  public User(String username, String email, String password, BinaryContent profile) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profile = profile;
+  }
+
+  public void setStatus(UserStatus status) {
+    this.status = status;
+    if (status != null) {
+      status.setUser(this); // 양방향 관계 유지
     }
+  }
 
-    public UUID getId() {
-        return id;
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent newProfile) {
+    if (newUsername != null && !newUsername.equals(this.username)) {
+      this.username = newUsername;
     }
-
-    public Long getCreatedAt() {
-        return createdAt;
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
     }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
     }
-
-    public String getUsername() {
-        return username;
+    if (newProfile != null && !newProfile.equals(this.profile)) {
+      this.profile = newProfile;
     }
+  }
 
-
-    public void updateUsername(String username) {
-        this.username = username;
-        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-    }
+  public void setProfile(BinaryContent profile) {
+    this.profile = profile;
+  }
 }
