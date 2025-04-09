@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpServerErrorException.InternalServerError;
 
 //TODO: 전역예외 설정할 것
 @Slf4j
@@ -47,6 +48,18 @@ public class GlobalExceptionHandler {
         e.getMessage()
     );
     return ResponseEntity.status(ErrorCode.ILLEGAL_ARGUMENT.getStatus()).body(errorResponse);
+  }
+
+  //InternalServer에러
+  @ExceptionHandler(InternalServerError.class)
+  public ResponseEntity<ErrorResponse> handleInternalServerError(InternalServerError e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+        ErrorCode.INTERNAL_SERVER_ERROR.getStatus(),
+        e.getClass().getSimpleName(),
+        ErrorCode.INTERNAL_SERVER_ERROR.name(),
+        e.getMessage()
+    );
+    return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()).body(errorResponse);
   }
 }
 

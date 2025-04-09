@@ -26,7 +26,8 @@ public enum ErrorCode {
 
   //기존 에러코드 커스텀
   ELEMENTS_NOT_FOUND(404, "해당 리소스를 찾을 수 없습니다."),//no such EllementsException
-  ILLEGAL_ARGUMENT(400, "잘못된 리소스가 전달되었습니다.");//IllegalArgumentException
+  ILLEGAL_ARGUMENT(400, "잘못된 리소스가 전달되었습니다."),//IllegalArgumentException
+  INTERNAL_SERVER_ERROR(500, "서버 에러입니다.");
 
   private final int status;
   private final String message;
