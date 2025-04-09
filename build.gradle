@@ -1,0 +1,82 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'checkstyle'
+    id 'com.gorylenko.gradle-git-properties' version '2.4.1' // git 정보 읽기
+}
+
+gitProperties {
+    dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+    dateFormatTimeZone = "UTC"
+}
+
+checkstyle {
+    toolVersion = '1.0' // Checkstyle 버전
+    configFile = rootProject.file('checkstyle.xml') // Checkstyle 설정 파일 경로
+}
+
+// 이하 필요시에만 사용
+tasks.withType(Checkstyle) {
+    reports {
+        html.required = true // HTML 보고서 생성
+        xml.required = false // XML 보고서는 비활성화
+    }
+}
+
+group = 'com.sprint.mission'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    runtimeOnly 'com.h2database:h2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+    implementation 'org.postgresql:postgresql:42.6.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// build.gradle 에 빌드 정보 추가: build.properties 파일이 다음과 같이 생성
+tasks.register('writeBuildProperties') {
+    doLast {
+        def props = new Properties()
+        props.setProperty('version', project.version.toString())
+        props.setProperty('time', new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC")))
+
+        def file = file("$buildDir/resources/main/build.properties")
+        file.parentFile.mkdirs()
+        props.store(file.newWriter(), null)
+    }
+}
+
+processResources.dependsOn writeBuildProperties
