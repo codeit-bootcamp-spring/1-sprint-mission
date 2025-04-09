@@ -2,24 +2,24 @@
 create table binary_contents
 (
     id           uuid primary key,
-    created_at   timestamptz  not null,
-    file_name    varchar(255) not null,
-    size         bigint       not null,
-    content_type varchar(100) not null,
-    bytes        bytea        not null
+    created_at   timestamp with time zone not null,
+    file_name    varchar(255)             not null,
+    size         bigint                   not null,
+    content_type varchar(100)             not null
+--     bytes        bytea                    not null
 );
-alter table binary_contents
-    drop bytes;
+-- alter table binary_contents
+--     drop bytes;
 
 -- users
 create table users
 (
     id         uuid primary key,
-    created_at timestamptz  not null,
-    updated_at timestamptz,
-    username   varchar(50)  not null unique,
-    email      varchar(100) not null unique,
-    password   varchar(60)  not null,
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone,
+    username   varchar(50)              not null unique,
+    email      varchar(100)             not null unique,
+    password   varchar(60)              not null,
     profile_id uuid
 );
 alter table users
@@ -30,10 +30,10 @@ alter table users
 create table user_statuses
 (
     id             uuid primary key,
-    created_at     timestamptz not null,
-    updated_at     timestamptz,
-    user_id        uuid        not null unique,
-    last_active_at timestamptz not null
+    created_at     timestamp with time zone not null,
+    updated_at     timestamp with time zone,
+    user_id        uuid                     not null unique,
+    last_active_at timestamptz              not null
 );
 alter table user_statuses
     add constraint user_id
@@ -44,21 +44,21 @@ alter table user_statuses
 create table channels
 (
     id          uuid primary key,
-    created_at  timestamptz not null,
-    updated_at  timestamptz,
+    created_at  timestamp with time zone not null,
+    updated_at  timestamp with time zone,
     name        varchar(100),
     description varchar(500),
-    type        varchar(10) not null
+    type        varchar(10)              not null
 );
 
 -- messages
 create table messages
 (
     id         uuid primary key,
-    created_at timestamptz not null,
-    updated_at timestamptz,
+    created_at timestamp with time zone not null,
+    updated_at timestamp with time zone,
     content    text,
-    channel_id uuid        not null,
+    channel_id uuid                     not null,
     author_id  uuid
 );
 alter table messages
@@ -72,11 +72,11 @@ alter table messages
 create table read_statuses
 (
     id           uuid primary key,
-    created_at   timestamptz not null,
-    updated_at   timestamptz,
+    created_at   timestamp with time zone not null,
+    updated_at   timestamp with time zone,
     user_id      uuid,
     channel_id   uuid,
-    last_read_at timestamptz not null
+    last_read_at timestamp with time zone not null
 );
 alter table read_statuses
     add unique (user_id, channel_id);

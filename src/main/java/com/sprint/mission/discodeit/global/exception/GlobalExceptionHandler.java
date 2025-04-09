@@ -55,7 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       BusinessException ex) {
 
     ErrorCode errorCode = ex.getErrorCode();
-    log.info("{} - code:{}", ex.getClass().getSimpleName(), errorCode.getCode());
+    log.info("{} - {}: {}", ex.getClass().getSimpleName(), errorCode.getMessage(), ex.getDetails());
 
     ErrorResponse errorResponse = ErrorResponse.builder()
         .timestamp(ex.getTimestamp())
@@ -77,7 +77,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     ErrorResponse errorResponse = ErrorResponse.builder()
         .timestamp(Instant.now())
-        .code(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+        .code(ErrorCode.INTERNAL_SERVER_ERROR.name())
         .message(ex.getMessage())
         .exceptionType(ex.getClass().getSimpleName())
         .status(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus().value())

@@ -23,10 +23,40 @@ logging:
     rollingpolicy:
       max-history: 30
   level:
-    root: info
+    root: debug
 
 discodeit:
   storage:
     type: local
     local:
-      root-path: ${user.dir}/binaryContents
+      root-path: ./binaryContents
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "health"
+          - "info"
+          - "metrics"
+          - "loggers"
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  info:
+    env:
+      enabled: true
+
+info:
+  name: ${spring.application.name}
+  version: ${spring.application.version}
+  java:
+    version: ${java.version}
+  spring-boot:
+    version: ${spring.boot.version}
+  profile: ${spring.profiles.active}
+  storage:
+    type: ${discodeit.storage.type}
+    path: ${discodeit.storage.local.root-path}
+  jpa:
+    ddl-auto: ${spring.jpa.hibernate.ddl-auto}

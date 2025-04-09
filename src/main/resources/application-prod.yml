@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
 
 spring:
   datasource:
@@ -24,3 +24,28 @@ logging:
       max-history: 30
   level:
     root: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "health"
+          - "info"
+          - "metrics"
+          - "loggers"
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  info:
+    env:
+      enabled: true
+
+info:
+  name: ${spring.application.name}
+  version: ${spring.application.version}
+  java:
+    version: ${java.version}
+  spring-boot:
+    version: ${spring.boot.version}
+  profile: ${spring.profiles.active}

@@ -1,6 +1,9 @@
 spring:
   application:
     name: Discodeit
+    version: 1.7.0
+  boot:
+    version: 3.4.0
   profiles:
     active: dev
 
