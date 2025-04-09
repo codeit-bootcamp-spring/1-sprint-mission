@@ -18,8 +18,8 @@ public class ChannelDto {
   private String description;
   private Instant lastMessageAt; // 가장 최근 메시지 시간
   private List<UserDto> participants;// PRIVATE 채널 User ID 리스트
-  
-  //TODO: 다른 곳으로? 채널에 유저가 있는지 반환
+
+  //TODO: dto가 아닌 다른 곳으로? 채널에 유저가 있는지 반환
   public Boolean isUserExist(UUID userId) {
     if (participants.contains(userId)) {
       return true;

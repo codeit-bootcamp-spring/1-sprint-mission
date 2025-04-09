@@ -38,7 +38,7 @@ public class ReadStatusController {
       @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
     //TODO: readStatusUpdateDTO의 Instant가 아닌 readStatus 엔티티에서 현재시각으로 업데이트가됨
     // 인자 전달로 수정 필요
-    return ResponseEntity.ok(readStatusService.update(readStatusUpdateRequest));
+    return ResponseEntity.ok(readStatusService.update(readStatusId, readStatusUpdateRequest));
   }
 
   // 특정 사용자의 메시지 수신 정보 조회 (GET /readstatus/user/{userId})

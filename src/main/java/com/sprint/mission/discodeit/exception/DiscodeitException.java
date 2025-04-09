@@ -5,7 +5,7 @@ import java.util.Map;
 import lombok.Getter;
 
 @Getter
-public class DiscodeitException extends Exception {
+public class DiscodeitException extends RuntimeException {
 
   //에러객체 생성 시간 초기화
   final Instant timestamp = Instant.now();

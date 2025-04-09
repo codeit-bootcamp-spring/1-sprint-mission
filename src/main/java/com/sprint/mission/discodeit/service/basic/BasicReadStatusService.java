@@ -75,8 +75,8 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public ReadStatusDto update(ReadStatusUpdateRequest readStatusUpdateRequest) {
-    ReadStatus readStatus = readStatusRepository.findById(readStatusUpdateRequest.id()).orElseThrow(
+  public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
+    ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(
         () -> new NoSuchElementException("ReadStatus not found")
     );
     readStatus.update();
