@@ -64,8 +64,8 @@ public class MessageController {
         .body(createdMessage);
   }
 
-  @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
+  @PatchMapping("/{message-id}")
+  public ResponseEntity<MessageDto> updateMessage(@PathVariable("message-id") UUID messageId,
       @RequestBody MessageUpdateRequest request) {
     messageService.update(messageId, request.getRequesterId(), request);
     return ResponseEntity
@@ -74,9 +74,9 @@ public class MessageController {
   }
 
 
-  @DeleteMapping("/{messageId}")
-  public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId,
-      @RequestParam("requesterId") UUID requesterId) {
+  @DeleteMapping("/{message-id}")
+  public ResponseEntity<Void> deleteMessage(@PathVariable("message-id") UUID messageId,
+      @RequestParam("requester-id") UUID requesterId) {
     messageService.delete(messageId, requesterId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -84,10 +84,10 @@ public class MessageController {
   }
 
   // 페이징 구현
-  @GetMapping("/{channelId}")
+  @GetMapping("/{channel-id}")
   public ResponseEntity<PageResponse<MessageDto>> getMessages(
-      @PathVariable UUID channelId,
-      @RequestParam(required = false) String cursor,
+      @PathVariable("channel-id") UUID channelId,
+      @RequestParam(value = "cursor", required = false) String cursor,
       @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
       @RequestParam
       Pageable pageable) {

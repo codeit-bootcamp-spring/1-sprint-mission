@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @ResponseBody
-@RequestMapping("/api/binaryContents")
+@RequestMapping("/api/binary-contents")
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
@@ -40,17 +40,17 @@ public class BinaryContentController {
   }
 
 
-  @GetMapping("/{binaryContentId}")
+  @GetMapping("/{binary-content-id}")
   public ResponseEntity<BinaryContentDto> find(
-      @PathVariable("binaryContentId") UUID binaryContentId) {
+      @PathVariable("binary-content-id") UUID binaryContentId) {
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContentDto);
   }
 
-  @GetMapping("/{binaryContentId}/download")
-  public ResponseEntity<Resource> downloadBinaryContent(@PathVariable UUID binaryContentId) {
+  @GetMapping("/{binary-content-id}/download")
+  public ResponseEntity<Resource> downloadBinaryContent(@PathVariable("binary-content-id") UUID binaryContentId) {
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
     return binaryContentStorage.download(binaryContentDto);
   }
