@@ -1,0 +1,33 @@
+<configuration>
+  <!-- 로그 패턴 설정-->
+  <property name="LOG_PATTERN"
+    value="%d{yyyy-MM-DD HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg %n"/>
+
+  <!-- 로그 console 출력 설정 -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 로그 파일 경로 설정-->
+  <property name="LOG_PATH" value="./.logs"/>
+
+  <!-- 로그 파일 롤링 저장-->
+  <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/app.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+  <!-- 루트 로거에서 STDOUT와 File appender 참조 -->
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="File"/>
+  </root>
+</configuration>
+

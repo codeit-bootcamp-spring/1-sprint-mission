@@ -1,0 +1,36 @@
+package com.sprint.mission.discodeit.entity;
+
+
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import java.io.Serializable;
+
+@Getter
+@Entity
+@Table(name = "binary_contents")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//바이너리 데이터(이미지,파일)를 표현하는 도메인 모델
+//사용자의 프로필 이미지,메시지에 첨부된 파일을 저장하기 위해 활용
+public class BinaryContent extends BaseEntity {
+
+  @Column(nullable = false)
+  private String fileName; // 파일명
+
+  @Column(nullable = false)
+  private Long size; //파일 사이즈
+
+  @Column(nullable = false, length = 100)
+  private String contentType; // 타입
+
+  public BinaryContent(String fileName, Long size, String contentType) {
+    this.fileName = fileName;
+    this.size = size;
+    this.contentType = contentType;
+  }
+}
+
