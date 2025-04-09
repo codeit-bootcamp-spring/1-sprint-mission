@@ -1,0 +1,61 @@
+plugins {
+//    id 'checkstyle'
+    id 'java'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.sprint.mission'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Gradle 5.x 이상
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok'
+    // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql:42.6.0'
+//    // Docker - 최신 버전 사용
+//    checkstyle 'com.puppycrawl.tools:checkstyle:10.12.4'
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+//checkstyle {
+//    toolVersion = '10.12.4' // Checkstyle 버전
+//    configFile = file('checkstyle.xml') // Checkstyle 설정 파일 경로
+//}
+
+// 이하 필요시에만 사용
+tasks.withType(Checkstyle) {
+    reports {
+        html.required = true // HTML 보고서 생성
+        xml.required = false // XML 보고서는 비활성화
+    }
+}
