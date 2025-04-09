@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.BinaryContentStoreDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
@@ -19,11 +18,11 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -100,14 +99,33 @@ public class BasicMessageService extends MessageMapper implements MessageService
   }
 
   // 메세지 목록 조회
+  // TODO 정렬 기준(createdAt)과 커서 기준(id) 다른 거 수정
   @Transactional(readOnly = true)
   @Override
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-    Page<Message> messagePage = messageRepository.findAllByChannelId(channelId, pageable);
-    Page<MessageDto> messagePageDto = messagePage.map(message -> messageMapper.toDto(message));
-    return pageResponseMapper.fromPage(messagePageDto);
+  public Page<MessageDto> findAllByChannelId(UUID channelId, String cursor, Pageable pageable) {
+    // 커서를 idAfter로 디코딩
+    Integer idAfter = decodeCursor(cursor);
+
+    // idAfter을 전달해서 쿼리 호출 및 반환
+    Page<Message> messages;
+    if (idAfter != null){
+      messages = messageRepository.findByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(channelId, idAfter, pageable);
+    } else{
+      messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+    }
+    return messages.map(message -> messageMapper.toDto(message));
   }
 
+  // cursor을 원래의 Integer값으로 디코딩 (idAfter)
+  private Integer decodeCursor(String cursor){
+    if (cursor == null){
+      throw new IllegalArgumentException("Invalid cursor data");
+    }
+    byte[] cursorBinary = Base64.getDecoder().decode(cursor);
+    String cursorId = new String(cursorBinary);
+    Integer idAfter = Integer.valueOf(cursorId);
+    return idAfter;
+  }
 
   @Transactional
   @Override

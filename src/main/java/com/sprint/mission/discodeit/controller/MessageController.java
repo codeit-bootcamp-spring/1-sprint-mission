@@ -8,17 +8,17 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -87,12 +87,35 @@ public class MessageController {
   @GetMapping("/{channelId}")
   public ResponseEntity<PageResponse<MessageDto>> getMessages(
       @PathVariable UUID channelId,
-      @PageableDefault(page=0, size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
+      @RequestParam(required = false) String cursor,
+      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
       @RequestParam
       Pageable pageable) {
-    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, pageable);
+
+    Page<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor, pageable);
+
+    String nextCursor = getNextCursor(messages, cursor);
+
+    PageResponse<MessageDto> messageDtoPageResponse = PageResponseMapper.fromPage(messages, nextCursor);
+
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(messages);
+        .body(messageDtoPageResponse);
+  }
+
+  // cursor을 Base64 문자열로 인코딩
+  private String encodeCursor(MessageDto messages, String cursor) {
+    if (messages == null || messages.getId() == null) {
+      throw new IllegalArgumentException("Invalid cursor data");
+    }
+    return Base64.getEncoder().encodeToString((messages.getId().toString()).getBytes());
+  }
+
+  // nextCursor 생성
+  private String getNextCursor(Page<MessageDto> messages, String cursor){
+    List<MessageDto> content = messages.getContent();
+    String nextCursor = messages.hasNext() && !content.isEmpty() ?
+            encodeCursor(content.get(content.size() - 1), cursor) : null;
+    return nextCursor;
   }
 }
