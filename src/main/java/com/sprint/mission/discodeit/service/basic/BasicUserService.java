@@ -2,18 +2,20 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 
 @Slf4j
@@ -32,7 +34,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public User update(User user){
+  public User update(User user) {
     return userRepository.save(user);
   }
 
@@ -40,7 +42,10 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public User findUserById(String id) {
     return userRepository.findById(UUID.fromString(id)).orElseThrow(
-        () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        () -> {
+          log.debug("[USER NOT FOUND] [ID: {}]", id);
+          return new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", id));
+        }
     );
   }
 
@@ -52,22 +57,15 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<User> validateAndFindAllUsersIn(List<String> userIds) {
-    List<UUID> userUuids = userIds.stream()
-        .map(id -> {
-          try {
-            return UUID.fromString(id);
-          } catch (IllegalArgumentException e) {
-            // TODO : 예외를 던질지, 로그를 찍을지 고민
-            log.warn("Invalid UUID: {}", id);
-            return null;
-          }
-        }).filter(Objects::nonNull)
-        .toList();
+  public List<User> findAllUsersIn(List<String> userIds) {
+    log.debug("[VALIDATING USERS] : [ID: {}]", userIds);
+
+    List<UUID> userUuids = parseStringToUuid(userIds);
 
     // TODO : 상세 exception message 작성
     if (userUuids.isEmpty()) {
-      throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
+      log.warn("[ATTEMPT TO CREATE PRIVATE CHANNEL WITH NO USER]");
+      throw new DiscodeitException(ErrorCode.DEFAULT_ERROR_MESSAGE);
     }
 
     return userRepository.findAllByIdIn(userUuids);
@@ -77,12 +75,41 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public List<User> findByAllIn(List<UUID> userIds) {
     return userRepository.findAllByIdIn(userIds);
-
   }
 
   @Override
   @Transactional
   public void deleteUser(String id) {
-    userRepository.deleteById(UUID.fromString(id));
+
+    UUID userId = null;
+
+    try {
+      userId = UUID.fromString(id);
+    } catch (IllegalArgumentException e) {
+      throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT);
+    }
+
+    try {
+      userRepository.deleteById(userId);
+    } catch (EmptyResultDataAccessException ignored) {
+      log.warn("[USER DELETE IGNORED] No user found for ID: {}", id);
+    }
+  }
+
+  private List<UUID> parseStringToUuid(List<String> userIds) {
+    List<UUID> userUuids = new ArrayList<>();
+
+    for (String userId : userIds) {
+      try {
+        userUuids.add(UUID.fromString(userId));
+      } catch (IllegalArgumentException e) {
+        log.warn("[INVALID UUID FORMAT] : [ID: {}]", userId);
+        throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT,
+            Map.of("invalidUserId", userId));
+      }
+    }
+
+    return userUuids;
+
   }
 }

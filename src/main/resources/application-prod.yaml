@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: discodeit
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+  boot:
+    admin:
+      client:
+        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
+
+
+logging:
+  level:
+    p6spy: ERROR
+    root: INFO
+server:
+  port: 8082

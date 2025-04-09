@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.aop;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -7,9 +9,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This log is for development only
@@ -20,7 +19,8 @@ import java.util.List;
 @Component
 public class MethodLoggingAspect {
 
-  private static final ThreadLocal<List<String>> methodTrace = ThreadLocal.withInitial(ArrayList::new);
+  private static final ThreadLocal<List<String>> methodTrace = ThreadLocal.withInitial(
+      ArrayList::new);
 
   @Around("execution(* com.sprint.mission.discodeit.service..*(..)) " +
       "|| execution(* com.sprint.mission.discodeit.service.facade..*(..))")
@@ -36,7 +36,7 @@ public class MethodLoggingAspect {
     return joinPoint.proceed();
   }
 
-  @After("execution(* com.sprint.mission.discodeit.service.facade..*MasterFacade.*(..))")
+  @After("execution(* com.sprint.mission.discodeit.service.facade..*.*(..))")
   public void logFacadeCompletion() {
     List<String> calledMethods = methodTrace.get();
 

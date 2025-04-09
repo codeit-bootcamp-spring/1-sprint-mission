@@ -6,16 +6,15 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.user.UserManagementService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class UserFacadeImpl implements UserFacade {
 
@@ -27,6 +26,8 @@ public class UserFacadeImpl implements UserFacade {
   public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
     User user = userMapper.toEntity(request);
     User createdUser = userManagementService.createUser(user, profile);
+    log.debug("[USER CREATED] : [USERNAME: {}]", createdUser.getUsername());
+
     return userMapper.toDto(createdUser);
   }
 
@@ -40,8 +41,11 @@ public class UserFacadeImpl implements UserFacade {
   @Override
   @Transactional
   public UserResponseDto updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto) {
+    log.debug("[UPDATE USER REQUEST] : [ID: {}]", userId);
     User tmpUser = userMapper.toEntity(updateDto);
-    User updatedUser =  userManagementService.updateUser(userId, tmpUser, profile);
+    User updatedUser = userManagementService.updateUser(userId, tmpUser, profile);
+    log.debug("[UPDATED USER] : [ID : {}]", userId);
+
     return userMapper.toDto(updatedUser);
   }
 

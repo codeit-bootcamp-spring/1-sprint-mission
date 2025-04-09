@@ -1,2 +1,3 @@
 rootProject.name = '1-sprint-mission'
 
+include("admin")

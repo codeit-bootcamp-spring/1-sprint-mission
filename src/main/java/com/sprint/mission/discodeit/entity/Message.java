@@ -7,16 +7,16 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,7 +30,8 @@ public class Message extends BaseUpdatableEntity {
   @JoinColumn(name = "channel_id", nullable = false)
   private Channel channel;
 
-  @OneToOne(fetch = FetchType.LAZY)
+
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", nullable = false)
   private User author;
 
@@ -46,31 +47,33 @@ public class Message extends BaseUpdatableEntity {
     this.attachments.add(new MessageAttachment(this, attachment));
   }
 
-  public void addChannel(Channel channel){
+
+  public void addChannel(Channel channel) {
     this.channel = channel;
   }
 
-  public void addAuthor(User user){
+  public void addAuthor(User user) {
     this.author = user;
-
   }
 
   @Override
   public String toString() {
     return "Message{"
-
         + "id='" + getId() + '\''
         + ", userid='" + author.getId() + '\''
         + ", channelid='" + channel.getId() + '\''
-
         + ", content='" + content + '\''
         + '}';
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     Message message = (Message) o;
 
     return Objects.equals(getId(), message.getId());

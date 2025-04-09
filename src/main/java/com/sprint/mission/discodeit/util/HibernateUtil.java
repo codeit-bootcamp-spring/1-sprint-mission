@@ -2,16 +2,13 @@ package com.sprint.mission.discodeit.util;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.engine.internal.StatefulPersistenceContext;
 import org.hibernate.engine.spi.EntityHolder;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.proxy.HibernateProxy;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -33,13 +30,12 @@ public class HibernateUtil {
     StatefulPersistenceContext spc = (StatefulPersistenceContext) persistenceContext;
     Map<EntityKey, EntityHolder> m2 = spc.getEntityHoldersByKey();
 
-    for( EntityKey v : m2.keySet()){
-      log.info("[Persistence Context][Entity] :{}  [Initialized] : {}" , v , m2.get(v).isInitialized());
+    for (EntityKey v : m2.keySet()) {
+      log.debug("[Persistence Context][Entity] :{}  [Initialized] : {}", v,
+          m2.get(v).isInitialized());
     }
 
-    log.info("[SIZE] : {}", m2.size());
-
-
+    log.debug("[SIZE] : {}", m2.size());
 
 //    if (managedEntities.isEmpty()) return;
 //    for (Object entity : managedEntities) {

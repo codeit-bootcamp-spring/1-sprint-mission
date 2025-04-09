@@ -7,9 +7,6 @@ import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,9 +16,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Mapper(uses = UserMapper.class, imports = Objects.class)
+@Mapper(uses = UserMapper.class, imports = {Objects.class, ArrayList.class})
+
 public interface ChannelMapper {
+
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "name", source = "name")
   @Mapping(target = "type", constant = "PUBLIC")
@@ -29,6 +30,7 @@ public interface ChannelMapper {
 
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "type", constant = "PRIVATE")
+  @Mapping(target = "statuses", expression = "java(new ArrayList<>())")
   Channel toEntity(CreatePrivateChannelDto dto);
 
   @Mapping(source = "channel.id", target = "id")
@@ -43,7 +45,8 @@ public interface ChannelMapper {
       List<Channel> channels,
       Map<UUID, Instant> latestMessageByChannel,
       Map<UUID, List<User>> channelParticipants
-  ){
+  ) {
+
     return channels.stream()
         .map(channel -> toDto(
             channel,

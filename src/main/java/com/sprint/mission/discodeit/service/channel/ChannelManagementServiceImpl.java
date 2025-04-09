@@ -6,22 +6,19 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
-import com.sprint.mission.discodeit.util.HibernateUtil;
-import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
-import org.hibernate.proxy.HibernateProxy;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChannelManagementServiceImpl implements ChannelManagementService {
@@ -35,11 +32,13 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
   @Transactional(propagation = Propagation.REQUIRED)
   public Channel createPrivateChannel(Channel channel, List<String> userIds) {
 
-    List<User> participants = userService.validateAndFindAllUsersIn(userIds);
+    List<User> participants = userService.findAllUsersIn(userIds);
+    log.debug("[FOUND USERS OF IDS] : [{}]", userIds);
 
     List<ReadStatus> statuses = participants.stream()
         .map(user -> new ReadStatus(channel, user))
         .toList();
+    log.debug("[CREATED READ STATUS OF USERS] : [{}]", userIds);
 
     statuses.stream().forEach(channel::addReadStatus);
 
@@ -71,13 +70,13 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
 
     List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
 
-
     List<UUID> extractedChannelIds = parseStatusToChannelUuid(statuses);
     List<Channel> channels = channelService.findAllChannelsInOrPublic(extractedChannelIds);
 
     List<ReadStatus> secondStatuses = getDifferentReadStatuses(channels, extractedChannelIds);
 
-    List<UUID> newChannelIds = secondStatuses.stream().map(status -> status.getChannel().getId()).distinct().collect(Collectors.toList());
+    List<UUID> newChannelIds = secondStatuses.stream().map(status -> status.getChannel().getId())
+        .distinct().collect(Collectors.toList());
 
     List<Channel> newChannels = channelService.findAllChannelsInOrPublic(newChannelIds);
     List<Channel> mergedChannels = Stream.concat(channels.stream(), newChannels.stream())
@@ -88,8 +87,9 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
         .distinct()
         .collect(Collectors.toList());
 
-    List<String> userIds = mergedStatuses.stream().map(status -> status.getUser().getId().toString()).collect(Collectors.toList());
-    List<User> users = userService.validateAndFindAllUsersIn(userIds);
+    List<String> userIds = mergedStatuses.stream()
+        .map(status -> status.getUser().getId().toString()).collect(Collectors.toList());
+    List<User> users = userService.findAllUsersIn(userIds);
 
     return mergedChannels;
   }
@@ -102,7 +102,9 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
         .collect(Collectors.toList());
   }
 
-  private List<ReadStatus> getDifferentReadStatuses(List<Channel> channels, List<UUID> originalChannelIds) {
+  private List<ReadStatus> getDifferentReadStatuses(List<Channel> channels,
+      List<UUID> originalChannelIds) {
+
     List<UUID> difference = channels.stream()
         .map(c -> c.getId())
         .filter(id -> !originalChannelIds.contains(id))

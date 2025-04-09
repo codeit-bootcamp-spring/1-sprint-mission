@@ -10,14 +10,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -36,16 +35,24 @@ public class Channel extends BaseUpdatableEntity {
   private List<ReadStatus> statuses = new ArrayList<>();
 
 
-
   public enum ChannelType {
     PRIVATE, PUBLIC
   }
 
   public void updateChannelName(String channelName) {
+
+    if (channelName.isBlank()) {
+      return;
+    }
+
     this.name = channelName;
   }
 
   public void updateDescription(String description) {
+    if (description.isBlank()) {
+      return;
+    }
+
     this.description = description;
   }
 
@@ -71,8 +78,12 @@ public class Channel extends BaseUpdatableEntity {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     Channel channel = (Channel) o;
 
     return Objects.equals(getId(), channel.getId());

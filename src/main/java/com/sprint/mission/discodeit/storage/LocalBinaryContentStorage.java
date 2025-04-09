@@ -1,8 +1,14 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.file.FileException;
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -13,12 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
-
+@Slf4j
 @Component
 @ConditionalOnProperty(value = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -31,7 +32,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       Files.createDirectories(root);
     } catch (IOException e) {
-      throw new CustomException(ErrorCode.FILE_ERROR);
+      throw new FileException(ErrorCode.FILE_ERROR);
     }
   }
 
@@ -39,20 +40,29 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public UUID put(UUID id, byte[] bytes) {
     Path filePath = resolvePath(id);
     try {
+
+      log.debug("[WRITING BINARY FILE] : [ID: {}]", id);
       Files.write(filePath, bytes);
       return id;
     } catch (IOException e) {
-      throw new CustomException(ErrorCode.FILE_ERROR);
+      log.warn("[ERROR WHILE WRITING FILE] : [ID: {}]", id);
+      throw new FileException(ErrorCode.FILE_ERROR);
     }
   }
 
   @Override
   public InputStream get(UUID id) {
+
+    log.debug("[OPENING INPUT_STREAM]");
+
     Path filePath = resolvePath(id);
     try {
       return Files.newInputStream(filePath);
     } catch (IOException e) {
-      throw new CustomException(ErrorCode.FILE_ERROR);
+
+      log.warn("[ERROR WHILE OPENING INPUT_STREAM]");
+      throw new FileException(ErrorCode.FILE_ERROR);
+
     }
   }
 
@@ -62,7 +72,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     Path filePath = resolvePath(id);
 
+    log.debug("[DOWNLOADING FILE] : [PATH: {}]", filePath);
+
     if (!Files.exists(filePath)) {
+      log.error("[FILE NOT FOUND] : [PATH: {}]", filePath);
+
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
@@ -84,6 +98,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
           .body(resource);
 
     } catch (Exception e) {
+      log.warn("[ERROR WHILE DOWNLOADING] : [REASON : {}]", e.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }

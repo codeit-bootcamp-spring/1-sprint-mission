@@ -11,10 +11,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 
 @Tag(name = "User API", description = "User 작업")
@@ -94,7 +94,7 @@ public interface UserApiDocs {
       @ApiResponse(responseCode = "204", description = "User 삭제 성공"),
       @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
   })
+  ResponseEntity<Void> deleteUser(@Parameter(description = "삭제할 User UUID") UUID id);
 
-  ResponseEntity<Void> deleteUser(@Parameter(description = "삭제할 User UUID") String id);
 
 }

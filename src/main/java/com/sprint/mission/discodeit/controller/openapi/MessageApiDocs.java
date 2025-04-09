@@ -12,12 +12,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.Instant;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
-import java.util.List;
 
 @Tag(name = "Message API", description = "Message 작업")
 public interface MessageApiDocs {
@@ -34,14 +34,14 @@ public interface MessageApiDocs {
           ))
   })
   ResponseEntity<MessageResponseDto> sendMessage(
-      @Parameter(description = "메시지 생성 정보", required = true) CreateMessageDto messageDto,
+      @Parameter(description = "메시지 생성 정보", required = true) CreateMessageDto messageCreateRequest,
       @Parameter(
           description = "바이너리 첨부 파일",
           content = @Content(
-              mediaType = "image/*",
+              mediaType = "*/*",
               schema = @Schema(type = "string", format = "binary")
-          )
-
+          ),
+          required = false
       ) List<MultipartFile> files);
 
   @Operation(summary = "Message 업데이트")
@@ -73,15 +73,18 @@ public interface MessageApiDocs {
           )
       )
   })
-  ResponseEntity<Void> deleteMessage(@Parameter(required = true, description = "삭제할 Message UUID") String messageId);
+  ResponseEntity<Void> deleteMessage(
+      @Parameter(required = true, description = "삭제할 Message UUID") String messageId);
 
 
   @Operation(summary = "Channel 의 Message들 조회")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Message 조회 성공")
   })
-  ResponseEntity<PageResponse<MessageResponseDto>> getChannelMessages(@Parameter(required = true, description = "조회할 Channel UUID") String channelId,
-                                                                      Instant cursor,
-                                                                      Pageable pageable);
+  ResponseEntity<PageResponse<MessageResponseDto>> getChannelMessages(
+      @Parameter(required = true, description = "조회할 Channel UUID") String channelId,
+      Instant cursor,
+      Pageable pageable);
+
 
 }

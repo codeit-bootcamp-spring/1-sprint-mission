@@ -1,0 +1,33 @@
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: OFF
+    p6spy: INFO
+    root: INFO
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        show_sql: false
+  sql:
+    init:
+      mode: never
+
+
+
+

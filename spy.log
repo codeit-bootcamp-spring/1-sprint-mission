@@ -1,0 +1,7 @@
+1743493652897|0|statement|connection 83|url jdbc:h2:mem:5c5326bb-1d45-45f7-9096-63d5ab2bb0c5|drop table if exists binary_contents cascade |drop table if exists binary_contents cascade 
+1743493652898|0|statement|connection 83|url jdbc:h2:mem:5c5326bb-1d45-45f7-9096-63d5ab2bb0c5|drop table if exists channels cascade |drop table if exists channels cascade 
+1743493652898|0|statement|connection 83|url jdbc:h2:mem:5c5326bb-1d45-45f7-9096-63d5ab2bb0c5|drop table if exists message_attachments cascade |drop table if exists message_attachments cascade 
+1743493652898|0|statement|connection 83|url jdbc:h2:mem:5c5326bb-1d45-45f7-9096-63d5ab2bb0c5|drop table if exists messages cascade |drop table if exists messages cascade 
+1743493652898|0|statement|connection 83|url jdbc:h2:mem:5c5326bb-1d45-45f7-9096-63d5ab2bb0c5|drop table if exists read_statuses cascade |drop table if exists read_statuses cascade 
+1743493652899|0|statement|connection 83|url jdbc:h2:mem:5c5326bb-1d45-45f7-9096-63d5ab2bb0c5|drop table if exists user_statuses cascade |drop table if exists user_statuses cascade 
+1743493652899|0|statement|connection 83|url jdbc:h2:mem:5c5326bb-1d45-45f7-9096-63d5ab2bb0c5|drop table if exists users cascade |drop table if exists users cascade 

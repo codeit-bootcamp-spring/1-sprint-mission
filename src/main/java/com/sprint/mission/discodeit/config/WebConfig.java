@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.interceptor.RequestLoggingInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -10,9 +9,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
+  private final RequestLoggingInterceptor interceptor;
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new RequestLoggingInterceptor())
+    registry.addInterceptor(interceptor)
         .order(1)
         .addPathPatterns("/**");
   }
