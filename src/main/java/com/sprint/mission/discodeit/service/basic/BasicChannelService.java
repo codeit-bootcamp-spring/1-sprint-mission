@@ -33,7 +33,7 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
     Channel channel = Channel.builder()
         .name(channelName)
         .description(channelDescription)
-        .type(ChannelType.PUBLIC)
+        .type(Channel.ChannelType.PUBLIC)
         .build();
     return toDto(channelRepository.save(channel));
   }
@@ -45,7 +45,7 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
     Channel channel = Channel.builder()
         .name(null)
         .description(null)
-        .type(ChannelType.PRIVATE)
+        .type(Channel.ChannelType.PRIVATE)
         .build();
     Channel createdChannel = channelRepository.save(channel);
     for (UUID userId : request.getParticipantIds()) {
@@ -73,9 +73,9 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
     List<Channel> publicChannels = channelRepository.findAll();
     List<ChannelDto> returnChannels = new ArrayList<>();
     for (Channel channel : publicChannels) {
-      if (channel.getType().equals(ChannelType.PUBLIC)) {
+      if (channel.getType().equals(Channel.ChannelType.PUBLIC)) {
         returnChannels.add(toDto(channel));
-      } else if (channel.getType().equals(ChannelType.PRIVATE)) {
+      } else if (channel.getType().equals(Channel.ChannelType.PRIVATE)) {
         Optional<ReadStatus> optionalReadStatus = readStatusRepository.findById(channel.getId());
         if (optionalReadStatus.isPresent() && optionalReadStatus.get().getUser().getId()
             .equals(userId)) {
@@ -93,7 +93,7 @@ public class BasicChannelService extends ChannelMapper implements ChannelService
     // private 채널이면 수정할 수 없다는 말
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ChannelNotFoundException(null));
-    if (channel.getType().equals(ChannelType.PRIVATE)) {
+    if (channel.getType().equals(Channel.ChannelType.PRIVATE)) {
       throw new PrivateChannelUpdateException(null);
     }
     String newName = request.getNewName();

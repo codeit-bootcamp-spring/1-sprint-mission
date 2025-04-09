@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -49,7 +48,7 @@ public class ChannelMapper {
     }
 
     List<UUID> participantIds = new ArrayList<>();
-    if (channel.getType().equals(ChannelType.PRIVATE)) {
+    if (channel.getType().equals(Channel.ChannelType.PRIVATE)) {
       readStatusRepository.findAllByChannelId(channel.getId())
           .forEach(readStatus -> participantIds.add(readStatus.getUser().getId()));
       // .forEach()는 Iterable에서 제공하는 메서드라서 .stream() 안써도 된다.
