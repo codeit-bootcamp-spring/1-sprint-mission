@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -45,7 +46,7 @@ public class MessageController {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE
   )
   public ResponseEntity<MessageDto> createMessage(
-      @ModelAttribute MessageCreateRequest messageCreateRequest,
+      @ModelAttribute @Valid MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
     MessageDto createdMessage = messageService.create(messageCreateRequest, attachments);
@@ -56,7 +57,7 @@ public class MessageController {
 
   @PatchMapping("/{message-id}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable("message-id") UUID messageId,
-      @RequestBody MessageUpdateRequest request) {
+      @RequestBody @Valid MessageUpdateRequest request) {
     messageService.update(messageId, request.getRequesterId(), request);
     return ResponseEntity
         .status(HttpStatus.OK)

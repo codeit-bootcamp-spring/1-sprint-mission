@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.sprint.mission.discodeit.validator.ProfileFile;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class UserController {
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
   )
   public ResponseEntity<UserDto> create(
-      @ModelAttribute UserCreateRequest userCreateRequest,
+      @ModelAttribute @Valid UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false)
       @ProfileFile(message = "이미지 파일만 설정할 수 있습니다.")
       MultipartFile profile
@@ -63,16 +64,16 @@ public class UserController {
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
   )
   /*
-  TODO @PathVariable은 URL 경로의 일부로 데이터를 전달하는 방식.
+  @PathVariable은 URL 경로의 일부로 데이터를 전달하는 방식.
    multipart/form-data 요청에서는 URL이 아니라 요청 바디에서 데이터가 전달되기 때문에, 스프링이 @PathVariable을 제대로 매핑하지 못할 수도 있음.
    그래서 보통 파일 업로드가 포함된 경우 (이렇게 form data로 줘야하는 경우) @RequestParam을 사용해서 바디에서 값을 받아야 함.
-   @RequestParam : multipart/form-data 요청에서는 URL이 아니라 "바디에서" 값을 받는다!
+   @RequestParam : multipart/form-data 요청에서는 URL이 아니라 "바디에서" 값을 받는다
     -> GET 요청이면 URL에서 (?userId=...) 값을 받지만,
-    -> POST (multipart/form-data) 요청이면 바디에서 값을 받는다!
+    -> POST (multipart/form-data) 요청이면 바디에서 값을 받는다
    */
   public ResponseEntity<UserDto> update(
       @PathVariable("user-id") UUID userId,
-      @ModelAttribute UserUpdateRequest userUpdateRequest,
+      @ModelAttribute @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false)
       @ProfileFile(message = "이미지 파일만 설정할 수 있습니다.")
       MultipartFile profile
@@ -104,7 +105,7 @@ public class UserController {
   @PostMapping("/{user-id}/user-status")
   public ResponseEntity<UserStatusDto> createUserStatusByUserId(
       @PathVariable("user-id") UUID userId,
-      @RequestBody UserStatusCreateRequest userStatusCreateRequest
+      @RequestBody @Valid UserStatusCreateRequest userStatusCreateRequest
   ) {
     UserStatusDto userStatusDto = userStatusService.create(userStatusCreateRequest);
     return ResponseEntity
@@ -115,7 +116,7 @@ public class UserController {
   @PatchMapping("/{user-id}/user-status")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @PathVariable("user-id") UUID userId,
-      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest
+      @RequestBody @Valid UserStatusUpdateRequest userStatusUpdateRequest
   ) {
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
     return ResponseEntity
