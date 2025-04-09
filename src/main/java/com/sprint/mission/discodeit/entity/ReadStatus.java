@@ -43,10 +43,13 @@ public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
   public void update(Instant newLastReadAt) {
     boolean anyValueUpdated = false;
-    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
-      this.lastReadAt = newLastReadAt;
-      anyValueUpdated = true;
+
+    if (newLastReadAt == null || newLastReadAt.equals(this.lastReadAt)) {
+      throw new IllegalArgumentException("ReadStatus update fail");
     }
+    this.lastReadAt = newLastReadAt;
+    this.updatedAt = Instant.now();
+
     if (anyValueUpdated) {
       this.updatedAt = Instant.now();
     }

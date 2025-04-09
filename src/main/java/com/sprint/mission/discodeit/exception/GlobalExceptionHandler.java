@@ -100,6 +100,20 @@ public class GlobalExceptionHandler {
             .body(errorResponse);
   }
 
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+    ErrorResponse errorResponse = ErrorResponse.builder()
+            .code("BAD_REQUEST")
+            .message(e.getMessage())
+            .exceptionType(e.getClass().getSimpleName())
+            .status(HttpStatus.BAD_REQUEST.value())
+            .build();
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(errorResponse);
+  }
+
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception e) {
     ErrorResponse errorResponse = ErrorResponse.builder()

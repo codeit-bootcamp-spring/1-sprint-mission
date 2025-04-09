@@ -19,7 +19,6 @@ import java.util.UUID;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@ResponseBody
 @RequestMapping("/api/channels")
 public class ChannelController {
 
