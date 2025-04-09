@@ -47,17 +47,13 @@ public class UserController implements UserApi {
       log.debug("프로필 파일 첨부됨: {}", userCreateRequest.username());
     }
 
-    try {
-      Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-          .map(fileConverter::convert);
+    Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
+        .map(fileConverter::convert);
 
-      UserDto userDto = userService.create(userCreateRequest, profileRequest);
-      log.info("사용자 생성 완료 - ID: {}", userDto.id());
-      return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
-    } catch (Exception e) {
-      log.error("사용자 생성 실패 ", e);
-      throw e;
-    }
+    UserDto userDto = userService.create(userCreateRequest, profileRequest);
+    log.info("사용자 생성 완료 - ID: {}", userDto.id());
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
+
   }
 
   @PatchMapping(
@@ -75,32 +71,23 @@ public class UserController implements UserApi {
       log.debug("프로필 업데이트 파일 첨부됨: {}", userId);
     }
 
-    try {
-      BinaryContentCreateRequest profileRequest = fileConverter.convert(profile);
-      UserDto userDto = userService.update(userId, userUpdateRequest,
-          Optional.ofNullable(profileRequest));
-      log.info("사용자 정보 수정 완료 - ID: {}", userId);
-      return ResponseEntity.status(HttpStatus.OK).body(userDto);
-    } catch (Exception e) {
-      log.error("사용자 정보 수정 실패 - ID: {}", userId, e);
-      throw e;
-    }
+    BinaryContentCreateRequest profileRequest = fileConverter.convert(profile);
+    UserDto userDto = userService.update(userId, userUpdateRequest,
+        Optional.ofNullable(profileRequest));
+    log.info("사용자 정보 수정 완료 - ID: {}", userId);
+    return ResponseEntity.status(HttpStatus.OK).body(userDto);
+
   }
 
   @DeleteMapping(path = "{userId}")
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
     log.info("DELETE /api/users/{} - 사용자 삭제 요청", userId);
-    try {
-      userService.delete(userId);
-      log.info("사용자 삭제 완료 - ID: {}", userId);
-      return ResponseEntity
-          .status(HttpStatus.NO_CONTENT)
-          .build();
-    } catch (Exception e) {
-      log.error("사용자 삭제 실패 - ID: {}", userId, e);
-      throw e;
-    }
+    userService.delete(userId);
+    log.info("사용자 삭제 완료 - ID: {}", userId);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
   @GetMapping
