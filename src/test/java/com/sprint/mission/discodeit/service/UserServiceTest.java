@@ -20,7 +20,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -280,7 +279,7 @@ class UserServiceTest {
           () -> Assertions.assertEquals(userDto.nickname(), user.getNickname()),
           () -> Assertions.assertEquals(userDto.email(), user.getEmail()),
           () -> Assertions.assertEquals(userDto.statusMessage(), user.getStatusMessage()),
-          () -> Assertions.assertEquals(userDto.profileId().id(), binaryId)
+          () -> Assertions.assertEquals(userDto.profile().id(), binaryId)
       );
 
       // userRepository.save가 정확히 한 번 호출되었는지 검증
@@ -439,7 +438,7 @@ class UserServiceTest {
       );
 
       userStatus = new UserStatus(user);
-      user.setUserStatus(userStatus);
+      user.setStatus(userStatus);
 
     }
 
