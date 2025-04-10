@@ -10,12 +10,10 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelCategory;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -62,9 +60,9 @@ public class BasicChannelService implements ChannelService {
 
     Channel channel = new Channel(createPublicChannelDto.name(), ChannelType.PUBLIC,
         ChannelCategory.TEXT, createPublicChannelDto.description());
-    Channel createdChannel = channelRepository.save(channel);
-    log.info("Public 채널 생성 완료: channelId = {}", createdChannel.getId());
-    return channelMapper.toDto(createdChannel);
+    channelRepository.save(channel);
+    log.info("Public 채널 생성 완료: channelId = {}", channel.getId());
+    return channelMapper.toDto(channel);
   }
 
   @Override
@@ -80,27 +78,17 @@ public class BasicChannelService implements ChannelService {
     }
 
     Channel channel = new Channel(null, ChannelType.PRIVATE, ChannelCategory.TEXT, null);
-    Channel savedChannel = channelRepository.save(channel);
-    log.debug("Private 채널 생성 완료: channelId = {}", savedChannel.getId());
+    channelRepository.save(channel);
 
-    List<String> userIds = createPrivateChannelDTo.participantIds().stream().distinct().toList();
-    List<UserDto> participants = new ArrayList<>();
+    List<UUID> userIds = createPrivateChannelDTo.participantIds().stream().map(UUID::fromString)
+        .toList();
 
-    for (String userId : userIds) {
-      User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
-      if (user == null) {
-        log.warn("Private 채널에 존재하지 않는 사용자 추가 시도");
-        throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
-      }
-      ReadStatus readStatus = new ReadStatus(channel, user, Instant.now());
-      ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
-      log.debug("Private 채널과 사용자를 ReadStatus로 연결 : readStatusId = {}, channelId = {}, userId = {}",
-          savedReadStatus.getId(), savedReadStatus.getChannel().getId(),
-          savedReadStatus.getUser().getId());
-      participants.add(userMapper.toDto(user));
-      log.info("Private 채널에 사용자 추가:  channelId = {}, userId = {}", channel.getId(), user.getId());
-    }
-    log.info("Private 채널 생성 완료: channelId = {}", savedChannel.getId());
+    List<ReadStatus> readStatuses = userRepository.findAllById(userIds).stream()
+        .map(user -> new ReadStatus(channel, user, channel.getCreatedAt()))
+        .toList();
+    readStatusRepository.saveAll(readStatuses);
+
+    log.info("Private 채널 생성 완료: channelId = {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
@@ -113,9 +101,11 @@ public class BasicChannelService implements ChannelService {
     }
 
     //fetch 조인으로 한번에 가져온다.
-    //todo - 고민 : user id가 유효한지 검사 안해도 되나?
     List<Channel> channels = channelRepository.findChannelsWithReadStatusByUserId(
         UUID.fromString(userId));
+
+    channels.addAll(channelRepository.findByType(ChannelType.PUBLIC));
+    channels = channels.stream().distinct().toList();
 
     return channels.stream().map(channelMapper::toDto).toList();
   }
@@ -175,8 +165,8 @@ public class BasicChannelService implements ChannelService {
       throw new PrivateChannelUpdateException(ErrorCode.CHANNEL_PRIVATE_NOT_UPDATABLE);
     }
 
-    channel.setName(updateChannelDto.channelName());
-    channel.setDescription(updateChannelDto.description());
+    channel.setName(updateChannelDto.newName());
+    channel.setDescription(updateChannelDto.newDescription());
 
     Channel updatedChannel = channelRepository.save(channel);
     log.info("Public 채널 정보 수정 완료: channelId = {}", updatedChannel.getId());
