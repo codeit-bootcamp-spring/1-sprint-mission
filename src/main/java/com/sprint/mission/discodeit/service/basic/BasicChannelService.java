@@ -99,10 +99,9 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelDto> findAllDTO() {
     List<Channel> channelList = findAll();
-    List<ChannelDto> channelDtoList = channelList.stream()
-        .map(channel -> findDTO(channel.getId()))
-        .collect(Collectors.toList());
-    return channelDtoList;
+    return channelList.stream()
+        .map(channel -> channelMapper.toDto(channel))
+        .toList();
   }
 
 
