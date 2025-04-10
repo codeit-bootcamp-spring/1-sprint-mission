@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.storage;
+package com.sprint.mission.discodeit.storage.local;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;

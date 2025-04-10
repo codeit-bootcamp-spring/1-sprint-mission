@@ -1,0 +1,32 @@
+version: '3'
+services:
+  app:
+    container_name: discodeit-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: discodeit:prod
+    ports:
+      - "8081:${APP_PORT}"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${POSTGRES_PORT}/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - .discodeit/storage:/app/.discodeit/storage
+    depends_on:
+      - db
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - my-postgres-data:/var/lib/postgresql/data # postgres 의 volumes 경로
+      - ./ddl:/docker-entrypoint-initdb.d/
+
+volumes:
+  my-postgres-data:
