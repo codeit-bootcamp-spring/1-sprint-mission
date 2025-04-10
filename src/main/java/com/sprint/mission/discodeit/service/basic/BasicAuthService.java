@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.login.LoginRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -18,11 +20,12 @@ public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final UserStatusService userStatusService;
+  private final UserMapper userMapper;
 
   @Transactional
   @Override
-  public User login(LoginRequest loginRequest) {
-    User user = userRepository.findById(loginRequest.userId())
+  public UserDto login(LoginRequest loginRequest) {
+    User user = userRepository.findByUsername(loginRequest.userName())
         .orElseThrow(() -> new NoSuchElementException("사용자가 없습니다."));
 
     if (!user.getPassword().equals(loginRequest.password())) {
@@ -30,6 +33,6 @@ public class BasicAuthService implements AuthService {
     }
 
     userStatusService.updateByUserId(user.getId(), new UserStatusUpdateRequest(Instant.now()));
-    return user;
+    return userMapper.toDto(user);
   }
 }
