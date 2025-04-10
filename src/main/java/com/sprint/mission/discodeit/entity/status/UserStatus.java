@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.entity.status;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -19,8 +21,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserStatus extends BaseUpdatableEntity {
 
-  @OneToOne
-  @JoinColumn(name = "user_id")
+  @JsonBackReference
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
   private User user;
   private Instant lastActiveAt;
 
@@ -31,7 +34,7 @@ public class UserStatus extends BaseUpdatableEntity {
 
   private static final int USER_ACTIVE_TIMEOUT_SECONDS = 5 * 60;
 
-  public boolean isActive() {
+  public boolean isOnline() {
     return Instant.now().minusSeconds(USER_ACTIVE_TIMEOUT_SECONDS).isBefore(this.getLastActiveAt());
   }
 }

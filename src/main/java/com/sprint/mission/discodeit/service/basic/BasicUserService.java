@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,13 +72,14 @@ public class BasicUserService implements UserService {
 
     User user = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(),
         createUserDto.password(), null, AccountStatus.UNVERIFIED, null);
+    userRepository.save(user);
 
     UserStatus userStatus = new UserStatus(user);
+    user.setStatus(userStatus);
     userStatusRepository.save(userStatus);
-    user.setUserStatus(userStatus);
+
     log.debug("사용자 상태 객체 생성 및 연결: {}", userStatus);
 
-    userRepository.save(user);
     log.info("사용자 생성 완료: id = {}, email = {}, username = {}", user.getId(), user.getEmail(),
         user.getUsername());
 
@@ -106,7 +108,7 @@ public class BasicUserService implements UserService {
     } else {
       user.setProfile(profile);
       userRepository.save(user);
-      log.info("사용자 프로필 사진 등록: id = {}, profileId = {}", user.getId(), profile.getId());
+      log.info("사용자 프로필 사진 등록: id = {}, profile = {}", user.getId(), profile.getId());
     }
     return userMapper.toDto(user);
   }
@@ -168,13 +170,17 @@ public class BasicUserService implements UserService {
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
     //to
-    user.setUsername(updateUserDto.newUsername());
-    user.setNickname(updateUserDto.newNickname());
-    user.setEmail(updateUserDto.newEmail());
-    user.setPassword(updateUserDto.newPassword());
-    user.setUpdatedAt(updateUserDto.updatedAt());
-    user.setAccountStatus(updateUserDto.accountStatus());
-    user.setStatusMessage(updateUserDto.newStatusMessage());
+    user.setUsername(
+        updateUserDto.newUsername() == null ? user.getUsername() : updateUserDto.newUsername());
+    user.setNickname(
+        updateUserDto.newNickname() == null ? user.getNickname() : updateUserDto.newNickname());
+    user.setEmail(updateUserDto.newEmail() == null ? user.getEmail() : updateUserDto.newEmail());
+    user.setPassword(
+        updateUserDto.newPassword() == null ? user.getPassword() : updateUserDto.newPassword());
+    user.setUpdatedAt(
+        updateUserDto.updatedAt() == null ? Instant.now() : updateUserDto.updatedAt());
+    user.setStatusMessage(updateUserDto.newStatusMessage() == null ? user.getStatusMessage()
+        : updateUserDto.newStatusMessage());
 
     User savedUser = userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", savedUser.getId());
@@ -182,7 +188,7 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = userStatusRepository.findByUser(savedUser)
         .orElseThrow(() -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
 
-    user.setUserStatus(userStatus);
+    user.setStatus(userStatus);
     log.debug("사용자 상태 객체 연결");
 
     userRepository.save(user);
@@ -206,7 +212,7 @@ public class BasicUserService implements UserService {
     }
 
     if (user.getProfile() != null) {
-      log.info("사용자 이전 프로필 사진 삭제: userId = {}, profileId = {}", userId,
+      log.info("사용자 이전 프로필 사진 삭제: userId = {}, profile = {}", userId,
           user.getProfile().getId());
       binaryContentRepository.delete(user.getProfile());
       log.debug("사용자 이전 프로필 삭제 완료");
@@ -218,12 +224,12 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     user.setProfile(binaryContent);
-    log.debug("사용자 프로필 사진 등록 완료: userId = {}, profileId = {}", user.getId(),
+    log.debug("사용자 프로필 사진 등록 완료: userId = {}, profile = {}", user.getId(),
         user.getProfile().getId());
 
     user.setUpdatedAt(updateUserDto.updatedAt());
 
-    UserStatus userStatus = user.getUserStatus();
+    UserStatus userStatus = user.getStatus();
     userStatus.setUpdatedAt(updateUserDto.updatedAt());
 
     userStatusRepository.save(userStatus);
