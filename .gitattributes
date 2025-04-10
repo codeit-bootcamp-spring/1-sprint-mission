@@ -6,3 +6,6 @@ gradle/wrapper/* text eol=lf
 *.sh text eol=lf
 Dockerfile text eol=lf
 *.env text eol=lf
+
+# 설정
+*.yml text eol=lf

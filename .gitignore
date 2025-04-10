@@ -4,6 +4,7 @@
 ### File ###
 binaryContents/
 logs/
+*.env
 
 ### Eclipse ###
 .metadata
