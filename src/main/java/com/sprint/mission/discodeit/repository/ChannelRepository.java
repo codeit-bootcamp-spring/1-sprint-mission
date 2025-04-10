@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Channel;
 
+import com.sprint.mission.discodeit.entity.ChannelType;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,9 +15,10 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
   //유저가 속한 채널만 가져오는 쿼리
   //Channels과 ReadStatuses를 fetch 조인 하여 user_id가 같은 channel들만 가져옴
-  @Query("SELECT DISTINCT c FROM Channel c " +
-      "JOIN FETCH c.readStatuses rs " +
-      "WHERE rs.user.id = :userId")
+  @Query("SELECT DISTINCT c "
+      + "FROM Channel c "
+      + "JOIN FETCH c.readStatuses rs "
+      + "WHERE rs.user.id = :userId")
   List<Channel> findChannelsWithReadStatusByUserId(@Param("userId") UUID userId);
 
   //private 채널이면서 channel Id가 같은 채널을 조회
@@ -24,8 +27,9 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
   @Query("SELECT DISTINCT c FROM Channel c " +
       "JOIN FETCH c.readStatuses rs " +
       "JOIN FETCH rs.user u " +
-      "LEFT JOIN FETCH u.userStatus " +
+      "LEFT JOIN FETCH u.status " +
       "WHERE c.id = :channelId AND c.type = com.sprint.mission.discodeit.entity.ChannelType.PRIVATE")
   Optional<Channel> findPrivateChannelWithParticipantsById(@Param("channelId") UUID channelId);
 
+  Collection<? extends Channel> findByType(ChannelType channelType);
 }

@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
-import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
@@ -23,11 +22,12 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -171,37 +171,49 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public PageResponse<MessageDto> findAllByChannelIdWithCursor(String channelId, Instant cursor,
-      int size) {
+  public PageResponse<MessageDto> findAllByChannelIdWithCursor(String channelId,
+      Instant cursor,
+      Pageable pageable) {
 
     if (channelId == null) {
       throw new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
-    Channel channel = channelRepository.findById(UUID.fromString(channelId))
-        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+    PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+        pageable.getSort());
 
-    Pageable pageable = (Pageable) PageRequest.of(0, size + 1);
+    List<Message> messages = messageRepository.findAllByChannelIdWithAuthor(
+        UUID.fromString(channelId),
+        Optional.ofNullable(cursor).orElse(Instant.now()),
+        pageRequest);
 
-    List<Message> messages = messageRepository.findByChannelIdAndCreatedAtBeforeCursorOrderByCreatedAtDesc(
-        UUID.fromString(channelId), cursor, pageable);
+    //다음 페이지 존재하는지 확인하기
+    boolean hasNext = messages.size() > pageable.getPageSize();
 
-    boolean hasNext = false;
-    Instant nextCursorInstant = null;
-
-    // 요청한 크기보다 많은 결과가 있으면 다음 페이지가 있다는 의미
-    if (messages.size() > size) {
-      hasNext = true;
-      messages = messages.subList(0, size); // 마지막 항목은 제외
-    }
-    // 다음 커서 값 설정 (마지막 메시지의 createdAt)
-    if (!messages.isEmpty() && hasNext) {
-      nextCursorInstant = messages.get(messages.size() - 1).getCreatedAt();
+    // 요청한 size보다 많은 결과가 있으면 마지막 항목을 제거해야함!
+    if (hasNext) {
+      messages = messages.subList(0, pageable.getPageSize());
     }
 
-    List<MessageDto> messageDtos = messages.stream().map(messageMapper::toDto).toList();
+    // 결과가 없거나 다음 페이지가 없는 경우,
+    Instant nextCursor = null;
+    if (!messages.isEmpty()) {
+      // 마지막 항목의 ID를 다음 커서로 설정하기
+      nextCursor = messages.get(messages.size() - 1).getCreatedAt();
+    }
 
-    return pageResponseMapper.fromCursorResult(messageDtos, hasNext, size, nextCursorInstant, null);
+    List<MessageDto> messageDtos = messages.stream()
+        .map(messageMapper::toDto)
+        .toList();
+
+    Long total = messageRepository.countMessagesByChannelId(UUID.fromString(channelId));
+    return pageResponseMapper.fromPage(
+        messageDtos,
+        hasNext,
+        messageDtos.size(),
+        nextCursor == null ? null : nextCursor.toString(),
+        total
+    );
   }
 
 /*  @Override
@@ -293,4 +305,6 @@ public class BasicMessageService implements MessageService {
 
     return true;
   }
+
+
 }
