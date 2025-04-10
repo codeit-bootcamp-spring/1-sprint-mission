@@ -43,6 +43,10 @@ test {
     useJUnitPlatform()
 }
 
+//bootJar {
+//    archiveFileName = 'app.jar'
+//}
+
 checkstyle {
     toolVersion = '1.0' // Checkstyle 버전
     configFile = rootProject.file('checkstyle.xml') // Checkstyle 설정 파일 경로

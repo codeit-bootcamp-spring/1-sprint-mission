@@ -1,11 +1,11 @@
 spring:
   application:
-    name: Discodeit
-    version: 1.7.0
+    name: discodeit
+    version: 1.2-M8
   boot:
     version: 3.4.0
   profiles:
-    active: dev
+    active: ${PROFILES_ACTIVE}
 
 logging:
   level:
