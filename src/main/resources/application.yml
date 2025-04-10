@@ -13,26 +13,26 @@ spring:
         instance:
           name: discodeit
   profiles:
-    active: dev
+    active: ${SPRING_PROFILE_ACTIVE:dev}
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
         default_batch_fetch_size: 100
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
   output:
     ansi:
       enabled: always
-  #  sql:
-  #    init:
-  #      mode: always
-  #      schema-locations: classpath:schema.sql
   servlet:
     multipart:
       enabled: true
-      max-file-size: 5MB  # 업로드할 파일 최대 크기
+      max-file-size: 5MB
       max-request-size: 10MB
 
 logging:
@@ -44,9 +44,9 @@ management:
     web:
       exposure:
         include: health, info, metrics, loggers, env
-#  endpoint:
-#    health:
-#      show-details: always
+  endpoint:
+    health:
+      show-details: always
 
 info:
   app.name: Discodeit

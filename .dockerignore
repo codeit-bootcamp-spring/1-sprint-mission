@@ -1,0 +1,16 @@
+/build
+/.gradle
+
+.idea
+*.iml
+
+.git
+.gitignore
+
+.DS_Store
+*.log
+*.db
+.env
+
+!gradlew
+!gradlew.bat
