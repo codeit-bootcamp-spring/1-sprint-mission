@@ -8,8 +8,8 @@ spring:
 spring:
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:discodeit}
-    username: ${DB_USERNAME:discodeit_user}
-    password: ${DB_PASSWORD:discodeit1234}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   sql:
     init:
@@ -22,7 +22,7 @@ spring:
 discodeit:
   storage:
     type: ${STORAGE_TYPE:local}
-    local.root-path : ${DISCODEIT_STORAGE:"var/discodeit-storage"}
+    local.root-path : ${DISCODEIT_STORAGE:"var/discodeit-storage/"}
 
 logging:
   level:
