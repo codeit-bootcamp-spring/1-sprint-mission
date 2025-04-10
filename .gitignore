@@ -41,6 +41,8 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### 환경변수 ###
+.env
 
 ...
 .idea

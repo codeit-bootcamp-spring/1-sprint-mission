@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '1.0-SNAPSHOT'
+version = '1.2-M8'
 
 
 java {
@@ -90,8 +90,15 @@ tasks.register('writeBuildProperties') {
     }
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+
+if (project.hasProperty("skipTests")) {
+    test {
+        enabled = false
+    }
+} else {
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
 }
 
 application {
