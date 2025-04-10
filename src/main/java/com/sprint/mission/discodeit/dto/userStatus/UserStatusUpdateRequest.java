@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.dto.userStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
-public record UpdateUserStatusDto(
+public record UserStatusUpdateRequest(
     @NotNull
-    Instant updateAt
+    Instant newLastActiveAt
 ) {
 
 }

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.auth.UserLoginDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
@@ -39,7 +39,7 @@ public class BasicAuthService implements AuthService {
     }
     // 이것도 마찬가지로 제어할 수 없는 값이라 이 방식을 쓰면 안되는지?
     UserStatusDto userStatusDto = userStatusService.updateByUserId(user.getId().toString(),
-        new UpdateUserStatusDto(Instant.now()));
+        new UserStatusUpdateRequest(Instant.now()));
 
     return userMapper.toDto(user);
   }

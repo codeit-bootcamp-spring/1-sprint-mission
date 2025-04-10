@@ -29,7 +29,7 @@ public class ChannelController {
   @PostMapping("/public")
   public ResponseEntity<ChannelDto> creatPublicChannel(
       @Valid @RequestBody CreatePublicChannelDto createPublicChannelDto) {
-    log.info("Public 채널 생성 요청: channelName = {}", createPublicChannelDto.name());
+    log.info("Public 채널 생성 요청: newName = {}", createPublicChannelDto.name());
     try {
       ChannelDto channelDto = channelService.create(createPublicChannelDto);
       return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);

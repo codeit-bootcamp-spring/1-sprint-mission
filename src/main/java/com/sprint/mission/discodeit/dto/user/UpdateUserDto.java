@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.Length;
 
 public record UpdateUserDto(
 
-    @Size(min = 1, max = 20)
+    @Size(min = 0, max = 20)
     //username
     String newUsername,
     //닉네임
@@ -30,9 +30,7 @@ public record UpdateUserDto(
     //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
     AccountStatus accountStatus,
     //갱신 일자
-    @NotNull
     Instant updatedAt
-
 ) {
 
 }

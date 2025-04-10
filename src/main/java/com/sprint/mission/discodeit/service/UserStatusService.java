@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import java.util.List;
 
 public interface UserStatusService {
@@ -16,7 +16,8 @@ public interface UserStatusService {
 
   UserStatusDto create(CreateUserStatusDto createUserStatusDto);
 
-  UserStatusDto updateByUserId(String userStatusId, UpdateUserStatusDto updateUserStatusDto);
+  UserStatusDto updateByUserId(String userStatusId,
+      UserStatusUpdateRequest userStatusUpdateRequest);
 
   boolean delete(String userStatusId);
 }

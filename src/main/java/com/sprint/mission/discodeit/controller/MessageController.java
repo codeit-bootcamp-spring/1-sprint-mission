@@ -8,10 +8,12 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.awt.print.Pageable;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -80,10 +82,9 @@ public class MessageController {
   public ResponseEntity<PageResponse<MessageDto>> getMessagesWithCursor(
       @RequestParam String channelId,
       @RequestParam(required = false) Instant cursor,
-      @RequestParam(defaultValue = "50") int size) {
-
+      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
     PageResponse<MessageDto> response = messageService.findAllByChannelIdWithCursor(
-        channelId, cursor, size);
+        channelId, cursor, pageable);
 
     return ResponseEntity.ok().body(response);
   }

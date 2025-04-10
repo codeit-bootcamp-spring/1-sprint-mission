@@ -3,13 +3,12 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,14 +30,10 @@ public class UserController {
 
   //사용자 단일 조회
   @GetMapping("/{userId}")
-  public ResponseEntity<UserDto> getUser(@PathVariable String userId,
-      @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch) {
+  public ResponseEntity<UserDto> getUser(@PathVariable String userId) {
 
     UserDto userDto = userService.findById(userId);
-    String etag = "\"" + userDto.hashCode() + "\"";
-    if (etag.equals(ifNoneMatch)) {
-      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(userDto);
-    }
+
     return ResponseEntity.ok(userDto);
   }
 
@@ -98,11 +93,12 @@ public class UserController {
 
 
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusDto> updateUserStatus(@PathVariable String userId) {
+  public ResponseEntity<UserStatusDto> updateUserStatus(@PathVariable String userId,
+      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
     log.info("사용자 상태 수정 요청: userId = {}", userId);
     try {
       UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,
-          new UpdateUserStatusDto(Instant.now()));
+          userStatusUpdateRequest);
       return ResponseEntity.ok().body(userStatusDto);
     } catch (Exception e) {
       log.error("사용자 상태 수정 중 오류 발생: {}", e.getMessage());
