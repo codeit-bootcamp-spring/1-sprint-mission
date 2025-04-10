@@ -27,7 +27,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   private final String bucket;
   private final int presignedUrlExpiration;
   private final S3Client s3Client; // s3Client를 하나로 쓰기 위해서 추가
-  private final S3Presigner s3Presigner;
 
   public S3BinaryContentStorage(String accessKey, String secretKey, String region, String bucket,
       int presignedUrlExpiration) {
@@ -37,7 +36,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     this.bucket = bucket;
     this.presignedUrlExpiration = presignedUrlExpiration;
     this.s3Client = getS3Client();
-    this.s3Presigner = getS3Presigner();
   }
 
   protected S3Client getS3Client() { // 테스트 때문에 접근 제어자 변경 -> 이런 경우(테스트 때문에 실제 코드 변경)가 흔할까요?
@@ -51,9 +49,9 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .build();
   }
 
-  protected S3Presigner getS3Presigner() {
+  private String generatePresignedUrl(String key, String contentType) {
     // Presign Client 생성
-    return S3Presigner.builder()
+    S3Presigner presigner = S3Presigner.builder()
         .region(Region.of(region))
         .credentialsProvider(
             StaticCredentialsProvider.create(
@@ -61,9 +59,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
             )
         )
         .build();
-  }
 
-  private String generatePresignedUrl(String key, String contentType) {
     // 요청 객체 생성
     GetObjectRequest getObjectRequest = GetObjectRequest.builder()
         .bucket(bucket)
@@ -78,9 +74,9 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .build();
 
     // URL 생성
-    PresignedGetObjectRequest presignedReqeust = s3Presigner.presignGetObject(presignRequest);
+    PresignedGetObjectRequest presignedReqeust = presigner.presignGetObject(presignRequest);
 
-    s3Presigner.close();
+    presigner.close();
     return presignedReqeust.url().toString();
   }
 

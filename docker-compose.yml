@@ -8,6 +8,8 @@ services:
     image: discodeit:prod
     ports:
       - "8081:${APP_PORT}"
+    env_file:
+      - .env # Docker Compose 에서도 위 설정을 주입할 수 있도록 수정
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:${POSTGRES_PORT}/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}

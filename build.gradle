@@ -70,6 +70,9 @@ dependencies {
 
     // Springdoc OpenAPI 의존성 (Swagger UI를 위한 OpenAPI 지원)
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+
+    // AWS S3 SDK 의존성
+    implementation 'software.amazon.awssdk:s3:2.31.7'
 }
 
 
