@@ -32,7 +32,8 @@ bin/
 # 로컬 환경 설정 파일 제외
 application-local.yaml
 application-local.yml
-
+application-dev.yml
+application-dev.yaml
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
