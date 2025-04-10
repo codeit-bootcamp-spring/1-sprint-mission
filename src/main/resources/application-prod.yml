@@ -25,12 +25,6 @@ logging:
   level:
     root: info
 
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: ./binaryContents
-
 management:
   endpoints:
     web:
