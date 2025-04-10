@@ -23,6 +23,11 @@ spring:
         org.hibernate.type.descriptor.sql.BasicBinder: trace  # 바인딩된 파라미터 출력
     database: postgresql
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
 discodeit:
   storage:
     type: local
@@ -44,7 +49,6 @@ management:
     env:
       enabled: true
 
-# TODO: 파일 크기 등 설정하기!
 info:
   app:
     name: Discodeit
