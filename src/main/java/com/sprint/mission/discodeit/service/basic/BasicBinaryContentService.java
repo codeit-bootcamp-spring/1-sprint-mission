@@ -41,14 +41,16 @@ public class BasicBinaryContentService implements BinaryContentService {
         .build();
 
     try {
+      //파일을 로컬에 먼저 저장
+      binaryContentStorage.put(binaryContent.getId(), bytes);
+      log.info("File saved successfully in Local Storage.");
       //파일 메타 정보를 DB에 저장
       binaryContentRepository.save(binaryContent);
-      //bytes를 로컬에 저장
-      binaryContentStorage.put(binaryContent.getId(), bytes);
       log.info("File created successfully with ID: {} and file name: {}", binaryContent.getId(),
           binaryContent.getFileName());
       return binaryContentMapper.toDto(binaryContent);
     } catch (Exception e) {
+      binaryContentStorage.delete(binaryContent.getId()); //DB저장 오류시 저장된 로컬 파일 삭제
       log.error("File with ID: {} creating failed: {}", binaryContent.getId(),
           e.getMessage());
       throw e;

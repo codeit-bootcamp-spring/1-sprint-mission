@@ -17,4 +17,6 @@ public interface BinaryContentStorage {
   //HTTP API로 다운로드 기능을 제공합니다. 파일을 다운받을 수 있는 응답을 제공함.
   ResponseEntity<?> download(BinaryContentDto binaryContentDto);
 
+  //로컬 파일 삭제
+  void delete(UUID id);
 }

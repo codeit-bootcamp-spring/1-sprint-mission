@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
         ErrorCode.VALID_ERROR.getStatus(),
         e.getClass().getSimpleName(),
         ErrorCode.VALID_ERROR.name(),
-        e.getBindingResult().getFieldError().getDefaultMessage() //너무 길어서 message만 나오게함.
+        e.getMessage()
     );
     return ResponseEntity.status(ErrorCode.VALID_ERROR.getStatus()).body(errorResponse);
   }

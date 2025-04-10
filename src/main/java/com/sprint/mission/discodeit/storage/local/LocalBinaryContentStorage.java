@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.storage.local;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.file.FileNotFoundException;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +64,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.notExists(filePath)) {
-      throw new NoSuchElementException("File with key " + binaryContentId + " does not exist");
+      throw new FileNotFoundException(Map.of("BinaryContentId: ", binaryContentId));
     }
     try {
       return Files.newInputStream(filePath);
@@ -88,5 +90,19 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         .header(HttpHeaders.CONTENT_TYPE, metaData.contentType())
         .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metaData.size()))
         .body(resource);
+  }
+
+  @Override
+  public void delete(UUID id) {
+    Path filePath = resolvePath(id);
+    try {
+      if (Files.exists(filePath)) {
+        Files.delete(filePath);
+      } else {
+        throw new FileNotFoundException(Map.of("BinaryContentId: ", id));
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to delete file with key " + id, e);
+    }
   }
 }
