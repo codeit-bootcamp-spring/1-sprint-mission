@@ -5,7 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/discodeit-data/global/pg_control" beforeDir="false" afterPath="$PROJECT_DIR$/discodeit-data/global/pg_control" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/discodeit-data/pg_wal/000000010000000000000001" beforeDir="false" afterPath="$PROJECT_DIR$/discodeit-data/pg_wal/000000010000000000000001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/discodeit-data/postmaster.pid" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/application-test.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +87,9 @@
     &quot;associatedIndex&quot;: 6
     }</component>
   <component name="ProjectId" id="2tJHHNiRcVAr1uKVJzazTQZNzx0" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -150,10 +165,10 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.DiscodeitApplication.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;part2-이요한-sprint7&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;part2-이요한-sprint7-Infra&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/tdd/study/build.gradle&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/icb16/IdeaProjects/1-sprint-mission&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -162,7 +177,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.28965518&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;two.files.diff.last.used.file&quot;: &quot;C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
@@ -183,6 +198,7 @@
       <recent name="com.sprint.mission.service.jcf.addOn" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\icb16\IdeaProjects\1-sprint-mission" />
       <recent name="C:\1-sprint-mission\src\main\java\com\sprint\mission\repository\jcf\addOn" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -202,7 +218,7 @@
       <recent name="com.sprint.mission.dto.mappedDto" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.MessageServiceTest.createSuccess">
+  <component name="RunManager" selected="Spring Boot.DiscodeitApplication">
     <configuration name="ChannelServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
@@ -283,12 +299,21 @@
       </method>
     </configuration>
     <configuration name="DiscodeitApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="prod" />
       <module name="discodeit.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.sprint.mission.DiscodeitApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="JUnit.ChannelServiceTest" />
+      <item itemvalue="JUnit.ChannelServiceTest.createPrivateChannelFail" />
+      <item itemvalue="JUnit.ChannelServiceTest.updatePrivateChannelFail" />
+      <item itemvalue="JUnit.ChannelServiceTest.updatePrivateChannelSuccess" />
+      <item itemvalue="JUnit.MessageServiceTest.createSuccess" />
+      <item itemvalue="Spring Boot.DiscodeitApplication" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.MessageServiceTest.createSuccess" />
@@ -412,6 +437,12 @@
       <workItem from="1743942749813" duration="514000" />
       <workItem from="1743948546536" duration="22000" />
       <workItem from="1743955624952" duration="20000" />
+      <workItem from="1744090958669" duration="10034000" />
+      <workItem from="1744120372242" duration="1343000" />
+      <workItem from="1744250864826" duration="439000" />
+      <workItem from="1744252128479" duration="1367000" />
+      <workItem from="1744257869408" duration="2836000" />
+      <workItem from="1744261435827" duration="2946000" />
     </task>
     <servers />
   </component>

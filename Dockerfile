@@ -1,7 +1,15 @@
-FROM openjdk:17-jdk
+FROM amazoncorretto:17
 
-COPY build/libs/*0.0.1.jar /app.jar
+WORKDIR /app
 
-EXPOSE 8080
+COPY ./ ./
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+RUN ./gradlew build -x test
+
+EXPOSE 80
+
+ENV PROJECT_NAME=discodeit
+ENV PROJECT_VERSION=1.2-M8
+ENV JVM_OPTS=""
+
+ENTRYPOINT ["sh", "-c", "exec java ${JVM_OPTS} -jar /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar"]

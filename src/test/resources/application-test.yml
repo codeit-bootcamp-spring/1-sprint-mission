@@ -12,6 +12,7 @@ spring:
     hibernate:
       ddl-auto: create
 
+
 discodeit:
   storage:
     type: local

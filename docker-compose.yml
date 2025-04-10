@@ -1,0 +1,18 @@
+services:
+  discodeit-server:
+    container_name: discodeit-server
+    build: .
+
+
+    volumes:
+      - ./discodeit-data:/var/lib/postgresql/data
+
+    depends_on:
+      - postgres-db
+
+
+
+  postgres-db:
+    container_name: postgres-db
+    image: postgres
+    environment:

@@ -1,6 +1,28 @@
-src/test
-README.md
-HELP.md
+# DB 볼륨 데이터
+discodeit-data
+
+# GIT 관련
+.gitignore
 .github
+.gitattributes
+
+# build 관련
+build
+.gradle
+out
+
+# IDE 관련
+.idea
+.vscode
+
+# 필요없을 문서
+HELP.md
+README.md
+
+# 민감 보안 관련
+.env
+
+
+
 
 
