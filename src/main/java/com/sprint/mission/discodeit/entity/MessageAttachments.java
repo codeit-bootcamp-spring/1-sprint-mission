@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,12 +18,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "message_attachments")
 @NoArgsConstructor
-public class MessageAttachments {
-
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private UUID id;
-
+public class MessageAttachments extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "message_id")
