@@ -41,7 +41,7 @@ public class BasicChannelService implements ChannelService {
         .type(ChannelType.PUBLIC)
         .build();
 
-    log.debug("DEBUG: Create public channel: {}", channel);
+    log.debug("Create public channel: {}", channel);
     log.info("Create public channel with ID: {}", channel.getId());
     return channelMapper.toDto(channelRepository.save(channel));
   }
@@ -70,7 +70,7 @@ public class BasicChannelService implements ChannelService {
     for (UUID uuid : userIDList) {
       ReadStatusDto readStatusDto = readStatusService.create(
           new ReadStatusRequest(channel.getId(), uuid));
-      log.debug("DEBUG: Create read status for user: {} , readStatusId: {}", uuid,
+      log.debug("Create read status for user: {} , readStatusId: {}", uuid,
           readStatusDto.id());
       log.info("ReadStatus created with ID: {} ", readStatusDto.id());
     }
@@ -129,7 +129,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(channelId).orElseThrow(()
         -> new ChannelNotFoundException(Map.of("요청된 Channel ID: ", channelId)));
     channel.updateName(channelUpdateRequest.name());
-    log.debug("DEBUG: Update channel: {}", channel);
+    log.debug("Update channel: {}", channel);
     log.info("Update channel with ID: {}", channelId);
     return channelMapper.toDto(channelRepository.save(channel));
   }

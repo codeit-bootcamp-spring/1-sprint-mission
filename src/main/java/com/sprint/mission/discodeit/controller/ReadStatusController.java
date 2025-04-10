@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class ReadStatusController {
   // 메시지 수신 정보 생성 (POST /readstatus)
   @PostMapping
   public ResponseEntity<ReadStatusDto> create(
-      @RequestBody ReadStatusRequest readStatusRequest) {
+      @RequestBody @Valid ReadStatusRequest readStatusRequest) {
     return ResponseEntity.ok(readStatusService.create(readStatusRequest));
   }
 
@@ -35,7 +36,7 @@ public class ReadStatusController {
   @PutMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusDto> update(
       @PathVariable("readStatusId") UUID readStatusId,
-      @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
+      @RequestBody @Valid ReadStatusUpdateRequest readStatusUpdateRequest) {
     //TODO: readStatusUpdateDTO의 Instant가 아닌 readStatus 엔티티에서 현재시각으로 업데이트가됨
     // 인자 전달로 수정 필요
     return ResponseEntity.ok(readStatusService.update(readStatusId, readStatusUpdateRequest));

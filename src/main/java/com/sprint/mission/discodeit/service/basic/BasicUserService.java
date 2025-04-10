@@ -84,7 +84,8 @@ public class BasicUserService implements UserService {
         .build();
     userStatusService.create(userStatusRequest);
 
-    log.debug("DEBUG: User created : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
+    //TODO: debug레벨에서 민감정보 노출 막기 구현해도 좋을듯
+    log.debug("User created : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
     log.info("User created successfully with ID: {}", user.getId());
     return userDto;
   }
@@ -141,7 +142,7 @@ public class BasicUserService implements UserService {
     user.updateUser(userUpdateRequest.newName(), userUpdateRequest.newEmail(),
         userUpdateRequest.newPassword(),
         nullableProfile);
-    log.debug("DEBUG: User updated : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
+    log.debug("User updated : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
     log.info("User update successfully with ID : {} ", user.getId());
     return userMapper.toDto(userRepository.save(user));
   }

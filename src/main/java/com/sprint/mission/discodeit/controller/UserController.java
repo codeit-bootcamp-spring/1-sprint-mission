@@ -87,8 +87,9 @@ public class UserController {
 
   // 사용자 온라인 상태 업데이트
   @PatchMapping("/{id}/online")
-  public ResponseEntity<UserStatusUpdateRequest> updateUserStatus(@PathVariable("id") UUID id,
-      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+  public ResponseEntity<UserStatusUpdateRequest> updateUserStatus(
+      @PathVariable("id") UUID id,
+      @RequestBody @Valid UserStatusUpdateRequest userStatusUpdateRequest) {
     UserStatusUpdateRequest updatedStatus = userService.updateUserStatus(id,
         userStatusUpdateRequest);
     return ResponseEntity.status(HttpStatus.OK).body(updatedStatus);

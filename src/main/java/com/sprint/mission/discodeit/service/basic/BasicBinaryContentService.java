@@ -49,7 +49,7 @@ public class BasicBinaryContentService implements BinaryContentService {
           binaryContent.getFileName());
       return binaryContentMapper.toDto(binaryContent);
     } catch (Exception e) {
-      log.error("Error: File with ID: {} creating failed: {}", binaryContent.getId(),
+      log.error("File with ID: {} creating failed: {}", binaryContent.getId(),
           e.getMessage());
       throw e;
     }

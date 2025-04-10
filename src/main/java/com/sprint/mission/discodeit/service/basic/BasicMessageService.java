@@ -80,7 +80,7 @@ public class BasicMessageService implements MessageService {
         .attachments(attachments)
         .build();
 
-    log.debug("DEBUG: Message created : {}", message);
+    log.debug("Message created : {}", message);
     log.info("Message created with id : {}", message.getId());
     return messageMapper.toDto(messageRepository.save(message));
   }
@@ -120,7 +120,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(id)
         .orElseThrow(() -> new MessageNotFoundException(Map.of("Message ID: ", id)));
     message.updateContent(messageUpdateRequest.content());
-    log.debug("DEBUG: Message updated : {}", message);
+    log.debug("Message updated : {}", message);
     log.info("Message updated with id : {}", message.getId());
     return messageMapper.toDto(messageRepository.save(message));
   }

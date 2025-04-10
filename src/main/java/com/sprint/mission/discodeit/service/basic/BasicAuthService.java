@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.auth.AuthUserDTO;
+import com.sprint.mission.discodeit.dto.auth.AuthUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.login.LoginFailedException;
@@ -19,14 +19,14 @@ public class BasicAuthService implements AuthService {
   private final UserMapper userMapper;
 
   @Override
-  public UserDto isUserExist(AuthUserDTO authUserDTO) {
+  public UserDto isUserExist(AuthUserRequest authUserRequest) {
     User targetUser = userRepository.findAll()
         .stream()
-        .filter(user -> authUserDTO.name().equals(user.getUsername())
-            && authUserDTO.password().equals(user.getPassword()))
+        .filter(user -> authUserRequest.name().equals(user.getUsername())
+            && authUserRequest.password().equals(user.getPassword()))
         .findFirst()
         .orElseThrow(() -> new LoginFailedException(
-            Map.of("Login 시도 유저 이름", authUserDTO.name())));
+            Map.of("Login 시도 유저 이름", authUserRequest.name())));
 
     return userMapper.toDto(targetUser);
   }
