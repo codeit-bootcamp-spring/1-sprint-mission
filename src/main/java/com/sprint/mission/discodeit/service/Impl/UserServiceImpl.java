@@ -318,7 +318,7 @@ public class UserServiceImpl implements UserService {
   private User findUserById(UUID id) {
     return userRepository.findById(id)
         .orElseThrow(() -> {
-          log.error("[사용자 조회 실패] 존재하지 않는 ID: '{}'", id);
+          log.debug("[사용자 조회 실패] 존재하지 않는 ID: '{}'", id);
           return new RestApiException(DomainErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
         });
   }

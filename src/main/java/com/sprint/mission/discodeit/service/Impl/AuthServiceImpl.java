@@ -25,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
     try {
       // 요청 데이터 검증 (null 체크)
       if (loginRequest == null) {
-        log.error("[로그인 실패] 로그인 요청 객체가 null입니다");
+        log.debug("[로그인 실패] 로그인 요청 객체가 null입니다");
         throw new RestApiException(DomainErrorCode.INVALID_INPUT, "로그인 요청이 올바르지 않습니다.");
       }
 
@@ -58,14 +58,14 @@ public class AuthServiceImpl implements AuthService {
 
   private void validateEmail(String email) {
     if (email == null || email.isBlank()) {
-      log.error("[로그인 실패] 이메일이 누락되었습니다: '{}'", email);
+      log.debug("[로그인 실패] 이메일이 누락되었습니다: '{}'", email);
       throw new RestApiException(DomainErrorCode.INVALID_INPUT, "이메일은 필수 입력값입니다.");
     }
   }
 
   private void validatePassword(String password) {
     if (password == null || password.isBlank()) {
-      log.error("[로그인 실패] 비밀번호가 누락되었습니다");
+      log.debug("[로그인 실패] 비밀번호가 누락되었습니다");
       throw new RestApiException(DomainErrorCode.INVALID_INPUT, "비밀번호는 필수 입력값입니다.");
     }
   }
@@ -73,14 +73,14 @@ public class AuthServiceImpl implements AuthService {
   private User findUserByEmail(String email) {
     return userRepository.findByEmail(email)
         .orElseThrow(() -> {
-          log.error("[로그인 실패] 존재하지 않는 이메일: '{}'", email);
+          log.debug("[로그인 실패] 존재하지 않는 이메일: '{}'", email);
           return new RestApiException(DomainErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
         });
   }
 
   private void validateCredentials(User user, String password) {
     if (!password.equals(user.getPassword())) {
-      log.error("[로그인 실패] 비밀번호 불일치: 사용자 '{}'", user.getEmail());
+      log.debug("[로그인 실패] 비밀번호 불일치: 사용자 '{}'", user.getEmail());
       throw new RestApiException(DomainErrorCode.PASSWORD_NOT_MATCH, "비밀번호가 일치하지 않습니다.");
     }
   }

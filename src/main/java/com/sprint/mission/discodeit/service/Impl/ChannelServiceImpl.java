@@ -65,7 +65,7 @@ public class ChannelServiceImpl implements ChannelService {
     for (UUID userId : request.getParticipantIds()) {
       User user = userRepository.findById(userId)
           .orElseThrow(() -> {
-            log.error("사용자를 찾을 수 없습니다: {}", userId);
+            log.debug("사용자를 찾을 수 없습니다: {}", userId);
             return new RestApiException(DomainErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다");
           });
       participants.add(user);

@@ -45,7 +45,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
       log.info("바이너리 콘텐츠 저장 완료: {}", savedContent.getId());
       return binaryContentMapper.toDto(savedContent);
     } catch (Exception e) {
-      log.error("파일 저장 실패: {}", e.getMessage());
+      log.debug("파일 저장 실패: {}", e.getMessage());
       throw new RestApiException(DomainErrorCode.FILE_STORAGE_FAILED, "파일 저장 실패");
     }
   }
