@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -94,6 +93,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public void delete(UUID id) {
+    //로컬에 저장된 파일을 삭제함.
     Path filePath = resolvePath(id);
     try {
       if (Files.exists(filePath)) {

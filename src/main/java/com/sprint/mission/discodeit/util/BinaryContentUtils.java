@@ -45,22 +45,27 @@ public class BinaryContentUtils {
   }
 
 
-  //삭제
+  //DB와 로컬 파일을 삭제
+  public void deleteBinaryContent(UUID profileId) {
+    binaryContentRepository.deleteById(profileId);
+    binaryContentStorage.delete(profileId);
+  }
+
+  //유저-프로필 이미지 삭제
   public void deleteBinaryContentByUserId(UUID userId) {
 
     User user = userRepository.findById(userId).orElse(null);
     UUID profileId = Objects.requireNonNull(user).getProfile().getId();
-    binaryContentRepository.deleteById(profileId);
-    binaryContentStorage.delete(profileId);
-
+    deleteBinaryContent(profileId);
   }
 
+  //메시지-이미지 삭제
   public void deleteBinaryContentByMessageId(UUID messageId) {
     messageRepository.findById(messageId).ifPresent(message -> {
       List<BinaryContent> attachments = message.getAttachments();
       if (attachments != null) {
         attachments.forEach(attachment ->
-            binaryContentRepository.deleteById(attachment.getId())
+            deleteBinaryContent(attachment.getId())
         );
       }
     });

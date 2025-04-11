@@ -39,6 +39,7 @@ public class User extends BaseUpdatableEntity implements Serializable {
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true)
   private UserStatus status;
+
   //update
 
   public void updateUser(String username, String email, String password,
