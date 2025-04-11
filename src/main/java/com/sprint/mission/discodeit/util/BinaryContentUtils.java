@@ -45,11 +45,13 @@ public class BinaryContentUtils {
   }
 
 
+  //삭제
   public void deleteBinaryContentByUserId(UUID userId) {
 
     User user = userRepository.findById(userId).orElse(null);
     UUID profileId = Objects.requireNonNull(user).getProfile().getId();
     binaryContentRepository.deleteById(profileId);
+    binaryContentStorage.delete(profileId);
 
   }
 
