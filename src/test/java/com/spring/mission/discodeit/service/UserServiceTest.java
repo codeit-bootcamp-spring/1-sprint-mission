@@ -1,13 +1,14 @@
 package com.spring.mission.discodeit.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -15,7 +16,10 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.util.BinaryContentUtils;
+import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,6 +44,8 @@ public class UserServiceTest {
   private BinaryContentStorage binaryContentStorage;
   @Mock
   private BinaryContentRepository binaryContentRepository;
+  @Mock
+  private BinaryContentUtils binaryContentUtils;
 
   @InjectMocks
   private BasicUserService userService;
@@ -51,45 +57,58 @@ public class UserServiceTest {
   @DisplayName("유저생성")
   class UserCreate {
 
-    @Test
-    @DisplayName("유저생성 성공")
-    void testCreateUser() {
-      //given
-      UserRequest userRequest = new UserRequest(
-          "name", "1234", "name@gmail.com"
+    private UserRequest request;
+    private User user;
+    private UserDto userDto;
+
+
+    @BeforeEach
+    void setUp() {
+      request = new UserRequest(
+          "testUser", "1234", "test@test.com"
       );
-
-      UUID userId = UUID.randomUUID();
-      //가짜 유저
-      User savedUser = mock(User.class);
-
-      // 2. save 동작에 대한 mock
-      when(userRepository.save(any(User.class))).thenReturn(savedUser);
-
-      // 3. toDto에 대한 mock
-      UserDto userDto = UserDto.builder()
-          .id(userId)
-          .name("name")
-          .email("name@gmail.com")
+      user = User.builder()
+          .username("testUser")
+          .password("1234")
+          .email("test@test.com")
+          .profile(null).build();
+      userDto = UserDto.builder()
+          .id(UUID.randomUUID())
+          .name("testUser")
+          .email("test@test.com")
           .profile(null)
           .online(true)
           .build();
-      when(userMapper.toDto(savedUser)).thenReturn(userDto);
-
-      // when
-      UserDto result = userService.createUser(userRequest, java.util.Optional.empty());
-
-      //then
-      assertNotNull(result);
-      assertEquals("name", result.getName());
-      assertEquals("name@gmail.com", result.getEmail());
     }
-  }
 
-  @Nested
-  @DisplayName("유저 업데이트")
-  class UserUpdate {
+    @Test
+    @DisplayName("유저생성 성공")
+    void testCreateUser() {
+      // Given , mock의 동작을 설정한다.
+      given(userRepository.existsByEmail(request.email())).willReturn(false);
+      given(userRepository.existsByUsername(request.name())).willReturn(false);
+      given(userRepository.save(any(User.class))).willReturn(user);
+      given(userMapper.toDto(user)).willReturn(userDto);
+      BinaryContent mockProfile = null;
+      given(binaryContentUtils.makeNullableProfile(Optional.empty()))
+          .willReturn(mockProfile);
 
+      // When
+      UserDto result = userService.createUser(request, Optional.empty());
+
+      // Then
+      assertEquals(result, userDto);
+      assertThat(result).isNotNull();
+      assertThat(result.getName()).isEqualTo(request.name());
+      assertThat(result.getEmail()).isEqualTo(request.email());
+      then(userRepository).should().save(any(User.class));
+    }
+
+    @Nested
+    @DisplayName("유저 업데이트")
+    class UserUpdate {
+
+    }
   }
 
 }
