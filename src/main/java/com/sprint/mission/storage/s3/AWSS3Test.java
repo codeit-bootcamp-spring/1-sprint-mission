@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
@@ -30,43 +27,47 @@ import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Properties;
 import java.util.UUID;
 
 import static com.sprint.mission.common.exception.ErrorCode.*;
 import static java.nio.charset.StandardCharsets.*;
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 public class AWSS3Test {
     // 테스트 용 임시 S3 메서드들
     // 업로드 -> 다운로드 순서로 진행해야 KEY 반영
 
-    private final BinaryService binaryService;
     private final S3Client s3Client;
     private String accessKey;
     private String secretKey;
     private String region;
     private String bucket;
-    private String key;
+    private long presigned_url_expiration;
+    private static final String KEY = "운동.jpg";
 
-    public AWSS3Test(BinaryService binaryService) {
+    public AWSS3Test() {
         settingS3Info();
-        this.binaryService = binaryService;
         this.s3Client = getS3Client();
     }
 
     @PostMapping("upload/s3")
     public void upload(@RequestPart("file-s3") MultipartFile file) throws Exception {
-        key = file.getOriginalFilename();
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
-                .key(key)
+                .key(KEY)
                 .contentType(file.getContentType())
                 .build();
 
@@ -76,21 +77,42 @@ public class AWSS3Test {
     @GetMapping("download/s3")
     public ResponseEntity<Resource> download(){
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .key(key)
+                .key(KEY)
                 .bucket(bucket)
                 .build();
 
         ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
-        String contentDisposition = ContentDisposition.attachment().filename(key, UTF_8).build().toString();
+        String contentDisposition = ContentDisposition.attachment().filename(KEY, UTF_8).build().toString();
         String contentType = s3Object.response().contentType();
         Long contentLength = s3Object.response().contentLength();
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .header(CONTENT_DISPOSITION, contentDisposition)
                 .contentType(MediaType.parseMediaType(contentType))
                 .contentLength(contentLength)
                 .body(new InputStreamResource(s3Object));
     }
+
+    @GetMapping("presigned/s3")
+    public ResponseEntity<Void> downloadPresigned(){
+        S3Presigner s3Presigner = getS3Presigner();
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .key(KEY)
+                .bucket(bucket)
+                //.responseContentType()
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(presigned_url_expiration))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        PresignedGetObjectRequest presignedGetObjectRequest = s3Presigner.presignGetObject(presignRequest);
+        String redirectURL = presignedGetObjectRequest.url().toString();
+
+        return ResponseEntity.status(FOUND).header(LOCATION, redirectURL).build();
+    }
+
 
     private void settingS3Info() {
         Properties props = new Properties();
@@ -103,6 +125,7 @@ public class AWSS3Test {
         secretKey = props.getProperty("AWS_S3_SECRET_KEY").trim();
         region = props.getProperty("AWS_S3_REGION").trim();
         bucket = props.getProperty("AWS_S3_BUCKET").trim();
+        presigned_url_expiration = Long.parseLong(props.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION").trim());
     }
 
     private S3Client getS3Client() {
@@ -110,6 +133,14 @@ public class AWSS3Test {
         return S3Client.builder()
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .build();
+    }
+
+    private S3Presigner getS3Presigner() {
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+        return S3Presigner.builder()
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .region(Region.of(region))
                 .build();
     }
 }
