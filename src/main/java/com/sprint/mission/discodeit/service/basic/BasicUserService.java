@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.file.FileNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -15,7 +16,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.util.BinaryContentUtils;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
@@ -37,8 +38,8 @@ public class BasicUserService implements UserService {
   private final UserStatusService userStatusService;
 
   private final UserMapper userMapper;
+  private final BinaryContentUtils binaryContentUtils;
 
-  private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
 
   @Transactional
@@ -55,19 +56,8 @@ public class BasicUserService implements UserService {
     }
 
     //nullable한 프로필
-    BinaryContent nullableProfile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType);
-          binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
-          log.info("Profile created with ID : {} ", binaryContent.getId());
-          return binaryContent;
-        })
-        .orElse(null);
+    BinaryContent nullableProfile = binaryContentUtils.makeNullableProfile(
+        optionalProfileCreateRequest);
 
     User user = User.builder()
         .username(userRequest.name())
@@ -123,33 +113,48 @@ public class BasicUserService implements UserService {
       Optional<BinaryContentRequest> optionalProfileCreateRequest) {
 
     //nullable한 프로필
-    BinaryContent nullableProfile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType);
-          binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
-          log.info("Profile image created with ID : {} ", binaryContent.getId());
-          return binaryContent;
-        })
-        .orElse(null);
+    BinaryContent nullableProfile = binaryContentUtils.makeNullableProfile(
+        optionalProfileCreateRequest);
+    //새로운 이미지가 들어온 경우, 기존의 이미지를 삭제한다.
+    if (nullableProfile != null) {
+      binaryContentUtils.deleteBinaryContentByUserId(userID);
+    }
 
     User user = findbyId(userID);
 
-    user.updateUser(userUpdateRequest.newName(), userUpdateRequest.newEmail(),
-        userUpdateRequest.newPassword(),
-        nullableProfile);
+    // null or 공백인 경우 기존 정보 유지
+    String newName = Optional.ofNullable(userUpdateRequest.newName())
+        .filter(s -> !s.isBlank())
+        .orElse(user.getUsername());
+
+    String newEmail = Optional.ofNullable(userUpdateRequest.newEmail())
+        .filter(s -> !s.isBlank())
+        .orElse(user.getEmail());
+
+    String newPassword = Optional.ofNullable(userUpdateRequest.newPassword())
+        .filter(s -> !s.isBlank())
+        .orElse(user.getPassword());
+
+    BinaryContent newProfile =
+        (nullableProfile != null) ? binaryContentRepository.findById(nullableProfile.getId())
+            .orElseThrow(() -> new FileNotFoundException(
+                Map.of("파일 ID : ", nullableProfile.getId().toString())))
+            : user.getProfile();
+
+    user.updateUser(newName, newEmail, newPassword, newProfile);
+
     log.debug("User updated : {}", user); //debug 로그에는 엔티티를 모두 노출해도 될까?
     log.info("User update successfully with ID : {} ", user.getId());
     return userMapper.toDto(userRepository.save(user));
   }
 
   @Override
+  @Transactional
   public void deleteUser(UUID userID) {
+
+    binaryContentUtils.deleteBinaryContentByUserId(userID);
     userRepository.deleteById(userID);
+
     log.info("User deleted successfully with ID: {}", userID);
   }
 

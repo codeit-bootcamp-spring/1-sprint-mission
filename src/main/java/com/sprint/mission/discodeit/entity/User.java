@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -12,12 +13,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "users")
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,7 +33,7 @@ public class User extends BaseUpdatableEntity implements Serializable {
   @Column(name = "password")
   private String password;
 
-  @OneToOne(cascade = CascadeType.PERSIST)
+  @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
@@ -50,11 +49,6 @@ public class User extends BaseUpdatableEntity implements Serializable {
     this.profile = nullableProfile;
 
     super.update();
-  }
-
-  //새로운 이미지가 들어오면, 완전히 새로운 이미지 객체로 간주 ?
-  private void updateBinaryContent(BinaryContent newBinaryContent) {
-    this.profile = newBinaryContent;
   }
 
 

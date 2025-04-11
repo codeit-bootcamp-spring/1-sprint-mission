@@ -2,6 +2,7 @@ package com.spring.mission.discodeit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -11,11 +12,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,10 +31,8 @@ public class UserServiceTest {
   //@Mock으로 외부 의존성 대체 ,
   @Mock
   private UserRepository userRepository;
-
   @Mock
   private UserStatusService userStatusService;
-
   @Mock
   private UserMapper userMapper;
 
@@ -42,50 +42,54 @@ public class UserServiceTest {
   private BinaryContentRepository binaryContentRepository;
 
   @InjectMocks
-  private UserService userService;
+  private BasicUserService userService;
   //given
   // when ..  thenReturn
   //verity -> 어떤 메서드가 몇 번/어떤 파라미터로 호출되었는지 확인 가능
 
-  /*
-  create
-   */
-  @Test
-  @DisplayName("유저생성 성공")
-  void testCreateUser() {
-    //given
-    UserRequest userRequest = new UserRequest(
-        "name", "1234", "name@gmail.com"
-    );
+  @Nested
+  @DisplayName("유저생성")
+  class UserCreate {
 
-    User userEntity = mock(User.class);
-    UUID userId = UUID.randomUUID();
-    User savedUser = mock(User.class);
-    when(savedUser.getId()).thenReturn(userId);
+    @Test
+    @DisplayName("유저생성 성공")
+    void testCreateUser() {
+      //given
+      UserRequest userRequest = new UserRequest(
+          "name", "1234", "name@gmail.com"
+      );
 
-    //when
-    when(savedUser.getId()).thenReturn(userId);
-    when(savedUser.getUsername()).thenReturn("name");
-    // 2. save 동작에 대한 mock
-    when(userRepository.save(userEntity)).thenReturn(savedUser);
+      UUID userId = UUID.randomUUID();
+      //가짜 유저
+      User savedUser = mock(User.class);
 
-    // 3. toDto에 대한 mock
-    UserDto userDto = UserDto.builder()
-        .id(userId)
-        .name("name")
-        .email("name@gmail.com")
-        .profile(null)
-        .online(true)
-        .build();
-    when(userMapper.toDto(savedUser)).thenReturn(userDto);
+      // 2. save 동작에 대한 mock
+      when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-    // when
-    UserDto result = userService.createUser(userRequest, null);
+      // 3. toDto에 대한 mock
+      UserDto userDto = UserDto.builder()
+          .id(userId)
+          .name("name")
+          .email("name@gmail.com")
+          .profile(null)
+          .online(true)
+          .build();
+      when(userMapper.toDto(savedUser)).thenReturn(userDto);
 
-    //then
-    assertNotNull(result);
-    assertEquals("name", result.getName());
-    assertEquals("name@gmail.com", result.getEmail());
+      // when
+      UserDto result = userService.createUser(userRequest, java.util.Optional.empty());
+
+      //then
+      assertNotNull(result);
+      assertEquals("name", result.getName());
+      assertEquals("name@gmail.com", result.getEmail());
+    }
+  }
+
+  @Nested
+  @DisplayName("유저 업데이트")
+  class UserUpdate {
+
   }
 
 }
