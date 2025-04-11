@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.api;
 
+import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +31,7 @@ public interface BinaryContentApi {
       )
   })
   @GetMapping("/{binaryContentId}")
-  ResponseEntity<BinaryContent> find(
+  ResponseEntity<BinaryContentDto> find(
       @Parameter(description = "조회할 첨부 파일 ID") UUID binaryContentId
   );
 
@@ -42,7 +43,7 @@ public interface BinaryContentApi {
       )
   })
   @GetMapping
-  ResponseEntity<List<BinaryContent>> findAllByIdIn(
+  ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
       @Parameter(description = "조회할 첨부 파일 ID 목록") List<UUID> binaryContentIds
   );
 } 

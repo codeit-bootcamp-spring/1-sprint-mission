@@ -30,6 +30,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.2'
+    implementation 'software.amazon.awssdk:s3:2.31.7'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
@@ -38,6 +39,9 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'com.h2database:h2'
+    testImplementation 'org.testcontainers:testcontainers:1.20.6'
+    testImplementation 'org.testcontainers:junit-jupiter:1.20.6'
+    testImplementation 'org.testcontainers:localstack:1.20.6'
 }
 
 jacocoTestReport {

@@ -111,7 +111,7 @@ class MessageRepositoryTest {
 
     em.flush();
     em.clear();
-
+    Message foundMessage = em.find(Message.class, saved.get(0).getId());
     Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
     Instant cursor = saved.get(2).getCreatedAt();
     Slice<Message> result = messageRepository.findNextMessages(channel.getId(), cursor, pageable);

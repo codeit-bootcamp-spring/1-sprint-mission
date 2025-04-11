@@ -28,7 +28,6 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentMapper binaryContentMapper;
 
   @Override
@@ -57,11 +56,6 @@ public class BasicBinaryContentService implements BinaryContentService {
     );
 
     BinaryContent savedContent = binaryContentRepository.save(binaryContent);
-    String extension = getFileExtension(binaryContent.getFileName());
-    Path filePath = binaryContentStorage.put(savedContent.getId(), dto.getBytes(), extension);
-
-    savedContent.setFilePath(filePath.toString());
-
     log.info("파일 저장 완료: id={}, fileName={}, size={}bytes", savedContent.getId(),
         savedContent.getFileName(), savedContent.getSize());
     return savedContent;
@@ -69,58 +63,22 @@ public class BasicBinaryContentService implements BinaryContentService {
 
 
   @Override
-  public InputStream getBinaryContent(UUID id) {
-    BinaryContent binaryContent = binaryContentRepository.findById(id)
+  public BinaryContentDto find(UUID id) {
+    BinaryContentDto dto = binaryContentRepository.findById(id)
+        .map(binaryContentMapper::toDto)
         .orElseThrow(FileNotFoundException::new);
-    String extension = getFileExtension(binaryContent.getFileName());
-    return binaryContentStorage.get(id, extension);
-  }
-
-
-  @Override
-  public ResponseEntity<?> downloadBinaryContent(UUID id) {
-    log.info("파일 다운로드 요청: id={}", id);
-
-    BinaryContent binaryContent = binaryContentRepository.findById(id)
-        .orElseThrow(() -> {
-          log.warn("파일 다운로드 실패 - 존재하지 않음: id={}", id);
-          return new FileNotFoundException();
-        });
-
-    String extension = getFileExtension(binaryContent.getFileName());
-
-    if (!binaryContentStorage.exists(id, extension)) {
-      log.warn("파일 존재하지 않음 (Storage): id={}", id);
-      throw new FileNotFoundException();
-    }
-
-    log.debug("파일 다운로드 응답 준비 완료: id={}, fileName={}", id, binaryContent.getFileName());
-    return binaryContentStorage.download(binaryContentMapper.toDto(binaryContent), extension);
-  }
-
-
-  @Override
-  public BinaryContent find(UUID id) {
-    return binaryContentRepository.findById(id)
-        .orElseThrow(FileNotFoundException::new);
+    return dto;
   }
 
   @Override
-  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-    return binaryContentRepository.findAllByIdIn(ids);
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> ids) {
+    return binaryContentRepository.findAllByIdIn(ids).stream().map(binaryContentMapper::toDto)
+        .toList();
   }
 
   @Override
   public void delete(UUID id) {
-    BinaryContent binaryContent = binaryContentRepository.findById(id)
-        .orElseThrow(FileNotFoundException::new);
-    String extension = getFileExtension(binaryContent.getFileName());
-    binaryContentStorage.delete(id, extension);
+    binaryContentRepository.findById(id).orElseThrow(FileNotFoundException::new);
     binaryContentRepository.deleteById(id);
-  }
-
-  private String getFileExtension(String fileName) {
-    int dotIndex = fileName.lastIndexOf(".");
-    return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
   }
 }

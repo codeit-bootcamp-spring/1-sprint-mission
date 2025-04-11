@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack-s3-test
+    ports:
+      - "4566:4566" # LocalStack Gateway
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data

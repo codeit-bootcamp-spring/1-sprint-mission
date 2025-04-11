@@ -83,8 +83,7 @@ public class BasicMessageService implements MessageService {
     List<UUID> attachmentIds = binaryRequests.stream()
         .map(binaryRequest -> {
           BinaryContent savedContent = binaryContentService.saveBinaryContent(binaryRequest);
-          String extension = getFileExtension(binaryRequest.getFileName());
-          binaryContentStorage.put(savedContent.getId(), binaryRequest.getBytes(), extension);
+          binaryContentStorage.put(savedContent.getId(), binaryRequest.getBytes());
           log.debug("첨부파일 저장 완료: id={}, name={}", savedContent.getId(),
               binaryRequest.getFileName());
           return savedContent.getId();
@@ -189,19 +188,11 @@ public class BasicMessageService implements MessageService {
     );
     BinaryContent saveContent = binaryContentRepository.save(binaryContent);
 
-    String extension = getFileExtension(multipartFile.getOriginalFilename());
     try {
-      Path filePath = binaryContentStorage.put(saveContent.getId(), multipartFile.getBytes(),
-          extension);
-      binaryContent.setFilePath(filePath.toString());
+      binaryContentStorage.put(saveContent.getId(), multipartFile.getBytes());
     } catch (Exception e) {
       throw new FileUploadFailedException();
     }
     return binaryContentMapper.toDto(saveContent);
-  }
-
-  private String getFileExtension(String fileName) {
-    int dotIndex = fileName.lastIndexOf('.');
-    return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
   }
 }
