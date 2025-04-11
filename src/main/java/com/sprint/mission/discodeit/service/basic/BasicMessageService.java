@@ -57,6 +57,7 @@ public class BasicMessageService implements MessageService {
     User foundUser = userRepository.findById(messageRequest.userId()).orElseThrow(()
         -> new UserNotFoundException(Map.of("User ID: ", messageRequest.userId())));
 
+    //TODO: binaryContent관련 유틸 or 팩토리 분리해보기
     List<BinaryContent> attachments = attachmentRequests.stream()
         .map(attachmentRequest -> {
           String fileName = attachmentRequest.fileName();

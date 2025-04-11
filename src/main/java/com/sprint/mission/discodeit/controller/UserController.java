@@ -37,7 +37,7 @@ public class UserController {
   // 사용자 등록
   @PostMapping
   public ResponseEntity<UserDto> createUser(
-      @RequestPart @Valid UserRequest userRequest,
+      @RequestPart(value = "userRequest") @Valid UserRequest userRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     Optional<BinaryContentRequest> profileRequest = Optional.ofNullable(profile)

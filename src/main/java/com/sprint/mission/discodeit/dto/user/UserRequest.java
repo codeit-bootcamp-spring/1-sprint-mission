@@ -17,8 +17,7 @@ public record UserRequest
 
         @Email(message = "이메일 형식이 맞아야합니다.")
         @NotBlank(message = "이메일은 필수로 입력해야합니다.")
-        String email,
-
-        BinaryContent profile) {
+        String email
+    ) {
 
 }

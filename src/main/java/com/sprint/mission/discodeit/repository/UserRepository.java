@@ -12,10 +12,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
   boolean existsByUsername(String username);
 
-
   boolean existsByEmail(String email);
 
-//  //채널에 참여하는 유저 id 리스트 반환
-//  List<UUID> findDistinctUserIdByChannelId(UUID channelId);
 
 }
