@@ -112,6 +112,9 @@ public class BasicUserService implements UserService {
       UUID userID, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentRequest> optionalProfileCreateRequest) {
 
+    //유저가 존재하는지 확인
+    User user = findbyId(userID);
+
     //nullable한 프로필
     BinaryContent nullableProfile = binaryContentUtils.makeNullableProfile(
         optionalProfileCreateRequest);
@@ -119,8 +122,6 @@ public class BasicUserService implements UserService {
     if (nullableProfile != null) {
       binaryContentUtils.deleteBinaryContentByUserId(userID);
     }
-
-    User user = findbyId(userID);
 
     // null or 공백인 경우 기존 정보 유지
     String newName = Optional.ofNullable(userUpdateRequest.newName())
@@ -130,6 +131,15 @@ public class BasicUserService implements UserService {
     String newEmail = Optional.ofNullable(userUpdateRequest.newEmail())
         .filter(s -> !s.isBlank())
         .orElse(user.getEmail());
+
+    // 이름이나 이메일이 변경되었다면, 존재하는지 체크
+    if (!newName.equals(user.getUsername()) && userRepository.existsByUsername(newName)) {
+      throw new UserAlreadyExistsException(Map.of("User Name: ", newName));
+    }
+
+    if (!newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
+      throw new UserAlreadyExistsException(Map.of("User email: ", newEmail));
+    }
 
     String newPassword = Optional.ofNullable(userUpdateRequest.newPassword())
         .filter(s -> !s.isBlank())
