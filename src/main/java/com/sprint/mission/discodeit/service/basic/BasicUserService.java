@@ -160,12 +160,16 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public void deleteUser(UUID userID) {
+  public void deleteUser(UUID userId) {
 
-    binaryContentUtils.deleteBinaryContentByUserId(userID);
-    userRepository.deleteById(userID);
+    //유저 존재 검증
+    userRepository.findById(userId).orElseThrow(
+        () -> new UserNotFoundException(Map.of("유저 ID: ", userId.toString())));
 
-    log.info("User deleted successfully with ID: {}", userID);
+    binaryContentUtils.deleteBinaryContentByUserId(userId);
+    userRepository.deleteById(userId);
+
+    log.info("User deleted successfully with ID: {}", userId);
   }
 
   @Override
