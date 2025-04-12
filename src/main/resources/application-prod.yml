@@ -1,3 +1,5 @@
+
+---
 spring:
   servlet:
     multipart:
@@ -19,6 +21,7 @@ spring:
       ddl-auto: none
     open-in-view: false
 
+---
 discodeit:
   storage:
     type: ${STORAGE_TYPE:local}

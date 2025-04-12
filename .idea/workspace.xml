@@ -5,13 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/S3PracticeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/storage/s3/AWSS3Test.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/DiscodeitApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/DiscodeitApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/S3Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/S3Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/toremove/S3PracticeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/toremove/S3PracticeController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/S3BinaryContentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/S3BinaryContentStorage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/storage/s3/AWSS3Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/storage/s3/AWSS3Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,7 +167,7 @@
     &quot;git-widget-placeholder&quot;: &quot;part2-이요한-sprint7-Infra&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/icb16/IdeaProjects/1-sprint-mission&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/start/external/build.gradle&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -175,7 +176,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.28965518&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;terminal&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;two.files.diff.last.used.file&quot;: &quot;C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
@@ -445,7 +446,14 @@
       <workItem from="1744265225439" duration="13436000" />
       <workItem from="1744294751537" duration="9653000" />
       <workItem from="1744329826320" duration="641000" />
-      <workItem from="1744330679127" duration="7501000" />
+      <workItem from="1744330679127" duration="8705000" />
+      <workItem from="1744430686630" duration="144000" />
+      <workItem from="1744432565277" duration="598000" />
+      <workItem from="1744453938071" duration="344000" />
+      <workItem from="1744454430639" duration="1282000" />
+      <workItem from="1744460234074" duration="1536000" />
+      <workItem from="1744467504126" duration="861000" />
+      <workItem from="1744468991936" duration="6326000" />
     </task>
     <servers />
   </component>

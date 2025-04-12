@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -121,11 +122,13 @@ public class AWSS3Test {
         } catch (IOException e) {
             throw new CustomException(FILE_CONVERT_ERROR);
         }
+
         accessKey = props.getProperty("AWS_S3_ACCESS_KEY").trim();
         secretKey = props.getProperty("AWS_S3_SECRET_KEY").trim();
         region = props.getProperty("AWS_S3_REGION").trim();
         bucket = props.getProperty("AWS_S3_BUCKET").trim();
         presigned_url_expiration = Long.parseLong(props.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION").trim());
+        //env.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION", Long.class);
     }
 
     private S3Client getS3Client() {
