@@ -12,8 +12,7 @@ public record UserUpdateRequest
         String newPassword,
 
         @Email(message = "이메일 형식이 맞아야합니다.")
-        String newEmail,
-        String newFilePAth
+        String newEmail
     ) {
 
 }
