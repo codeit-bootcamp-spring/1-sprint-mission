@@ -1,10 +1,10 @@
----
 spring:
   servlet:
     multipart:
       enabled: true
       max-file-size: 20MB # 요청 파일 하나당 허용 사이즈
       max-request-size: 50MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
+
 ---
 spring:
   datasource:
@@ -33,13 +33,42 @@ discodeit:
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 
+---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, loggers, health, metrics
+  info:
+    env:
+      enabled: true
+
+info:
+  application-name: Discodeit
+  application-version: 1.7.0
+  java-version: 17
+  spring-boot-version: 3.4.0
+  key-settings:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
+
+---
 logging:
   level:
     org.hibernate.sql : warn
+    com.sprint.mission: info
 
 springdoc:
   api-docs:
     enabled: false
   swagger-ui:
     enabled: false
-
