@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -30,11 +31,13 @@ public class S3Config {
                 .region(Region.of(properties.getRegion()))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
                 .build();
+        //
     }
 
     @Getter
     @AllArgsConstructor
     @ConfigurationProperties(prefix = "discodeit.storage.s3")
+    @Validated
     public static class S3ConfigProperties {
         @NotBlank (message = "Access key is required")
         private String accessKey;
