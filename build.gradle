@@ -45,6 +45,7 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 	implementation 'org.postgresql:postgresql:42.7.3'
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator' //actuator 추가
 
 	implementation 'software.amazon.awssdk:s3:2.31.7'
 
@@ -54,7 +55,7 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 
 	compileOnly 'org.projectlombok:lombok'
-
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"

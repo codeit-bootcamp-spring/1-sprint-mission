@@ -6,7 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/S3Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/S3Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +67,20 @@
     &quot;accountId&quot;: &quot;c3b7675d-cb84-4590-9844-f892f30550c4&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.tomcat.embed/tomcat-embed-core/10.1.36/3ccaa558e32e317e35d6674d65d7d9aa182e082f/tomcat-embed-core-10.1.36.jar!/jakarta/servlet/http/HttpServlet.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot/3.3.9/4b45bffd62ba7604dae62bfb356fe5b7a405d354/spring-boot-3.3.9.jar!/org/springframework/boot/context/properties/ConfigurationProperties.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-core/6.1.17/fa713816046e5f2d020191932dd337f297332fea/spring-core-6.1.17.jar!/org/springframework/core/env/PropertyResolver.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-web/6.1.17/d6a573fcc292c1c477ed75ae270af018174fad28/spring-web-6.1.17.jar!/org/springframework/http/ContentDisposition.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-web/6.1.17/d6a573fcc292c1c477ed75ae270af018174fad28/spring-web-6.1.17.jar!/org/springframework/web/multipart/MultipartException.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/auth/2.31.7/e86cea1359da5ff15fde952bd6d2efc1de81322e/auth-2.31.7.jar!/software/amazon/awssdk/auth/credentials/AwsBasicCredentials.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/s3/2.31.7/f2b0a87c0f47ae5fe00ceddec8d30dc99442978f/s3-2.31.7.jar!/software/amazon/awssdk/services/s3/S3Client.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/s3/2.31.7/f2b0a87c0f47ae5fe00ceddec8d30dc99442978f/s3-2.31.7.jar!/software/amazon/awssdk/services/s3/model/PutObjectRequest.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.jdks/temurin-17.0.14/lib/src.zip!/java.base/java/net/URLConnection.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.jdks/temurin-17.0.14/lib/src.zip!/java.base/java/nio/file/Path.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.jdks/temurin-17.0.14/lib/src.zip!/java.base/java/util/Properties.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.jdks/temurin-17.0.14/lib/src.zip!/java.xml/com/sun/org/apache/xpath/internal/axes/LocPathIterator.java" root0="SKIP_INSPECTION" />
+  </component>
   <component name="JsbtTreeLayoutManager">
     <layout place="tools.popupGrunt">
       <scroll-view-position x="0" y="0" />
@@ -170,7 +187,7 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.28965518",
-    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
     "two.files.diff.last.used.file": "C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java",
     "vue.rearranger.settings.migration": "true"
@@ -311,10 +328,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.MessageServiceTest.createSuccess" />
-        <item itemvalue="JUnit.ChannelServiceTest" />
         <item itemvalue="JUnit.ChannelServiceTest.updatePrivateChannelSuccess" />
         <item itemvalue="JUnit.ChannelServiceTest.updatePrivateChannelFail" />
         <item itemvalue="JUnit.ChannelServiceTest.createPrivateChannelFail" />
+        <item itemvalue="JUnit.ChannelServiceTest" />
       </list>
     </recent_temporary>
   </component>
@@ -448,6 +465,7 @@
       <workItem from="1744460234074" duration="1536000" />
       <workItem from="1744467504126" duration="861000" />
       <workItem from="1744468991936" duration="6647000" />
+      <workItem from="1744519538704" duration="739000" />
     </task>
     <servers />
   </component>
