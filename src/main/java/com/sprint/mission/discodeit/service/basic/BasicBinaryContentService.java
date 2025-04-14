@@ -29,10 +29,10 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   public BinaryContentDto create(CreateBinaryContentRequest request) {
 
+    log.debug("BinaryContent 생성 시작: fileName={}, size={}, contentType={}",
+        request.fileName(), request.bytes().length, request.contentType());
+
     String fileName = request.fileName();
-
-    log.info("BinaryContent 생성 요청 : fileName={}", fileName);
-
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
 
@@ -47,31 +47,51 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
 
-    log.info("BinaryContent 생성 성공 : binaryContentId={}", binaryContentDto.id());
+    log.info("BinaryContent 생성 완료: id={}, fileName={}, size={}",
+        binaryContent.getId(), fileName, bytes.length);
 
     return binaryContentDto;
   }
 
   @Override
   public BinaryContentDto find(UUID binaryContentId) {
-    return binaryContentRepository.findById(binaryContentId)
+    log.debug("BinaryContent 조회 시작: id={}", binaryContentId);
+
+    BinaryContentDto binaryContentDto = binaryContentRepository.findById(binaryContentId)
         .map(binaryContentMapper::toDto)
         .orElseThrow(() -> new BinaryContentNotFoundException(binaryContentId));
+
+    log.info("BinaryContent 조회 완료: id={}, fileName={}",
+        binaryContentDto.id(), binaryContentDto.fileName());
+
+    return binaryContentDto;
   }
 
   @Override
   public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentRepository.findAllById(binaryContentIds).stream()
+
+    log.debug("BinaryContent 목록 조회 시작: ids={}", binaryContentIds);
+
+    List<BinaryContentDto> binaryContentDtos = binaryContentRepository.findAllById(binaryContentIds).stream()
         .map(binaryContentMapper::toDto)
         .toList();
+
+    log.info("BinaryContent 목록 조회 완료: 조회된 항목 수={}", binaryContentDtos.size());
+
+    return binaryContentDtos;
   }
 
   @Override
   @Transactional
   public void delete(UUID binaryContentId) {
+
+    log.debug("BinaryContent 삭제 시작: id={}", binaryContentId);
+
     if (!binaryContentRepository.existsById(binaryContentId)) {
       throw new BinaryContentNotFoundException(binaryContentId);
     }
     binaryContentRepository.deleteById(binaryContentId);
+
+    log.info("BinaryContent 삭제 완료: id={}", binaryContentId);
   }
 }

@@ -1,12 +1,12 @@
+server:
+  port: 8080
+
 spring:
   datasource: # 데이터베이스 설정
     driver-class-name: org.postgresql.Driver  # PostgreSQL 데이터베이스 사용
     url: jdbc:postgresql://localhost:5432/discodeit # 연결 URL
     username: discodeit_user  # 사용자
     password: discodeit1234 # 비밀번호
-
-server:
-  port: 8081
 
 logging: # Hibernate SQL 로그 설정
   level:

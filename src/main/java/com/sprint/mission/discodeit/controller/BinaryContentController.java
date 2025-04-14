@@ -58,7 +58,7 @@ public class BinaryContentController implements BinaryContentApi {
 
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
 
-    log.info("BinaryContent 다운로드 성공 : fileName={}", binaryContentDto.fileName());
+    log.debug("BinaryContent 다운로드 응답 : {}", binaryContentDto);
 
     return binaryContentStorage.download(binaryContentDto);
   }

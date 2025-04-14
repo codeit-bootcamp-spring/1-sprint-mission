@@ -46,13 +46,13 @@ public class UserController implements UserApi {
       @Valid @RequestPart("userRequest") CreateUserRequest userRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
-    log.info("User 생성 요청 : username={}", userRequest.username());
+    log.info("User 생성 요청 : {}", userRequest);
 
     Optional<CreateBinaryContentRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
         profile);
     UserDto userDto = userService.create(userRequest, profileRequest);
 
-    log.info("User 생성 성공 : userId={}", userDto.id());
+    log.debug("User 생성 응답 : {}", userDto);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -66,13 +66,13 @@ public class UserController implements UserApi {
       @Valid @RequestPart("userRequest") UpdateUserRequest userRequest,
       @RequestPart("profile") MultipartFile profile) {
 
-    log.info("User 수정 요청 : userId={}", userId);
+    log.info("User 수정 요청 : userId={}, request={}", userId, userRequest);
 
     Optional<CreateBinaryContentRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
         profile);
     UserDto userDto = userService.update(userId, userRequest, profileRequest);
 
-    log.info("User 수정 성공 : userId={}", userId);
+    log.debug("User 수정 응답 : {}", userDto);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -87,7 +87,7 @@ public class UserController implements UserApi {
 
     userService.delete(userId);
 
-    log.info("User 삭제 성공 : userId={}", userId);
+    log.debug("User 삭제 성공 : userId={}", userId);
 
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -111,11 +111,11 @@ public class UserController implements UserApi {
       @PathVariable("userId") UUID userId,
       @Valid @RequestBody UpdateUserStatusRequest request) {
 
-    log.info("UserStatus 수정 요청 : userId={}", userId);
+    log.info("UserStatus 수정 요청 : userId={}, request={}", userId, request);
 
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, request);
 
-    log.info("UserStatus 수정 성공 : userStatusId={}", userStatusDto.id());
+    log.debug("UserStatus 수정 응답 : {}", userStatusDto);
 
     return ResponseEntity
         .status(HttpStatus.OK)

@@ -46,13 +46,13 @@ public class MessageController implements MessageApi {
       @Valid @RequestPart(value = "CreateMessageRequest") CreateMessageRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-    log.info("Message 생성 요청 : content={}", request.content());
+    log.info("Message 생성 요청 : {}", request);
 
     List<CreateBinaryContentRequest> attachmentRequests = BinaryContentUtil.convertToBinaryContentRequests(
         attachments);
     MessageDto messageDto = messageService.create(request, attachmentRequests);
 
-    log.info("Message 생성 성공 : messageId={}", messageDto.id());
+    log.debug("Message 생성 응답 : {}", messageDto);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -65,11 +65,11 @@ public class MessageController implements MessageApi {
       @PathVariable("messageId") UUID messageId,
       @RequestBody UpdateMessageRequest request) {
 
-    log.info("Message 수정 요청 : messageId={}", messageId);
+    log.info("Message 수정 요청 : messageId={}, request={}", messageId, request);
 
     MessageDto messageDto = messageService.update(messageId, request);
 
-    log.info("Message 수정 성공 : messageId={}", messageId);
+    log.debug("Message 수정 응답 : {}", messageDto);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -84,7 +84,7 @@ public class MessageController implements MessageApi {
 
     messageService.delete(messageId);
 
-    log.info("Message 삭제 성공 : messageId={}", messageId);
+    log.debug("Message 삭제 성공 : messageId={}", messageId);
 
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)

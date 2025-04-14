@@ -17,6 +17,7 @@ build/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+node_modules/
 
 ### Eclipse ###
 .apt_generated
@@ -46,3 +47,6 @@ bin/
 
 ### data ###
 /data/
+
+### env ###
+*.env

@@ -32,6 +32,9 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @Transactional
   public UserStatusDto create(CreateUserStatusRequest request) {
+
+    log.debug("UserStatus 생성 시작: userId={}", request.userId());
+
     UUID userId = request.userId();
 
     User user = userRepository.findById(userId)
@@ -44,21 +47,38 @@ public class BasicUserStatusService implements UserStatusService {
     Instant lastActiveAt = request.lastActiveAt();
     UserStatus userStatus = new UserStatus(user, lastActiveAt);
     userStatusRepository.save(userStatus);
+
+    log.info("UserStatus 생성 완료: id={}, userId={}", userStatus.getId(), userId);
+
     return userStatusMapper.toDto(userStatus);
   }
 
   @Override
   public UserStatusDto find(UUID userStatusId) {
-    return userStatusRepository.findById(userStatusId)
+
+    log.debug("UserStatus 조회 시작: id={}", userStatusId);
+
+    UserStatusDto userStatusDto = userStatusRepository.findById(userStatusId)
         .map(userStatusMapper::toDto)
         .orElseThrow(() -> new UserStatusNotFoundException(userStatusId));
+
+    log.info("UserStatus 조회 완료: id={}", userStatusId);
+
+    return userStatusDto;
   }
 
   @Override
   public List<UserStatusDto> findAll() {
-    return userStatusRepository.findAll().stream()
+
+    log.debug("전체 UserStatus 목록 조회 시작");
+
+    List<UserStatusDto> userStatusDtos = userStatusRepository.findAll().stream()
         .map(userStatusMapper::toDto)
         .toList();
+
+    log.info("전체 UserStatus 목록 조회 완료: 조회된 항목 수={}", userStatusDtos.size());
+
+    return userStatusDtos;
   }
 
   @Override
@@ -66,9 +86,14 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatusDto update(UUID userStatusId, UpdateUserStatusRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
 
+    log.debug("UserStatus 수정 시작: id={}, newLastActiveAt={}",
+        userStatusId, newLastActiveAt);
+
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new UserStatusNotFoundException(userStatusId));
     userStatus.update(newLastActiveAt);
+
+    log.info("UserStatus 수정 완료: id={}", userStatusId);
 
     return userStatusMapper.toDto(userStatus);
   }
@@ -78,9 +103,14 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatusDto updateByUserId(UUID userId, UpdateUserStatusRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
 
+    log.debug("사용자 ID로 UserStatus 수정 시작: userId={}, newLastActiveAt={}",
+        userId, newLastActiveAt);
+
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new UserNotFoundException(userId));
     userStatus.update(newLastActiveAt);
+
+    log.info("사용자 ID로 UserStatus 수정 완료: userId={}", userId);
 
     return userStatusMapper.toDto(userStatus);
   }
@@ -88,9 +118,13 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @Transactional
   public void delete(UUID userStatusId) {
+
+    log.debug("UserStatus 삭제 시작: id={}", userStatusId);
+
     if (!userStatusRepository.existsById(userStatusId)) {
       throw new UserStatusNotFoundException(userStatusId);
     }
     userStatusRepository.deleteById(userStatusId);
+    log.info("UserStatus 삭제 완료: id={}", userStatusId);
   }
 }

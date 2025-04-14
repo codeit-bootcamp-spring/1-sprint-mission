@@ -48,6 +48,9 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto create(CreateMessageRequest messageRequest,
       List<CreateBinaryContentRequest> binaryContentRequests) {
+
+    log.debug("Message 생성 시작: request={}", messageRequest);
+
     UUID channelId = messageRequest.channelId();
     UUID authorId = messageRequest.authorId();
 
@@ -67,6 +70,9 @@ public class BasicMessageService implements MessageService {
     );
 
     messageRepository.save(message);
+
+    log.info("Message 생성 완료: id={}, channelId={}", message.getId(), channelId);
+
     return messageMapper.toDto(message);
   }
 
@@ -98,22 +104,33 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageDto update(UUID messageId, UpdateMessageRequest request) {
+
+    log.debug("Message 수정 시작: id={}, request={}", messageId, request);
+
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new MessageNotFoundException(messageId));
     message.update(newContent);
+
+    log.info("Message 수정 완료: id={}, channelId={}", messageId, message.getChannel().getId());
+
     return messageMapper.toDto(message);
   }
 
   @Override
   @Transactional
   public void delete(UUID messageId) {
+
+    log.debug("Message 삭제 시작: id={}", messageId);
+
     if (!messageRepository.existsById(messageId)) {
       throw new MessageNotFoundException(messageId);
     }
 
     messageRepository.deleteById(messageId);
+
+    log.info("Message 삭제 완료: id={}", messageId);
   }
 
 

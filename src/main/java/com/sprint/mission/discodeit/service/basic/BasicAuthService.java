@@ -25,6 +25,9 @@ public class BasicAuthService implements AuthService {
   @Override
   @Transactional(readOnly = true)
   public UserDto login(LoginRequest request) {
+
+    log.debug("로그인 시도: username={}", request.username());
+
     String username = request.username();
     String password = request.password();
 
@@ -35,6 +38,7 @@ public class BasicAuthService implements AuthService {
       throw new WrongPasswordException();
     }
 
+    log.info("로그인 성공: userId={}, username={}", user.getId(), user.getUsername());
     return userMapper.toDto(user);
   }
 }

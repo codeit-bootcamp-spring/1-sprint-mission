@@ -5,7 +5,11 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '0.0.1-SNAPSHOT'
+version = '1.2-M8'
+
+bootJar {
+    archiveFileName = "discodeit-${version}.jar"
+}
 
 java {
     toolchain {

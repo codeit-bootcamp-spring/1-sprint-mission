@@ -37,11 +37,11 @@ public class ChannelController implements ChannelApi {
   public ResponseEntity<ChannelDto> create(
       @Valid @RequestBody CreatePublicChannelRequest request) {
 
-    log.info("Public Channel 생성 요청 : channelName={}", request.name());
+    log.info("Public Channel 생성 요청 : {}", request);
 
     ChannelDto channelDto = channelService.create(request);
 
-    log.info("Public Channel 생성 성공 : channelId={}", channelDto.id());
+    log.debug("Public Channel 생성 응답 : {}", channelDto);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -53,11 +53,11 @@ public class ChannelController implements ChannelApi {
   public ResponseEntity<ChannelDto> create(
       @RequestBody CreatePrivateChannelRequest request) {
 
-    log.info("Private Channel 생성 요청 : participantIds={}", request.participantIds());
+    log.info("Private Channel 생성 요청 : {}", request);
 
     ChannelDto channelDto = channelService.create(request);
 
-    log.info("Private Channel 생성 성공 : channelId={}", channelDto.id());
+    log.debug("Private Channel 생성 응답 : {}", channelDto);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -70,11 +70,11 @@ public class ChannelController implements ChannelApi {
       @PathVariable("channelId") UUID channelId,
       @Valid @RequestBody UpdatePublicChannelRequest request) {
 
-    log.info("Public Channel 수정 요청 : channelId={}", channelId);
+    log.info("Public Channel 수정 요청 : channelId={}, request={}", channelId, request);
 
     ChannelDto channelDto = channelService.update(channelId, request);
 
-    log.info("Public Channel 수정 성공 : channelId={}", channelId);
+    log.debug("Public Channel 수정 응답 : {}", channelDto);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -89,7 +89,7 @@ public class ChannelController implements ChannelApi {
 
     channelService.delete(channelId);
 
-    log.info("Public Channel 삭제 성공 : channelId={}", channelId);
+    log.debug("Public Channel 삭제 성공 : channelId={}", channelId);
 
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
