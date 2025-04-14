@@ -408,3 +408,48 @@ Caused by: org.postgresql.util.PSQLException: ġ��������: ��
 2025-04-11 09:52:00.418 [SpringApplicationShutdownHook] []   INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-04-11 09:52:00.425 [SpringApplicationShutdownHook] []   INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
 2025-04-11 09:52:00.447 [SpringApplicationShutdownHook] []   INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+2025-04-11 19:53:19.719 [main] []   INFO  com.sprint.mission.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.12 with PID 19564 (C:\Users\qwert\1-sprint-mission\build\classes\java\main started by qwert in C:\Users\qwert\1-sprint-mission)
+2025-04-11 19:53:19.722 [main] []   INFO  com.sprint.mission.discodeit.DiscodeitApplication - The following 1 profile is active: "prod"
+2025-04-11 19:53:21.784 [main] []   INFO  org.springframework.data.repository.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-11 19:53:22.103 [main] []   INFO  org.springframework.data.repository.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 304 ms. Found 6 JPA repository interfaces.
+2025-04-11 19:53:23.255 [main] []   INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 80 (http)
+2025-04-11 19:53:23.275 [main] []   INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-04-11 19:53:23.275 [main] []   INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-04-11 19:53:23.393 [main] []   INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-04-11 19:53:23.393 [main] []   INFO  org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3588 ms
+2025-04-11 19:53:23.647 [main] []   DEBUG org.springframework.web.filter.ServerHttpObservationFilter - Filter 'webMvcObservationFilter' configured for use
+2025-04-11 19:53:23.718 [main] []   INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+2025-04-11 19:53:24.305 [main] []   INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5b5b9521
+2025-04-11 19:53:24.307 [main] []   INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+2025-04-11 19:53:24.439 [main] []   INFO  org.hibernate.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-11 19:53:24.562 [main] []   INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.5.Final
+2025-04-11 19:53:24.622 [main] []   INFO  org.hibernate.cache.internal.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-04-11 19:53:25.170 [main] []   INFO  org.springframework.orm.jpa.persistenceunit.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-11 19:53:25.333 [main] []   INFO  org.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-04-11 19:53:27.054 [main] []   INFO  org.hibernate.engine.transaction.jta.platform.internal.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-11 19:53:27.058 [main] []   INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-11 19:53:27.557 [main] []   INFO  com.sprint.mission.discodeit.config.StorageConfig - ✅ Using LocalBinaryContentStorage
+2025-04-11 19:53:27.658 [main] []   INFO  org.springframework.data.jpa.repository.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-11 19:53:29.103 [main] []   INFO  org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-04-11 19:53:30.276 [main] []   INFO  org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver - Exposing 5 endpoints beneath base path '/actuator'
+2025-04-11 19:53:30.479 [main] []   INFO  org.springframework.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 80 (http) with context path '/'
+2025-04-11 19:53:30.502 [main] []   INFO  com.sprint.mission.discodeit.DiscodeitApplication - Started DiscodeitApplication in 12.215 seconds (process running for 14.368)
+2025-04-11 19:53:30.835 [RMI TCP Connection(3)-172.30.1.73] []   INFO  org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-04-11 19:53:30.836 [RMI TCP Connection(3)-172.30.1.73] []   INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-04-11 19:53:30.839 [RMI TCP Connection(3)-172.30.1.73] []   INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2025-04-11 19:53:47.166 [http-nio-80-exec-8] [92e9bf2d-6e3f-45f6-803a-91b7eb6b0802] GET /api/channels INFO  com.sprint.mission.discodeit.service.basic.BasicChannelService - Find all channels by userId: userId=10b50014-bd39-4aaa-914a-c09758f8d47f,조회된 채널 수=0
+2025-04-11 19:53:47.190 [http-nio-80-exec-9] [f6aa2ef7-4333-4304-8103-ed4fd639f60e] GET /api/channels INFO  com.sprint.mission.discodeit.service.basic.BasicChannelService - Find all channels by userId: userId=10b50014-bd39-4aaa-914a-c09758f8d47f,조회된 채널 수=0
+2025-04-11 19:53:47.308 [http-nio-80-exec-4] [85d0e58a-9959-4a78-a40a-13d76a7780c9] GET /api/channels INFO  com.sprint.mission.discodeit.service.basic.BasicChannelService - Find all channels by userId: userId=10b50014-bd39-4aaa-914a-c09758f8d47f,조회된 채널 수=0
+2025-04-11 19:53:50.318 [http-nio-80-exec-5] [26adc778-bef3-4231-9c61-77581fe4d709] GET /api/channels INFO  com.sprint.mission.discodeit.service.basic.BasicChannelService - Find all channels by userId: userId=10b50014-bd39-4aaa-914a-c09758f8d47f,조회된 채널 수=0
+2025-04-11 19:53:56.398 [SpringApplicationShutdownHook] []   INFO  org.springframework.boot.web.embedded.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-04-11 19:53:57.572 [tomcat-shutdown] []   INFO  org.springframework.boot.web.embedded.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-04-11 19:53:57.639 [SpringApplicationShutdownHook] []   INFO  org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-04-11 19:53:57.644 [SpringApplicationShutdownHook] []   INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+2025-04-11 19:53:57.652 [SpringApplicationShutdownHook] []   INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
