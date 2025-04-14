@@ -59,7 +59,15 @@ jobs:
             --query 'taskDefinition.taskDefinitionArn' --output text)
           echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
 
-      - name: Deploy new ECS task definition
+      - name: Scale service to 0 (stop current task)
+        run: |
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --desired-count 0
+          sleep 30
+
+      - name: Deploy new ECS task definition with count 1
         run: |
           aws ecs update-service \
             --cluster ${{ vars.ECS_CLUSTER }} \
@@ -72,10 +80,3 @@ jobs:
           aws ecs wait services-stable \
             --cluster ${{ vars.ECS_CLUSTER }} \
             --services ${{ vars.ECS_SERVICE }}
-
-      - name: Confirm only 1 task is running
-        run: |
-          aws ecs update-service \
-            --cluster ${{ vars.ECS_CLUSTER }} \
-            --service ${{ vars.ECS_SERVICE }} \
-            --desired-count 1
