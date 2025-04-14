@@ -69,8 +69,11 @@ jobs:
 
       - name: Wait for new task to stabilize
         run: |
-          echo "Waiting 60 seconds for the new task to stabilize..."
-          sleep 60
+          echo "⏳ Waiting for new task to stabilize..."
+          aws ecs wait services-stable \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --services ${{ vars.ECS_SERVICE }}
+          echo "✅ New task is stable."
 
       - name: Scale down ECS service to 1
         run: |
