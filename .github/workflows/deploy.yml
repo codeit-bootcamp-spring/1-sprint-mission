@@ -59,17 +59,22 @@ jobs:
             --query 'taskDefinition.taskDefinitionArn' --output text)
           echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
 
-      - name: Stop current ECS service
-        run: |
-          aws ecs update-service \
-            --cluster ${{ vars.ECS_CLUSTER }} \
-            --service ${{ vars.ECS_SERVICE }} \
-            --desired-count 0
-
-      - name: Restart ECS service with new task
+      - name: Scale up ECS service to 2
         run: |
           aws ecs update-service \
             --cluster ${{ vars.ECS_CLUSTER }} \
             --service ${{ vars.ECS_SERVICE }} \
             --task-definition ${{ env.TASK_DEF_ARN }} \
+            --desired-count 2
+
+      - name: Wait for new task to stabilize
+        run: |
+          echo "Waiting 60 seconds for the new task to stabilize..."
+          sleep 60
+
+      - name: Scale down ECS service to 1
+        run: |
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
             --desired-count 1

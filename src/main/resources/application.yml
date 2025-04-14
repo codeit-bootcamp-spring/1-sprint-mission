@@ -19,7 +19,7 @@ spring:
         instance:
           name: discodeit
   profiles:
-    active: ${SPRING_PROFILE_ACTIVE:prod}
+    active: ${SPRING_PROFILES_ACTIVE:prod}
   jpa:
     open-in-view: false
     hibernate:
