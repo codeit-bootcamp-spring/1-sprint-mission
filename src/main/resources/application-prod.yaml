@@ -1,3 +1,6 @@
+server:
+  port: 80
+
 spring:
   application:
     name: discodeit
@@ -7,7 +10,7 @@ spring:
       schema-locations: classpath:/schema.sql
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/discodeit
+    url: jdbc:postgresql://host.docker.internal:5432/discodeit
     username: discodeit_user
     password: discodeit1234
   jpa:
