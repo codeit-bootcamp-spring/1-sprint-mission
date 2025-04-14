@@ -9,13 +9,13 @@ COPY build.gradle settings.gradle gradlew /app/
 COPY gradle /app/gradle
 
 # 의존성 미리 다운(캐시)
-RUN ./gradlew dependencies --no-daemon
+RUN chmod +x gradlew && ./gradlew dependencies --no-daemon
 
 # 전체 프로젝트 복사 (.dockerignore로 불필요 파일 제외)
 COPY . /app
 
 # Gradle Wrapper 사용하여 빌드 (테스트 제외)
-RUN ./gradlew build -x test
+RUN chmod +x gradlew && ./gradlew build -x test
 
 # 실행 이미지
 FROM amazoncorretto:17-alpine
