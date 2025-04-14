@@ -45,3 +45,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Docker ###
+.env
+.env.*

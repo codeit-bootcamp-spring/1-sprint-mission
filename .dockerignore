@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+.github
+
+# Gradle
+.gradle
+build/
+!build/libs/*.jar
+
+# IDE
+.idea
+*.iml
+.vscode
+*.sublime-*
+
+# Logs
+logs/
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Node modules (if any)
+node_modules/
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Tests
+src/test/
+
+# Local configuration
+*.env
+*.env.local 
