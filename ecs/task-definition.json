@@ -19,7 +19,12 @@
         }
       ],
       "essential": true,
-      "environment": [],
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "prod"
+        }
+      ],
       "environmentFiles": [
         {
           "value": "arn:aws:s3:::discodeit-binary-content-storage-kcw/discodeit.env",
