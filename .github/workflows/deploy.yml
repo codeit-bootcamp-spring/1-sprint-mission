@@ -41,13 +41,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Update ECS task definition
-        id: Update-task
-        run: |
-          TASK_DEF=$(aws ecs describe-task-definition --task-definition ${{ vars.ECS_TASK_DEFINITION }})
-          NEW_TASK_DEF=$(echo "$TASK_DEF" | jq --arg IMAGE "${{ vars.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}" '.taskDefinition | { ... , containerDefinitions: [.containerDefinitions[0] | .image = $IMAGE] }')
-          echo "$NEW_TASK_DEF" > new-task-def.json
-          aws ecs register-task-definition --cli-input-json file://new-task-def.json
+      - name: Render ECS task definition
+        id: render-task
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs/task-definition.json
+          container-name: discodeit-app
+          image: ${{ vars.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
 
       - name: Stop current ECS service
         run: |
