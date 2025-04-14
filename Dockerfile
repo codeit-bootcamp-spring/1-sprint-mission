@@ -36,4 +36,4 @@ COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar /app/
 EXPOSE 80
 
 # jar 파일 실행 (환경변수 활용)
-CMD ["sh", "-c", "java $JVM_OPTS -Dspring.profiles.active=$SPRING_PROFILE -jar /app/app.jar"]
+CMD ["sh", "-c", "java $JVM_OPTS -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE -jar /app/app.jar"]
