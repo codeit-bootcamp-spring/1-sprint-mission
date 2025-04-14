@@ -23,7 +23,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: us-east-1
 
-      - name: Login to Amazon ECR
+      - name: Login to Public ECR
+        run: |
+          aws ecr-public get-login-password --region us-east-1 \
+            | docker login --username AWS --password-stdin public.ecr.aws
+
+      - name: Build and Push Docker Image
         run: |
           docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest -t ${{ vars.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }} .
           docker push ${{ vars.ECR_REPOSITORY_URI }}:latest
