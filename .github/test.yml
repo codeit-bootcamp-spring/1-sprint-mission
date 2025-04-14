@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: temrin
+          distribution: temurin
 
       - name: Grant execute permission to Gradle
         run: chmod +x gradlew
@@ -28,4 +28,4 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@4
         with:
-          token: ${{ secret.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
