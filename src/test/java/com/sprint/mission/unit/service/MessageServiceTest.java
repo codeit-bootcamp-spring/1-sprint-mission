@@ -1,4 +1,4 @@
-package com.sprint.mission.unit;
+package com.sprint.mission.unit.service;
 
 //create, update, delete 메소드
 //핵심 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성
@@ -8,9 +8,7 @@ import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.MessageMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
-import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.BinaryContentStorage;
@@ -18,36 +16,28 @@ import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.BinaryService;
-import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.jcf.serviceImpl.JCFMessageService;
 import com.sprint.mission.unit.util.MockFileFactory;
 import com.sprint.mission.unit.util.ReflectionFieldSetter;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.sprint.mission.entity.main.ChannelType.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.ReflectionTestUtils.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MessageServiceTest {

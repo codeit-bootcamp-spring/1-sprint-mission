@@ -1,4 +1,4 @@
-package com.sprint.mission.unit;
+package com.sprint.mission.unit.service;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.dto.BinaryContentMapper;
