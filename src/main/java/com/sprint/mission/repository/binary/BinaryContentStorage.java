@@ -1,7 +1,6 @@
-package com.sprint.mission.repository;
+package com.sprint.mission.repository.binary;
 
 import com.sprint.mission.dto.response.BinaryContentDto;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 

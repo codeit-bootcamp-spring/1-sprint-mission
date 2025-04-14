@@ -1,7 +1,7 @@
 //package com.sprint.mission.controller.toremove;
 //
 //import com.sprint.mission.dto.response.BinaryContentDto;
-//import com.sprint.mission.repository.S3BinaryContentStorage;
+//import com.sprint.mission.repository.binary.S3BinaryContentStorage;
 //import lombok.RequiredArgsConstructor;
 //import org.springframework.http.ResponseEntity;
 //import org.springframework.web.bind.annotation.GetMapping;

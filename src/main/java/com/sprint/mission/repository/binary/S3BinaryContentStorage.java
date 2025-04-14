@@ -1,8 +1,7 @@
-package com.sprint.mission.repository;
+package com.sprint.mission.repository.binary;
 import com.sprint.mission.config.S3ConfigProperties;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;

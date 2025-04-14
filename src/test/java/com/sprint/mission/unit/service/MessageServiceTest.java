@@ -11,7 +11,7 @@ import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinaryContentStorage;
+import com.sprint.mission.repository.binary.BinaryContentStorage;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserRepository;

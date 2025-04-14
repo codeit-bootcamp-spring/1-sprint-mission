@@ -32,8 +32,8 @@
 //  public void repositoryMethod() {
 //  }
 //
-//  @Pointcut("!within(com.sprint.mission.repository.BinaryContentStorage)" +
-//      " && !within(com.sprint.mission.repository.LocalBinaryContentStorage)")
+//  @Pointcut("!within(com.sprint.mission.repository.binary.BinaryContentStorage)" +
+//      " && !within(com.sprint.mission.repository.binary.LocalBinaryContentStorage)")
 //  public void excludeBinaryContentStorage() {}
 //
 //

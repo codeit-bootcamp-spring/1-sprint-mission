@@ -1,4 +1,4 @@
-package com.sprint.mission.repository;
+package com.sprint.mission.repository.binary;
 
 import com.sprint.mission.entity.addOn.BinaryContent;
 import org.springframework.data.jpa.repository.JpaRepository;
