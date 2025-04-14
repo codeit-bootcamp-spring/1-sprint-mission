@@ -106,7 +106,7 @@ class MessageRepositoryTest {
     for (int i = 0; i < 3; i++) {
       Message message = messageRepository.save(new Message("메시지 " + i, channel, user, List.of()));
       saved.add(message);
-      Thread.sleep(10);
+      Thread.sleep(1000);
     }
 
     em.flush();

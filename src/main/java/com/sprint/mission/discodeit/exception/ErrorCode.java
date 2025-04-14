@@ -36,9 +36,9 @@ public enum ErrorCode {
   private String code;
   private String message;
 
-  ErrorCode(HttpStatus httpStatus, String user001, String message) {
+  ErrorCode(HttpStatus httpStatus, String code, String message) {
     this.status = httpStatus;
-    this.code = user001;
+    this.code = code;
     this.message = message;
   }
 }
