@@ -25,7 +25,7 @@ public class BasicAuthService implements AuthService {
   @Transactional
   @Override
   public UserDto login(LoginRequest loginRequest) {
-    User user = userRepository.findByUsername(loginRequest.userName())
+    User user = userRepository.findByUsername(loginRequest.username())
         .orElseThrow(() -> new NoSuchElementException("사용자가 없습니다."));
 
     if (!user.getPassword().equals(loginRequest.password())) {

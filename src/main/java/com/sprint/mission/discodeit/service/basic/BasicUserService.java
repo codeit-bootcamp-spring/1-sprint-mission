@@ -43,7 +43,7 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
     }
 
-    if (userRepository.existsByUsername((userCreateRequest.userName()))) {
+    if (userRepository.existsByUsername((userCreateRequest.username()))) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
     }
 
@@ -67,7 +67,7 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     User user = new User(
-        userCreateRequest.userName(),
+        userCreateRequest.username(),
         userCreateRequest.email(),
         userCreateRequest.password(),
         nullableProfile,
@@ -168,7 +168,7 @@ public class BasicUserService implements UserService {
 
     userRepository.deleteById(userId);
   }
-  
+
   private boolean isValidEmail(String email) {
     return email.matches(EMAIL_REGEX);
   }

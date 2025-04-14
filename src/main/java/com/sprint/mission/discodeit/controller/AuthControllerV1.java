@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthControllerV1 {
 
@@ -20,7 +20,7 @@ public class AuthControllerV1 {
 
   @PostMapping(value = "/login")
   public ResponseEntity<UserDto> login(@Valid @RequestBody LoginRequest request) {
-    log.info("로그인 요청: username={}", request.userName());
+    log.info("로그인 요청: username={}", request.username());
     UserDto login = authService.login(request);
     log.debug("로그인 응답: {}", login);
     return ResponseEntity.status(HttpStatus.OK).body(login);

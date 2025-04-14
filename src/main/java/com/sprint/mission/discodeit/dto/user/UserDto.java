@@ -7,7 +7,7 @@ public record UserDto(
     UUID userId,
     Instant createdAt,
     Instant updatedAt,
-    String userName,
+    String username,
     String email,
     UUID profileId,
     boolean isOnline
