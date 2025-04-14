@@ -3,7 +3,7 @@ name: CI-Test
 on:
   pull_request:
     branches:
-      - part3-김창우
+      - part3-김창우-sprint8
 
 jobs:
   test:
