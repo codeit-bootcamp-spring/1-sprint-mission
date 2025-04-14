@@ -37,14 +37,14 @@ import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class JCFChannelService implements ChannelService {
+public class ChannelServiceImpl implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageService messageService;
     private final ChannelMapper channelMapper;
     private final MessageRepository messageRepository;
-    private final ReadStatusService readStatusService;
+    private final ReadStatusServiceImpl readStatusService;
 
 
     @Override

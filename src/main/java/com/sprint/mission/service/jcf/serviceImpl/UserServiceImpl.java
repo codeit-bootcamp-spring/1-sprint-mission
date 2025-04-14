@@ -22,7 +22,7 @@ import java.util.UUID;
 @Slf4j @Service
 @RequiredArgsConstructor
 @Transactional
-public class JCFUserService implements UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;

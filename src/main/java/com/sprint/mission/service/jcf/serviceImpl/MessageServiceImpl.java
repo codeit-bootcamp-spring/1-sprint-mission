@@ -12,7 +12,6 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserRepository;
@@ -35,7 +34,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class JCFMessageService implements MessageService {
+public class MessageServiceImpl implements MessageService {
 
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
@@ -52,9 +51,10 @@ public class JCFMessageService implements MessageService {
 
         Channel writtenPlace = channelRepository.findById(responseDto.channelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
-        Message createdMessage = messageMapper.toEntity(writtenPlace, author, responseDto.content());
 
-        List<BinaryContent> binaryContentList = binaryContentDtoForCreateList.stream().map(binaryService::create).toList();
+        Message createdMessage = messageMapper.toEntity(writtenPlace, author, responseDto.content());
+        List<BinaryContent> binaryContentList = binaryContentDtoForCreateList.stream()
+                .map(binaryService::create).toList();
 
         createdMessage.getMessageAttachments().addAll(binaryContentList);
         return messageRepository.save(createdMessage);

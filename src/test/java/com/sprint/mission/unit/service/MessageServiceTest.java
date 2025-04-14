@@ -16,7 +16,7 @@ import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.BinaryService;
-import com.sprint.mission.service.jcf.serviceImpl.JCFMessageService;
+import com.sprint.mission.service.jcf.serviceImpl.MessageServiceImpl;
 import com.sprint.mission.unit.util.MockFileFactory;
 import com.sprint.mission.unit.util.ReflectionFieldSetter;
 import org.junit.jupiter.api.DisplayName;
@@ -27,8 +27,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
@@ -42,7 +40,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class MessageServiceTest {
 
-    private static final Logger log = LoggerFactory.getLogger(MessageServiceTest.class);
     private final ReflectionFieldSetter reflectionFieldSetter = new ReflectionFieldSetter();
     private final MockFileFactory mockFileFactory = new MockFileFactory();
 
@@ -62,7 +59,7 @@ public class MessageServiceTest {
     private MessageRepository messageRepository;
 
     @InjectMocks
-    private JCFMessageService messageService;
+    private MessageServiceImpl messageService;
 
     @Test
     @DisplayName("메시지 생성 성공")

@@ -8,7 +8,7 @@ import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.dto.response.ReadStatusDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.repository.UserRepository;
-import com.sprint.mission.service.jcf.serviceImpl.ReadStatusService;
+import com.sprint.mission.service.jcf.serviceImpl.ReadStatusServiceImpl;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +38,7 @@ import static org.springframework.http.HttpStatus.*;
 public class ReadStatusController {
 
     // 카피
-    private final ReadStatusService readStatusService;
+    private final ReadStatusServiceImpl readStatusService;
     private final UserRepository userRepository;
     private final ReadStatusMapper readStatusMapper;
 

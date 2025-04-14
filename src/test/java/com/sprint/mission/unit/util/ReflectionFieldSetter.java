@@ -12,10 +12,6 @@ public class ReflectionFieldSetter {
     public Object settingFieldValue(Object target) {
         setField(target, "id", UUID.randomUUID());
         setField(target, "createdAt", Instant.now());
-
-
-
-
         return target;
     }
 }

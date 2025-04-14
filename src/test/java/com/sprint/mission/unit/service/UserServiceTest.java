@@ -9,7 +9,7 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.BinaryService;
-import com.sprint.mission.service.jcf.serviceImpl.JCFUserService;
+import com.sprint.mission.service.jcf.serviceImpl.UserServiceImpl;
 import com.sprint.mission.service.jcf.supporter.UserServiceSupporter;
 import com.sprint.mission.unit.util.MockFileFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -110,7 +110,7 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    private JCFUserService userService;
+    private UserServiceImpl userService;
 
     @Test
     @DisplayName("Delete 실패 - userId에 맞는 user가 존재하지 않음")

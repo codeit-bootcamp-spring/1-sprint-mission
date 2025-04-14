@@ -11,6 +11,7 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.repository.UserRepository;
+import com.sprint.mission.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,13 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ReadStatusService {
+public class ReadStatusServiceImpl implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
@@ -40,7 +40,6 @@ public class ReadStatusService {
         if (readStatusRepository.existsById(user.getStatus().getId())) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
         }
-
         return readStatusRepository.save(new ReadStatus(user, channel, request.lastReadAt()));
     }
 
@@ -54,10 +53,6 @@ public class ReadStatusService {
         ReadStatus readStatus = this.findById(readStatusId);
         readStatus.update(request.newLastReadAt());
         return readStatus;
-    }
-
-    public boolean existsById(UUID readStatusId) {
-        return readStatusRepository.existsById(readStatusId);
     }
 
     public void delete(UUID readStatusId) {

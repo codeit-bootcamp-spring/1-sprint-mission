@@ -5,24 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/UserStatusService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/repository/UserRepoTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/repository/UserStatusRepoTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/UserStatusService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/resources/schema-test.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/VirtualThread.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/MessageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/UserStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/UserStatus.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/UserStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/UserStatusRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/JCFUserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/UserStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/UserStatusServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/ChannelServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/MessageServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/MessageServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/UserServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/UserServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/application-test.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ReadStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ReadStatusRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/JCFMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/JCFMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/MessageServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/MessageServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/util/ReflectionFieldSetter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/util/ReflectionFieldSetter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +121,11 @@
     "JUnit.ChannelCascadeTest.deleteChannel.executor": "Run",
     "JUnit.ChannelServiceTest.createPrivateChannelFail.executor": "Run",
     "JUnit.ChannelServiceTest.createPrivateChannelSuccess.executor": "Run",
+    "JUnit.ChannelServiceTest.createPublicChannelSuccess.executor": "Run",
+    "JUnit.ChannelServiceTest.deleteSuccess.executor": "Run",
     "JUnit.ChannelServiceTest.executor": "Run",
+    "JUnit.ChannelServiceTest.findByIdFail.executor": "Run",
+    "JUnit.ChannelServiceTest.findByIdSuccess.executor": "Run",
     "JUnit.ChannelServiceTest.updatePrivateChannelFail.executor": "Run",
     "JUnit.ChannelServiceTest.updatePrivateChannelSuccess.executor": "Run",
     "JUnit.ChannelTest.createChannelService.executor": "Run",
@@ -248,80 +240,81 @@
       <recent name="com.sprint.mission.dto.mappedDto" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.UserStatusRepoTest">
-    <configuration name="UserRepoTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.ChannelServiceTest">
+    <configuration name="ChannelService" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.unit.repository.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.repository" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.repository.UserRepoTest" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.service.ChannelService" />
       <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserRepoTest.findByIdTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ChannelService.createPublicChannelSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.unit.repository.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.repository" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.repository.UserRepoTest" />
-      <option name="METHOD_NAME" value="findByIdTest" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.service.ChannelService" />
+      <option name="METHOD_NAME" value="createPublicChannelSuccess" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserStatusRepoTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ChannelService.deleteSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.unit.repository.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.repository" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.repository.UserStatusRepoTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UserStatusRepoTest.create" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.unit.repository.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.repository" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.repository.UserStatusRepoTest" />
-      <option name="METHOD_NAME" value="create" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.service.ChannelService" />
+      <option name="METHOD_NAME" value="deleteSuccess" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserStatusRepoTest.findByUserFail" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ChannelService.findByIdFail" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.unit.repository.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.repository" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.repository.UserStatusRepoTest" />
-      <option name="METHOD_NAME" value="findByUserFail" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.service.ChannelService" />
+      <option name="METHOD_NAME" value="findByIdFail" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ChannelService.findByIdSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.unit.service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.service.ChannelService" />
+      <option name="METHOD_NAME" value="findByIdSuccess" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -336,20 +329,20 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="JUnit.UserRepoTest" />
-      <item itemvalue="JUnit.UserRepoTest.findByIdTest" />
-      <item itemvalue="JUnit.UserStatusRepoTest" />
-      <item itemvalue="JUnit.UserStatusRepoTest.create" />
-      <item itemvalue="JUnit.UserStatusRepoTest.findByUserFail" />
+      <item itemvalue="JUnit.ChannelService.createPublicChannelSuccess" />
+      <item itemvalue="JUnit.ChannelService.deleteSuccess" />
+      <item itemvalue="JUnit.ChannelService.findByIdFail" />
+      <item itemvalue="JUnit.ChannelService.findByIdSuccess" />
+      <item itemvalue="JUnit.ChannelServiceTest" />
       <item itemvalue="Spring Boot.DiscodeitApplication" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.UserStatusRepoTest" />
-        <item itemvalue="JUnit.UserStatusRepoTest.findByUserFail" />
-        <item itemvalue="JUnit.UserStatusRepoTest.create" />
-        <item itemvalue="JUnit.UserRepoTest" />
-        <item itemvalue="JUnit.UserRepoTest.findByIdTest" />
+        <item itemvalue="JUnit.ChannelServiceTest" />
+        <item itemvalue="JUnit.ChannelService.createPublicChannelSuccess" />
+        <item itemvalue="JUnit.ChannelService.findByIdSuccess" />
+        <item itemvalue="JUnit.ChannelService.findByIdFail" />
+        <item itemvalue="JUnit.ChannelService.deleteSuccess" />
       </list>
     </recent_temporary>
   </component>
@@ -496,7 +489,7 @@
       <workItem from="1744525940158" duration="852000" />
       <workItem from="1744545622714" duration="30000" />
       <workItem from="1744624163687" duration="826000" />
-      <workItem from="1744636985114" duration="6203000" />
+      <workItem from="1744636985114" duration="9320000" />
     </task>
     <servers />
   </component>
