@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (for ECR)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
@@ -30,11 +30,12 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest -t ${{ vars.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }} .
+          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest \
+                       -t ${{ vars.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }} .
           docker push ${{ vars.ECR_REPOSITORY_URI }}:latest
           docker push ${{ vars.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (for ECS)
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
@@ -49,10 +50,25 @@ jobs:
           container-name: discodeit-app
           image: ${{ vars.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
 
+      - name: Register new ECS task definition
+        id: register-task
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://${{ steps.render-task.outputs.task-definition }} \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+
       - name: Stop current ECS service
         run: |
-          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER }} --service ${{ vars.ECS_SERVICE }} --desired-count 0
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --desired-count 0
 
       - name: Restart ECS service with new task
         run: |
-          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER }} --service ${{ vars.ECS_SERVICE }} --desired-count 1
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --task-definition ${{ env.TASK_DEF_ARN }} \
+            --desired-count 1
