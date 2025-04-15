@@ -1,10 +1,12 @@
 spring:
-  profiles: prod
+  config:
+    activate:
+      on-profile: prod  # 'spring.profiles' 대신 이 항목을 사용
   application:
     name: Discodeit
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit  # PostgreSQL DB 주소
+    url: jdbc:postgresql://host.docker.internal:5432/discodeit  # docker 주소
     username: discodeit_user                         # DB 사용자
     password: discodeit1234                          # DB 비밀번호
     driver-class-name: org.postgresql.Driver         # PostgreSQL 드라이버

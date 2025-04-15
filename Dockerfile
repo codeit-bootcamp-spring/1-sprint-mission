@@ -1,8 +1,6 @@
 # 1. Amazon Corretto 17을 베이스 이미지로 사용
 FROM amazoncorretto:17
 
-MAINTAINER hyojKim
-
 # 2. 작업 디렉토리 설정
 WORKDIR /app
 
@@ -21,4 +19,4 @@ ENV PROJECT_NAME=discodeit \
 EXPOSE 80
 
 # 7. 실행 명령어 (환경변수를 이용해 jar 파일 실행)
-CMD java $JVM_OPTS -jar build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar
+CMD java $JVM_OPTS -jar ./build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar
