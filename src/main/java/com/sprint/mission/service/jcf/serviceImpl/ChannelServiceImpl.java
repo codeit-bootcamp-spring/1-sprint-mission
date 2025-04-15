@@ -8,12 +8,9 @@ import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.response.ChannelDto;
-import com.sprint.mission.entity.addOn.ReadStatus;
-import com.sprint.mission.entity.main.BaseEntity;
+import com.sprint.mission.dto.response.PrivateChannelWithUserAndLastMessageAtDto;
 import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.ChannelRepository;
-import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
@@ -25,10 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.entity.main.ChannelType.PRIVATE;
 import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
@@ -44,7 +41,6 @@ public class ChannelServiceImpl implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageService messageService;
     private final ChannelMapper channelMapper;
-    private final MessageRepository messageRepository;
     private final ReadStatusService readStatusService;
 
 
@@ -80,31 +76,22 @@ public class ChannelServiceImpl implements ChannelService {
     @Transactional(readOnly = true)
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        // 쿼리1
-        List<ReadStatus> readStatusList = readStatusRepository.findAllByUser_Id(userId);
+        List<PrivateChannelWithUserAndLastMessageAtDto> privateChannelDTOBeforeChange = channelRepository.findAllPrivateChannelByUserId(userId);
 
-        // 유저가 참여한 Private 채널 리스트
-        List<Channel> participatingPrivateChannel = readStatusList.stream().map(ReadStatus::getChannel).toList();
+        // Private 채널에 대한 DTO 변환 - 나중에 mapper 수정 후 람다식 적용 ㄱ
+        List<ChannelDto> privateChannelDTOList = privateChannelDTOBeforeChange.stream()
+                .map((dto) -> channelMapper.toDto(dto.channel(), dto.users(), dto.lastMessageAt()))
+                .toList();
 
+        // Public 채널에 대한 DTO 변환
+        List<ChannelDto> publicChannelList = channelRepository.findAllByChannelType(PUBLIC).stream()
+                .map(channelMapper::toDto)
+                .toList();
+
+        // 합치기
         List<ChannelDto> channelDtoList = new ArrayList<>();
-        participatingPrivateChannel.forEach((channel) -> {
-            // 채널별 ReadStauts들 가져오기
-            // 쿼리2
-            Instant lastMessageAt = messageRepository.findTop1ByChannel_IdOrderByCreatedAtDesc(channel.getId())
-                    .map(BaseEntity::getCreatedAt)
-                    .orElse(null);
-
-            // 쿼리3
-            List<User> userList = readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
-                    .map(ReadStatus::getUser).toList();
-            ChannelDto dto = channelMapper.toDto(channel, userList, lastMessageAt);
-            channelDtoList.add(dto);
-        });
-
-        // 쿼리4
-        channelDtoList.addAll(channelRepository.findAllByChannelType(PUBLIC)
-                .stream().map(channelMapper::toDto)
-                .toList());
+        channelDtoList.addAll(privateChannelDTOList);
+        channelDtoList.addAll(publicChannelList);
 
         return channelDtoList;
     }

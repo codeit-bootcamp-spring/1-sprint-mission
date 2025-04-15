@@ -1,18 +1,13 @@
 package com.sprint.mission.repository;
 
 import com.querydsl.core.group.GroupBy;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sprint.mission.dto.response.ChannelDto;
-import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.dto.response.PrivateChannelWithUserAndLastMessageAtDto;
 import com.sprint.mission.entity.main.*;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.sprint.mission.entity.addOn.QReadStatus.readStatus;
 import static com.sprint.mission.entity.main.QChannel.*;
@@ -24,8 +19,7 @@ public class CustomChannelRepositoryImpl implements CustomChannelRepository{
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public List<TestDto> findAllChannelByUserId(UUID userId) {
-
+    public List<PrivateChannelWithUserAndLastMessageAtDto> findAllPrivateChannelByUserId(UUID userId) {
 
         List<Channel> participatingPrivateChannel = jpaQueryFactory
                 .select(readStatus.channel)
@@ -43,9 +37,7 @@ public class CustomChannelRepositoryImpl implements CustomChannelRepository{
                 .transform(GroupBy.groupBy(message.channel.id)
                         .as(message.createdAt.max()));
 
-
         List<UUID> channelIds = participatingPrivateChannel.stream().map(BaseEntity::getId).toList();
-
         Map<UUID, List<User>> channelUserListMap = jpaQueryFactory
                 .from(channel)
                 .join(channel.readStatus, readStatus)
@@ -54,8 +46,13 @@ public class CustomChannelRepositoryImpl implements CustomChannelRepository{
                 .groupBy(channel.id)
                 .transform(GroupBy.groupBy(channel.id).as(GroupBy.list(user)));
 
-
-
+        List<PrivateChannelWithUserAndLastMessageAtDto> dtoList = new ArrayList<>();
+        for (Channel channel : participatingPrivateChannel) {
+            Instant lastMessageInChannel = lastMessageMap.get(channel.getId());
+            List<User> userList = channelUserListMap.get(channel.getId());
+            dtoList.add(new PrivateChannelWithUserAndLastMessageAtDto(channel, userList, lastMessageInChannel));
+        }
+        return dtoList;
     }
 }
 
