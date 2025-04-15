@@ -46,6 +46,9 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### AWS ECS 배포용 환경 변수 파일
+discodeit.env
+
 ### Docker ###
 .env
 .env.*
