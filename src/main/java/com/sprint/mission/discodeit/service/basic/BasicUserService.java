@@ -123,10 +123,6 @@ public class BasicUserService implements UserService {
     String newUsername = userUpdateRequest.newUserName();
     String newEmail = userUpdateRequest.newEmail();
 
-    if (!user.getPassword().equals(userUpdateRequest.password())) {
-      throw InvalidCredentialsException.wrongPassword();
-    }
-
     if (!isValidEmail(newEmail)) {
       throw InvalidEmailException.withEmail(newEmail);
     }
