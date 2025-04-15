@@ -34,6 +34,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     //Actuator 의존성 추가
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    //AWS S3 SDK 의존성 추가
+    implementation 'software.amazon.awssdk:s3:2.31.7'
     runtimeOnly 'org.postgresql:postgresql'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
