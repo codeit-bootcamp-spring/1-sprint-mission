@@ -10,6 +10,7 @@ RUN gradle dependencies --no-daemon || true
 COPY . .
 
 # 빌드 실행 (테스트 생략)
+RUN chmod +x gradlew
 RUN ./gradlew build -PskipTests --no-daemon
 
 # [2] Runtime Stage
