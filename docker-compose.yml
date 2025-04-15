@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT}:80"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+      - JVM_OPTS=${JVM_OPTS}
+      - DB_HOST=postgres
+      - DB_PORT=${POSTGRES_PORT}
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+volumes:
+  postgres-data:
