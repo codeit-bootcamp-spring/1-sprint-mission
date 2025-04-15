@@ -8,7 +8,6 @@ import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.response.ChannelDto;
-import com.sprint.mission.dto.response.PrivateChannelWithUserAndLastMessageAtDto;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.sprint.mission.entity.main.ChannelType.PRIVATE;
 import static com.sprint.mission.entity.main.ChannelType.PUBLIC;
