@@ -7,12 +7,17 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
+import com.sprint.mission.discodeit.exception.user.InvalidEmailException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +25,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -39,16 +44,21 @@ public class BasicUserService implements UserService {
   @Transactional
   @Override
   public UserDto create(UserCreateRequest userCreateRequest, MultipartFile profile) {
-    if (!isValidEmail(userCreateRequest.email())) {
-      throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
+    log.debug("사용자 생성 시작: {}", userCreateRequest);
+
+    String username = userCreateRequest.username();
+    String email = userCreateRequest.email();
+
+    if (!isValidEmail(email)) {
+      throw InvalidEmailException.withEmail(email);
     }
 
-    if (userRepository.existsByUsername((userCreateRequest.username()))) {
-      throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
+    if (userRepository.existsByUsername((username))) {
+      throw UserAlreadyExistsException.withUsername(username);
     }
 
-    if (userRepository.existsByEmail((userCreateRequest.email()))) {
-      throw new IllegalArgumentException("이미 존재하는 사용자 이메일입니다.");
+    if (userRepository.existsByEmail((email))) {
+      throw UserAlreadyExistsException.withEmail(email);
     }
 
     BinaryContent nullableProfile = Optional.ofNullable(profile)
@@ -76,46 +86,57 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
     UserStatus userStatus = new UserStatus(user, Instant.now());
     userStatusRepository.save(userStatus);
+    log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
     return userMapper.toDto(user);
   }
 
   @Transactional(readOnly = true)
   @Override
   public UserDto find(UUID userId) {
+    log.debug("사용자 조회 시작: id={}", userId);
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
+    log.info("사용자 조회 완료: id={}", userId);
     return userMapper.toDto(user);
   }
 
   @Transactional(readOnly = true)
   @Override
   public List<UserDto> findAll() {
-    return userRepository.findAll()
+    log.debug("모든 사용자 조회 시작");
+    List<UserDto> userList = userRepository.findAll()
         .stream()
         .map(userMapper::toDto)
         .toList();
+    log.info("모든 사용자 조회 완료: 총 {}명", userList.size());
+    return userList;
   }
 
   @Transactional
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile profile) {
+    log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
+
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
+
+    String newUsername = userUpdateRequest.newUserName();
+    String newEmail = userUpdateRequest.newEmail();
 
     if (!user.getPassword().equals(userUpdateRequest.password())) {
-      throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+      throw InvalidCredentialsException.wrongPassword();
     }
 
-    if (!isValidEmail(userUpdateRequest.newEmail())) {
-      throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
+    if (!isValidEmail(newEmail)) {
+      throw InvalidEmailException.withEmail(newEmail);
     }
 
-    if (userRepository.existsByUsername(userUpdateRequest.newUserName())) {
-      throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
+    if (userRepository.existsByUsername(newUsername)) {
+      throw UserAlreadyExistsException.withUsername(newUsername);
     }
 
-    if (userRepository.existsByEmail(userUpdateRequest.newEmail())) {
-      throw new IllegalArgumentException("이미 존재하는 사용자 이메일입니다.");
+    if (userRepository.existsByEmail(newEmail)) {
+      throw UserAlreadyExistsException.withEmail(newEmail);
     }
 
     Optional<BinaryContent> newProfile = Optional.ofNullable(profile)
@@ -142,6 +163,7 @@ public class BasicUserService implements UserService {
 
     user.update(userUpdateRequest.newUserName(), userUpdateRequest.newEmail());
     userRepository.save(user);
+    log.info("사용자 수정 완료: id={}", userId);
     return userMapper.toDto(user);
   }
 
@@ -156,17 +178,20 @@ public class BasicUserService implements UserService {
           profileFile.getBytes()
       ));
     } catch (IOException e) {
-      throw new RuntimeException("파일 업로드 중 오류 발생", e);
+      throw new RuntimeException(e);
     }
   }
 
   @Transactional
   @Override
   public void delete(UUID userId) {
+    log.debug("사용자 삭제 시작: id={}", userId);
+
     userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
 
     userRepository.deleteById(userId);
+    log.info("사용자 삭제 완료: id={}", userId);
   }
 
   private boolean isValidEmail(String email) {

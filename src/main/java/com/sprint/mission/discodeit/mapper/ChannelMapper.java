@@ -7,9 +7,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface ChannelMapper {
-
-  @Mapping(target = "channelId", source = "channel.id")
+  
   ChannelDto toDto(Channel channel);
-
 
 }

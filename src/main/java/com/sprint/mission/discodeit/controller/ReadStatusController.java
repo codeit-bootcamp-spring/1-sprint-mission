@@ -16,13 +16,13 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/read-status")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class ReadStatusController {
 
   private final ReadStatusService readStatusService;
 
-  @PostMapping(value = "")
+  @PostMapping(value = "/readStatuses")
   public ResponseEntity<ReadStatusDto> createReadStatus(
       @Valid @RequestBody ReadStatusCreateRequest request) {
     log.info("읽음 상태 생성 요청: {}", request);
@@ -31,7 +31,7 @@ public class ReadStatusController {
     return ResponseEntity.status(HttpStatus.CREATED).body(createReadStatus);
   }
 
-  @PutMapping(value = "/{readStatusId}")
+  @PutMapping(value = "/readStatuses/{readStatusId}")
   public ResponseEntity<ReadStatusDto> updateReadStatus(
       @PathVariable("readStatusId") UUID readStatusId,
       @Valid @RequestBody ReadStatusUpdateRequest request) {
@@ -41,9 +41,9 @@ public class ReadStatusController {
     return ResponseEntity.status(HttpStatus.OK).body(updateReadStatus);
   }
 
-  @GetMapping(value = "/{userId}")
+  @GetMapping(value = "/readStatuses")
   public ResponseEntity<List<ReadStatusDto>> getUserReadStatuses(
-      @PathVariable("userId") UUID userId) {
+      @RequestParam("userId") UUID userId) {
     log.info("사용자별 읽음 상태 목록 조회 요청: userId={}", userId);
     List<ReadStatusDto> readStatusList = readStatusService.findAllByUserId(userId);
     log.debug("사용자별 읽음 상태 목록 조회 응답: count={}", readStatusList.size());
