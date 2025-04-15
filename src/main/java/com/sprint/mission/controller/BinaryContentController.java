@@ -6,11 +6,9 @@ import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.binary.BinaryContentStorage;
-import com.sprint.mission.service.jcf.serviceImpl.BinaryServiceImpl;
-
+import com.sprint.mission.service.BinaryService;
 import java.util.List;
 import java.util.UUID;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -33,7 +31,7 @@ import static org.springframework.http.HttpStatus.*;
 @Tag(name = "BinaryContent", description = "첨부 파일 API")
 public class BinaryContentController {
 
-    private final BinaryServiceImpl binaryContentService;
+    private final BinaryService binaryContentService;
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
 

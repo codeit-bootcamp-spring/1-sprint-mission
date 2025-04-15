@@ -7,12 +7,9 @@ import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.dto.response.ReadStatusDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
-import com.sprint.mission.repository.UserRepository;
-import com.sprint.mission.service.jcf.serviceImpl.ReadStatusServiceImpl;
-
+import com.sprint.mission.service.ReadStatusService;
 import java.util.List;
 import java.util.UUID;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -37,9 +34,7 @@ import static org.springframework.http.HttpStatus.*;
 @Tag(name = "ReadStatus", description = "Message 읽음 상태 API")
 public class ReadStatusController {
 
-    // 카피
-    private final ReadStatusServiceImpl readStatusService;
-    private final UserRepository userRepository;
+    private final ReadStatusService readStatusService;
     private final ReadStatusMapper readStatusMapper;
 
 

@@ -15,6 +15,7 @@ import java.util.UUID;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
     void deleteAllByChannel(Channel channel);
+
     @EntityGraph(attributePaths = {"user", "channel", "user.profile", "user.status"})
     List<ReadStatus> findAllByUser_Id(UUID userId);
 

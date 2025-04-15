@@ -5,12 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/QuerydslFactory.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepositoryImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/TestDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/supporter/ChannelServiceSupporter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/repository/BinaryRepoTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/repository/ChannelRepoTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/repository/MessageRepoTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/repository/ReadStatusRepoTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/BinaryServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ReadStatusServiceTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/common/exception/ErrorCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/common/exception/ErrorCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/BinaryContentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/BinaryContentController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ChannelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ChannelController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ReadStatusController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ReadStatusController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/ChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/ChannelDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/javaApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ChannelRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ReadStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ReadStatusRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/JCFMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/JCFMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/BasicAuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/BasicAuthServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/ChannelServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/ChannelServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/MessageServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/MessageServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/util/ReflectionFieldSetter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/util/ReflectionFieldSetter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,111 +124,111 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Downloaded.Files.Path.Enabled": "false",
-    "Gradle.1-sprint-mission [build].executor": "Run",
-    "Gradle.1-sprint-mission [clean].executor": "Run",
-    "Gradle.Build 1-sprint-mission.executor": "Run",
-    "Gradle.Download Sources.executor": "Run",
-    "JUnit.AllChannel.testAllChannel.executor": "Run",
-    "JUnit.AllChannel.testAllChannelWithEntityGraph.executor": "Run",
-    "JUnit.AnnotationTest.toStringTest.executor": "Run",
-    "JUnit.AssertJTest.descriptionTest.executor": "Run",
-    "JUnit.AssertJTest.exceptionTest.executor": "Run",
-    "JUnit.AssertJTest.usingAssertJ.executor": "Run",
-    "JUnit.ChannelCascadeTest.deleteChannel.executor": "Run",
-    "JUnit.ChannelServiceTest.createPrivateChannelFail.executor": "Run",
-    "JUnit.ChannelServiceTest.createPrivateChannelSuccess.executor": "Run",
-    "JUnit.ChannelServiceTest.createPublicChannelSuccess.executor": "Run",
-    "JUnit.ChannelServiceTest.deleteSuccess.executor": "Run",
-    "JUnit.ChannelServiceTest.executor": "Run",
-    "JUnit.ChannelServiceTest.findByIdFail.executor": "Run",
-    "JUnit.ChannelServiceTest.findByIdSuccess.executor": "Run",
-    "JUnit.ChannelServiceTest.updatePrivateChannelFail.executor": "Run",
-    "JUnit.ChannelServiceTest.updatePrivateChannelSuccess.executor": "Run",
-    "JUnit.ChannelTest.createChannelService.executor": "Run",
-    "JUnit.ChannelTest.createPrivateService.executor": "Run",
-    "JUnit.ChannelTest.createPublicService.executor": "Run",
-    "JUnit.JUnitTest.usingAssertJ.executor": "Run",
-    "JUnit.MapperTest.channelTypeTest.executor": "Run",
-    "JUnit.MapperTest.privateChannelTypeTest.executor": "Run",
-    "JUnit.MessageCascadeTest.cascade.executor": "Run",
-    "JUnit.MessageServiceTest.createSuccess.executor": "Run",
-    "JUnit.MessageTest.createMessage.executor": "Run",
-    "JUnit.MessageTest.setting.executor": "Run",
-    "JUnit.MessageTest.updateMessage.executor": "Run",
-    "JUnit.MockUserTest.userEqualsHashCodeTest.executor": "Run",
-    "JUnit.StatusTest.testReadStatus.executor": "Run",
-    "JUnit.ToString.test.executor": "Run",
-    "JUnit.UserJpaTest.createTest.executor": "Run",
-    "JUnit.UserJpaTest.executor": "Run",
-    "JUnit.UserJpaTest.saveTest.executor": "Run",
-    "JUnit.UserRepoTest.executor": "Run",
-    "JUnit.UserRepoTest.findByIdTest.executor": "Run",
-    "JUnit.UserRepoTest.userEqualsHashCodeTest.executor": "Run",
-    "JUnit.UserServiceTest.delete.executor": "Run",
-    "JUnit.UserServiceTest.duplicateTest.executor": "Run",
-    "JUnit.UserServiceTest.executor": "Run",
-    "JUnit.UserServiceTest.isDuplicateEmail.executor": "Run",
-    "JUnit.UserServiceTest.isDuplicateName.executor": "Run",
-    "JUnit.UserStatusRepoTest.create.executor": "Run",
-    "JUnit.UserStatusRepoTest.executor": "Run",
-    "JUnit.UserStatusRepoTest.findByUserFail.executor": "Run",
-    "JUnit.UserTest.cascadeUserAndUserStatusTest.executor": "Run",
-    "JUnit.UserTest.createTest.executor": "Run",
-    "JUnit.UserTest.delete.executor": "Run",
-    "JUnit.UserTest.duplicateNameTest.executor": "Run",
-    "JUnit.UserTest.duplicateUserTest.executor": "Run",
-    "JUnit.UserTest.executor": "Run",
-    "JUnit.UserTest.find.executor": "Run",
-    "JUnit.UserTest.findAll.executor": "Run",
-    "JUnit.UserTest.findAllWithStatusTest.executor": "Run",
-    "JUnit.UserTest.findStatusMap.executor": "Run",
-    "JUnit.UserTest.setUp.executor": "Run",
-    "JUnit.UserTest.setUpTest.executor": "Run",
-    "JUnit.UserTest.update.executor": "Run",
-    "JUnit.UserTest.updateUser.executor": "Run",
-    "JUnit.UserTest.userEqualsHashCodeTest.executor": "Run",
-    "JUnit.UserTest.userNotHashCode.executor": "Run",
-    "JUnit.UserUserStatusCascadeTest.userAndProfile.executor": "Run",
-    "JUnit.UserUserStatusCascadeTest.userAndUserStatus.executor": "Run",
-    "Repository.Attach.Annotations": "false",
-    "Repository.Attach.JavaDocs": "false",
-    "Repository.Attach.Sources": "false",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.DiscodeitApplication.executor": "Debug",
-    "git-widget-placeholder": "part2-이요한-sprint7-Infra",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/icb16/IdeaProjects/1-sprint-mission/src/test/resources",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.28965518",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "two.files.diff.last.used.file": "C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
+    &quot;Gradle.1-sprint-mission [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.1-sprint-mission [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build 1-sprint-mission.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AllChannel.testAllChannel.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AllChannel.testAllChannelWithEntityGraph.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AnnotationTest.toStringTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AssertJTest.descriptionTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AssertJTest.exceptionTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AssertJTest.usingAssertJ.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelCascadeTest.deleteChannel.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.createPrivateChannelFail.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.createPrivateChannelSuccess.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.createPublicChannelSuccess.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.deleteSuccess.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.findByIdFail.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.findByIdSuccess.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.updatePrivateChannelFail.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.updatePrivateChannelSuccess.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelTest.createChannelService.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelTest.createPrivateService.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelTest.createPublicService.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.JUnitTest.usingAssertJ.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MapperTest.channelTypeTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MapperTest.privateChannelTypeTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageCascadeTest.cascade.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageServiceTest.createSuccess.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageTest.createMessage.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageTest.setting.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageTest.updateMessage.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MockUserTest.userEqualsHashCodeTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.StatusTest.testReadStatus.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ToString.test.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserJpaTest.createTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserJpaTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserJpaTest.saveTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserRepoTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserRepoTest.findByIdTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserRepoTest.userEqualsHashCodeTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceTest.delete.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceTest.duplicateTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceTest.isDuplicateEmail.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceTest.isDuplicateName.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserStatusRepoTest.create.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserStatusRepoTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserStatusRepoTest.findByUserFail.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.cascadeUserAndUserStatusTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.createTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.delete.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.duplicateNameTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.duplicateUserTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.find.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.findAll.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.findAllWithStatusTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.findStatusMap.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.setUp.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.setUpTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.update.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.updateUser.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.userEqualsHashCodeTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserTest.userNotHashCode.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserUserStatusCascadeTest.userAndProfile.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserUserStatusCascadeTest.userAndUserStatus.executor&quot;: &quot;Run&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.DiscodeitApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;part2-이요한-sprint7-Infra&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/icb16/IdeaProjects/1-sprint-mission/src/test/resources&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.28965518&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;two.files.diff.last.used.file&quot;: &quot;C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql",
-      "mysql_aurora",
-      "h2"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;,
+      &quot;mysql_aurora&quot;,
+      &quot;h2&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.sprint.mission.service.jcf.main" />
@@ -240,7 +259,7 @@
       <recent name="com.sprint.mission.dto.mappedDto" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ChannelServiceTest">
+  <component name="RunManager" selected="Spring Boot.DiscodeitApplication">
     <configuration name="ChannelService" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
@@ -329,16 +348,15 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="JUnit.ChannelService" />
       <item itemvalue="JUnit.ChannelService.createPublicChannelSuccess" />
       <item itemvalue="JUnit.ChannelService.deleteSuccess" />
       <item itemvalue="JUnit.ChannelService.findByIdFail" />
       <item itemvalue="JUnit.ChannelService.findByIdSuccess" />
-      <item itemvalue="JUnit.ChannelServiceTest" />
       <item itemvalue="Spring Boot.DiscodeitApplication" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ChannelServiceTest" />
         <item itemvalue="JUnit.ChannelService.createPublicChannelSuccess" />
         <item itemvalue="JUnit.ChannelService.findByIdSuccess" />
         <item itemvalue="JUnit.ChannelService.findByIdFail" />
@@ -489,7 +507,9 @@
       <workItem from="1744525940158" duration="852000" />
       <workItem from="1744545622714" duration="30000" />
       <workItem from="1744624163687" duration="826000" />
-      <workItem from="1744636985114" duration="9320000" />
+      <workItem from="1744636985114" duration="10293000" />
+      <workItem from="1744686985594" duration="2314000" />
+      <workItem from="1744689536190" duration="4535000" />
     </task>
     <servers />
   </component>

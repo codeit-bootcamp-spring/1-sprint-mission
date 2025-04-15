@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class BasicAuthService implements AuthService {
+public class BasicAuthServiceImpl implements AuthService {
 
   private final UserRepository userRepository;
 

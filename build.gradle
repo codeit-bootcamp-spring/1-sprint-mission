@@ -61,6 +61,12 @@ dependencies {
 	annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
 	runtimeOnly 'org.postgresql:postgresql'
 
+	//querydsl
+	implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+
 	// 테스트 코드에서도 MapStruct를 사용할 경우 추가
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
 	testImplementation "org.mockito:mockito-core:5.16.1"  // Mockito 라이브러리
@@ -70,6 +76,17 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+def querydslDir = "build/generated/querydsl"
+
+tasks.withType(JavaCompile) {
+	options.generatedSourceOutputDirectory = file(querydslDir)
+}
+
+clean {
+	delete file(querydslDir)
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
+

@@ -19,6 +19,7 @@ import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 
 import com.sprint.mission.service.MessageService;
+import com.sprint.mission.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class ChannelServiceImpl implements ChannelService {
     private final MessageService messageService;
     private final ChannelMapper channelMapper;
     private final MessageRepository messageRepository;
-    private final ReadStatusServiceImpl readStatusService;
+    private final ReadStatusService readStatusService;
 
 
     @Override
@@ -81,6 +82,7 @@ public class ChannelServiceImpl implements ChannelService {
     public List<ChannelDto> findAllByUserId(UUID userId) {
         // 쿼리1
         List<ReadStatus> readStatusList = readStatusRepository.findAllByUser_Id(userId);
+
         // 유저가 참여한 Private 채널 리스트
         List<Channel> participatingPrivateChannel = readStatusList.stream().map(ReadStatus::getChannel).toList();
 
@@ -95,7 +97,8 @@ public class ChannelServiceImpl implements ChannelService {
             // 쿼리3
             List<User> userList = readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
                     .map(ReadStatus::getUser).toList();
-            channelDtoList.add(channelMapper.toDto(channel, userList, lastMessageAt));
+            ChannelDto dto = channelMapper.toDto(channel, userList, lastMessageAt);
+            channelDtoList.add(dto);
         });
 
         // 쿼리4
