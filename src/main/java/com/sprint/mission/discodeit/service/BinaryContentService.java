@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 
 import jakarta.transaction.Transactional;
-import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
