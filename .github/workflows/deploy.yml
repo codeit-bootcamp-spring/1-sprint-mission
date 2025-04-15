@@ -52,8 +52,8 @@ jobs:
       - name: Stop current ECS service
         run: |
           aws ecs update-service \
-            --cluster ${{ vars.ECS_CLUSTER_NAME }} \
-            --service ${{ vars.ECS_SERVICE_NAME }} \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
             --desired-count 0 \
             --region ${{ vars.AWS_REGION }}
 
@@ -61,6 +61,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ecs/task-definition.json
-          cluster: ${{ vars.ECS_CLUSTER_NAME }}
-          service: ${{ vars.ECS_SERVICE_NAME }}
+          cluster: ${{ vars.ECS_CLUSTER }}
+          service: ${{ vars.ECS_SERVICE }}
           wait-for-service-stability: true # 배포 안정화 확인 (헬스체크 통과 시까지 대기)
