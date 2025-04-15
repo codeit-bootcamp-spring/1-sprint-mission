@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -36,67 +35,50 @@ public class UserController implements UserApi {
   public ResponseEntity<UserDto> createUser(
       @Valid @RequestPart(value = "userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "binaryContent", required = false) MultipartFile file) {
-
     /* 유저 생성 요청(Request) */
     log.info("유저 생성 요청(Request): username={}, hasProfileImage={}",
         userCreateRequest.username(),
         file != null);
-
     // 프로필 이미지 처리
     Optional<BinaryContentCreateRequest> profileRequest =
         Optional.ofNullable(file).flatMap(this::resolveProfileRequest);
 
     if (profileRequest.isPresent()) {
-      log.debug("프로필 이미지 생성 : filename={}, size={}, contentType={}",
-          file.getName(),
-          file.getSize(),
-          file.getContentType());
+      log.debug("프로필 이미지 생성 : {}", profileRequest);
     }
-
     // 유저 생성
     UserDto userDto = userService.createUser(userCreateRequest, profileRequest);
     /* 유저 생성 응답(Response) */
-    log.info("유저 생성 응답(Response): username={}, HttpStatus={} ",
-        userDto.username(),
-        HttpStatus.CREATED);
+    log.debug("유저 생성 응답(Response) {}", userDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
+  public ResponseEntity<UserDto> updateUser(
+      @PathVariable UUID userId,
       @Valid @RequestPart(value = "userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile file) {
+      @RequestPart(value = "profile", required = false) MultipartFile file
+  ) {
     log.info(
-        "유저 수정 요청(Request): usernameChanged={}, emailChanged={}, passwordChanged={}, hasProfileImage={}",
-        userUpdateRequest.newUsername() != null,
-        userUpdateRequest.newEmail() != null,
-        userUpdateRequest.newPassword() != null,
-        file != null && !file.isEmpty()
+        "유저 수정 요청(Request): userId={}, userUpdateRequest={}", userId, userUpdateRequest
     );
-
     // 새로운 프로필 이미지 처리
     Optional<BinaryContentCreateRequest> profileRequest =
         Optional.ofNullable(file).flatMap(this::resolveProfileRequest);
-
     if (profileRequest.isPresent()) {
-      log.debug("프로필 이미지 생성 : filename={}, size={}, contentType={}",
-          file.getName(),
-          file.getSize(),
-          file.getContentType());
+      log.debug("프로필 이미지 생성 : {}", profileRequest);
     }
-
     // 유저 수정
     UserDto userDto = userService.updateUserInfo(userId, userUpdateRequest, profileRequest);
-    log.info("유저 수정 응답(Response): username={}, HttpStatus={} ",
-        userDto.username(),
-        HttpStatus.OK);
-    return ResponseEntity.ok(userDto);
+    log.debug("유저 수정 응답(Response) {}", userDto);
+    return ResponseEntity.status(HttpStatus.OK).body(userDto);
 
   }
 
 
   @PatchMapping(value = "/{userId}/userStatus")
-  public ResponseEntity<UserStatusDto> updateUserStateByUserId(@PathVariable UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStateByUserId(
+      @PathVariable UUID userId,
       @RequestBody UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
 
     // 유저 상태 수정

@@ -57,6 +57,8 @@ public class BasicUserService implements UserService {
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
     log.info("사용자 생성 시도: username={}", userCreateRequest.username());
+    log.debug("사용자 생성 시도: userCreateRequest={}, optionalProfileCreateRequest={}", userCreateRequest,
+        optionalProfileCreateRequest);
 
     // username과 email이 다른 유저와 같이 겹치는지 검증
     if (userRepository.existsByUsername(userCreateRequest.username())) {
@@ -105,13 +107,8 @@ public class BasicUserService implements UserService {
         .user(user)
         .lastActiveAt(Instant.now())
         .build();
-    userStatusRepository.save(userStatus);
+    userStatus = userStatusRepository.save(userStatus);
 
-    /** 멘토님 궁금한 점 있습니다!!!
-     * base 7 코드에서는 user에  userStatus를 지정하지 않던데
-     * 저는 위와 같이 했을 때 toDto 쪽에서 문제가 생기던데,
-     * 코드를 어떻게 이해보면 될까요?
-     * **/
     user.updateUserStatus(userStatus);
 
     /* 중복이 없는 유저 이름과 만들어진 시각을 log.info에 담는다.*/

@@ -96,10 +96,10 @@ public class MessageController implements MessageApi {
 
   @GetMapping
   public ResponseEntity<PageResponse<MessageDto>> getMessageByChannelId(
-      @RequestParam("messageId") UUID channelId,
+      @RequestParam("channelId") UUID channelId,
       @RequestParam(defaultValue = "0") int page, // 0페이지 부터
       @RequestParam(defaultValue = "50") int size, // 50개씩
-      @RequestParam(defaultValue = "createDate") String sortBy, // 정렬 기준
+      @RequestParam(defaultValue = "createdAt") String sortBy, // 정렬 기준
       @RequestParam(defaultValue = "desc") String direction) { // 내림차순 --> 최신 것부터
     // PageRequest.of(page, size, sort)
     // 0, 10, Sort.by("orderDate").descending()

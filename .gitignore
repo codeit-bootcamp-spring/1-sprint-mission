@@ -43,7 +43,8 @@ bin/
 
 ### 환경변수 ###
 .env
-.env.forPR
+forPR.env
+discodeit.env
 
 ...
 .idea

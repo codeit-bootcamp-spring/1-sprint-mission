@@ -94,6 +94,8 @@ public class BasicMessageService implements MessageService {
     log.info("메세지 생성 시도 성공: messageContent={}, createdAt={}",
         message.getContent(),
         message.getCreatedAt());
+    log.info("메세지 생성 시도 성공: messageID={}",
+        message.getId());
     return messageMapper.toDto(message);
   }
 
