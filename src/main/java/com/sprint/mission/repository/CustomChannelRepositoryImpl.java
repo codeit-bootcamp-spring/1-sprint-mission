@@ -2,6 +2,8 @@ package com.sprint.mission.repository;
 
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sprint.mission.dto.ChannelMapper;
+import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.dto.response.PrivateChannelWithUserAndLastMessageAtDto;
 import com.sprint.mission.entity.main.*;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +20,9 @@ import static com.sprint.mission.entity.main.QUser.*;
 public class CustomChannelRepositoryImpl implements CustomChannelRepository{
 
     private final JPAQueryFactory jpaQueryFactory;
+    private final ChannelMapper channelMapper;
 
-    public List<PrivateChannelWithUserAndLastMessageAtDto> findAllPrivateChannelByUserId(UUID userId) {
+    public List<ChannelDto> findAllPrivateChannelByUserId(UUID userId) {
 
         List<Channel> participatingPrivateChannel = jpaQueryFactory
                 .select(readStatus.channel)
@@ -52,7 +55,10 @@ public class CustomChannelRepositoryImpl implements CustomChannelRepository{
             List<User> userList = channelUserListMap.get(channel.getId());
             dtoList.add(new PrivateChannelWithUserAndLastMessageAtDto(channel, userList, lastMessageInChannel));
         }
-        return dtoList;
+
+        return dtoList.stream()
+                .map(dto -> channelMapper.toDto(dto.channel(), dto.users(), dto.lastMessageAt()))
+                .toList();
     }
 }
 

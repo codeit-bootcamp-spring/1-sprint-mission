@@ -76,12 +76,9 @@ public class ChannelServiceImpl implements ChannelService {
     @Transactional(readOnly = true)
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        List<PrivateChannelWithUserAndLastMessageAtDto> privateChannelDTOBeforeChange = channelRepository.findAllPrivateChannelByUserId(userId);
 
         // Private 채널에 대한 DTO 변환 - 나중에 mapper 수정 후 람다식 적용 ㄱ
-        List<ChannelDto> privateChannelDTOList = privateChannelDTOBeforeChange.stream()
-                .map((dto) -> channelMapper.toDto(dto.channel(), dto.users(), dto.lastMessageAt()))
-                .toList();
+        List<ChannelDto> privateChannelDTOList = channelRepository.findAllPrivateChannelByUserId(userId);
 
         // Public 채널에 대한 DTO 변환
         List<ChannelDto> publicChannelList = channelRepository.findAllByChannelType(PUBLIC).stream()

@@ -5,16 +5,22 @@ package com.sprint.mission.unit.service;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.dto.ChannelMapper;
+import com.sprint.mission.dto.UserMapper;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
+import com.sprint.mission.dto.response.ChannelDto;
+import com.sprint.mission.dto.response.PrivateChannelWithUserAndLastMessageAtDto;
+import com.sprint.mission.dto.response.UserDto;
 import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.ReadStatusService;
 import com.sprint.mission.service.jcf.serviceImpl.ChannelServiceImpl;
 import com.sprint.mission.unit.util.ReflectionFieldSetter;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,12 +29,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.sprint.mission.entity.main.ChannelType.*;
 import static org.assertj.core.api.Assertions.*;
@@ -39,6 +43,8 @@ import static org.springframework.test.util.ReflectionTestUtils.*;
 public class ChannelServiceTest {
 
     private final ReflectionFieldSetter reflectionFieldSetter = new ReflectionFieldSetter();
+
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @Spy
     private ChannelMapper channelMapper = Mappers.getMapper(ChannelMapper.class);
@@ -82,8 +88,7 @@ public class ChannelServiceTest {
         PrivateChannelCreateDTO requestDTO = new PrivateChannelCreateDTO(userIdList);
         when(channelRepository.save(any(Channel.class))).thenAnswer(invocation -> {
                     Channel savedChannel = invocation.getArgument(0);
-                    setField(savedChannel, "id", UUID.randomUUID());
-                    setField(savedChannel, "createdAt", Instant.now());
+                    reflectionFieldSetter.settingFieldValue(savedChannel);
                     return savedChannel;
                 }
         );
@@ -109,8 +114,7 @@ public class ChannelServiceTest {
         PrivateChannelCreateDTO requestDTO = new PrivateChannelCreateDTO(userIdList);
         when(channelRepository.save(any(Channel.class))).thenAnswer(invocation -> {
                     Channel savedChannel = invocation.getArgument(0);
-                    setField(savedChannel, "id", UUID.randomUUID());
-                    setField(savedChannel, "createdAt", Instant.now());
+                    reflectionFieldSetter.settingFieldValue(savedChannel);
                     return savedChannel;
                 }
         );
@@ -172,9 +176,49 @@ public class ChannelServiceTest {
     }
 
     @Test
-    @DisplayName("UserId로 채널리스트 조회 성공")
-    void findAllByUserIdSuccess(){
+    @DisplayName("특정 유저가 접근 할 수 있는 모든 채널 조회 성공")
+    void findAllByUserIdSuccess() {
+        // given
+        int userCount = 20;
+        List<UserDto> userList = new ArrayList<>();
+        for (int i = 0; i < userCount; i++) {
+            User user = new User("testUser" + i, "testPassword", "testEmail" + i, null);
+            reflectionFieldSetter.settingFieldValue(user);
+            userList.add(userMapper.toDto(user));
+        }
 
+        int privateChannelCount = 4;
+        List<ChannelDto> privateChannelList = new ArrayList<>();
+        for (int i = 0; i < privateChannelCount; i++) {
+            privateChannelList.add(new ChannelDto(
+                    UUID.randomUUID(), PRIVATE, null, null, userList, Instant.now()));
+        }
+
+        List<Channel> publicChannelList = new ArrayList<>();
+        int publicChannelCount = 5;
+        for (int i = 0; i < publicChannelCount; i++) {
+            Channel publicChannel = new Channel("testChannel" + i, "testChannelName" + i, PUBLIC);
+            reflectionFieldSetter.settingFieldValue(publicChannel);
+            publicChannelList.add(publicChannel);
+        }
+
+        when(channelRepository.findAllPrivateChannelByUserId(any(UUID.class))).thenReturn(privateChannelList);
+        when(channelRepository.findAllByChannelType(any())).thenReturn(publicChannelList);
+
+
+        // when
+        List<ChannelDto> allChannels = channelService.findAllByUserId(UUID.randomUUID());
+        List<ChannelDto> privateChannels = allChannels.stream().filter(channelDto -> channelDto.channelType().equals(PRIVATE)).toList();
+        List<ChannelDto> publicChannels = allChannels.stream().filter(channelDto -> channelDto.channelType().equals(PUBLIC)).toList();
+
+        // then
+        assertThat(allChannels).isNotEmpty();
+        assertThat(privateChannels.size()).isEqualTo(privateChannelCount);
+        assertThat(publicChannels.size()).isEqualTo(publicChannelCount);
+        assertThat(allChannels.size()).isEqualTo(privateChannelCount + publicChannelCount);
+
+        privateChannels.forEach(channelDto ->
+                assertThat(channelDto.participants()).isNotEmpty());
     }
 
 
