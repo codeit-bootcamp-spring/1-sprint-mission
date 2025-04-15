@@ -97,10 +97,13 @@ public class BasicChannelService implements ChannelService {
     userRepository.findById(userId).orElseThrow(() -> {
       return new UserNotFoundException(Map.of("userId", userId));
     });
-    List<Channel> channels = readStatusService.findAllReadStatusEntitiesByUserId(userId).stream()
+    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
         .map(ReadStatus::getChannel)
+        .map(Channel::getId)
         .toList();
-    return channels.stream()
+
+    return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
+        .stream()
         .map(channelMapper::toDto)
         .toList();
   }
@@ -154,10 +157,11 @@ public class BasicChannelService implements ChannelService {
     String keyword = inputHandler.getYesNOInput().toLowerCase();
     if (keyword.equals("y")) {
 
-      if (channelRepository.findById(id).isEmpty()) {
-        log.error("채널 삭제 단계에서 채널을 찾지 못함: channelId={}", id);
-        throw new ChannelNotFoundException(Map.of("channelId", id));
-      }
+      channelRepository.findById(id)
+          .orElseThrow(() -> {
+            log.error("채널 수정 단계에서 채널을 찾지 못함: channelId={}", id);
+            return new ChannelNotFoundException(Map.of("id", id));
+          });
 
       log.info("채널 메세지 삭제");
       // 채널 메세지 삭제
