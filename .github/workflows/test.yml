@@ -1,7 +1,7 @@
 name: Run Tests
 
 on:
-  pull_request:
+  push: # 테스트, 일시적으로 push 로 변경
     branches:
       - part2-김경린
 
