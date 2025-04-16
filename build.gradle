@@ -62,9 +62,6 @@ dependencies {
     // Spring Boot Test 의존성
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    // Mockito 의존성
-    implementation "org.mockito:mockito-core:4.6.1"
-
     // JUnit 플랫폼 런처 (JUnit 테스트 실행)
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 

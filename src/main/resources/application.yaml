@@ -8,13 +8,12 @@ spring:
   jpa:
     show-sql: true
 
-
   servlet:
     multipart:
       max-file-size: 10MB # 파일 하나의 최대 크기
-      max-request-size: 20MB # 한 벙네 최대 업로드 가능 용량
+      max-request-size: 20MB # 한 번에 최대 업로드 가능 용량
   profiles:
-    active: test
+    active: ${SPRING_PROFILES_ACTIVE:test}
 
 discodeit:
   storage:
@@ -56,12 +55,9 @@ info:
     java-version: 17
     spring-boot-version: 3.4.0
 
-  jpa:
-    ddl-auto: validate
-
-  multipart:
-    max-file-size: 10MB
-    max-request-size: 20MB
+  datasource:
+    url: ${spring.datasource.url}
+    driver-class-name: ${spring.datasource.driver-class-name}
 
 
 springdoc:

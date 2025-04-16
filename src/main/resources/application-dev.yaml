@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:devDB
+    url: jdbc:h2:mem:devDB;MODE=PostgreSQL # PostgreSQL 호환 모드 추가
     username: devUser
     password: devPass
     driver-class-name: org.h2.Driver  # 명시적으로 드라이버 클래스 지정
