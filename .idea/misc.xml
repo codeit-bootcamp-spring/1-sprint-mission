@@ -3,6 +3,7 @@
   <component name="EntryPointsManager">
     <writeAnnotations>
       <writeAnnotation name="jakarta.persistence.OneToMany" />
+      <writeAnnotation name="org.testcontainers.junit.jupiter.Container" />
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />

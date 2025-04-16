@@ -5,12 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepositoryImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/ChannelServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/serviceImpl/ChannelServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/supporter/ChannelServiceSupporter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/binary/S3BinaryContentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/binary/S3BinaryContentStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/storage/s3/AWSS3Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/storage/s3/AWSS3Test.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/application-test.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,12 +64,12 @@
     &quot;assignee&quot;: &quot;ARlegro&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/codeit-bootcamp-spring/1-sprint-mission.git",
-    "accountId": "c3b7675d-cb84-4590-9844-f892f30550c4"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/codeit-bootcamp-spring/1-sprint-mission.git&quot;,
+    &quot;accountId&quot;: &quot;c3b7675d-cb84-4590-9844-f892f30550c4&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.tomcat.embed/tomcat-embed-core/10.1.36/3ccaa558e32e317e35d6674d65d7d9aa182e082f/tomcat-embed-core-10.1.36.jar!/jakarta/servlet/http/HttpServlet.class" root0="SKIP_INSPECTION" />
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot/3.3.9/4b45bffd62ba7604dae62bfb356fe5b7a405d354/spring-boot-3.3.9.jar!/org/springframework/boot/context/properties/ConfigurationProperties.class" root0="SKIP_INSPECTION" />
@@ -94,6 +96,9 @@
   <component name="PackageJsonUpdateNotifier">
     <dismissed value="$PROJECT_DIR$/react-project/package.json" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
+  </component>
   <component name="ProjectColorInfo">{
     &quot;associatedIndex&quot;: 6
     }</component>
@@ -112,6 +117,8 @@
     "Gradle.1-sprint-mission [clean].executor": "Run",
     "Gradle.Build 1-sprint-mission.executor": "Run",
     "Gradle.Download Sources.executor": "Run",
+    "JUnit.AWSS3Test.downLoadFile.executor": "Run",
+    "JUnit.AWSS3Test.uploadFile.executor": "Run",
     "JUnit.AllChannel.testAllChannel.executor": "Run",
     "JUnit.AllChannel.testAllChannelWithEntityGraph.executor": "Run",
     "JUnit.AnnotationTest.toStringTest.executor": "Run",
@@ -241,7 +248,39 @@
       <recent name="com.sprint.mission.dto.mappedDto" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ChannelServiceTest.findAllByUserIdSuccess">
+  <component name="RunManager" selected="JUnit.AWSS3Test.downLoadFile">
+    <configuration name="AWSS3Test.downLoadFile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.storage.s3.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.storage.s3" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.storage.s3.AWSS3Test" />
+      <option name="METHOD_NAME" value="downLoadFile" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AWSS3Test.uploadFile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.storage.s3.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.storage.s3" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.storage.s3.AWSS3Test" />
+      <option name="METHOD_NAME" value="uploadFile" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="ChannelServiceTest.findAllByUserIdSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
@@ -274,38 +313,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ChannelService.deleteSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.unit.service.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.service" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.service.ChannelService" />
-      <option name="METHOD_NAME" value="deleteSuccess" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ChannelService.findByIdFail" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="discodeit.test" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.sprint.mission.unit.service.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.service" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.service.ChannelService" />
-      <option name="METHOD_NAME" value="findByIdFail" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="ChannelService.findByIdSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
@@ -331,20 +338,20 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="JUnit.AWSS3Test.downLoadFile" />
+      <item itemvalue="JUnit.AWSS3Test.uploadFile" />
       <item itemvalue="JUnit.ChannelServiceTest.findAllByUserIdSuccess" />
       <item itemvalue="JUnit.ChannelService.createPublicChannelSuccess" />
-      <item itemvalue="JUnit.ChannelService.deleteSuccess" />
-      <item itemvalue="JUnit.ChannelService.findByIdFail" />
       <item itemvalue="JUnit.ChannelService.findByIdSuccess" />
       <item itemvalue="Spring Boot.DiscodeitApplication" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.AWSS3Test.downLoadFile" />
+        <item itemvalue="JUnit.AWSS3Test.uploadFile" />
         <item itemvalue="JUnit.ChannelServiceTest.findAllByUserIdSuccess" />
         <item itemvalue="JUnit.ChannelService.createPublicChannelSuccess" />
         <item itemvalue="JUnit.ChannelService.findByIdSuccess" />
-        <item itemvalue="JUnit.ChannelService.findByIdFail" />
-        <item itemvalue="JUnit.ChannelService.deleteSuccess" />
       </list>
     </recent_temporary>
   </component>
@@ -494,6 +501,8 @@
       <workItem from="1744636985114" duration="10293000" />
       <workItem from="1744686985594" duration="2314000" />
       <workItem from="1744689536190" duration="5199000" />
+      <workItem from="1744769886070" duration="312000" />
+      <workItem from="1744776066971" duration="8373000" />
     </task>
     <servers />
   </component>

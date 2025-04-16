@@ -23,13 +23,16 @@ public class CustomChannelRepositoryImpl implements CustomChannelRepository {
 
     public List<ChannelDto> findAllPrivateChannelByUserId(UUID userId) {
 
+        // 쿼리1
         List<Channel> participatingPrivateChannel = getParticipatingPrivateChannel(userId);
         if (participatingPrivateChannel.isEmpty()) {
             return Collections.emptyList();
         }
         List<UUID> channelIds = participatingPrivateChannel.stream().map(BaseEntity::getId).toList();
 
+        // 쿼리2
         Map<UUID, List<User>> usersInChannelMap = findChannelUsersMapByChannelIds(channelIds);
+        // 쿼리3
         Map<UUID, Instant> lastMessageMap = getChannelLastMessagetMap(participatingPrivateChannel);
 
         return participatingPrivateChannel.stream().map((channel) -> {

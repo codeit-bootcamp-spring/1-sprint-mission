@@ -1,8 +1,10 @@
 package com.sprint.mission.repository.binary;
 import com.sprint.mission.config.S3ConfigProperties;
 import com.sprint.mission.dto.response.BinaryContentDto;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -43,6 +45,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     @Override
     public InputStream get(UUID id) {
         return null;
+
     }
 
     @Override
