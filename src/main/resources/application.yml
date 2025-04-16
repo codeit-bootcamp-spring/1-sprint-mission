@@ -5,7 +5,13 @@ spring:
   boot:
     version: 3.4.0
   profiles:
-    active: ${PROFILES_ACTIVE}
+    active: ${PROFILES_ACTIVE:dev}
+  config:
+    import: optional:file:.env[.properties] # Spring Boot 3.1 이상에서만 작동
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
 
 logging:
   level:

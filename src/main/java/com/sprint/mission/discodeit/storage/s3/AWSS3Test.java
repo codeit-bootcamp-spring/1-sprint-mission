@@ -5,10 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.Properties;
-import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -165,7 +163,7 @@ public class AWSS3Test {
     try {
       // 테스트 파일 경로 및 키 이름 설정
       String uploadFilePath = "binaryContents/file.txt";
-      String keyName = "test-files/file.txt";
+      String keyName = "test-filess/file.txt";
       String downloadDestination = "binaryContents/downloaded-file.txt";
 
       // 업로드 테스트
