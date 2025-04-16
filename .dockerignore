@@ -1,0 +1,8 @@
+.gitignore
+.github
+
+.idea
+
+README.md
+
+*.log

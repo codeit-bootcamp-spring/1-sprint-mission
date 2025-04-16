@@ -1,0 +1,7 @@
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+
+    ports:
+      - "8081:${APP_PORT}"
