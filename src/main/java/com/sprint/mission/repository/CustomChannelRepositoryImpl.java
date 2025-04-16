@@ -5,7 +5,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.dto.ChannelMapper;
 import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.main.*;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.factory.Mappers;
 
 import java.time.Instant;
 import java.util.*;
@@ -15,11 +17,14 @@ import static com.sprint.mission.entity.main.QChannel.*;
 import static com.sprint.mission.entity.main.QMessage.*;
 import static com.sprint.mission.entity.main.QUser.*;
 
-@RequiredArgsConstructor
 public class CustomChannelRepositoryImpl implements CustomChannelRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
-    private final ChannelMapper channelMapper;
+    private final ChannelMapper channelMapper = Mappers.getMapper(ChannelMapper.class);
+
+    public CustomChannelRepositoryImpl(EntityManager em) {
+        this.jpaQueryFactory = new JPAQueryFactory(em);
+    }
 
     public List<ChannelDto> findAllPrivateChannelByUserId(UUID userId) {
 

@@ -51,7 +51,6 @@ public class AWSS3Test {
 
     @BeforeAll
     static void setUp() {
-
         accessKey = localStack.getAccessKey();
         secretKey = localStack.getSecretKey();
         region = Region.of(localStack.getRegion());

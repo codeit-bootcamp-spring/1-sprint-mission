@@ -3,6 +3,7 @@ package com.sprint.mission.unit.service;
 //create, update, delete 메소드
 //핵심 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.dto.ChannelMapper;
 import com.sprint.mission.dto.UserMapper;
@@ -27,6 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Import;
 
 import java.time.Instant;
 import java.util.*;
@@ -36,6 +38,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.ReflectionTestUtils.*;
 
+@Import(JPAQueryFactory.class)
 @ExtendWith(MockitoExtension.class)
 public class ChannelServiceTest {
 
