@@ -6,6 +6,7 @@ services:
     ports:
       - "${APP_PORT}:80"
     environment:
+      - TZ=Asia/Seoul
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
       - JVM_OPTS=${JVM_OPTS}
       - DB_HOST=postgres
@@ -13,8 +14,15 @@ services:
       - DB_NAME=${POSTGRES_DB}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - STORAGE_TYPE=${STORAGE_TYPE}
+      - STORAGE_LOCAL_ROOT_PATH=${STORAGE_LOCAL_ROOT_PATH}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_S3_PRESIGNED_URL_EXPIRATION=${AWS_S3_PRESIGNED_URL_EXPIRATION}
     depends_on:
       - postgres
+    volumes:
+      - ${STORAGE_LOCAL_ROOT_PATH}:/app/storage
+      - ~/.aws:/root/.aws
 
   postgres:
     image: postgres:${POSTGRES_VERSION}

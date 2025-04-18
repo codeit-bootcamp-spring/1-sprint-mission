@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -21,6 +24,16 @@ class AWSS3Test {
   static S3Client s3Client;
   static S3Presigner presigner;
   static String bucketName;
+
+  @BeforeEach
+  void cleanUp() {
+    Path path = Paths.get("src/test/resources/downloaded_sample.txt");
+    try {
+      Files.deleteIfExists(path);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   @BeforeAll
   static void setup() throws IOException {

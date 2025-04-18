@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,13 +19,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final Path root;
 
-  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath) {
-    this.root = Paths.get(rootPath);
+  public LocalBinaryContentStorage(
+      @Value("${discodeit.storage.local.root-path}") Path root
+  ) {
+    this.root = root;
   }
 
   @PostConstruct
