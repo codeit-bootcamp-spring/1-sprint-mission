@@ -46,3 +46,5 @@ bin/
 # 민감 보안
 .env
 .dockerignore
+awscliv2.zip
+aws
