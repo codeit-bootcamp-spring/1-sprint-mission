@@ -2,23 +2,30 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: 20MB # 요청 파일 하나당 허용 사이즈
-      max-request-size: 50MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
+      max-file-size: ${MAX_FILE_SIZE}
+      max-request-size: ${MAX_REQUEST_SIZE}
 
 ---
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:discodeit}
+    url: ${SPRING_DATASOURCE_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  sql:
-    init:
-      mode: always
+  #  sql:
+  #    init:
+  #      mode: always
   jpa:
     hibernate:
       ddl-auto: none
+    show-sql: false
     open-in-view: false
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: ${MAX_FILE_SIZE}
+      max-request-size: ${MAX_REQUEST_SIZE}
+
 
 ---
 discodeit:
@@ -31,7 +38,7 @@ discodeit:
       secret-key: ${AWS_S3_SECRET_KEY}
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
-      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION}
 
 ---
 management:

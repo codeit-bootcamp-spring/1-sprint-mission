@@ -5,27 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/logback-spring.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/discodeit-data/base/16384/pg_internal.init" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/discodeit-data/global/pg_control" beforeDir="false" afterPath="$PROJECT_DIR$/discodeit-data/global/pg_control" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/discodeit-data/global/pg_internal.init" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/discodeit-data/pg_stat/pgstat.stat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/discodeit-data/pg_wal/000000010000000000000001" beforeDir="false" afterPath="$PROJECT_DIR$/discodeit-data/pg_wal/000000010000000000000001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/ReadStatusMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/dto/ReadStatusMapperImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/entity/addOn/QBinaryContent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/entity/addOn/QReadStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/entity/addOn/QUserStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/entity/main/QBaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/entity/main/QBaseUpdatableEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/entity/main/QChannel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/entity/main/QMessage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/entity/main/QUser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/DiscodeitApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/DiscodeitApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-prod.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -522,6 +506,7 @@
       <workItem from="1744808506072" duration="1312000" />
       <workItem from="1745040226942" duration="1610000" />
       <workItem from="1745044373432" duration="2265000" />
+      <workItem from="1745058609975" duration="2685000" />
     </task>
     <servers />
   </component>
