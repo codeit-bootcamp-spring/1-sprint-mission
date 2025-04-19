@@ -5,12 +5,10 @@ import com.sprint.mission.common.exception.CustomErrorResponse;
 import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.repository.BinaryContentStorage;
-import com.sprint.mission.service.jcf.addOn.BinaryService;
-
+import com.sprint.mission.repository.binary.BinaryContentStorage;
+import com.sprint.mission.service.BinaryService;
 import java.util.List;
 import java.util.UUID;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

@@ -1,10 +1,7 @@
 package com.sprint.mission.dto.request;
 
-import com.sprint.mission.entity.main.Message;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-
 import java.util.UUID;
 
 public record MessageDtoForCreate(

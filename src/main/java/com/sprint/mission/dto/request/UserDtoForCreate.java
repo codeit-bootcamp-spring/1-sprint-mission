@@ -1,6 +1,5 @@
 package com.sprint.mission.dto.request;
 
-import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -21,24 +20,6 @@ public record UserDtoForCreate(
         @Email(message = "올바른 이메일 형식이 아닙니다.")
         @NotBlank(message = "이메일은 필수입니다.")
         String email) {
-
-//    public User toEntity() {
-//        return new User(username, password, email);
-//    }
 }
-;
-// 프로필 이미지
-//    private MultipartFile profileImg;
-//
-//    public byte[] getProfileImgAsByte(){
-//        if (profileImg == null){
-//            return null;
-//        }
-//
-//        try {
-//            return profileImg.getBytes();
-//        } catch (IOException e) {
-//            return null;
-//        }
-//    }
+
 

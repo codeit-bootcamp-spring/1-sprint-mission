@@ -1,7 +1,5 @@
 package com.sprint.mission.dto.request;
 
-import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.ChannelType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

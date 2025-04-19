@@ -17,24 +17,9 @@ public record UserDtoForUpdate(
         @Schema(description = "새로운 비밀번호", example = "1234")
         @NotBlank(message = "비밀번호는 필수입니다.")
         String password,
-//
+
         @Schema(description = "새로운 이메일", example = "code123@codeit.com")
         @Email(message = "이메일 형식이 아닙니다.")
         String email) {
 }
-;
-// 프로필 이미지
-//    private MultipartFile profileImg;
-//
-//    public byte[] getProfileImgAsByte(){
-//        if (profileImg == null){
-//            return null;
-//        }
-//
-//        try {
-//            return profileImg.getBytes();
-//        } catch (IOException e) {
-//            return null;
-//        }
-//    }
 

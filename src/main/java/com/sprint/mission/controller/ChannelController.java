@@ -108,15 +108,6 @@ public class ChannelController {
         return CommonResponse.toResponseEntityWithoutData
                 (NO_CONTENT, "성공적으로 삭제되었습니다");
     }
-
-    /**
-     * 응답 DTO (타입별)
-     */
-//    private FindChannelDto getFindChannelDto(Channel findedChannel) {
-//        return (findedChannel.isPrivate())
-//                ? new FindPrivateChannelDto(findedChannel)
-//                : new FindPublicChannelDto(findedChannel);
-//    }
 }
 
 

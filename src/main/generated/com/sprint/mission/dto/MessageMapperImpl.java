@@ -77,12 +77,12 @@ public class MessageMapperImpl implements MessageMapper {
 
         Channel channel1 = null;
         channel1 = channel;
+        User author1 = null;
+        author1 = author;
         String content1 = null;
         content1 = content;
 
-        User user = null;
-
-        Message message = new Message( channel1, user, content1 );
+        Message message = new Message( content1, channel1, author1 );
 
         return message;
     }

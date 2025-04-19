@@ -5,50 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/react-project/postcss.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/public/static/assets/index-CRrRqFH4.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/public/static/assets/index-kQJbKSsj.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/public/static/favicon.ico" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/public/static/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/auth/LoginForm.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/auth/RegisterForm.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/channels/CreateChannelModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/layout/MainLayout.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/layout/Sidebar.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/messages/ChatArea.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/messages/MessageInput.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/messages/MessageItem.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/components/ui/UserStatus.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/context/AuthContext.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/context/ChannelContext.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/context/MessageContext.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/src/services/api.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/react-project/tailwind.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/BinaryContentDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelAllDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindChannelDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindMessageDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPrivateChannelDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPublicChannelDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindUserDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/SaveUserDto.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/BinarycontentRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/file/FileBinaryContentRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/file/FileChannelRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/file/FileMessageRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/file/FileReadStatusRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/file/FileUserRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/file/FileUserStatusRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/jcf/addOn/JCFBinaryContentRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/jcf/addOn/JCFReadStatusRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/jcf/addOn/JCFUserStatusRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/jcf/main/JCFChannelRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/jcf/main/JCFMessageRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/jcf/main/JCFUserRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/java/com/sprint/mission/DiscodeitApplicationTests.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/java/com/sprint/mission/discodeit/CustomErrorTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/BinaryContentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/BinaryContentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/P6spyConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/P6spyConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/P6spyPrettySqlFormatter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/P6spyPrettySqlFormatter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/config/QuerydslFactory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/CustomChannelRepositoryImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/storage/s3/AWSS3Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/storage/s3/AWSS3Test.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/unit/service/ChannelServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/application-test.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,17 +37,6 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="discodeit" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="discodeit" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="discodeit" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build" type="c8890929:TasksNode$1" />
               </path>
             </expand>
             <select />
@@ -113,17 +67,38 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/ARlegro/1-sprint-mission.git&quot;,
+    &quot;url&quot;: &quot;https://github.com/codeit-bootcamp-spring/1-sprint-mission.git&quot;,
     &quot;accountId&quot;: &quot;c3b7675d-cb84-4590-9844-f892f30550c4&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.tomcat.embed/tomcat-embed-core/10.1.36/3ccaa558e32e317e35d6674d65d7d9aa182e082f/tomcat-embed-core-10.1.36.jar!/jakarta/servlet/http/HttpServlet.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework.boot/spring-boot/3.3.9/4b45bffd62ba7604dae62bfb356fe5b7a405d354/spring-boot-3.3.9.jar!/org/springframework/boot/context/properties/ConfigurationProperties.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-core/6.1.17/fa713816046e5f2d020191932dd337f297332fea/spring-core-6.1.17.jar!/org/springframework/core/env/PropertyResolver.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-web/6.1.17/d6a573fcc292c1c477ed75ae270af018174fad28/spring-web-6.1.17.jar!/org/springframework/http/ContentDisposition.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-web/6.1.17/d6a573fcc292c1c477ed75ae270af018174fad28/spring-web-6.1.17.jar!/org/springframework/web/multipart/MultipartException.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/auth/2.31.7/e86cea1359da5ff15fde952bd6d2efc1de81322e/auth-2.31.7.jar!/software/amazon/awssdk/auth/credentials/AwsBasicCredentials.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/s3/2.31.7/f2b0a87c0f47ae5fe00ceddec8d30dc99442978f/s3-2.31.7.jar!/software/amazon/awssdk/services/s3/S3Client.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/s3/2.31.7/f2b0a87c0f47ae5fe00ceddec8d30dc99442978f/s3-2.31.7.jar!/software/amazon/awssdk/services/s3/model/PutObjectRequest.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.jdks/temurin-17.0.14/lib/src.zip!/java.base/java/net/URLConnection.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.jdks/temurin-17.0.14/lib/src.zip!/java.base/java/nio/file/Path.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.jdks/temurin-17.0.14/lib/src.zip!/java.base/java/util/Properties.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.jdks/temurin-17.0.14/lib/src.zip!/java.xml/com/sun/org/apache/xpath/internal/axes/LocPathIterator.java" root0="SKIP_INSPECTION" />
+  </component>
   <component name="JsbtTreeLayoutManager">
     <layout place="tools.popupGrunt">
       <scroll-view-position x="0" y="0" />
     </layout>
   </component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="PackageJsonUpdateNotifier">
     <dismissed value="$PROJECT_DIR$/react-project/package.json" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
   </component>
   <component name="ProjectColorInfo">{
     &quot;associatedIndex&quot;: 6
@@ -143,27 +118,60 @@
     "Gradle.1-sprint-mission [clean].executor": "Run",
     "Gradle.Build 1-sprint-mission.executor": "Run",
     "Gradle.Download Sources.executor": "Run",
+    "JUnit.AWSS3Test.downLoadFile.executor": "Run",
+    "JUnit.AWSS3Test.uploadFile.executor": "Run",
     "JUnit.AllChannel.testAllChannel.executor": "Run",
     "JUnit.AllChannel.testAllChannelWithEntityGraph.executor": "Run",
     "JUnit.AnnotationTest.toStringTest.executor": "Run",
+    "JUnit.AssertJTest.descriptionTest.executor": "Run",
+    "JUnit.AssertJTest.exceptionTest.executor": "Run",
+    "JUnit.AssertJTest.usingAssertJ.executor": "Run",
     "JUnit.ChannelCascadeTest.deleteChannel.executor": "Run",
+    "JUnit.ChannelServiceTest.createPrivateChannelFail.executor": "Run",
+    "JUnit.ChannelServiceTest.createPrivateChannelSuccess.executor": "Run",
+    "JUnit.ChannelServiceTest.createPublicChannelSuccess.executor": "Run",
+    "JUnit.ChannelServiceTest.deleteSuccess.executor": "Run",
+    "JUnit.ChannelServiceTest.executor": "Run",
+    "JUnit.ChannelServiceTest.findAllByUserIdSuccess.executor": "Run",
+    "JUnit.ChannelServiceTest.findByIdFail.executor": "Run",
+    "JUnit.ChannelServiceTest.findByIdSuccess.executor": "Run",
+    "JUnit.ChannelServiceTest.updatePrivateChannelFail.executor": "Run",
+    "JUnit.ChannelServiceTest.updatePrivateChannelSuccess.executor": "Run",
     "JUnit.ChannelTest.createChannelService.executor": "Run",
     "JUnit.ChannelTest.createPrivateService.executor": "Run",
     "JUnit.ChannelTest.createPublicService.executor": "Run",
+    "JUnit.JUnitTest.usingAssertJ.executor": "Run",
     "JUnit.MapperTest.channelTypeTest.executor": "Run",
     "JUnit.MapperTest.privateChannelTypeTest.executor": "Run",
     "JUnit.MessageCascadeTest.cascade.executor": "Run",
+    "JUnit.MessageServiceTest.createSuccess.executor": "Run",
     "JUnit.MessageTest.createMessage.executor": "Run",
     "JUnit.MessageTest.setting.executor": "Run",
     "JUnit.MessageTest.updateMessage.executor": "Run",
     "JUnit.MockUserTest.userEqualsHashCodeTest.executor": "Run",
     "JUnit.StatusTest.testReadStatus.executor": "Run",
     "JUnit.ToString.test.executor": "Run",
+    "JUnit.UserJpaTest.createTest.executor": "Run",
+    "JUnit.UserJpaTest.executor": "Run",
+    "JUnit.UserJpaTest.saveTest.executor": "Run",
+    "JUnit.UserRepoTest.executor": "Run",
+    "JUnit.UserRepoTest.findByIdTest.executor": "Run",
+    "JUnit.UserRepoTest.findByUsername.executor": "Run",
     "JUnit.UserRepoTest.userEqualsHashCodeTest.executor": "Run",
+    "JUnit.UserServiceTest.delete.executor": "Run",
+    "JUnit.UserServiceTest.duplicateTest.executor": "Run",
+    "JUnit.UserServiceTest.executor": "Run",
+    "JUnit.UserServiceTest.isDuplicateEmail.executor": "Run",
+    "JUnit.UserServiceTest.isDuplicateName.executor": "Run",
+    "JUnit.UserStatusRepoTest.create.executor": "Run",
+    "JUnit.UserStatusRepoTest.executor": "Run",
+    "JUnit.UserStatusRepoTest.findByUserFail.executor": "Run",
     "JUnit.UserTest.cascadeUserAndUserStatusTest.executor": "Run",
     "JUnit.UserTest.createTest.executor": "Run",
     "JUnit.UserTest.delete.executor": "Run",
+    "JUnit.UserTest.duplicateNameTest.executor": "Run",
     "JUnit.UserTest.duplicateUserTest.executor": "Run",
+    "JUnit.UserTest.executor": "Run",
     "JUnit.UserTest.find.executor": "Run",
     "JUnit.UserTest.findAll.executor": "Run",
     "JUnit.UserTest.findAllWithStatusTest.executor": "Run",
@@ -187,10 +195,10 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.DiscodeitApplication.executor": "Run",
-    "git-widget-placeholder": "Merging part2-이요한",
+    "git-widget-placeholder": "part2-이요한-sprint7-Infra",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java",
+    "last_opened_file_path": "C:/Users/icb16/IdeaProjects/1-sprint-mission/src/test/resources",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -199,14 +207,16 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.28965518",
-    "settings.editor.selected.configurable": "preferences.keymap",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.3.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
     "two.files.diff.last.used.file": "C:/Users/icb16/IdeaProjects/1-sprint-mission/src/main/java/com/sprint/mission/dto/ChannelMapper.java",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
-      "postgresql"
+      "postgresql",
+      "mysql_aurora",
+      "h2"
     ]
   }
 }]]></component>
@@ -218,106 +228,111 @@
       <recent name="com.sprint.mission.service.jcf.addOn" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\icb16\IdeaProjects\1-sprint-mission\src\test\resources" />
+      <recent name="C:\Users\icb16\IdeaProjects\1-sprint-mission" />
       <recent name="C:\1-sprint-mission\src\main\java\com\sprint\mission\repository\jcf\addOn" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\icb16\IdeaProjects\1-sprint-mission\.github\workflows" />
+      <recent name="C:\Users\icb16\IdeaProjects\1-sprint-mission\src\main\resources" />
+      <recent name="C:\Users\icb16\IdeaProjects\1-sprint-mission\src\test\resources" />
       <recent name="C:\1-sprint-mission\src" />
       <recent name="C:\1-sprint-mission\src\main\resources\static" />
-      <recent name="C:\1-sprint-mission\test\java\com\sprint\mission" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.sprint.mission.entity" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.sprint.mission.service.jcf.main" />
+      <recent name="com.sprint.mission.unit" />
+      <recent name="com.sprint.mission.practice" />
       <recent name="com.sprint.mission.dto.response" />
       <recent name="com.sprint.mission.dto.mappedDto" />
-      <recent name="com.sprint.mission.dto.request" />
-      <recent name="com.sprint.mission.service" />
-      <recent name="com.sprint.mission.controller" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.DiscodeitApplication">
-    <configuration name="ChannelCascadeTest.deleteChannel" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="JUnit.UserRepoTest.findByUsername">
+    <configuration name="AWSS3Test.downLoadFile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.cascade.*" />
+          <option name="PATTERN" value="com.sprint.mission.storage.s3.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.cascade" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.cascade.ChannelCascadeTest" />
-      <option name="METHOD_NAME" value="deleteChannel" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.storage.s3" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.storage.s3.AWSS3Test" />
+      <option name="METHOD_NAME" value="downLoadFile" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ChannelTest.createPublicService" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="AWSS3Test.uploadFile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.BasicTest.*" />
+          <option name="PATTERN" value="com.sprint.mission.storage.s3.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.ChannelTest" />
-      <option name="METHOD_NAME" value="createPublicService" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.storage.s3" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.storage.s3.AWSS3Test" />
+      <option name="METHOD_NAME" value="uploadFile" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="MessageCascadeTest.cascade" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ChannelServiceTest.findAllByUserIdSuccess" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.cascade.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.service.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.cascade" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.cascade.MessageCascadeTest" />
-      <option name="METHOD_NAME" value="cascade" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.service" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.service.ChannelServiceTest" />
+      <option name="METHOD_NAME" value="findAllByUserIdSuccess" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserTest.duplicateUserTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UserRepoTest.findByIdTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.BasicTest.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.repository.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.BasicTest" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.BasicTest.UserTest" />
-      <option name="METHOD_NAME" value="duplicateUserTest" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.repository" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.repository.UserRepoTest" />
+      <option name="METHOD_NAME" value="findByIdTest" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserUserStatusCascadeTest.userAndProfile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="UserRepoTest.findByUsername" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="discodeit.test" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.sprint.mission.cascade.*" />
+          <option name="PATTERN" value="com.sprint.mission.unit.repository.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.sprint.mission.cascade" />
-      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.cascade.UserUserStatusCascadeTest" />
-      <option name="METHOD_NAME" value="userAndProfile" />
+      <option name="PACKAGE_NAME" value="com.sprint.mission.unit.repository" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.unit.repository.UserRepoTest" />
+      <option name="METHOD_NAME" value="findByUsername" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="DiscodeitApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="ACTIVE_PROFILES" value="dev" />
       <module name="discodeit.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.sprint.mission.DiscodeitApplication" />
       <method v="2">
@@ -325,20 +340,20 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="JUnit.ChannelCascadeTest.deleteChannel" />
-      <item itemvalue="JUnit.ChannelTest.createPublicService" />
-      <item itemvalue="JUnit.MessageCascadeTest.cascade" />
-      <item itemvalue="JUnit.UserTest.duplicateUserTest" />
-      <item itemvalue="JUnit.UserUserStatusCascadeTest.userAndProfile" />
+      <item itemvalue="JUnit.UserRepoTest.findByIdTest" />
+      <item itemvalue="JUnit.UserRepoTest.findByUsername" />
+      <item itemvalue="JUnit.AWSS3Test.downLoadFile" />
+      <item itemvalue="JUnit.AWSS3Test.uploadFile" />
+      <item itemvalue="JUnit.ChannelServiceTest.findAllByUserIdSuccess" />
       <item itemvalue="Spring Boot.DiscodeitApplication" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ChannelTest.createPublicService" />
-        <item itemvalue="JUnit.MessageCascadeTest.cascade" />
-        <item itemvalue="JUnit.ChannelCascadeTest.deleteChannel" />
-        <item itemvalue="JUnit.UserTest.duplicateUserTest" />
-        <item itemvalue="JUnit.UserUserStatusCascadeTest.userAndProfile" />
+        <item itemvalue="JUnit.UserRepoTest.findByUsername" />
+        <item itemvalue="JUnit.UserRepoTest.findByIdTest" />
+        <item itemvalue="JUnit.AWSS3Test.downLoadFile" />
+        <item itemvalue="JUnit.AWSS3Test.uploadFile" />
+        <item itemvalue="JUnit.ChannelServiceTest.findAllByUserIdSuccess" />
       </list>
     </recent_temporary>
   </component>
@@ -435,6 +450,62 @@
       <workItem from="1742141885777" duration="5456000" />
       <workItem from="1742170757014" duration="9004000" />
       <workItem from="1742183884185" duration="5925000" />
+      <workItem from="1742521884163" duration="533000" />
+      <workItem from="1742523663028" duration="1875000" />
+      <workItem from="1742612541626" duration="714000" />
+      <workItem from="1742626004352" duration="1000" />
+      <workItem from="1742775738648" duration="533000" />
+      <workItem from="1742776531341" duration="5445000" />
+      <workItem from="1742790434166" duration="595000" />
+      <workItem from="1742807092833" duration="3448000" />
+      <workItem from="1742822767276" duration="7974000" />
+      <workItem from="1742864044675" duration="3350000" />
+      <workItem from="1742872115602" duration="2206000" />
+      <workItem from="1742874366460" duration="416000" />
+      <workItem from="1742875648245" duration="3295000" />
+      <workItem from="1742883099817" duration="3726000" />
+      <workItem from="1742914711678" duration="325000" />
+      <workItem from="1742948823730" duration="66000" />
+      <workItem from="1742952307818" duration="545000" />
+      <workItem from="1742956930342" duration="614000" />
+      <workItem from="1743146470569" duration="1430000" />
+      <workItem from="1743161059167" duration="590000" />
+      <workItem from="1743174612793" duration="4000" />
+      <workItem from="1743908908900" duration="346000" />
+      <workItem from="1743916978619" duration="5889000" />
+      <workItem from="1743931740719" duration="3000" />
+      <workItem from="1743942749813" duration="514000" />
+      <workItem from="1743948546536" duration="22000" />
+      <workItem from="1743955624952" duration="20000" />
+      <workItem from="1744090958669" duration="10034000" />
+      <workItem from="1744120372242" duration="1343000" />
+      <workItem from="1744250864826" duration="439000" />
+      <workItem from="1744252128479" duration="1367000" />
+      <workItem from="1744257869408" duration="2836000" />
+      <workItem from="1744261435827" duration="3095000" />
+      <workItem from="1744265225439" duration="13436000" />
+      <workItem from="1744294751537" duration="9653000" />
+      <workItem from="1744329826320" duration="641000" />
+      <workItem from="1744330679127" duration="8705000" />
+      <workItem from="1744430686630" duration="144000" />
+      <workItem from="1744432565277" duration="598000" />
+      <workItem from="1744453938071" duration="344000" />
+      <workItem from="1744454430639" duration="1282000" />
+      <workItem from="1744460234074" duration="1536000" />
+      <workItem from="1744467504126" duration="861000" />
+      <workItem from="1744468991936" duration="6647000" />
+      <workItem from="1744519538704" duration="739000" />
+      <workItem from="1744520303608" duration="1033000" />
+      <workItem from="1744524148369" duration="1739000" />
+      <workItem from="1744525940158" duration="852000" />
+      <workItem from="1744545622714" duration="30000" />
+      <workItem from="1744624163687" duration="826000" />
+      <workItem from="1744636985114" duration="10293000" />
+      <workItem from="1744686985594" duration="2314000" />
+      <workItem from="1744689536190" duration="5199000" />
+      <workItem from="1744769886070" duration="312000" />
+      <workItem from="1744776066971" duration="12718000" />
+      <workItem from="1744808506072" duration="1312000" />
     </task>
     <servers />
   </component>

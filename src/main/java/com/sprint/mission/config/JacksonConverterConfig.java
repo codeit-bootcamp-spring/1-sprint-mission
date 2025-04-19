@@ -8,6 +8,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import java.util.ArrayList;
 import java.util.List;
 
+// 스웨거 에러 발생 안시키려고
 @Configuration
 public class JacksonConverterConfig {
 

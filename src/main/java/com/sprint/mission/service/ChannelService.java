@@ -1,11 +1,8 @@
 package com.sprint.mission.service;
 
 
-import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
-import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 
 import java.util.List;
 import java.util.UUID;

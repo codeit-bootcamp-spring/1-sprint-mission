@@ -1,0 +1,35 @@
+services:
+  discodeit-server:
+    container_name: discodeit-server
+    build: .
+    ports:
+      - 8081:80
+
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+    env_file:
+      - .env
+
+  postgres-db:
+    container_name: postgres-db
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+
+    volumes:
+      - ./discodeit-data:/var/lib/postgresql/data
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+    env_file:
+      - .env
+
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}"]
+      interval: 5s
+      retries: 10

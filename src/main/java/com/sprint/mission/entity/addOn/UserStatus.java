@@ -14,7 +14,7 @@ import java.util.UUID;
 import static jakarta.persistence.FetchType.*;
 
 @Entity
-@EqualsAndHashCode(of = {"lastActiveAt"}, callSuper = true)
+@EqualsAndHashCode(of = {"user"}, callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @AllArgsConstructor
 @ToString(of = "lastActiveAt")

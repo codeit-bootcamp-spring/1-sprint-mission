@@ -5,11 +5,11 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '0.0.1'
+version = '1.2-M8'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
 
@@ -44,26 +44,54 @@ dependencies {
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.10.0'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 	implementation 'org.postgresql:postgresql:42.7.3'
-//	implementation "org.mapstruct:mapstruct:1.6.3"
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator' //actuator 추가
+
+	implementation 'software.amazon.awssdk:s3:2.31.7'
+
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
 	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	runtimeOnly 'com.h2database:h2'
 
 	compileOnly 'org.projectlombok:lombok'
-
-	// Lombok과 MapStruct 충돌 해결을 위한 라이브러리라는데 안해도 문제 없어서 주석처리
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
 	runtimeOnly 'org.postgresql:postgresql'
 
+	//querydsl
+	implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+
 	// 테스트 코드에서도 MapStruct를 사용할 경우 추가
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.5.5.Final"
+	testImplementation "org.mockito:mockito-core:5.16.1"  // Mockito 라이브러리
+	testImplementation 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.mockito:mockito-core:5.16.1'
+
+	testImplementation "cloud.localstack:localstack-utils:0.2.23"
+	testImplementation 'org.testcontainers:localstack:1.20.6'
+	testImplementation 'org.testcontainers:junit-jupiter:1.20.6'
+
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+def querydslDir = "build/generated/querydsl"
+
+tasks.withType(JavaCompile) {
+	options.generatedSourceOutputDirectory = file(querydslDir)
+}
+
+clean {
+	delete file(querydslDir)
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+

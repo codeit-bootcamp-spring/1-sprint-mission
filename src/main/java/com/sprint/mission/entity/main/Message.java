@@ -47,12 +47,6 @@ public class Message extends BaseUpdatableEntity{
     )
     private List<BinaryContent> messageAttachments = new ArrayList<>();
 
-    public Message(Channel channel, User user, String content) {
-        this.content = content;
-        this.channel = channel;
-        this.author = user;
-    }
-
     public Message update(String newContent) {
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
@@ -60,8 +54,13 @@ public class Message extends BaseUpdatableEntity{
         return this;
     }
 
-//    public void addAttachment(BinaryContent attachment) {
-//        attachments.add(attachment);
-//        //일단은 단방향이니
-//   }
+    public Message(String content, Channel channel, User author) {
+        this.content = content;
+        this.channel = channel;
+        this.author = author;
+    }
+
+    public void addAttachment(BinaryContent attachment) {
+        messageAttachments.add(attachment);
+    }
 }

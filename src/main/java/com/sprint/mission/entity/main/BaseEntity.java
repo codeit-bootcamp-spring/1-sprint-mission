@@ -16,7 +16,6 @@ import java.util.UUID;
 @MappedSuperclass
 @EqualsAndHashCode(of = "id")
 @Getter @EntityListeners(AuditingEntityListener.class)
-//@Setter // 테스트 코드용 SETTER
 public abstract class BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)

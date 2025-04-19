@@ -24,22 +24,4 @@ public record BinaryContentDto(
         String fileName,
         String contentType,
         byte[] bytes) {
-
-    public BinaryContent toEntity() {
-        return new BinaryContent(fileName, contentType, bytes);
-    }
-
-    public static Optional<BinaryContentDto> fileToBinaryContentDto(MultipartFile file) {
-        log.info("file : {}", file);
-        if (file == null || file.isEmpty()) {
-            return Optional.empty();
-        }
-        try {
-            BinaryContentDto binaryContentDto = new BinaryContentDto(file.getName(),
-                    file.getContentType(), file.getBytes());
-            return Optional.of(binaryContentDto);
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
-        }
-    }
 }

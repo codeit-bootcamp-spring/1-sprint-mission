@@ -14,17 +14,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-//    void create(MessageDtoForCreate responseDto, Optional<BinaryContentDto> attachmentsDto);
-
     Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> attachmentsDto);
-
     Message update(UUID messageId, MessageDtoForUpdate updateDto);
     List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable);
     List<ScrollPageResponse<MessageDto>> findAllByChannelId(UUID channelId);
-    //List<Message> findAll();
     void delete(UUID messageId);
-
     Message findById(UUID messageId);
-
     void deleteAllByChannelId(UUID channelId);
 }

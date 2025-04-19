@@ -60,8 +60,4 @@ public class User extends BaseUpdatableEntity{
         this.email = newEmail;
         return this;
     }
-
-//    public Optional<BinaryContent> getProfile() { // mapping은 null 체크 해줌
-//        return Optional.ofNullable(profile);
-//    }
 }

@@ -2,20 +2,14 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
-import com.sprint.mission.common.exception.CustomException;
-import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.ReadStatusMapper;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.dto.response.ReadStatusDto;
 import com.sprint.mission.entity.addOn.ReadStatus;
-import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.UserRepository;
-import com.sprint.mission.service.jcf.addOn.ReadStatusService;
-
+import com.sprint.mission.service.ReadStatusService;
 import java.util.List;
 import java.util.UUID;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -25,12 +19,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.Locked;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.*;
@@ -43,9 +34,7 @@ import static org.springframework.http.HttpStatus.*;
 @Tag(name = "ReadStatus", description = "Message 읽음 상태 API")
 public class ReadStatusController {
 
-    // 카피
     private final ReadStatusService readStatusService;
-    private final UserRepository userRepository;
     private final ReadStatusMapper readStatusMapper;
 
 

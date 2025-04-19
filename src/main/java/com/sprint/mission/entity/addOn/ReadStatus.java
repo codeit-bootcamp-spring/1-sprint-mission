@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
 import static jakarta.persistence.FetchType.*;
 @Entity
