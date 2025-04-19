@@ -41,7 +41,7 @@ public class AWSS3Test {
 
         // .env 파일이 없으면 테스트 전체 스킵
         if (!Files.exists(envPath)) {
-            System.out.println("⚠️ .env 파일이 없어 S3 테스트를 건너뜁니다.");
+            System.out.println("env 파일이 없어 S3 테스트를 건너뜁니다.");
             Assumptions.assumeTrue(false); // JUnit 5의 테스트 스킵
             return;
         }
