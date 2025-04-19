@@ -1,4 +1,4 @@
-package com.sprint.mission.entity.main;
+package com.sprint.mission.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

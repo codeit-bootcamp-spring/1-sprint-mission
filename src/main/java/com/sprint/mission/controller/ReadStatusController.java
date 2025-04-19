@@ -6,7 +6,7 @@ import com.sprint.mission.dto.ReadStatusMapper;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.dto.response.ReadStatusDto;
-import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.entity.ReadStatus;
 import com.sprint.mission.service.ReadStatusService;
 import java.util.List;
 import java.util.UUID;

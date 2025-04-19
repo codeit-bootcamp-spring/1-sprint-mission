@@ -1,9 +1,9 @@
 package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.response.ReadStatusDto;
-import com.sprint.mission.entity.addOn.ReadStatus;
-import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.ReadStatus;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.User;
 import java.time.Instant;
 import java.util.UUID;
 import javax.annotation.processing.Generated;

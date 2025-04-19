@@ -1,8 +1,5 @@
-package com.sprint.mission.entity.main;
+package com.sprint.mission.entity;
 
-import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.entity.addOn.ReadStatus;
-import com.sprint.mission.entity.addOn.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;

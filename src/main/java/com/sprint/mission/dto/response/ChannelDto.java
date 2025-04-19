@@ -1,6 +1,6 @@
 package com.sprint.mission.dto.response;
 
-import com.sprint.mission.entity.main.ChannelType;
+import com.sprint.mission.entity.ChannelType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;

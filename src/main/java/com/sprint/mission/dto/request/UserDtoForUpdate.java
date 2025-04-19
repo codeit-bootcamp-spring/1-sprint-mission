@@ -1,6 +1,5 @@
 package com.sprint.mission.dto.request;
 
-import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

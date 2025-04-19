@@ -1,15 +1,11 @@
-package com.sprint.mission.entity.addOn;
+package com.sprint.mission.entity;
 
-import com.sprint.mission.entity.main.BaseUpdatableEntity;
-import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
 import static jakarta.persistence.FetchType.*;
 

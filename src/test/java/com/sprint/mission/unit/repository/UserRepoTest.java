@@ -1,7 +1,7 @@
 package com.sprint.mission.unit.repository;
 
 
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

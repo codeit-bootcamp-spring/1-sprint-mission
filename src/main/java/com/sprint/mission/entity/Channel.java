@@ -1,6 +1,5 @@
-package com.sprint.mission.entity.main;
+package com.sprint.mission.entity;
 
-import com.sprint.mission.entity.addOn.ReadStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;

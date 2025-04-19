@@ -1,16 +1,13 @@
-package com.sprint.mission.entity.main;
+package com.sprint.mission.entity;
 
-import com.sprint.mission.entity.addOn.BinaryContent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.*;

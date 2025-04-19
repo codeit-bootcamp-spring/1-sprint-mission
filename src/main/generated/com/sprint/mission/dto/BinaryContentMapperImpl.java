@@ -2,7 +2,7 @@ package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.response.BinaryContentDto;
-import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.BinaryContent;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;

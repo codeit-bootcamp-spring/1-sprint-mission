@@ -5,6 +5,9 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.ChannelType;
+import com.sprint.mission.entity.ReadStatus;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
@@ -34,7 +37,7 @@ public class QChannel extends EntityPathBase<Channel> {
 
     public final StringPath name = createString("name");
 
-    public final ListPath<com.sprint.mission.entity.addOn.ReadStatus, com.sprint.mission.entity.addOn.QReadStatus> readStatus = this.<com.sprint.mission.entity.addOn.ReadStatus, com.sprint.mission.entity.addOn.QReadStatus>createList("readStatus", com.sprint.mission.entity.addOn.ReadStatus.class, com.sprint.mission.entity.addOn.QReadStatus.class, PathInits.DIRECT2);
+    public final ListPath<ReadStatus, com.sprint.mission.entity.addOn.QReadStatus> readStatus = this.<ReadStatus, com.sprint.mission.entity.addOn.QReadStatus>createList("readStatus", ReadStatus.class, com.sprint.mission.entity.addOn.QReadStatus.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.Instant> updatedAt = _super.updatedAt;

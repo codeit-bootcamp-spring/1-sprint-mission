@@ -8,9 +8,9 @@ import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.MessageMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
-import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.Message;
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.Message;
+import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.binary.BinaryContentStorage;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.entity.main.ChannelType.*;
+import static com.sprint.mission.entity.ChannelType.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

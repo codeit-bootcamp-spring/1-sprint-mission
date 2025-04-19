@@ -3,7 +3,7 @@ package com.sprint.mission.controller;
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
 import com.sprint.mission.dto.request.LoginRequest;
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.User;
 import com.sprint.mission.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

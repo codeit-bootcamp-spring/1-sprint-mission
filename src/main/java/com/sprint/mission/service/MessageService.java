@@ -7,7 +7,7 @@ import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.dto.response.ScrollPageResponse;
-import com.sprint.mission.entity.main.Message;
+import com.sprint.mission.entity.Message;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

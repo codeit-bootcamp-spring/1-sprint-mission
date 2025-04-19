@@ -7,7 +7,7 @@ import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
-import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.Channel;
 import com.sprint.mission.service.ChannelService;
 
 import io.swagger.v3.oas.annotations.Operation;

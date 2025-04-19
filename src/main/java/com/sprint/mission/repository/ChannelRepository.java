@@ -1,7 +1,7 @@
 package com.sprint.mission.repository;
 
-import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.ChannelType;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.ChannelType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,7 +1,5 @@
-package com.sprint.mission.entity.addOn;
+package com.sprint.mission.entity;
 
-import com.sprint.mission.entity.main.BaseEntity;
-import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;

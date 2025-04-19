@@ -2,9 +2,9 @@ package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.response.MessageDto;
 import com.sprint.mission.dto.response.UserDto;
-import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.Message;
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.Message;
+import com.sprint.mission.entity.User;
 import org.mapstruct.*;
 
 import static org.mapstruct.MappingInheritanceStrategy.*;

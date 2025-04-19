@@ -1,7 +1,7 @@
 package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.response.ReadStatusDto;
-import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.entity.ReadStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.Mapping;

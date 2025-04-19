@@ -1,10 +1,7 @@
 package com.sprint.mission.service;
 
-import com.sprint.mission.common.exception.CustomException;
-import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.entity.addOn.UserStatus;
-import com.sprint.mission.entity.main.User;
-import org.springframework.transaction.annotation.Transactional;
+import com.sprint.mission.entity.UserStatus;
+import com.sprint.mission.entity.User;
 
 import java.util.List;
 import java.util.UUID;

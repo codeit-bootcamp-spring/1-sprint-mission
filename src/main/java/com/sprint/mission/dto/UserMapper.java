@@ -2,9 +2,8 @@ package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.response.UserDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
-import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.entity.addOn.UserStatus;
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.BinaryContent;
+import com.sprint.mission.entity.User;
 import org.mapstruct.*;
 
 // 기본값은 EXPLICIT

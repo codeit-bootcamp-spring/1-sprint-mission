@@ -3,15 +3,13 @@ package com.sprint.mission.dto;
 import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.response.UserDto;
-import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.ChannelType;
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.ChannelType;
+import com.sprint.mission.entity.User;
 import org.mapstruct.*;
 
 import java.time.Instant;
 import java.util.List;
-
-import static org.mapstruct.MappingInheritanceStrategy.*;
 
 //@MapperConfig(mappingInheritanceStrategy = AUTO_INHERIT_ALL_FROM_CONFIG)
 @Mapper(componentModel = "spring")

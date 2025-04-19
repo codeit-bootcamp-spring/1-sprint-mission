@@ -5,6 +5,8 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
+import com.sprint.mission.entity.BinaryContent;
+import com.sprint.mission.entity.Message;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
@@ -36,7 +38,7 @@ public class QMessage extends EntityPathBase<Message> {
     //inherited
     public final ComparablePath<java.util.UUID> id = _super.id;
 
-    public final ListPath<com.sprint.mission.entity.addOn.BinaryContent, com.sprint.mission.entity.addOn.QBinaryContent> messageAttachments = this.<com.sprint.mission.entity.addOn.BinaryContent, com.sprint.mission.entity.addOn.QBinaryContent>createList("messageAttachments", com.sprint.mission.entity.addOn.BinaryContent.class, com.sprint.mission.entity.addOn.QBinaryContent.class, PathInits.DIRECT2);
+    public final ListPath<BinaryContent, com.sprint.mission.entity.addOn.QBinaryContent> messageAttachments = this.<BinaryContent, com.sprint.mission.entity.addOn.QBinaryContent>createList("messageAttachments", BinaryContent.class, com.sprint.mission.entity.addOn.QBinaryContent.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.Instant> updatedAt = _super.updatedAt;

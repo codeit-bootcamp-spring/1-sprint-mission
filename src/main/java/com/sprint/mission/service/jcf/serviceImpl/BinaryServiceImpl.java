@@ -4,7 +4,7 @@ import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
-import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.BinaryContent;
 import com.sprint.mission.repository.binary.BinaryContentStorage;
 import com.sprint.mission.repository.binary.BinaryContentRepository;
 import com.sprint.mission.service.BinaryService;

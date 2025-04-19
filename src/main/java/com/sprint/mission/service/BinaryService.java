@@ -1,7 +1,7 @@
 package com.sprint.mission.service;
 
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
-import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.BinaryContent;
 import java.util.List;
 import java.util.UUID;
 

@@ -4,7 +4,7 @@ import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
-import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.BinaryContent;
 import org.mapstruct.Mapper;
 import org.springframework.web.multipart.MultipartFile;
 

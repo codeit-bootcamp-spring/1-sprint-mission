@@ -1,7 +1,7 @@
 package com.sprint.mission.service;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
-import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.entity.ReadStatus;
 import java.util.List;
 import java.util.UUID;
 

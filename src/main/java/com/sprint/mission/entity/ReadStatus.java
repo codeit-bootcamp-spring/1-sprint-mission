@@ -1,8 +1,5 @@
-package com.sprint.mission.entity.addOn;
+package com.sprint.mission.entity;
 
-import com.sprint.mission.entity.main.BaseUpdatableEntity;
-import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

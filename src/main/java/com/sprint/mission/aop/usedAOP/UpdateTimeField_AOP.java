@@ -1,8 +1,8 @@
 //package com.sprint.mission.aop.usedAOP;
 //
-//import com.sprint.mission.entity.main.Channel;
-//import com.sprint.mission.entity.main.Message;
-//import com.sprint.mission.entity.main.User;
+//import com.sprint.mission.entity.Channel;
+//import com.sprint.mission.entity.Message;
+//import com.sprint.mission.entity.User;
 //import lombok.extern.slf4j.Slf4j;
 //import org.aspectj.lang.JoinPoint;
 //import org.aspectj.lang.annotation.*;

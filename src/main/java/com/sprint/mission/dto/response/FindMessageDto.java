@@ -1,6 +1,5 @@
 package com.sprint.mission.dto.response;
 
-import com.sprint.mission.entity.main.Message;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;

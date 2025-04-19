@@ -1,7 +1,7 @@
 package com.sprint.mission.unit.repository;
 
-import com.sprint.mission.entity.addOn.UserStatus;
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.UserStatus;
+import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.UserStatusRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

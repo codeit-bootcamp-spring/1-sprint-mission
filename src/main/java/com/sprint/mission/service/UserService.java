@@ -2,7 +2,7 @@ package com.sprint.mission.service;
 
 
 import com.sprint.mission.dto.request.UserDtoForUpdate;
-import com.sprint.mission.entity.main.User;
+import com.sprint.mission.entity.User;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

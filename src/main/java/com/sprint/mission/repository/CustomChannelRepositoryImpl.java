@@ -4,9 +4,10 @@ import com.querydsl.core.group.GroupBy;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.dto.ChannelMapper;
 import com.sprint.mission.dto.response.ChannelDto;
-import com.sprint.mission.entity.main.*;
+import com.sprint.mission.entity.BaseEntity;
+import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.User;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 
 import java.time.Instant;
