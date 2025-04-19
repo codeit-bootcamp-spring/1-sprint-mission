@@ -13,20 +13,22 @@ import java.util.Optional;
 
 @Mapper(componentModel = "spring")
 public interface BinaryContentMapper {
-    BinaryContentDto toDto(BinaryContent binaryContent);
 
-    default Optional<BinaryContentDtoForCreate> convertFileToBinaryContentDto(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            return Optional.empty();
-        }
-        try {
-            BinaryContentDtoForCreate binaryContentDtoForCreate = new BinaryContentDtoForCreate(file.getName(),
-                    file.getContentType(), file.getSize(), file.getBytes());
-            return Optional.of(binaryContentDtoForCreate);
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
-        }
+  BinaryContentDto toDto(BinaryContent binaryContent);
+
+  default Optional<BinaryContentDtoForCreate> convertFileToBinaryContentDto(MultipartFile file) {
+    if (file == null || file.isEmpty()) {
+      return Optional.empty();
     }
+    try {
+      BinaryContentDtoForCreate binaryContentDtoForCreate = new BinaryContentDtoForCreate(
+          file.getName(),
+          file.getContentType(), file.getSize(), file.getBytes());
+      return Optional.of(binaryContentDtoForCreate);
+    } catch (IOException e) {
+      throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
+    }
+  }
 
-    BinaryContent toEntity(BinaryContentDtoForCreate request);
+  BinaryContent toEntity(BinaryContentDtoForCreate request);
 }

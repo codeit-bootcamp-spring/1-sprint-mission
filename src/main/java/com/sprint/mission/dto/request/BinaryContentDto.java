@@ -7,8 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public record BinaryContentDto(
 
-        @Schema(example = "zessy")
-        String fileName,
-        String contentType,
-        byte[] bytes) {
+    @Schema(example = "zessy")
+    String fileName,
+    String contentType,
+    byte[] bytes) {
+
 }

@@ -1,6 +1,9 @@
 package com.sprint.mission.service;
 
 
+import com.sprint.mission.dto.request.ChannelDtoForUpdate;
+import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
+import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.response.ChannelDto;
 import com.sprint.mission.entity.Channel;
 
@@ -8,10 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-//
-//    Channel create(ChannelDtoForRequest dto);
-//
-//  List<FindChannelAllDto> findAllByUserId(UUID userId);
 
   List<Channel> findAll();
 

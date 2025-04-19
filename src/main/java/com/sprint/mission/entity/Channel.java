@@ -18,28 +18,31 @@ import static jakarta.persistence.CascadeType.*;
 @Getter
 @Schema(description = "채널")
 @Table(name = "channels")
-public class Channel extends BaseUpdatableEntity{
+public class Channel extends BaseUpdatableEntity {
 
-    private ChannelType channelType;
-    private String name;
-    private String description;
+  private ChannelType channelType;
+  private String name;
+  private String description;
 
-    @OneToMany(mappedBy = "channel", cascade = REMOVE, orphanRemoval = true)
-    private List<ReadStatus> readStatus = new ArrayList<>();
+  @OneToMany(mappedBy = "channel", cascade = REMOVE, orphanRemoval = true)
+  private List<ReadStatus> readStatus = new ArrayList<>();
 
-    public Channel(String name, String description, ChannelType channelType) {
-        this.name = name;
-        this.channelType = channelType;
-        this.description = description;
+  public Channel(String name, String description, ChannelType channelType) {
+    this.name = name;
+    this.channelType = channelType;
+    this.description = description;
+  }
+
+  public void update(String newName, String newDescription) {
+    this.name = newName;
+    this.description = newDescription;
+  }
+
+  public boolean isPrivate() {
+    if (this.channelType == ChannelType.PRIVATE) {
+      return true;
+    } else {
+      return false;
     }
-
-    public void update(String newName, String newDescription) {
-        this.name = newName;
-        this.description = newDescription;
-    }
-
-    public boolean isPrivate() {
-        if (this.channelType == ChannelType.PRIVATE) return true;
-        else return false;
-    }
+  }
 }

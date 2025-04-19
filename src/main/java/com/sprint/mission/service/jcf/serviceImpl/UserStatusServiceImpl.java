@@ -21,35 +21,36 @@ import java.util.UUID;
 @Transactional
 public class UserStatusServiceImpl implements UserStatusService {
 
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
 
-    public UserStatus create(User user) {
-        if (userStatusRepository.existsByUser(user))
-            throw new CustomException(ErrorCode.ALREADY_EXIST_USER_STATUS);
-        return userStatusRepository.save(new UserStatus(user));
+  public UserStatus create(User user) {
+    if (userStatusRepository.existsByUser(user)) {
+      throw new CustomException(ErrorCode.ALREADY_EXIST_USER_STATUS);
     }
+    return userStatusRepository.save(new UserStatus(user));
+  }
 
-    @Transactional(readOnly = true)
-    public List<UserStatus> findAll() {
-        return userStatusRepository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<UserStatus> findAll() {
+    return userStatusRepository.findAll();
+  }
 
-    public UserStatus updateByUserId(UUID userId) {
-        User loginUser = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
-        UserStatus updatingUserStatus = userStatusRepository.findByUser(loginUser)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_STATUS_MATCHING_USER));
-        updatingUserStatus.update();
-        return updatingUserStatus;
-    }
+  public UserStatus updateByUserId(UUID userId) {
+    User loginUser = userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+    UserStatus updatingUserStatus = userStatusRepository.findByUser(loginUser)
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_STATUS_MATCHING_USER));
+    updatingUserStatus.update();
+    return updatingUserStatus;
+  }
 
-    public void delete(UUID statusId) {
-        if (userStatusRepository.existsById(statusId)) {
-            throw new CustomException(ErrorCode.NO_SUCH_USER_STATUS);
-        } else {
-            userStatusRepository.deleteById(statusId);
-        }
+  public void delete(UUID statusId) {
+    if (userStatusRepository.existsById(statusId)) {
+      throw new CustomException(ErrorCode.NO_SUCH_USER_STATUS);
+    } else {
+      userStatusRepository.deleteById(statusId);
     }
+  }
 };
 

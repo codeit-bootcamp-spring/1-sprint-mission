@@ -8,12 +8,11 @@ import org.mapstruct.Mapping;
 
 import static org.mapstruct.MappingInheritanceStrategy.*;
 
-@MapperConfig(mappingInheritanceStrategy = AUTO_INHERIT_ALL_FROM_CONFIG)
 @Mapper(componentModel = "spring")
 public interface ReadStatusMapper {
 
-    @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "channelId", source = "channel.id")
-    @Mapping(target = "lastReadAt", source = "lastReadAt")
-    ReadStatusDto toDto(ReadStatus readStatus);
+  @Mapping(target = "userId", source = "user.id")
+  @Mapping(target = "channelId", source = "channel.id")
+  @Mapping(target = "lastReadAt", source = "lastReadAt")
+  ReadStatusDto toDto(ReadStatus readStatus);
 }

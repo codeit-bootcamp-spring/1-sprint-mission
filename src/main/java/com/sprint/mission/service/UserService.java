@@ -12,9 +12,14 @@ import java.util.UUID;
 
 @Service
 public interface UserService {
-    User create(UserDtoForCreate requestDTO, MultipartFile profile);
-    User update(UUID userId, UserDtoForUpdate requestDTO);
-    User findById(UUID id);
-    List<User> findAll();
-    void delete(UUID userId);
+
+  User create(UserDtoForCreate requestDTO, MultipartFile profile);
+
+  User update(UUID userId, UserDtoForUpdate requestDTO);
+
+  User findById(UUID id);
+
+  List<User> findAll();
+
+  void delete(UUID userId);
 }

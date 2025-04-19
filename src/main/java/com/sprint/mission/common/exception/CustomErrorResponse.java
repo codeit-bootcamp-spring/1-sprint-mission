@@ -25,31 +25,32 @@ public class CustomErrorResponse {
   //  private String path;
 //  private String timestamp;
 
-  public static ResponseEntity<CustomErrorResponse> toResponseEntity(ErrorCode e, HttpServletRequest request) {
+  public static ResponseEntity<CustomErrorResponse> toResponseEntity(ErrorCode e,
+      HttpServletRequest request) {
     HttpStatus eStatus = e.getStatus();
     HttpHeaders headers = new HttpHeaders();
     headers.add("Custom-Header", "ErrorResponseHeader");
     headers.add("Content-Type", "application/json");
     return ResponseEntity
-            .status(eStatus)
-            .headers(headers)
-            .body(CustomErrorResponse.builder()
-                    .status(eStatus.value()+"")
-                    .message(e.getMessage())
-                    .errorCode(eStatus.getReasonPhrase())
+        .status(eStatus)
+        .headers(headers)
+        .body(CustomErrorResponse.builder()
+            .status(eStatus.value() + "")
+            .message(e.getMessage())
+            .errorCode(eStatus.getReasonPhrase())
 //                    .path(request.getRequestURI())
-                    .build());
+            .build());
   }
 
   public static ResponseEntity<CustomErrorResponse> toResponseEntity(ErrorCode e) {
     HttpStatus eStatus = e.getStatus();
     return ResponseEntity
-            .status(eStatus)
-            .body(CustomErrorResponse.builder()
-                    .status(eStatus.value()+"")
-                    .message(e.getMessage())
-                    .errorCode(eStatus.getReasonPhrase())
-                    .build());
+        .status(eStatus)
+        .body(CustomErrorResponse.builder()
+            .status(eStatus.value() + "")
+            .message(e.getMessage())
+            .errorCode(eStatus.getReasonPhrase())
+            .build());
   }
   // 결과 예시 : {"status":400,"message":"잘못된 요청입니다.","errorCode":"BAD_REQUEST"}
 }

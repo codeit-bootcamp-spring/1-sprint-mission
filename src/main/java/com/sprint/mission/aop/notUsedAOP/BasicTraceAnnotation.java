@@ -17,25 +17,28 @@ import org.aspectj.lang.annotation.Pointcut;
 // 쓰고 싶을 때 컴포넌트 설정
 public class BasicTraceAnnotation {
 
-    private final TraceDevice trace;
+  private final TraceDevice trace;
 
-    @Pointcut("@within(com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation)")
-    public void classWithin(){}
-    @Pointcut("@within(com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation)")
-    public void methodWith(){}
+  @Pointcut("@within(com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation)")
+  public void classWithin() {
+  }
 
-    @Around("classWithin()")
-    public Object doTrace(ProceedingJoinPoint joinPoint){
+  @Pointcut("@within(com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation)")
+  public void methodWith() {
+  }
 
-        TraceStatus status = null;
-        try {
-            status = trace.begin(joinPoint);
-            Object result = joinPoint.proceed();
-            trace.end(status, result);
-            return result;
-        } catch (Throwable e) {
-            trace.exception(status, e, null);
-            throw new RuntimeException(e);
-        }
+  @Around("classWithin()")
+  public Object doTrace(ProceedingJoinPoint joinPoint) {
+
+    TraceStatus status = null;
+    try {
+      status = trace.begin(joinPoint);
+      Object result = joinPoint.proceed();
+      trace.end(status, result);
+      return result;
+    } catch (Throwable e) {
+      trace.exception(status, e, null);
+      throw new RuntimeException(e);
     }
+  }
 }

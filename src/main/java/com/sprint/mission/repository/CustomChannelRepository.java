@@ -6,5 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CustomChannelRepository {
-    List<ChannelDto> findAllPrivateChannelByUserId(UUID userId);
+
+  List<ChannelDto> findAllPrivateChannelByUserId(UUID userId);
 }

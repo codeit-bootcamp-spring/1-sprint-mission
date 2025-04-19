@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 //
-////@Component
+/// /@Component
 //@Slf4j
 ////@Aspect
 //public class FileExceptionAOP {

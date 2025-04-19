@@ -20,59 +20,59 @@ import static com.sprint.mission.entity.main.QUser.*;
 
 public class CustomChannelRepositoryImpl implements CustomChannelRepository {
 
-    private final JPAQueryFactory jpaQueryFactory;
-    private final ChannelMapper channelMapper = Mappers.getMapper(ChannelMapper.class);
+  private final JPAQueryFactory jpaQueryFactory;
+  private final ChannelMapper channelMapper = Mappers.getMapper(ChannelMapper.class);
 
-    public CustomChannelRepositoryImpl(EntityManager em) {
-        this.jpaQueryFactory = new JPAQueryFactory(em);
+  public CustomChannelRepositoryImpl(EntityManager em) {
+    this.jpaQueryFactory = new JPAQueryFactory(em);
+  }
+
+  public List<ChannelDto> findAllPrivateChannelByUserId(UUID userId) {
+
+    // 쿼리1
+    List<Channel> participatingPrivateChannel = getParticipatingPrivateChannel(userId);
+    if (participatingPrivateChannel.isEmpty()) {
+      return Collections.emptyList();
     }
+    List<UUID> channelIds = participatingPrivateChannel.stream().map(BaseEntity::getId).toList();
 
-    public List<ChannelDto> findAllPrivateChannelByUserId(UUID userId) {
+    // 쿼리2
+    Map<UUID, List<User>> usersInChannelMap = findChannelUsersMapByChannelIds(channelIds);
+    // 쿼리3
+    Map<UUID, Instant> lastMessageMap = getChannelLastMessagetMap(participatingPrivateChannel);
 
-        // 쿼리1
-        List<Channel> participatingPrivateChannel = getParticipatingPrivateChannel(userId);
-        if (participatingPrivateChannel.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<UUID> channelIds = participatingPrivateChannel.stream().map(BaseEntity::getId).toList();
+    return participatingPrivateChannel.stream().map((channel) -> {
+      Instant lastMessageInChannel = lastMessageMap.get(channel.getId());
+      List<User> userList = usersInChannelMap.get(channel.getId());
+      return channelMapper.toDto(channel, userList, lastMessageInChannel);
+    }).toList();
+  }
 
-        // 쿼리2
-        Map<UUID, List<User>> usersInChannelMap = findChannelUsersMapByChannelIds(channelIds);
-        // 쿼리3
-        Map<UUID, Instant> lastMessageMap = getChannelLastMessagetMap(participatingPrivateChannel);
+  private Map<UUID, Instant> getChannelLastMessagetMap(List<Channel> participatingPrivateChannel) {
+    return jpaQueryFactory
+        .from(message)
+        .where(message.channel.in(participatingPrivateChannel))
+        .transform(GroupBy.groupBy(message.channel.id)
+            .as(message.createdAt.max()));
+  }
 
-        return participatingPrivateChannel.stream().map((channel) -> {
-            Instant lastMessageInChannel = lastMessageMap.get(channel.getId());
-            List<User> userList = usersInChannelMap.get(channel.getId());
-            return channelMapper.toDto(channel, userList, lastMessageInChannel);
-        }).toList();
-    }
+  private List<Channel> getParticipatingPrivateChannel(UUID userId) {
+    return jpaQueryFactory
+        .select(readStatus.channel)
+        .from(readStatus)
+        .where(readStatus.user.id.eq(userId))
+        .fetch();
+  }
 
-    private Map<UUID, Instant> getChannelLastMessagetMap(List<Channel> participatingPrivateChannel) {
-        return jpaQueryFactory
-                .from(message)
-                .where(message.channel.in(participatingPrivateChannel))
-                .transform(GroupBy.groupBy(message.channel.id)
-                        .as(message.createdAt.max()));
-    }
-
-    private List<Channel> getParticipatingPrivateChannel(UUID userId) {
-        return jpaQueryFactory
-                .select(readStatus.channel)
-                .from(readStatus)
-                .where(readStatus.user.id.eq(userId))
-                .fetch();
-    }
-
-    private Map<UUID, List<User>> findChannelUsersMapByChannelIds(List<UUID> channelIds) {
-        return jpaQueryFactory
-                .from(channel)
-                .join(channel.readStatus, readStatus)
-                .join(readStatus.user, user)
-                .join(user.profile).fetchJoin()
-                .where(channel.id.in(channelIds))
-                .groupBy(channel.id)
-                .transform(GroupBy.groupBy(channel.id).as(GroupBy.list(user)));
-    }
+  private Map<UUID, List<User>> findChannelUsersMapByChannelIds(List<UUID> channelIds) {
+    return jpaQueryFactory
+        .from(channel)
+        .join(channel.readStatus, readStatus)
+        .join(readStatus.user, user)
+        .join(user.profile).fetchJoin()
+        .where(channel.id.in(channelIds))
+        .groupBy(channel.id)
+        .transform(GroupBy.groupBy(channel.id).as(GroupBy.list(user)));
+  }
 }
 

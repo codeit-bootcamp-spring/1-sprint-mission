@@ -9,9 +9,9 @@ import static org.springframework.test.util.ReflectionTestUtils.*;
 
 public class ReflectionFieldSetter {
 
-    public Object settingFieldValue(Object target) {
-        setField(target, "id", UUID.randomUUID());
-        setField(target, "createdAt", Instant.now());
-        return target;
-    }
+  public Object settingFieldValue(Object target) {
+    setField(target, "id", UUID.randomUUID());
+    setField(target, "createdAt", Instant.now());
+    return target;
+  }
 }

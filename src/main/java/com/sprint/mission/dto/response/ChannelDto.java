@@ -8,12 +8,13 @@ import java.util.UUID;
 
 @Schema(description = "채널 조회 응답 DTO")
 public record ChannelDto(
-        UUID id,
-        ChannelType channelType,
-        String name,
-        String description,
-        List<UserDto> participants,
-        Instant lastMessageAt) {
+    UUID id,
+    ChannelType channelType,
+    String name,
+    String description,
+    List<UserDto> participants,
+    Instant lastMessageAt) {
+
 }
 // private
 //[ ] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.

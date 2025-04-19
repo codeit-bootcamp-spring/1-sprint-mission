@@ -21,26 +21,31 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceSupporter {
 
-    private final BinaryContentMapper binaryContentMapper;
-    private final BinaryService profileService;
-    private final UserMapper userMapper;
+  private final BinaryContentMapper binaryContentMapper;
+  private final BinaryService profileService;
+  private final UserMapper userMapper;
 
-    public void isDuplicateNameEmail(List<User> allUser, String username, String email) {
-        boolean isDuplicateName = allUser.stream()
-                .anyMatch(usr -> username.equals(usr.getUsername()));
+  public void isDuplicateNameEmail(List<User> allUser, String username, String email) {
+    boolean isDuplicateName = allUser.stream()
+        .anyMatch(usr -> username.equals(usr.getUsername()));
 
-        if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
-
-        boolean isDuplicateEmail = allUser.stream()
-                .anyMatch(usr -> email.equals(usr.getEmail()));
-        if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
+    if (isDuplicateName) {
+      throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
     }
 
-    public User createUser(UserDtoForCreate requestDTO, MultipartFile profile) {
-        Optional<BinaryContentDtoForCreate> profileDto = binaryContentMapper.convertFileToBinaryContentDto(profile);
-        return profileDto.map((binaryDto) -> {
-            BinaryContent createdBinaryContent = profileService.create(binaryDto);
-            return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
-        }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
+    boolean isDuplicateEmail = allUser.stream()
+        .anyMatch(usr -> email.equals(usr.getEmail()));
+    if (isDuplicateEmail) {
+      throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
+  }
+
+  public User createUser(UserDtoForCreate requestDTO, MultipartFile profile) {
+    Optional<BinaryContentDtoForCreate> profileDto = binaryContentMapper.convertFileToBinaryContentDto(
+        profile);
+    return profileDto.map((binaryDto) -> {
+      BinaryContent createdBinaryContent = profileService.create(binaryDto);
+      return userMapper.toEntityWithProfile(requestDTO, createdBinaryContent);
+    }).orElseGet(() -> userMapper.toEntityWithoutProfile(requestDTO));
+  }
 }

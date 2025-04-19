@@ -37,8 +37,8 @@
 //  public void excludeBinaryContentStorage() {}
 //
 //
-////    @Pointcut("execution(* com.sprint.mission.repository.jcf..create(..))")
-////    public void jcfCreateMethod(){} // 테스트 1회성
+/// /    @Pointcut("execution(* com.sprint.mission.repository.jcf..create(..))") /    public void
+/// jcfCreateMethod(){} // 테스트 1회성
 //
 //  @Around("(serviceMethod() || repositoryMethod() || controllerMethod()) && excludeBinaryContentStorage()")
 //  public Object doTrace(ProceedingJoinPoint joinPoint) {

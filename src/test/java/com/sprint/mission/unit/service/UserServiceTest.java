@@ -34,110 +34,110 @@ import static org.springframework.test.util.ReflectionTestUtils.*;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
-    private final MockFileFactory mockFileFactory = new MockFileFactory();
+  private final MockFileFactory mockFileFactory = new MockFileFactory();
 
-    @Spy
-    private BinaryContentMapper binaryContentMapper = Mappers.getMapper(BinaryContentMapper.class);
-    @Spy
-    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
-    @Mock
-    private BinaryService binaryService;
+  @Spy
+  private BinaryContentMapper binaryContentMapper = Mappers.getMapper(BinaryContentMapper.class);
+  @Spy
+  private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+  @Mock
+  private BinaryService binaryService;
 
-    @InjectMocks
-    private UserServiceSupporter userServiceSupporter;
-
-
-    @Test
-    @DisplayName("회원가입 성공")
-    void duplicateTest() {
-        UserDtoForCreate dto = new UserDtoForCreate("test1", "비밀번호486", "icb6999@naver.com");
-        MockMultipartFile mockFile = mockFileFactory.getMockFileList(1).get(0);
-
-        when(binaryService.create(any(BinaryContentDtoForCreate.class))).thenAnswer((invocation) -> {
-            BinaryContentDtoForCreate binaryDto = invocation.getArgument(0);
-            BinaryContent profile = binaryContentMapper.toEntity(binaryDto);
-            setField(profile, "id", UUID.randomUUID());
-            setField(profile, "createdAt", Instant.now());
-            return profile;
-        });
-
-        //when
-        User createdUser = userServiceSupporter.createUser(dto, mockFile);
-
-        //then
-        assertThat(createdUser).isNotNull();
-        assertThat(createdUser.getUsername()).isEqualTo(dto.username());
-        assertThat(createdUser.getPassword()).isEqualTo(dto.password());
-        assertThat(createdUser.getEmail()).isEqualTo(dto.email());
-
-        BinaryContent profile = createdUser.getProfile();
-        assertThat(profile).isNotNull();
-        assertThat(profile.getFileName()).isEqualTo(mockFile.getName());
-        assertThat(profile.getContentType()).isEqualTo(mockFile.getContentType());
-        assertThat(profile.getSize()).isEqualTo(mockFile.getSize());
-    }
+  @InjectMocks
+  private UserServiceSupporter userServiceSupporter;
 
 
-    @Test
-    @DisplayName("회원가입 실패 - 중복된 이름")
-    void isDuplicateName() {
-        // given
-        User user1 = new User("중복 될 이름1", "테스트 패스워드", "테스트 이메일", null);
-        User user2 = new User("중복 안 될 이름2", "테스트 패스워드", "테스트 이메일", null);
-        List<User> userList = List.of(user1, user2);
+  @Test
+  @DisplayName("회원가입 성공")
+  void duplicateTest() {
+    UserDtoForCreate dto = new UserDtoForCreate("test1", "비밀번호486", "icb6999@naver.com");
+    MockMultipartFile mockFile = mockFileFactory.getMockFileList(1).get(0);
 
-        //when //then
-        assertThatThrownBy(() ->
-                userServiceSupporter.isDuplicateNameEmail(userList, "중복 될 이름1", "icb444@naver.com"))
-                .isInstanceOf(CustomException.class);
-    }
+    when(binaryService.create(any(BinaryContentDtoForCreate.class))).thenAnswer((invocation) -> {
+      BinaryContentDtoForCreate binaryDto = invocation.getArgument(0);
+      BinaryContent profile = binaryContentMapper.toEntity(binaryDto);
+      setField(profile, "id", UUID.randomUUID());
+      setField(profile, "createdAt", Instant.now());
+      return profile;
+    });
 
-    @Test
-    @DisplayName("회원가입 실패 - 중복된 이메일")
-    void isDuplicateEmail() {
-        // given
-        List<User> userList = List.of(
-                new User("유저 1", "테스트 패스워드", "중복 이메일", null),
-                new User("유저 2", "테스트 패스워드", "테스트 이메일", null));
+    //when
+    User createdUser = userServiceSupporter.createUser(dto, mockFile);
 
-        //when //then
-        assertThatThrownBy(() ->
-                userServiceSupporter.isDuplicateNameEmail(userList, "유저 444", "중복 이메일"))
-                .isInstanceOf(CustomException.class);
-    }
+    //then
+    assertThat(createdUser).isNotNull();
+    assertThat(createdUser.getUsername()).isEqualTo(dto.username());
+    assertThat(createdUser.getPassword()).isEqualTo(dto.password());
+    assertThat(createdUser.getEmail()).isEqualTo(dto.email());
 
-    @Mock
-    private UserRepository userRepository;
+    BinaryContent profile = createdUser.getProfile();
+    assertThat(profile).isNotNull();
+    assertThat(profile.getFileName()).isEqualTo(mockFile.getName());
+    assertThat(profile.getContentType()).isEqualTo(mockFile.getContentType());
+    assertThat(profile.getSize()).isEqualTo(mockFile.getSize());
+  }
 
-    @InjectMocks
-    private UserServiceImpl userService;
 
-    @Test
-    @DisplayName("Delete 실패 - userId에 맞는 user가 존재하지 않음")
-    void deleteFail() {
-        // when
-        UUID userId = UUID.randomUUID();
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+  @Test
+  @DisplayName("회원가입 실패 - 중복된 이름")
+  void isDuplicateName() {
+    // given
+    User user1 = new User("중복 될 이름1", "테스트 패스워드", "테스트 이메일", null);
+    User user2 = new User("중복 안 될 이름2", "테스트 패스워드", "테스트 이메일", null);
+    List<User> userList = List.of(user1, user2);
 
-        assertThatThrownBy(() -> userService.delete(userId))
-                .isInstanceOf(CustomException.class);
-    }
+    //when //then
+    assertThatThrownBy(() ->
+        userServiceSupporter.isDuplicateNameEmail(userList, "중복 될 이름1", "icb444@naver.com"))
+        .isInstanceOf(CustomException.class);
+  }
 
-    @Test
-    @DisplayName("Delete 성공")
-    void deleteSuccess() {
-        // given
-        UUID userId = UUID.randomUUID();
-        User user = new User("지울 이름1", "비밀번호1", "이메일1", null);
-        setField(user, "id", userId);
-        setField(user, "createdAt", Instant.now());
+  @Test
+  @DisplayName("회원가입 실패 - 중복된 이메일")
+  void isDuplicateEmail() {
+    // given
+    List<User> userList = List.of(
+        new User("유저 1", "테스트 패스워드", "중복 이메일", null),
+        new User("유저 2", "테스트 패스워드", "테스트 이메일", null));
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    //when //then
+    assertThatThrownBy(() ->
+        userServiceSupporter.isDuplicateNameEmail(userList, "유저 444", "중복 이메일"))
+        .isInstanceOf(CustomException.class);
+  }
 
-        // when
-        userService.delete(userId);
+  @Mock
+  private UserRepository userRepository;
 
-        // then
-        verify(userRepository, times(1)).delete(user);
-    }
+  @InjectMocks
+  private UserServiceImpl userService;
+
+  @Test
+  @DisplayName("Delete 실패 - userId에 맞는 user가 존재하지 않음")
+  void deleteFail() {
+    // when
+    UUID userId = UUID.randomUUID();
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> userService.delete(userId))
+        .isInstanceOf(CustomException.class);
+  }
+
+  @Test
+  @DisplayName("Delete 성공")
+  void deleteSuccess() {
+    // given
+    UUID userId = UUID.randomUUID();
+    User user = new User("지울 이름1", "비밀번호1", "이메일1", null);
+    setField(user, "id", userId);
+    setField(user, "createdAt", Instant.now());
+
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+    // when
+    userService.delete(userId);
+
+    // then
+    verify(userRepository, times(1)).delete(user);
+  }
 }

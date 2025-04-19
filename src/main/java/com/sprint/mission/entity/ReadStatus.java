@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.Instant;
 
 import static jakarta.persistence.FetchType.*;
+
 @Entity
 @EqualsAndHashCode(of = {"user", "channel"}, callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -17,20 +18,20 @@ import static jakarta.persistence.FetchType.*;
 @Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id", unique = true)
-    private User user;
+  @ManyToOne(fetch = LAZY)
+  @JoinColumn(name = "user_id", unique = true)
+  private User user;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "channel_id", unique = true)
-    private Channel channel;
+  @ManyToOne(fetch = LAZY)
+  @JoinColumn(name = "channel_id", unique = true)
+  private Channel channel;
 
-    @NotNull
-    private Instant lastReadAt;
+  @NotNull
+  private Instant lastReadAt;
 
-    public void update(Instant newLastReadAt) {
-        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
-            this.lastReadAt = newLastReadAt;
-        }
+  public void update(Instant newLastReadAt) {
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
     }
+  }
 }

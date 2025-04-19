@@ -17,43 +17,44 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.stream.Stream;
+
 @Repository
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-    private final Path root;
+  private final Path root;
 
-    public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String root) {
-        this.root = Paths.get(root);
-        init();
+  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String root) {
+    this.root = Paths.get(root);
+    init();
+  }
+
+  //루트 디렉토리를 초기화합니다.
+  //Bean이 생성되면 자동으로 호출되도록
+  void init() {
+    if (!Files.exists(root)) {
+      try {
+        Files.createDirectories(root);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    } else {
+      try (Stream<Path> list = Files.list(root)) {
+        list.forEach(path -> {
+          try {
+            Files.deleteIfExists(path);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        });
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
+  }
 
-    //루트 디렉토리를 초기화합니다.
-    //Bean이 생성되면 자동으로 호출되도록
-    void init() {
-        if (!Files.exists(root)) {
-            try {
-                Files.createDirectories(root);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            try (Stream<Path> list = Files.list(root)) {
-                list.forEach(path -> {
-                    try {
-                        Files.deleteIfExists(path);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    @Override
-    public UUID put(UUID binaryContentId, byte[] content) {
+  @Override
+  public UUID put(UUID binaryContentId, byte[] content) {
 
 //        String mimeType;
 //        try (ByteArrayInputStream bais = new ByteArrayInputStream(content)){
@@ -66,63 +67,61 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 //        }
 //
 
-        Path path = resolvePath(binaryContentId);
-        try {
-            Files.deleteIfExists(path); // 테스트용
-            Files.createFile(path);
-            Files.write(path, content);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return binaryContentId;
+    Path path = resolvePath(binaryContentId);
+    try {
+      Files.deleteIfExists(path); // 테스트용
+      Files.createFile(path);
+      Files.write(path, content);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+    return binaryContentId;
+  }
 
-    /**
-     * 키 정보를 바탕으로 byte[] 데이터를 읽어 InputStream 타입으로 반환합니다.
-     * UUID는 BinaryContent의 Id 입니다.
-     */
-    @Override
-    public InputStream get(UUID id) {
-        Path binaryPath = this.resolvePath(id);
-        try {
-            return Files.newInputStream(binaryPath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+  /**
+   * 키 정보를 바탕으로 byte[] 데이터를 읽어 InputStream 타입으로 반환합니다. UUID는 BinaryContent의 Id 입니다.
+   */
+  @Override
+  public InputStream get(UUID id) {
+    Path binaryPath = this.resolvePath(id);
+    try {
+      return Files.newInputStream(binaryPath);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    /**
-     * HTTP API로 다운로드 기능을 제공합니다.
-     * BinaryContentDto 정보를 바탕으로 파일을 다운로드할 수 있는 응답을 반환
-     * get 메소드를 통해 파일의 바이너리 데이터를 조회합니다.
-     * BinaryContentDto와 바이너리 데이터를 활용해 ResponseEntity<Resource> 응답을 생성 후 반환
-     */
-    @Override
-    public ResponseEntity<? extends Resource> download(BinaryContentDto content) {
-        InputStream inputStream = this.get(content.id());
-        Resource resource = new InputStreamResource(inputStream);
+  /**
+   * HTTP API로 다운로드 기능을 제공합니다. BinaryContentDto 정보를 바탕으로 파일을 다운로드할 수 있는 응답을 반환 get 메소드를 통해 파일의 바이너리
+   * 데이터를 조회합니다. BinaryContentDto와 바이너리 데이터를 활용해 ResponseEntity<Resource> 응답을 생성 후 반환
+   */
+  @Override
+  public ResponseEntity<? extends Resource> download(BinaryContentDto content) {
+    InputStream inputStream = this.get(content.id());
+    Resource resource = new InputStreamResource(inputStream);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + "[discodeit] " + content.fileName());
-        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(content.size()));
+    HttpHeaders headers = new HttpHeaders();
+    headers.add(HttpHeaders.CONTENT_DISPOSITION,
+        "attachment; filename=" + "[discodeit] " + content.fileName());
+    headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(content.size()));
 
-        MediaType mediaType = content.contentType() == null
-                ? MediaType.APPLICATION_OCTET_STREAM
-                : MediaType.valueOf(content.contentType());
+    MediaType mediaType = content.contentType() == null
+        ? MediaType.APPLICATION_OCTET_STREAM
+        : MediaType.valueOf(content.contentType());
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(mediaType)
-                .body(resource);
-    }
+    return ResponseEntity.ok()
+        .headers(headers)
+        .contentType(mediaType)
+        .body(resource);
+  }
 
-    /**
-     * 편의
-     */
-    private Path resolvePath(UUID id) {
-        //파일 저장 위치 규칙 예시: {root}/{UUID}
-        return root.resolve(id.toString());
-    }
+  /**
+   * 편의
+   */
+  private Path resolvePath(UUID id) {
+    //파일 저장 위치 규칙 예시: {root}/{UUID}
+    return root.resolve(id.toString());
+  }
 }
 
 

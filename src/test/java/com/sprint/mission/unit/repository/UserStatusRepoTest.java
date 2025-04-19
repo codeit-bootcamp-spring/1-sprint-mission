@@ -23,102 +23,102 @@ import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTest
 @Sql(scripts = {"classpath:schema-test.sql"})
 public class UserStatusRepoTest {
 
-    @Autowired
-    private UserStatusRepository userStatusRepository;
-    @Autowired
-    private TestEntityManager tem;
+  @Autowired
+  private UserStatusRepository userStatusRepository;
+  @Autowired
+  private TestEntityManager tem;
 
-    @DisplayName("save 성공")
-    @Test
-    void save(){
-        // given
-        User user = new User("테스트 유저", "비밀번호", "이메일", null);
-        tem.persistAndFlush(user);
-        UserStatus userStatus = new UserStatus(user);
+  @DisplayName("save 성공")
+  @Test
+  void save() {
+    // given
+    User user = new User("테스트 유저", "비밀번호", "이메일", null);
+    tem.persistAndFlush(user);
+    UserStatus userStatus = new UserStatus(user);
 
-        // when
-        userStatusRepository.save(userStatus);
-        tem.flush();
-        UserStatus foundUserStatus = userStatusRepository.findById(userStatus.getId()).orElse(null);
+    // when
+    userStatusRepository.save(userStatus);
+    tem.flush();
+    UserStatus foundUserStatus = userStatusRepository.findById(userStatus.getId()).orElse(null);
 
-        // then
-        assertThat(foundUserStatus).isNotNull();
-        assertThat(foundUserStatus.getId()).isEqualTo(userStatus.getId());
-        assertThat(foundUserStatus.getUser()).isEqualTo(userStatus.getUser());
-        assertThat(foundUserStatus).isEqualTo(userStatus);
-    }
+    // then
+    assertThat(foundUserStatus).isNotNull();
+    assertThat(foundUserStatus.getId()).isEqualTo(userStatus.getId());
+    assertThat(foundUserStatus.getUser()).isEqualTo(userStatus.getUser());
+    assertThat(foundUserStatus).isEqualTo(userStatus);
+  }
 
-    @DisplayName("User로 조회 성공")
-    @Test
-    void findByUser(){
-        // given
-        User user = new User("테스트 유저", "비밀번호", "이메일", null);
-        tem.persistAndFlush(user);
+  @DisplayName("User로 조회 성공")
+  @Test
+  void findByUser() {
+    // given
+    User user = new User("테스트 유저", "비밀번호", "이메일", null);
+    tem.persistAndFlush(user);
 
-        UserStatus userStatus = new UserStatus(user);
-        tem.persistAndFlush(userStatus);
-        tem.clear();
+    UserStatus userStatus = new UserStatus(user);
+    tem.persistAndFlush(userStatus);
+    tem.clear();
 
-        // when
-        UserStatus foundUserStatus = userStatusRepository.findByUser(user).orElse(null);
+    // when
+    UserStatus foundUserStatus = userStatusRepository.findByUser(user).orElse(null);
 
-        // then
-        assertThat(foundUserStatus).isNotNull();
-        assertThat(foundUserStatus).isEqualTo(userStatus);
-    }
+    // then
+    assertThat(foundUserStatus).isNotNull();
+    assertThat(foundUserStatus).isEqualTo(userStatus);
+  }
 
-    @DisplayName("User로 조회 실패 : 잘못된 유저 매칭")
-    @Test
-    void findByUserFail(){
-        // given
-        User user = new User("테스트 유저", "비밀번호", "이메일", null);
-        User fakeUser = new User("가짜 유저", "가짜 비밀번호", "가짜 이메일", null);
-        tem.persistAndFlush(user);
-        tem.persistAndFlush(fakeUser);
+  @DisplayName("User로 조회 실패 : 잘못된 유저 매칭")
+  @Test
+  void findByUserFail() {
+    // given
+    User user = new User("테스트 유저", "비밀번호", "이메일", null);
+    User fakeUser = new User("가짜 유저", "가짜 비밀번호", "가짜 이메일", null);
+    tem.persistAndFlush(user);
+    tem.persistAndFlush(fakeUser);
 
-        UserStatus userStatus = new UserStatus(user);
-        tem.persistAndFlush(userStatus);
-        tem.clear();
+    UserStatus userStatus = new UserStatus(user);
+    tem.persistAndFlush(userStatus);
+    tem.clear();
 
-        // when, then
-        Optional<UserStatus> foundUser = userStatusRepository.findByUser(fakeUser);
+    // when, then
+    Optional<UserStatus> foundUser = userStatusRepository.findByUser(fakeUser);
 
-        assertThat(foundUser).isEmpty();
-    }
+    assertThat(foundUser).isEmpty();
+  }
 
-    @DisplayName("isExistByUser 성공")
-    @Test
-    void isExist(){
-        // given
-        User user = new User("테스트 유저", "비밀번호", "이메일", null);
-        tem.persistAndFlush(user);
-        UserStatus userStatus = new UserStatus(user);
-        tem.persistAndFlush(userStatus);
-        tem.clear();
+  @DisplayName("isExistByUser 성공")
+  @Test
+  void isExist() {
+    // given
+    User user = new User("테스트 유저", "비밀번호", "이메일", null);
+    tem.persistAndFlush(user);
+    UserStatus userStatus = new UserStatus(user);
+    tem.persistAndFlush(userStatus);
+    tem.clear();
 
-        // when
-        boolean isExist = userStatusRepository.existsByUser(user);
+    // when
+    boolean isExist = userStatusRepository.existsByUser(user);
 
-        // then
-        assertThat(isExist).isTrue();
-    }
+    // then
+    assertThat(isExist).isTrue();
+  }
 
-    @DisplayName("isExistByUser 실패")
-    @Test
-    void isExistFail(){
-        // given
-        User user = new User("테스트 유저", "비밀번호", "이메일", null);
-        User fakeUser = new User("가짜 유저", "가짜 비밀번호", "가짜 이메일", null);
-        tem.persistAndFlush(user);
-        tem.persistAndFlush(fakeUser);
-        UserStatus userStatus = new UserStatus(user);
-        tem.persistAndFlush(userStatus);
-        tem.clear();
+  @DisplayName("isExistByUser 실패")
+  @Test
+  void isExistFail() {
+    // given
+    User user = new User("테스트 유저", "비밀번호", "이메일", null);
+    User fakeUser = new User("가짜 유저", "가짜 비밀번호", "가짜 이메일", null);
+    tem.persistAndFlush(user);
+    tem.persistAndFlush(fakeUser);
+    UserStatus userStatus = new UserStatus(user);
+    tem.persistAndFlush(userStatus);
+    tem.clear();
 
-        // when
-        boolean isExist = userStatusRepository.existsByUser(fakeUser);
+    // when
+    boolean isExist = userStatusRepository.existsByUser(fakeUser);
 
-        // then
-        assertThat(isExist).isFalse();
-    }
+    // then
+    assertThat(isExist).isFalse();
+  }
 }

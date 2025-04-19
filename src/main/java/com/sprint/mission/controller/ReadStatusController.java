@@ -34,53 +34,55 @@ import static org.springframework.http.HttpStatus.*;
 @Tag(name = "ReadStatus", description = "Message 읽음 상태 API")
 public class ReadStatusController {
 
-    private final ReadStatusService readStatusService;
-    private final ReadStatusMapper readStatusMapper;
+  private final ReadStatusService readStatusService;
+  private final ReadStatusMapper readStatusMapper;
 
 
-    @Operation(summary = "Message 읽음 상태 생성")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "읽음 상태 생성 성공",
-                    content = @Content(schema = @Schema(implementation = ReadStatus.class))),
-            @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "읽음 상태가 이미 존재함",
-                    content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
-    })
-    @PostMapping
-    public ResponseEntity<CommonResponse> create(@RequestBody @Valid ReadStatusCreateRequest request) {
-        log.info("컨트롤러 생성 userId : {}", request.userId());
-        ReadStatusDto readStatusDto = readStatusMapper.toDto(readStatusService.create(request));
-        return CommonResponse.toResponseEntity
-                (CREATED, "읽음 상태가 생성되었습니다.", readStatusDto);
-    }
+  @Operation(summary = "Message 읽음 상태 생성")
+  @ApiResponses({
+      @ApiResponse(responseCode = "201", description = "읽음 상태 생성 성공",
+          content = @Content(schema = @Schema(implementation = ReadStatus.class))),
+      @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
+          content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
+      @ApiResponse(responseCode = "409", description = "읽음 상태가 이미 존재함",
+          content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
+  })
+  @PostMapping
+  public ResponseEntity<CommonResponse> create(
+      @RequestBody @Valid ReadStatusCreateRequest request) {
+    log.info("컨트롤러 생성 userId : {}", request.userId());
+    ReadStatusDto readStatusDto = readStatusMapper.toDto(readStatusService.create(request));
+    return CommonResponse.toResponseEntity
+        (CREATED, "읽음 상태가 생성되었습니다.", readStatusDto);
+  }
 
-    @Operation(summary = "Message 읽음 상태 수정")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Message 읽음 상태가 성공적으로 수정됨",
-                    content = @Content(schema = @Schema(implementation = ReadStatus.class))),
-            @ApiResponse(responseCode = "404", description = "Message 읽음 상태를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
-    })
-    @PatchMapping("{id}")
-    public ResponseEntity<CommonResponse> update(
-            @Parameter(description = "수정할 읽음 상태 ID") @PathVariable("id") UUID readStatusId,
-            @RequestBody @Valid ReadStatusUpdateRequest request) {
-        ReadStatusDto updatedReadStatusDto = readStatusMapper.toDto(readStatusService.update(readStatusId, request));
-        return CommonResponse.toResponseEntity
-                (OK, "읽음 상태가 업데이트되었습니다.", updatedReadStatusDto);
-    }
+  @Operation(summary = "Message 읽음 상태 수정")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "Message 읽음 상태가 성공적으로 수정됨",
+          content = @Content(schema = @Schema(implementation = ReadStatus.class))),
+      @ApiResponse(responseCode = "404", description = "Message 읽음 상태를 찾을 수 없음",
+          content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
+  })
+  @PatchMapping("{id}")
+  public ResponseEntity<CommonResponse> update(
+      @Parameter(description = "수정할 읽음 상태 ID") @PathVariable("id") UUID readStatusId,
+      @RequestBody @Valid ReadStatusUpdateRequest request) {
+    ReadStatusDto updatedReadStatusDto = readStatusMapper.toDto(
+        readStatusService.update(readStatusId, request));
+    return CommonResponse.toResponseEntity
+        (OK, "읽음 상태가 업데이트되었습니다.", updatedReadStatusDto);
+  }
 
-    @Operation(summary = "User의 Message 읽음 상태 목록 조회")
-    @ApiResponse(responseCode = "200", description = "Message 읽음 상태 목록 조회 성공",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class))))
-    @GetMapping
-    public ResponseEntity<CommonResponse> findAllByUserId(
-            @Parameter(description = "조회할 User ID", required = true) @RequestParam("userId") UUID userId) {
-        List<ReadStatusDto> readStatusDtoList = readStatusService.findAllByUserId(userId).stream()
-                .map(readStatusMapper::toDto)
-                .toList();
-        return CommonResponse.toResponseEntity
-                (OK, "읽음 상태 목록이 조회되었습니다.", readStatusDtoList);
-    }
+  @Operation(summary = "User의 Message 읽음 상태 목록 조회")
+  @ApiResponse(responseCode = "200", description = "Message 읽음 상태 목록 조회 성공",
+      content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class))))
+  @GetMapping
+  public ResponseEntity<CommonResponse> findAllByUserId(
+      @Parameter(description = "조회할 User ID", required = true) @RequestParam("userId") UUID userId) {
+    List<ReadStatusDto> readStatusDtoList = readStatusService.findAllByUserId(userId).stream()
+        .map(readStatusMapper::toDto)
+        .toList();
+    return CommonResponse.toResponseEntity
+        (OK, "읽음 상태 목록이 조회되었습니다.", readStatusDtoList);
+  }
 }

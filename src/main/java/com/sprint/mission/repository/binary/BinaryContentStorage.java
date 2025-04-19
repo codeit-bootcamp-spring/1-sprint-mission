@@ -10,7 +10,9 @@ import java.util.UUID;
 @Repository
 public interface BinaryContentStorage {
 
-    UUID put(UUID id, byte[] content);
-    InputStream get(UUID id);
-    ResponseEntity<?> download(BinaryContentDto content);
+  UUID put(UUID id, byte[] content);
+
+  InputStream get(UUID id);
+
+  ResponseEntity<?> download(BinaryContentDto content);
 }

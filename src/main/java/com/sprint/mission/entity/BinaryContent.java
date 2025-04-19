@@ -13,16 +13,16 @@ import lombok.*;
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
 
-    private String fileName;
-    private Long size;
-    private String contentType;
+  private String fileName;
+  private Long size;
+  private String contentType;
 
-    @OneToOne(mappedBy = "profile")
-    private User user;
+  @OneToOne(mappedBy = "profile")
+  private User user;
 
-    public BinaryContent(String fileName, Long size, String contentType) {
-        this.fileName = fileName;
-        this.size = size;
-        this.contentType = contentType;
-    }
+  public BinaryContent(String fileName, Long size, String contentType) {
+    this.fileName = fileName;
+    this.size = size;
+    this.contentType = contentType;
+  }
 }

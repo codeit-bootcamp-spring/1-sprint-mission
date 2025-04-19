@@ -17,7 +17,7 @@ spring:
       mode: always
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
     open-in-view: false
 
 ---
@@ -65,7 +65,7 @@ info:
 logging:
   level:
     org.hibernate.sql: warn
-    com.sprint.mission: info
+    com.sprint.mission: debug
 
 springdoc:
   api-docs:

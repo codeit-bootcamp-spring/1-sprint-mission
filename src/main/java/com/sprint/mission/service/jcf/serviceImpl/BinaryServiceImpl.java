@@ -22,36 +22,37 @@ import java.util.UUID;
 @Transactional
 public class BinaryServiceImpl implements BinaryService {
 
-    private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
-    private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
 
 
-    @Override
-    public BinaryContent create(BinaryContentDtoForCreate request){
-        BinaryContent savedUser = binaryContentRepository.save(binaryContentMapper.toEntity(request));
-        binaryContentStorage.put(savedUser.getId(), request.bytes());
-        return savedUser;
+  @Override
+  public BinaryContent create(BinaryContentDtoForCreate request) {
+    BinaryContent savedUser = binaryContentRepository.save(binaryContentMapper.toEntity(request));
+    binaryContentStorage.put(savedUser.getId(), request.bytes());
+    return savedUser;
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public BinaryContent findById(UUID id) {
+    return binaryContentRepository.findById(id)
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
+  }
+
+  @Override
+  public void deleteById(UUID binaryId) {
+    if (!binaryContentRepository.existsById(binaryId)) {
+      throw new CustomException(ErrorCode.NO_SUCH_BINARY);
+    } else {
+      binaryContentRepository.deleteById(binaryId);
     }
+  }
 
-    @Transactional(readOnly = true)
-    @Override
-    public BinaryContent findById(UUID id){
-        return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
-    }
-
-    @Override
-    public void deleteById(UUID binaryId) {
-        if (!binaryContentRepository.existsById(binaryId)) throw new CustomException(ErrorCode.NO_SUCH_BINARY);
-        else {
-            binaryContentRepository.deleteById(binaryId);
-        }
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-        return binaryContentRepository.findAllById(binaryContentIds);
-    }
+  @Transactional(readOnly = true)
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllById(binaryContentIds);
+  }
 }

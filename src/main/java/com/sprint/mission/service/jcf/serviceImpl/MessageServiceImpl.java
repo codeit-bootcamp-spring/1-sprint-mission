@@ -36,115 +36,117 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
-    private final MessageRepository messageRepository;
-    private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
-    private final BinaryService binaryService;
-    private final MessageMapper messageMapper;
-    private final PageResponseMapper pageResponseMapper;
+  private final MessageRepository messageRepository;
+  private final ChannelRepository channelRepository;
+  private final UserRepository userRepository;
+  private final BinaryService binaryService;
+  private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
 
 
-    @Override
-    public Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> binaryContentDtoForCreateList) {
-        User author = userRepository.findById(responseDto.userId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+  @Override
+  public Message create(MessageDtoForCreate responseDto,
+      List<BinaryContentDtoForCreate> binaryContentDtoForCreateList) {
+    User author = userRepository.findById(responseDto.userId())
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        Channel writtenPlace = channelRepository.findById(responseDto.channelId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
+    Channel writtenPlace = channelRepository.findById(responseDto.channelId())
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
-        Message createdMessage = messageMapper.toEntity(writtenPlace, author, responseDto.content());
-        List<BinaryContent> binaryContentList = binaryContentDtoForCreateList.stream()
-                .map(binaryService::create).toList();
+    Message createdMessage = messageMapper.toEntity(writtenPlace, author, responseDto.content());
+    List<BinaryContent> binaryContentList = binaryContentDtoForCreateList.stream()
+        .map(binaryService::create).toList();
 
-        createdMessage.getMessageAttachments().addAll(binaryContentList);
-        return messageRepository.save(createdMessage);
+    createdMessage.getMessageAttachments().addAll(binaryContentList);
+    return messageRepository.save(createdMessage);
+  }
+
+  @Override
+  public Message update(UUID messageId, MessageDtoForUpdate updateDto) {
+    Message updatingMessage = this.findById(messageId);
+    return updatingMessage.update(updateDto.content());
+  }
+
+
+  @Override
+  public Message findById(UUID channelId) {
+    return messageRepository.findById(channelId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
+  }
+
+  // 스크롤링
+  @Override
+  public List<ScrollPageResponse<MessageDto>> findAllByChannelId(UUID channelId) {
+    if (!channelRepository.existsById(channelId)) {
+      throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
     }
 
-    @Override
-    public Message update(UUID messageId, MessageDtoForUpdate updateDto) {
-        Message updatingMessage = this.findById(messageId);
-        return updatingMessage.update(updateDto.content());
+    // 매번 새 페이지마다 요청할지 아니면 한번에 다 가져올지 고민 (중간에 총개수가 바뀔 수 있으니)
+    Long totalMessageCount = messageRepository.countByChannel_Id(channelId);
+    ScrollPosition position = ScrollPosition.keyset();
+    List<ScrollPageResponse<MessageDto>> messageDtoList = new ArrayList<>();
+    while (true) {
+      Window<MessageDto> messageDtoWindow = messageRepository
+          .findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, (KeysetScrollPosition) position)
+          .map(messageMapper::toDto);
+
+      messageDtoList.add(
+          pageResponseMapper.toScrollPageResponse(messageDtoWindow, position, totalMessageCount));
+
+      // 포지션 초기화
+      position = getScrollPosition(messageDtoWindow);
+      if (!messageDtoWindow.hasNext()) {
+        break;
+      }
+    }
+    return messageDtoList;
+  }
+
+  // Page 버전
+  @Override
+  public List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable) {
+    if (!channelRepository.existsById(channelId)) {
+      throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
     }
 
+    Page<Message> pageMessages;
+    List<PageResponse<MessageDto>> messageDtoList = new ArrayList<>();
+    do {
+      pageMessages = messageRepository.findPagingAllByChannel_Id(channelId, pageable);
 
-    @Override
-    public Message findById(UUID channelId) {
-        return messageRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
+      Page<MessageDto> dtoPage = pageMessages.map(messageMapper::toDto);
+      PageResponse<MessageDto> messagePageResponse = pageResponseMapper.fromPage(dtoPage);
+      messageDtoList.add(messagePageResponse);
+
+      pageable = pageMessages.nextPageable();
+    } while (pageMessages.hasNext());
+    return messageDtoList;
+  }
+
+
+  @Override
+  public void delete(UUID messageId) {
+    // BinaryContent랑 cascade Remove관계라
+    if (!messageRepository.existsById(messageId)) {
+      throw new CustomException(ErrorCode.NO_SUCH_MESSAGE);
+    } else {
+      messageRepository.deleteById(messageId);
     }
-
-    // 스크롤링
-    @Override
-    public List<ScrollPageResponse<MessageDto>> findAllByChannelId(UUID channelId) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        }
-
-        // 매번 새 페이지마다 요청할지 아니면 한번에 다 가져올지 고민 (중간에 총개수가 바뀔 수 있으니)
-        Long totalMessageCount = messageRepository.countByChannel_Id(channelId);
-        ScrollPosition position = ScrollPosition.keyset();
-        List<ScrollPageResponse<MessageDto>> messageDtoList = new ArrayList<>();
-        while (true){
-            Window<MessageDto> messageDtoWindow = messageRepository
-                    .findFirst50ByChannel_IdOrderByCreatedAtDesc(channelId, (KeysetScrollPosition) position)
-                    .map(messageMapper::toDto);
-
-            messageDtoList.add(pageResponseMapper.toScrollPageResponse(messageDtoWindow, position, totalMessageCount));
-
-            // 포지션 초기화
-            position = getScrollPosition(messageDtoWindow);
-            if (!messageDtoWindow.hasNext()) {
-                break;
-            }
-        }
-        return messageDtoList;
-    }
-
-    // Page 버전
-    @Override
-    public List<PageResponse<MessageDto>> findAllByChannelId(UUID channelId, Pageable pageable) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        }
-
-        Page<Message> pageMessages;
-        List<PageResponse<MessageDto>> messageDtoList = new ArrayList<>();
-        do {
-            pageMessages = messageRepository.findPagingAllByChannel_Id(channelId, pageable);
-
-            Page<MessageDto> dtoPage = pageMessages.map(messageMapper::toDto);
-            PageResponse<MessageDto> messagePageResponse = pageResponseMapper.fromPage(dtoPage);
-            messageDtoList.add(messagePageResponse);
-
-            pageable = pageMessages.nextPageable();
-        } while (pageMessages.hasNext());
-        return messageDtoList;
-    }
+  }
 
 
-    @Override
-    public void delete(UUID messageId) {
-        // BinaryContent랑 cascade Remove관계라
-        if (!messageRepository.existsById(messageId)) {
-            throw new CustomException(ErrorCode.NO_SUCH_MESSAGE);
-        } else {
-            messageRepository.deleteById(messageId);
-        }
-    }
+  @Override
+  public void deleteAllByChannelId(UUID channelId) {
+    messageRepository.deleteAllByChannel_Id(channelId);
+  }
 
 
-    @Override
-    public void deleteAllByChannelId(UUID channelId) {
-        messageRepository.deleteAllByChannel_Id(channelId);
-    }
-
-
-    private ScrollPosition getScrollPosition(Window<MessageDto> messageDtoWindow) {
-        List<MessageDto> content = messageDtoWindow.getContent();
-        MessageDto lastDto = content.get(content.size() - 1);
-        Map<String, Object> keysetMap = new HashMap<>();
-        keysetMap.put("createdAt", lastDto.createdAt());
-        keysetMap.put("id", lastDto.id());
-        return ScrollPosition.forward(keysetMap);
-    }
+  private ScrollPosition getScrollPosition(Window<MessageDto> messageDtoWindow) {
+    List<MessageDto> content = messageDtoWindow.getContent();
+    MessageDto lastDto = content.get(content.size() - 1);
+    Map<String, Object> keysetMap = new HashMap<>();
+    keysetMap.put("createdAt", lastDto.createdAt());
+    keysetMap.put("id", lastDto.id());
+    return ScrollPosition.forward(keysetMap);
+  }
 }

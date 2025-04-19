@@ -26,51 +26,51 @@ import java.util.UUID;
 @Transactional
 public class ReadStatusServiceImpl implements ReadStatusService {
 
-    private final ReadStatusRepository readStatusRepository;
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
+  private final ReadStatusRepository readStatusRepository;
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
 
-    public ReadStatus create(ReadStatusCreateRequest request) {
-        User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+  public ReadStatus create(ReadStatusCreateRequest request) {
+    User user = userRepository.findById(request.userId())
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        Channel channel = channelRepository.findById(request.channelId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
+    Channel channel = channelRepository.findById(request.channelId())
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
-        if (readStatusRepository.existsById(user.getStatus().getId())) {
-            throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
-        }
-        return readStatusRepository.save(new ReadStatus(user, channel, request.lastReadAt()));
+    if (readStatusRepository.existsById(user.getStatus().getId())) {
+      throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
     }
+    return readStatusRepository.save(new ReadStatus(user, channel, request.lastReadAt()));
+  }
 
-    @Transactional(readOnly = true)
-    public ReadStatus findById(UUID readStatusId) {
-        return readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_READ_STATUS));
+  @Transactional(readOnly = true)
+  public ReadStatus findById(UUID readStatusId) {
+    return readStatusRepository.findById(readStatusId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_READ_STATUS));
+  }
+
+  public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
+    ReadStatus readStatus = this.findById(readStatusId);
+    readStatus.update(request.newLastReadAt());
+    return readStatus;
+  }
+
+  public void delete(UUID readStatusId) {
+    if (readStatusRepository.existsById(readStatusId)) {
+      readStatusRepository.deleteById(readStatusId);
+    } else {
+      throw new CustomException(ErrorCode.NO_SUCH_READ_STATUS);
     }
+  }
 
-    public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
-        ReadStatus readStatus = this.findById(readStatusId);
-        readStatus.update(request.newLastReadAt());
-        return readStatus;
-    }
+  @Transactional(readOnly = true)
+  public List<ReadStatus> findAllByUserId(UUID userId) {
+    return readStatusRepository.findAllByUser_Id(userId);
 
-    public void delete(UUID readStatusId) {
-        if (readStatusRepository.existsById(readStatusId)) {
-            readStatusRepository.deleteById(readStatusId);
-        } else {
-            throw new CustomException(ErrorCode.NO_SUCH_READ_STATUS);
-        }
-    }
+  }
 
-    @Transactional(readOnly = true)
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUser_Id(userId);
-
-    }
-
-    @Transactional(readOnly = true)
-    public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        return readStatusRepository.findAllByChannel_Id(channelId);
-    }
+  @Transactional(readOnly = true)
+  public List<ReadStatus> findAllByChannelId(UUID channelId) {
+    return readStatusRepository.findAllByChannel_Id(channelId);
+  }
 }

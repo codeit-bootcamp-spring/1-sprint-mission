@@ -7,9 +7,8 @@ import org.mapstruct.MapperConfig;
 
 import static org.mapstruct.MappingInheritanceStrategy.*;
 
-@MapperConfig(mappingInheritanceStrategy = AUTO_INHERIT_ALL_FROM_CONFIG)
 @Mapper(componentModel = "spring")
 public interface UserStatusMapper {
 
-    UserStatusDto toDto(UserStatus userStatus);
+  UserStatusDto toDto(UserStatus userStatus);
 }

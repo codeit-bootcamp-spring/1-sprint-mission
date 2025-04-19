@@ -13,18 +13,20 @@ import java.util.UUID;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    void deleteAllByChannel_Id(UUID channelId);
+  void deleteAllByChannel_Id(UUID channelId);
 
-    @EntityGraph(attributePaths = {"channel", "messageAttachments", "author"})
-    @NonNull
-    Optional<Message> findById(@NonNull UUID id);
+  @EntityGraph(attributePaths = {"channel", "messageAttachments", "author"})
+  @NonNull
+  Optional<Message> findById(@NonNull UUID id);
 
-    @EntityGraph(attributePaths = {"channel", "messageAttachments", "author", "author.status"})
-    Page<Message> findPagingAllByChannel_Id(UUID channelId, Pageable pageable);
+  @EntityGraph(attributePaths = {"channel", "messageAttachments", "author", "author.status"})
+  Page<Message> findPagingAllByChannel_Id(UUID channelId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"channel", "messageAttachments", "author", "author.status"})
-    Window<Message> findFirst50ByChannel_IdOrderByCreatedAtDesc(UUID channelId, KeysetScrollPosition position);
+  @EntityGraph(attributePaths = {"channel", "messageAttachments", "author", "author.status"})
+  Window<Message> findFirst50ByChannel_IdOrderByCreatedAtDesc(UUID channelId,
+      KeysetScrollPosition position);
 
-    Long countByChannel_Id(UUID channelId);
-    Optional<Message> findTop1ByChannel_IdOrderByCreatedAtDesc(UUID channelId);
+  Long countByChannel_Id(UUID channelId);
+
+  Optional<Message> findTop1ByChannel_IdOrderByCreatedAtDesc(UUID channelId);
 }

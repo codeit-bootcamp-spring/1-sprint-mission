@@ -4,10 +4,11 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record SaveUserDto(
-        UUID userId,
-        Instant createAt,
-        Instant updateAt,
-        String name,
-        String email,
-        UUID profileImgId){
+    UUID userId,
+    Instant createAt,
+    Instant updateAt,
+    String name,
+    String email,
+    UUID profileImgId) {
+
 }

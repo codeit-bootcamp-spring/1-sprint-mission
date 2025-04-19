@@ -13,4 +13,5 @@ public record FindChannelAllDto(
     String name, String description,
     List<UUID> participantIds,
     Instant lastMessageAt) {
+
 }

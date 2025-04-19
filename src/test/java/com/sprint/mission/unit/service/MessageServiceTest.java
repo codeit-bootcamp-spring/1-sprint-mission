@@ -40,65 +40,70 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class MessageServiceTest {
 
-    private final ReflectionFieldSetter reflectionFieldSetter = new ReflectionFieldSetter();
-    private final MockFileFactory mockFileFactory = new MockFileFactory();
+  private final ReflectionFieldSetter reflectionFieldSetter = new ReflectionFieldSetter();
+  private final MockFileFactory mockFileFactory = new MockFileFactory();
 
-    @Spy
-    private MessageMapper messageMapper = Mappers.getMapper(MessageMapper.class);
-    @Spy
-    private BinaryContentMapper binaryContentMapper = Mappers.getMapper(BinaryContentMapper.class);
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private ChannelRepository channelRepository;
-    @Mock
-    private BinaryService binaryService;
-    @Mock
-    private BinaryContentStorage binaryContentStorage;
-    @Mock
-    private MessageRepository messageRepository;
+  @Spy
+  private MessageMapper messageMapper = Mappers.getMapper(MessageMapper.class);
+  @Spy
+  private BinaryContentMapper binaryContentMapper = Mappers.getMapper(BinaryContentMapper.class);
+  @Mock
+  private UserRepository userRepository;
+  @Mock
+  private ChannelRepository channelRepository;
+  @Mock
+  private BinaryService binaryService;
+  @Mock
+  private BinaryContentStorage binaryContentStorage;
+  @Mock
+  private MessageRepository messageRepository;
 
-    @InjectMocks
-    private MessageServiceImpl messageService;
+  @InjectMocks
+  private MessageServiceImpl messageService;
 
-    @Test
-    @DisplayName("메시지 생성 성공")
-    void createSuccess() throws Exception {
-        // given
-        //    public Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> binaryContentDtoForCreateList) {
-        Channel channel = (Channel) reflectionFieldSetter.settingFieldValue(new Channel("작성된 곳", "테스트용 채널입니다", PUBLIC));
-        User author = (User) reflectionFieldSetter.settingFieldValue(new User("작성자", "패스워드123", "icb1555@naver.com", null));
-        MessageDtoForCreate dto = new MessageDtoForCreate(channel.getId(), author.getId(), "성공 할 메시지");
-        int numberOfFiles = 3;
-        List<MockMultipartFile> mockFileList = mockFileFactory.getMockFileList(numberOfFiles);
-        List<BinaryContentDtoForCreate> binaryDTOList = convertMockFileToBinaryDTO(mockFileList);
+  @Test
+  @DisplayName("메시지 생성 성공")
+  void createSuccess() throws Exception {
+    // given
+    //    public Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> binaryContentDtoForCreateList) {
+    Channel channel = (Channel) reflectionFieldSetter.settingFieldValue(
+        new Channel("작성된 곳", "테스트용 채널입니다", PUBLIC));
+    User author = (User) reflectionFieldSetter.settingFieldValue(
+        new User("작성자", "패스워드123", "icb1555@naver.com", null));
+    MessageDtoForCreate dto = new MessageDtoForCreate(channel.getId(), author.getId(), "성공 할 메시지");
+    int numberOfFiles = 3;
+    List<MockMultipartFile> mockFileList = mockFileFactory.getMockFileList(numberOfFiles);
+    List<BinaryContentDtoForCreate> binaryDTOList = convertMockFileToBinaryDTO(mockFileList);
 
-        when(userRepository.findById(author.getId())).thenReturn(Optional.of(author));
-        when(channelRepository.findById(channel.getId())).thenReturn(Optional.of(channel));
-        when(binaryService.create(any(BinaryContentDtoForCreate.class))).thenAnswer((invocation) -> {
-            BinaryContentDtoForCreate binaryDto = invocation.getArgument(0);
-            return reflectionFieldSetter.settingFieldValue(binaryContentMapper.toEntity(binaryDto));
-        });
-        when(messageRepository.save(any(Message.class))).thenAnswer(invocation -> reflectionFieldSetter.settingFieldValue(invocation.getArgument(0)));
+    when(userRepository.findById(author.getId())).thenReturn(Optional.of(author));
+    when(channelRepository.findById(channel.getId())).thenReturn(Optional.of(channel));
+    when(binaryService.create(any(BinaryContentDtoForCreate.class))).thenAnswer((invocation) -> {
+      BinaryContentDtoForCreate binaryDto = invocation.getArgument(0);
+      return reflectionFieldSetter.settingFieldValue(binaryContentMapper.toEntity(binaryDto));
+    });
+    when(messageRepository.save(any(Message.class))).thenAnswer(
+        invocation -> reflectionFieldSetter.settingFieldValue(invocation.getArgument(0)));
 
-        // when
-        Message message = messageService.create(dto, binaryDTOList);
+    // when
+    Message message = messageService.create(dto, binaryDTOList);
 
-        // then
-        assertThat(message).isNotNull();
-        assertThat(message.getContent()).isEqualTo(dto.content());
-        assertThat(message.getChannel()).isEqualTo(channel);
-        assertThat(message.getAuthor()).isEqualTo(author);
-        assertThat(message.getMessageAttachments()).hasSize(numberOfFiles);
-    }
+    // then
+    assertThat(message).isNotNull();
+    assertThat(message.getContent()).isEqualTo(dto.content());
+    assertThat(message.getChannel()).isEqualTo(channel);
+    assertThat(message.getAuthor()).isEqualTo(author);
+    assertThat(message.getMessageAttachments()).hasSize(numberOfFiles);
+  }
 
-    private List<BinaryContentDtoForCreate> convertMockFileToBinaryDTO(List<MockMultipartFile> mockFileList) {
-        return mockFileList.stream().map((mockFile) -> {
-            try {
-                return new BinaryContentDtoForCreate(mockFile.getOriginalFilename(), mockFile.getContentType(), mockFile.getSize(), mockFile.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
-    }
+  private List<BinaryContentDtoForCreate> convertMockFileToBinaryDTO(
+      List<MockMultipartFile> mockFileList) {
+    return mockFileList.stream().map((mockFile) -> {
+      try {
+        return new BinaryContentDtoForCreate(mockFile.getOriginalFilename(),
+            mockFile.getContentType(), mockFile.getSize(), mockFile.getBytes());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }).toList();
+  }
 }

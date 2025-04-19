@@ -11,34 +11,24 @@ import org.mapstruct.*;
 import java.time.Instant;
 import java.util.List;
 
-//@MapperConfig(mappingInheritanceStrategy = AUTO_INHERIT_ALL_FROM_CONFIG)
 @Mapper(componentModel = "spring")
 public interface ChannelMapper {
 
-    //public record ChannelDto(
-    //        UUID id,
-    //        ChannelType channelType,
-    //        String name,
-    //        String description,
-    //        List<UserDto> participants,
-    //        Instant lastMessageAt) {
+  @Mapping(target = "id", source = "channel.id")
+  @Mapping(target = "description", source = "channel.description")
+  @Mapping(target = "name", source = "channel.name")
+  @Mapping(target = "channelType", source = "channel.channelType")
+  @Mapping(target = "participants", source = "participants", qualifiedByName = "UserToUserDto")
+  @Mapping(target = "lastMessageAt", source = "lastMessageAt")
+  ChannelDto toDto(Channel channel, List<User> participants, Instant lastMessageAt);
 
-    @Mapping(target = "id", source = "channel.id")
-    @Mapping(target = "description", source = "channel.description")
-    @Mapping(target = "name", source = "channel.name")
-    @Mapping(target = "channelType", source = "channel.channelType")
-    @Mapping(target = "participants", source = "participants", qualifiedByName = "UserToUserDto")
-    @Mapping(target = "lastMessageAt", source = "lastMessageAt")
-    ChannelDto toDto(Channel channel, List<User> participants, Instant lastMessageAt);
+  @Named("UserToUserDto")
+  @Mapping(target = "online", expression = "java(user.getStatus() != null ? user.getStatus().isOnline() : null)")
+  UserDto UserToUserDto(User user);
 
-    @Named("UserToUserDto")
-    @Mapping(target = "online", expression = "java(user.getStatus() != null ? user.getStatus().isOnline() : null)")
-    UserDto UserToUserDto(User user);
+  ChannelDto toDto(Channel channel);
 
-    ChannelDto toDto(Channel channel);
+  Channel toPublicEntity(PublicChannelCreateDTO request, ChannelType channelType);
 
-    //@Mapping(target = ".", expression = "java(Channel.createChannel(request.name, request.description, PUBLIC))")
-    Channel toPublicEntity(PublicChannelCreateDTO request, ChannelType channelType);
-
-    Channel toPrivateEntity(ChannelType channelType);
+  Channel toPrivateEntity(ChannelType channelType);
 }

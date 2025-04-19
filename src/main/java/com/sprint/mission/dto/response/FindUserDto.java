@@ -16,4 +16,5 @@ public record FindUserDto(
     String email,
     UUID profileImgId,
     boolean isOnline) {
+
 }

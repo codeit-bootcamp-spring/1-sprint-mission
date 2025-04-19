@@ -16,8 +16,8 @@
 //@Component
 //public class UpdateTimeField_AOP {
 //
-////    @Pointcut("execution(* com.sprint.mission.repository..*del*(..))")
-////    public void delete(){} 삭제는 애초에 업데이트가 필요 없네
+/// /    @Pointcut("execution(* com.sprint.mission.repository..*del*(..))") /    public void
+/// delete(){} 삭제는 애초에 업데이트가 필요 없네
 //
 //    @Pointcut("execution(* com.sprint.mission.repository.jcf.main..save(..))")
 //    public void jcfMainSave(){}

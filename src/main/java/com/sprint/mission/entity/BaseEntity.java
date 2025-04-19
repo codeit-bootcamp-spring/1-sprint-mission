@@ -13,13 +13,15 @@ import java.util.UUID;
 
 @MappedSuperclass
 @EqualsAndHashCode(of = "id")
-@Getter @EntityListeners(AuditingEntityListener.class)
+@Getter
+@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private Instant createdAt;
+  @CreatedDate
+  @Column(updatable = false, nullable = false)
+  private Instant createdAt;
 }

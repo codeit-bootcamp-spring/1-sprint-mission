@@ -35,151 +35,157 @@ import static org.assertj.core.api.Assertions.*;
 @Testcontainers
 public class AWSS3Test {
 
-    private static S3Client s3Client;
-    private static String accessKey;
-    private static String secretKey;
-    private static Region region;
-    private static String bucketName;
-    private static URI endpoint;
-    private static final String contentType = "image/jpeg";
-    private static final String KEY = UUID.randomUUID().toString();
+  private static S3Client s3Client;
+  private static String accessKey;
+  private static String secretKey;
+  private static Region region;
+  private static String bucketName;
+  private static URI endpoint;
+  private static final String contentType = "image/jpeg";
+  private static final String KEY = UUID.randomUUID().toString();
 
-    @Container
-    private static LocalStackContainer localStack = new LocalStackContainer(
-            DockerImageName.parse("localstack/localstack:latest")
-    ).withServices(LocalStackContainer.Service.S3);
+  @Container
+  private static LocalStackContainer localStack = new LocalStackContainer(
+      DockerImageName.parse("localstack/localstack:latest")
+  ).withServices(LocalStackContainer.Service.S3);
 
-    @BeforeAll
-    static void setUp() {
-        accessKey = localStack.getAccessKey();
-        secretKey = localStack.getSecretKey();
-        region = Region.of(localStack.getRegion());
-        bucketName = "test-bucket-name";
-        endpoint = localStack.getEndpointOverride(LocalStackContainer.Service.S3);
-        // getEndpointOverride() 메서드를 사용하여 S3 서비스의 엔드포인트를 가져
-        s3Client = S3Client.builder()
-                .endpointOverride(endpoint)
-                .region(region)
-                .credentialsProvider(generateCredentialsProvider())
-                .forcePathStyle(true)
-                .build();
-        // 지정한 이름의 S3 버킷을 생성
-        s3Client.createBucket(b -> b.bucket(bucketName));
-    }
-
-
-
-    @DisplayName("S3에 파일 업로드")
-    @Test
-    void uploadFile() throws IOException {
-        MockMultipartFile mockFile = new MockMultipartFile("운동 테스트 파일", KEY, contentType, "test".getBytes());
-
-        // when
-        UUID savedKey = put(UUID.fromString(KEY), mockFile.getBytes());
-
-        //then
-        ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getGetObjectRequest(savedKey.toString(), contentType));
-        byte[] uploadedFileBytes = s3Object.readAllBytes();
-
-        // then
-        assertThat(uploadedFileBytes).isEqualTo(mockFile.getBytes());
-        assertThat(uploadedFileBytes.length).isEqualTo(mockFile.getBytes().length);
-    }
+  @BeforeAll
+  static void setUp() {
+    accessKey = localStack.getAccessKey();
+    secretKey = localStack.getSecretKey();
+    region = Region.of(localStack.getRegion());
+    bucketName = "test-bucket-name";
+    endpoint = localStack.getEndpointOverride(LocalStackContainer.Service.S3);
+    // getEndpointOverride() 메서드를 사용하여 S3 서비스의 엔드포인트를 가져
+    s3Client = S3Client.builder()
+        .endpointOverride(endpoint)
+        .region(region)
+        .credentialsProvider(generateCredentialsProvider())
+        .forcePathStyle(true)
+        .build();
+    // 지정한 이름의 S3 버킷을 생성
+    s3Client.createBucket(b -> b.bucket(bucketName));
+  }
 
 
-    /**
-     * 업로드 로직
-     */
-    private UUID put(UUID key, byte[] bytes) {
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key.toString())
-                .contentType(contentType)
-                .build();
+  @DisplayName("S3에 파일 업로드")
+  @Test
+  void uploadFile() throws IOException {
+    MockMultipartFile mockFile = new MockMultipartFile("운동 테스트 파일", KEY, contentType,
+        "test".getBytes());
 
-        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
-        return key;
-    }
+    // when
+    UUID savedKey = put(UUID.fromString(KEY), mockFile.getBytes());
 
-    @DisplayName("S3에서 파일 다운로드")
-    @Test
-    void downLoadFile() throws IOException, InterruptedException {
-        // given
-        MockMultipartFile mockFile = new MockMultipartFile("다운로드 할 파일", KEY, contentType, "test".getBytes());
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .key(KEY)
-                .contentType(mockFile.getContentType())
-                .bucket(bucketName).build();
-        s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(mockFile.getInputStream(), mockFile.getSize()));
-        BinaryContentDto dto = convertMockFileToBinaryDTO(mockFile);
+    //then
+    ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(
+        getGetObjectRequest(savedKey.toString(), contentType));
+    byte[] uploadedFileBytes = s3Object.readAllBytes();
 
-        // when
-        String presigned_Request_URL = downLoad(dto);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(presigned_Request_URL))
-                .GET().build();
-        HttpResponse<byte[]> result = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofByteArray());
+    // then
+    assertThat(uploadedFileBytes).isEqualTo(mockFile.getBytes());
+    assertThat(uploadedFileBytes.length).isEqualTo(mockFile.getBytes().length);
+  }
 
-        // then
-        assertThat(presigned_Request_URL).isNotNull();
-        assertThat(result.statusCode()).isEqualTo(200);
-        assertThat(result.body()).isEqualTo(mockFile.getBytes());
-    }
 
-    private BinaryContentDto convertMockFileToBinaryDTO(MockMultipartFile mockFile) throws IOException {
-        return new BinaryContentDto(UUID.fromString(KEY),
-                mockFile.getOriginalFilename(),
-                mockFile.getSize(),
-                mockFile.getContentType(),
-                mockFile.getBytes()
-        );
-    }
+  /**
+   * 업로드 로직
+   */
+  private UUID put(UUID key, byte[] bytes) {
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        .bucket(bucketName)
+        .key(key.toString())
+        .contentType(contentType)
+        .build();
 
-    /**
-     * 다운로드 로직
-     */
-    private String downLoad(BinaryContentDto content) {
-        return generatePresignedUrl(content.id().toString(), content.contentType());
-    }
+    s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
+    return key;
+  }
 
-    private String generatePresignedUrl(String key, String contentType) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .key(key)
-                .responseContentType(contentType)
-                .bucket(bucketName)
-                .build();
+  @DisplayName("S3에서 파일 다운로드")
+  @Test
+  void downLoadFile() throws IOException, InterruptedException {
+    // given
+    MockMultipartFile mockFile = new MockMultipartFile("다운로드 할 파일", KEY, contentType,
+        "test".getBytes());
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        .key(KEY)
+        .contentType(mockFile.getContentType())
+        .bucket(bucketName).build();
+    s3Client.putObject(putObjectRequest,
+        RequestBody.fromInputStream(mockFile.getInputStream(), mockFile.getSize()));
+    BinaryContentDto dto = convertMockFileToBinaryDTO(mockFile);
 
-        GetObjectPresignRequest getPresignedRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(3))
-                .getObjectRequest(getObjectRequest)
-                .build();
+    // when
+    String presigned_Request_URL = downLoad(dto);
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create(presigned_Request_URL))
+        .GET().build();
+    HttpResponse<byte[]> result = HttpClient.newHttpClient()
+        .send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-        S3Presigner s3Presigner = generateS3Presigner();
-        PresignedGetObjectRequest s3PresignedRequest = s3Presigner.presignGetObject(getPresignedRequest);
-        return s3PresignedRequest.url().toString();
-    }
+    // then
+    assertThat(presigned_Request_URL).isNotNull();
+    assertThat(result.statusCode()).isEqualTo(200);
+    assertThat(result.body()).isEqualTo(mockFile.getBytes());
+  }
 
-    /**
-     * 편의
-     */
-    private GetObjectRequest getGetObjectRequest(String key, String contentType) {
-        return GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .responseContentType(contentType)
-                .build();
-    }
+  private BinaryContentDto convertMockFileToBinaryDTO(MockMultipartFile mockFile)
+      throws IOException {
+    return new BinaryContentDto(UUID.fromString(KEY),
+        mockFile.getOriginalFilename(),
+        mockFile.getSize(),
+        mockFile.getContentType(),
+        mockFile.getBytes()
+    );
+  }
 
-    private static S3Presigner generateS3Presigner(){
-        return S3Presigner.builder()
-                .region(region)
-                .credentialsProvider(generateCredentialsProvider())
-                .endpointOverride(endpoint)
-                .build();
-    }
+  /**
+   * 다운로드 로직
+   */
+  private String downLoad(BinaryContentDto content) {
+    return generatePresignedUrl(content.id().toString(), content.contentType());
+  }
 
-    private static StaticCredentialsProvider generateCredentialsProvider() {
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey,secretKey);
-        return StaticCredentialsProvider.create(credentials);
-    }
+  private String generatePresignedUrl(String key, String contentType) {
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        .key(key)
+        .responseContentType(contentType)
+        .bucket(bucketName)
+        .build();
+
+    GetObjectPresignRequest getPresignedRequest = GetObjectPresignRequest.builder()
+        .signatureDuration(Duration.ofMinutes(3))
+        .getObjectRequest(getObjectRequest)
+        .build();
+
+    S3Presigner s3Presigner = generateS3Presigner();
+    PresignedGetObjectRequest s3PresignedRequest = s3Presigner.presignGetObject(
+        getPresignedRequest);
+    return s3PresignedRequest.url().toString();
+  }
+
+  /**
+   * 편의
+   */
+  private GetObjectRequest getGetObjectRequest(String key, String contentType) {
+    return GetObjectRequest.builder()
+        .bucket(bucketName)
+        .key(key)
+        .responseContentType(contentType)
+        .build();
+  }
+
+  private static S3Presigner generateS3Presigner() {
+    return S3Presigner.builder()
+        .region(region)
+        .credentialsProvider(generateCredentialsProvider())
+        .endpointOverride(endpoint)
+        .build();
+  }
+
+  private static StaticCredentialsProvider generateCredentialsProvider() {
+    AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+    return StaticCredentialsProvider.create(credentials);
+  }
 }

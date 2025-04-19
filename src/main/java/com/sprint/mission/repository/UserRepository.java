@@ -11,20 +11,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    Optional<User> findByUsername(String username);
 
-    @EntityGraph(attributePaths = {"status", "profile"})
-    @Query("SELECT u FROM User u")
-    List<User> findAllWithRelations();
+  Optional<User> findByUsername(String username);
 
+  @EntityGraph(attributePaths = {"status", "profile"})
+  @Query("SELECT u FROM User u")
+  List<User> findAllWithRelations();
 
-    @EntityGraph(attributePaths = {"status", "profile"})
-    @NonNull
-    Optional<User> findById(UUID id);
+  @EntityGraph(attributePaths = {"status", "profile"})
+  @NonNull
+  Optional<User> findById(UUID id);
 
-    @EntityGraph(attributePaths = {"status"})
-    Optional<User> findWithStatusById(UUID id);
+  @EntityGraph(attributePaths = {"status"})
+  Optional<User> findWithStatusById(UUID id);
 
-    @Query("SELECT u FROM User u JOIN FETCH u.readStatus rs JOIN FETCH rs.channel c WHERE u.id = :id")
-    Optional<User> findWithStatusAndChannelById(UUID id);
+  @Query("SELECT u FROM User u JOIN FETCH u.readStatus rs JOIN FETCH rs.channel c WHERE u.id = :id")
+  Optional<User> findWithStatusAndChannelById(UUID id);
 }

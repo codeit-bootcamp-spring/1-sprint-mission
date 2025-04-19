@@ -1,4 +1,5 @@
 package com.sprint.mission.repository.binary;
+
 import com.sprint.mission.config.S3ConfigProperties;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import lombok.Builder;
@@ -29,67 +30,69 @@ import static org.springframework.http.HttpStatus.*;
 @RequiredArgsConstructor
 public class S3BinaryContentStorage implements BinaryContentStorage {
 
-    private final S3Client s3Client;
-    private final S3ConfigProperties s3Properties;
+  private final S3Client s3Client;
+  private final S3ConfigProperties s3Properties;
 
-    @Override
-    public UUID put(UUID id, byte[] content) {
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .key(id.toString())
-                .bucket(s3Properties.bucket()).build();
+  @Override
+  public UUID put(UUID id, byte[] content) {
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        .key(id.toString())
+        .bucket(s3Properties.bucket()).build();
 
-        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
-        return id;
-    }
+    s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
+    return id;
+  }
 
-    @Override
-    public InputStream get(UUID id) {
-        return null;
+  @Override
+  public InputStream get(UUID id) {
+    return null;
 
-    }
+  }
 
-    @Override
-    public ResponseEntity<Void> download(BinaryContentDto content) {
-        String presignedUrl = generatePresignedUrl(content.id().toString(), content.contentType());
-        return ResponseEntity.status(FOUND).header(LOCATION, presignedUrl).build();
-    }
+  @Override
+  public ResponseEntity<Void> download(BinaryContentDto content) {
+    String presignedUrl = generatePresignedUrl(content.id().toString(), content.contentType());
+    return ResponseEntity.status(FOUND).header(LOCATION, presignedUrl).build();
+  }
 
-    /**
-     * 편의 메서드
-     */
-    private S3Client getS3Client() {
-        return S3Client.builder()
-                .region(Region.of(s3Properties.region()))
-                .credentialsProvider(generateCredentialsProvider())
-                .build();
-    }
+  /**
+   * 편의 메서드
+   */
+  private S3Client getS3Client() {
+    return S3Client.builder()
+        .region(Region.of(s3Properties.region()))
+        .credentialsProvider(generateCredentialsProvider())
+        .build();
+  }
 
-    private String generatePresignedUrl(String key, String contentType) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .key(key)
-                .responseContentType(contentType)
-                .bucket(s3Properties.bucket())
-                .build();
+  private String generatePresignedUrl(String key, String contentType) {
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        .key(key)
+        .responseContentType(contentType)
+        .bucket(s3Properties.bucket())
+        .build();
 
-        GetObjectPresignRequest getPresignedRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(s3Properties.presignedUrlExpiration()))
-                .getObjectRequest(getObjectRequest)
-                .build();
+    GetObjectPresignRequest getPresignedRequest = GetObjectPresignRequest.builder()
+        .signatureDuration(Duration.ofMinutes(s3Properties.presignedUrlExpiration()))
+        .getObjectRequest(getObjectRequest)
+        .build();
 
-        S3Presigner s3Presigner = generateS3Presigner();
-        PresignedGetObjectRequest s3PresignedRequest = s3Presigner.presignGetObject(getPresignedRequest);
-        return s3PresignedRequest.url().toString();
-    }
+    S3Presigner s3Presigner = generateS3Presigner();
+    PresignedGetObjectRequest s3PresignedRequest = s3Presigner.presignGetObject(
+        getPresignedRequest);
+    return s3PresignedRequest.url().toString();
+  }
 
-    private S3Presigner generateS3Presigner(){
-        return S3Presigner.builder()
-                .region(Region.of(s3Properties.region()))
-                .credentialsProvider(generateCredentialsProvider())
-                .build();
-    }
+  private S3Presigner generateS3Presigner() {
+    return S3Presigner.builder()
+        .region(Region.of(s3Properties.region()))
+        .credentialsProvider(generateCredentialsProvider())
+        .build();
+  }
 
-    private StaticCredentialsProvider generateCredentialsProvider() {
-        AwsBasicCredentials credentials = AwsBasicCredentials.create(s3Properties.accessKey(), s3Properties.secretKey());
-        return StaticCredentialsProvider.create(credentials);
-    }
+  private StaticCredentialsProvider generateCredentialsProvider() {
+    AwsBasicCredentials credentials = AwsBasicCredentials.create(s3Properties.accessKey(),
+        s3Properties.secretKey());
+    return StaticCredentialsProvider.create(credentials);
+  }
 }

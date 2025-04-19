@@ -11,15 +11,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
-    void deleteAllByChannel(Channel channel);
 
-    @EntityGraph(attributePaths = {"user", "channel", "user.profile", "user.status"})
-    List<ReadStatus> findAllByUser_Id(UUID userId);
+  void deleteAllByChannel(Channel channel);
 
-    @EntityGraph(attributePaths = {"user", "channel"}) // 이건 나중에 요구사항 보고 수정
-    List<ReadStatus> findAllByChannel_Id(UUID channelId);
+  @EntityGraph(attributePaths = {"user", "channel", "user.profile", "user.status"})
+  List<ReadStatus> findAllByUser_Id(UUID userId);
 
-    @EntityGraph(attributePaths = {"user", "channel"})
-    @NonNull
-    Optional<ReadStatus> findById(@NonNull UUID id);
+  @EntityGraph(attributePaths = {"user", "channel"})
+    // 이건 나중에 요구사항 보고 수정
+  List<ReadStatus> findAllByChannel_Id(UUID channelId);
+
+  @EntityGraph(attributePaths = {"user", "channel"})
+  @NonNull
+  Optional<ReadStatus> findById(@NonNull UUID id);
 }
