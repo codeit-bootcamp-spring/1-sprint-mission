@@ -1,13 +1,10 @@
-package com.sprint.mission.entity.main;
+package com.sprint.mission.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.ChannelType;
-import com.sprint.mission.entity.ReadStatus;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
@@ -19,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QChannel extends EntityPathBase<Channel> {
 
-    private static final long serialVersionUID = -2040373200L;
+    private static final long serialVersionUID = -144339679L;
 
     public static final QChannel channel = new QChannel("channel");
 
@@ -37,7 +34,7 @@ public class QChannel extends EntityPathBase<Channel> {
 
     public final StringPath name = createString("name");
 
-    public final ListPath<ReadStatus, com.sprint.mission.entity.addOn.QReadStatus> readStatus = this.<ReadStatus, com.sprint.mission.entity.addOn.QReadStatus>createList("readStatus", ReadStatus.class, com.sprint.mission.entity.addOn.QReadStatus.class, PathInits.DIRECT2);
+    public final ListPath<ReadStatus, QReadStatus> readStatus = this.<ReadStatus, QReadStatus>createList("readStatus", ReadStatus.class, QReadStatus.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.Instant> updatedAt = _super.updatedAt;

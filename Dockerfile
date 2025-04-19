@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY ./ ./
 
-RUN ./gradlew build #-x test  # 나중에 바꾸기
+RUN ./gradlew build -x test
 
 EXPOSE 80
 

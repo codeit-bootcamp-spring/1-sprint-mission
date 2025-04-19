@@ -1,12 +1,10 @@
-package com.sprint.mission.entity.main;
+package com.sprint.mission.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import com.sprint.mission.entity.BinaryContent;
-import com.sprint.mission.entity.Message;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
@@ -18,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QMessage extends EntityPathBase<Message> {
 
-    private static final long serialVersionUID = -1824398540L;
+    private static final long serialVersionUID = 71634981L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -38,7 +36,7 @@ public class QMessage extends EntityPathBase<Message> {
     //inherited
     public final ComparablePath<java.util.UUID> id = _super.id;
 
-    public final ListPath<BinaryContent, com.sprint.mission.entity.addOn.QBinaryContent> messageAttachments = this.<BinaryContent, com.sprint.mission.entity.addOn.QBinaryContent>createList("messageAttachments", BinaryContent.class, com.sprint.mission.entity.addOn.QBinaryContent.class, PathInits.DIRECT2);
+    public final ListPath<BinaryContent, QBinaryContent> messageAttachments = this.<BinaryContent, QBinaryContent>createList("messageAttachments", BinaryContent.class, QBinaryContent.class, PathInits.DIRECT2);
 
     //inherited
     public final DateTimePath<java.time.Instant> updatedAt = _super.updatedAt;

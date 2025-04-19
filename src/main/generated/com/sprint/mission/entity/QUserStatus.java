@@ -1,11 +1,10 @@
-package com.sprint.mission.entity.addOn;
+package com.sprint.mission.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import com.sprint.mission.entity.UserStatus;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
@@ -17,13 +16,13 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QUserStatus extends EntityPathBase<UserStatus> {
 
-    private static final long serialVersionUID = 267956621L;
+    private static final long serialVersionUID = -1533544769L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
     public static final QUserStatus userStatus = new QUserStatus("userStatus");
 
-    public final com.sprint.mission.entity.main.QBaseUpdatableEntity _super = new com.sprint.mission.entity.main.QBaseUpdatableEntity(this);
+    public final QBaseUpdatableEntity _super = new QBaseUpdatableEntity(this);
 
     //inherited
     public final DateTimePath<java.time.Instant> createdAt = _super.createdAt;
@@ -36,7 +35,7 @@ public class QUserStatus extends EntityPathBase<UserStatus> {
     //inherited
     public final DateTimePath<java.time.Instant> updatedAt = _super.updatedAt;
 
-    public final com.sprint.mission.entity.main.QUser user;
+    public final QUser user;
 
     public QUserStatus(String variable) {
         this(UserStatus.class, forVariable(variable), INITS);
@@ -56,7 +55,7 @@ public class QUserStatus extends EntityPathBase<UserStatus> {
 
     public QUserStatus(Class<? extends UserStatus> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new com.sprint.mission.entity.main.QUser(forProperty("user"), inits.get("user")) : null;
+        this.user = inits.isInitialized("user") ? new QUser(forProperty("user"), inits.get("user")) : null;
     }
 
 }

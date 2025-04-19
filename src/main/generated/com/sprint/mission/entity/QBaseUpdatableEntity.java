@@ -1,11 +1,10 @@
-package com.sprint.mission.entity.main;
+package com.sprint.mission.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import com.sprint.mission.entity.BaseUpdatableEntity;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 
@@ -16,7 +15,7 @@ import com.querydsl.core.types.Path;
 @Generated("com.querydsl.codegen.DefaultSupertypeSerializer")
 public class QBaseUpdatableEntity extends EntityPathBase<BaseUpdatableEntity> {
 
-    private static final long serialVersionUID = -899871083L;
+    private static final long serialVersionUID = -581477882L;
 
     public static final QBaseUpdatableEntity baseUpdatableEntity = new QBaseUpdatableEntity("baseUpdatableEntity");
 

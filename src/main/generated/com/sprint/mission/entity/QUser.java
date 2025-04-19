@@ -1,12 +1,10 @@
-package com.sprint.mission.entity.main;
+package com.sprint.mission.entity;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
 import com.querydsl.core.types.dsl.*;
 
 import com.querydsl.core.types.PathMetadata;
-import com.sprint.mission.entity.ReadStatus;
-import com.sprint.mission.entity.User;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
@@ -18,7 +16,7 @@ import com.querydsl.core.types.dsl.PathInits;
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QUser extends EntityPathBase<User> {
 
-    private static final long serialVersionUID = -739401794L;
+    private static final long serialVersionUID = 685637741L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
@@ -36,11 +34,11 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath password = createString("password");
 
-    public final com.sprint.mission.entity.addOn.QBinaryContent profile;
+    public final QBinaryContent profile;
 
-    public final ListPath<ReadStatus, com.sprint.mission.entity.addOn.QReadStatus> readStatus = this.<ReadStatus, com.sprint.mission.entity.addOn.QReadStatus>createList("readStatus", ReadStatus.class, com.sprint.mission.entity.addOn.QReadStatus.class, PathInits.DIRECT2);
+    public final ListPath<ReadStatus, QReadStatus> readStatus = this.<ReadStatus, QReadStatus>createList("readStatus", ReadStatus.class, QReadStatus.class, PathInits.DIRECT2);
 
-    public final com.sprint.mission.entity.addOn.QUserStatus status;
+    public final QUserStatus status;
 
     //inherited
     public final DateTimePath<java.time.Instant> updatedAt = _super.updatedAt;
@@ -65,8 +63,8 @@ public class QUser extends EntityPathBase<User> {
 
     public QUser(Class<? extends User> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.profile = inits.isInitialized("profile") ? new com.sprint.mission.entity.addOn.QBinaryContent(forProperty("profile"), inits.get("profile")) : null;
-        this.status = inits.isInitialized("status") ? new com.sprint.mission.entity.addOn.QUserStatus(forProperty("status"), inits.get("status")) : null;
+        this.profile = inits.isInitialized("profile") ? new QBinaryContent(forProperty("profile"), inits.get("profile")) : null;
+        this.status = inits.isInitialized("status") ? new QUserStatus(forProperty("status"), inits.get("status")) : null;
     }
 
 }

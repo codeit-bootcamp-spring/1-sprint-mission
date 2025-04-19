@@ -54,6 +54,7 @@ public class UserController {
   public ResponseEntity<CommonResponse> create(
       @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") @Valid UserDtoForCreate requestDTO,
       @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile profile) {
+    log.info("로그 테스트");
     User createdUser = userService.create(requestDTO, profile);
     return CommonResponse.toResponseEntity
         (CREATED, "유저가 성공적으로 생성되었습니다.", userMapper.toDto(createdUser));

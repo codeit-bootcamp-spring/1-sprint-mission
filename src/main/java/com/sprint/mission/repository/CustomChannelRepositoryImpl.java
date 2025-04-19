@@ -1,5 +1,10 @@
 package com.sprint.mission.repository;
 
+import static com.sprint.mission.entity.QChannel.channel;
+import static com.sprint.mission.entity.QMessage.message;
+import static com.sprint.mission.entity.QReadStatus.readStatus;
+import static com.sprint.mission.entity.QUser.user;
+
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.dto.ChannelMapper;
@@ -8,15 +13,14 @@ import com.sprint.mission.entity.BaseEntity;
 import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.User;
 import jakarta.persistence.EntityManager;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.mapstruct.factory.Mappers;
 
 import java.time.Instant;
-import java.util.*;
 
-import static com.sprint.mission.entity.addOn.QReadStatus.readStatus;
-import static com.sprint.mission.entity.main.QChannel.*;
-import static com.sprint.mission.entity.main.QMessage.*;
-import static com.sprint.mission.entity.main.QUser.*;
 
 public class CustomChannelRepositoryImpl implements CustomChannelRepository {
 

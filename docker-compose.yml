@@ -4,6 +4,8 @@ services:
     build: .
     ports:
       - 8081:80
+    command:
+      - ./gradlew test
 
     depends_on:
       postgres-db:
@@ -30,6 +32,7 @@ services:
       - .env
 
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}"]
+      test: ["CMD", "pg_isready", "-d", "${DB_NAME}", "-U", "${DB_USERNAME}"]
       interval: 5s
       retries: 10
+
