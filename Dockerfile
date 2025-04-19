@@ -1,12 +1,18 @@
-FROM amazoncorretto:17 AS builder
+FROM gradle:7.6.0-jdk17 AS builder
 
 WORKDIR /app
 
-COPY . /app
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle ./gradle
 
-RUN ./gradlew build --no-daemon
 
-FROM amazoncorretto:17
+RUN chmod +x gradlew && ./gradlew dependencies --no-daemon || true
+
+COPY . .
+
+RUN chmod +x gradlew && ./gradlew build --no-daemon
+
+FROM eclipse-temurin:17-jre-jammy
 
 ARG PROJECT_NAME
 ARG PROJECT_VERSION
