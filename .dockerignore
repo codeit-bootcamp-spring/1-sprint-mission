@@ -1,0 +1,11 @@
+.gradle
+out
+*.iml
+*.log
+*.db
+.DS_Store
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+.env

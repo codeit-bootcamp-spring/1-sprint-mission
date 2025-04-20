@@ -12,6 +12,11 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
+bootJar {
+    archiveBaseName = 'discodeit'
+    archiveVersion = '1.2-M8'
+}
+
 
 configurations {
     all {
@@ -38,12 +43,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator:3.4.4'
     implementation 'org.postgresql:postgresql:42.7.5'
     implementation 'org.mapstruct:mapstruct:1.6.3'
+    implementation 'software.amazon.awssdk:s3:2.31.7'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
     runtimeOnly 'com.h2database:h2'
