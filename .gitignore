@@ -52,3 +52,4 @@ discodeit.env
 ### Docker ###
 .env
 .env.*
+*.env
