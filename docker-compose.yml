@@ -9,9 +9,9 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       # DB 환경변수
-      DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
-      DATASOURCE_USERNAME: ${POSTGRES_USER}
-      DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       # 저장소 타입 및 경로 설정
       STORAGE_TYPE: ${STORAGE_TYPE}
       STORAGE_LOCAL_ROOT_PATH: ${STORAGE_LOCAL_ROOT_PATH}
@@ -28,7 +28,7 @@ services:
       - db
 
   db:
-    image: postgres:14
+    image: postgres:17
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
