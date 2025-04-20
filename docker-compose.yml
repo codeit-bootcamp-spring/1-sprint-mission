@@ -25,6 +25,7 @@ services:
       - postgres
     volumes:
       - ${STORAGE_LOCAL_ROOT_PATH}:/app/storage
+      - gradle-cache:/home/gradle/.gradle
 
   postgres:
     image: postgres:${POSTGRES_VERSION}
@@ -40,3 +41,5 @@ services:
 
 volumes:
   postgres-data:
+  gradle-cache:
+
