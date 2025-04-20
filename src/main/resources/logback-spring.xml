@@ -1,49 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- 로그 레벨별 색상 설정 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    
+    <!-- MDC 값을 포함한 로그 패턴 설정 -->
+    <property name="LOG_PATTERN" value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%-5level) %-36logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUri}] - %msg%n"/>
+    <property name="LOG_FILE_PATH" value=".logs"/>
+    <property name="LOG_FILE_NAME" value="application"/>
+
     <!-- 콘솔 출력 설정 -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
     <!-- 파일 출력 설정 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>.logs/application.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 일자별 롤링 설정 -->
-            <fileNamePattern>.logs/application.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <!-- 30일간 보관 -->
-            <maxHistory>30</maxHistory>
-            <!-- 자정에 롤링 -->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-        </rollingPolicy>
+        <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
         <encoder>
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
     </appender>
 
-    <!-- 개발 환경 로깅 설정 -->
-    <springProfile name="dev">
-        <root level="debug">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE"/>
-        </root>
-        <logger name="com.discodeit" level="debug"/>
-        <logger name="org.hibernate.SQL" level="debug"/>
-        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
-    </springProfile>
-
-    <!-- 운영 환경 로깅 설정 -->
-    <springProfile name="prod">
-        <root level="info">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE"/>
-        </root>
-        <logger name="com.discodeit" level="info"/>
-        <logger name="org.hibernate.SQL" level="debug"/>
-        <logger name="org.hibernate.orm.jdbc.bind" level="trace"/>
-    </springProfile>
+    <!-- 루트 로거 설정 - 레벨은 application.yaml에서 관리 -->
+    <root>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
 </configuration> 

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -12,101 +12,85 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.ActiveProfiles;
 
+/**
+ * ChannelRepository 슬라이스 테스트
+ */
 @DataJpaTest
-@ActiveProfiles("test")
 @EnableJpaAuditing
+@ActiveProfiles("test")
 class ChannelRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
+  @Autowired
+  private ChannelRepository channelRepository;
 
-    @Autowired
-    private ChannelRepository channelRepository;
+  @Autowired
+  private TestEntityManager entityManager;
 
-    @Test
-    @DisplayName("사용자 ID로 채널 목록 조회 성공")
-    void findAllByUserIdSuccess() {
-        // Given
-        User user = new User("testuser", "test@email.com", "password123!", null);
-        entityManager.persist(user);
+  /**
+   * TestFixture: 채널 생성용 테스트 픽스처
+   */
+  private Channel createTestChannel(ChannelType type, String name) {
+    Channel channel = new Channel(type, name, "설명: " + name);
+    return channelRepository.save(channel);
+  }
 
-        Channel publicChannel = new Channel("general", ChannelType.PUBLIC);
-        Channel privateChannel = new Channel(ChannelType.PRIVATE);
-        publicChannel.addUser(user);
-        privateChannel.addUser(user);
-        
-        entityManager.persist(publicChannel);
-        entityManager.persist(privateChannel);
-        entityManager.flush();
+  @Test
+  @DisplayName("타입이 PUBLIC이거나 ID 목록에 포함된 채널을 모두 조회할 수 있다")
+  void findAllByTypeOrIdIn_ReturnsChannels() {
+    // given
+    Channel publicChannel1 = createTestChannel(ChannelType.PUBLIC, "공개채널1");
+    Channel publicChannel2 = createTestChannel(ChannelType.PUBLIC, "공개채널2");
+    Channel privateChannel1 = createTestChannel(ChannelType.PRIVATE, "비공개채널1");
+    Channel privateChannel2 = createTestChannel(ChannelType.PRIVATE, "비공개채널2");
 
-        // When
-        List<Channel> channels = channelRepository.findAllByUserId(user.getId());
+    channelRepository.saveAll(
+        Arrays.asList(publicChannel1, publicChannel2, privateChannel1, privateChannel2));
 
-        // Then
-        assertThat(channels).hasSize(2);
-        assertThat(channels).extracting("type")
-            .containsExactlyInAnyOrder(ChannelType.PUBLIC, ChannelType.PRIVATE);
-    }
+    // 영속성 컨텍스트 초기화
+    entityManager.flush();
+    entityManager.clear();
 
-    @Test
-    @DisplayName("존재하지 않는 사용자 ID로 채널 목록 조회")
-    void findAllByUserIdEmpty() {
-        // Given
-        UUID nonExistentUserId = UUID.randomUUID();
+    // when
+    List<UUID> selectedPrivateIds = List.of(privateChannel1.getId());
+    List<Channel> foundChannels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
+        selectedPrivateIds);
 
-        // When
-        List<Channel> channels = channelRepository.findAllByUserId(nonExistentUserId);
+    // then
+    assertThat(foundChannels).hasSize(3); // 공개채널 2개 + 선택된 비공개채널 1개
 
-        // Then
-        assertThat(channels).isEmpty();
-    }
+    // 공개 채널 2개가 모두 포함되어 있는지 확인
+    assertThat(
+        foundChannels.stream().filter(c -> c.getType() == ChannelType.PUBLIC).count()).isEqualTo(2);
 
-    @Test
-    @DisplayName("채널 타입으로 채널 목록 조회")
-    void findAllByType() {
-        // Given
-        Channel publicChannel1 = new Channel("general", ChannelType.PUBLIC);
-        Channel publicChannel2 = new Channel("announcements", ChannelType.PUBLIC);
-        Channel privateChannel = new Channel(ChannelType.PRIVATE);
+    // 선택된 비공개 채널만 포함되어 있는지 확인
+    List<Channel> privateChannels = foundChannels.stream()
+        .filter(c -> c.getType() == ChannelType.PRIVATE)
+        .toList();
+    assertThat(privateChannels).hasSize(1);
+    assertThat(privateChannels.get(0).getId()).isEqualTo(privateChannel1.getId());
+  }
 
-        entityManager.persist(publicChannel1);
-        entityManager.persist(publicChannel2);
-        entityManager.persist(privateChannel);
-        entityManager.flush();
+  @Test
+  @DisplayName("타입이 PUBLIC이 아니고 ID 목록이 비어있으면 비어있는 리스트를 반환한다")
+  void findAllByTypeOrIdIn_EmptyList_ReturnsEmptyList() {
+    // given
+    Channel privateChannel1 = createTestChannel(ChannelType.PRIVATE, "비공개채널1");
+    Channel privateChannel2 = createTestChannel(ChannelType.PRIVATE, "비공개채널2");
 
-        // When
-        List<Channel> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC);
+    channelRepository.saveAll(Arrays.asList(privateChannel1, privateChannel2));
 
-        // Then
-        assertThat(publicChannels).hasSize(2);
-        assertThat(publicChannels).extracting("type")
-            .containsOnly(ChannelType.PUBLIC);
-    }
+    // 영속성 컨텍스트 초기화
+    entityManager.flush();
+    entityManager.clear();
 
-    @Test
-    @DisplayName("페이징을 사용한 채널 목록 조회")
-    void findAllWithPaging() {
-        // Given
-        for (int i = 1; i <= 20; i++) {
-            Channel channel = new Channel("channel" + i, ChannelType.PUBLIC);
-            entityManager.persist(channel);
-        }
-        entityManager.flush();
+    // when
+    List<Channel> foundChannels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
+        List.of());
 
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("name").ascending());
-
-        // When
-        Page<Channel> channelPage = channelRepository.findAll(pageRequest);
-
-        // Then
-        assertThat(channelPage.getContent()).hasSize(10);
-        assertThat(channelPage.getTotalElements()).isEqualTo(20);
-        assertThat(channelPage.getTotalPages()).isEqualTo(2);
-    }
+    // then
+    assertThat(foundChannels).isEmpty();
+  }
 } 

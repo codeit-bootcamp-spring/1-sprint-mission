@@ -1,37 +1,31 @@
+server:
+  port: 8080 # 웹 요청(HTTP)을 받을 서버 API 포트. http://localhost:8080으로 접속가능
+
 spring:
-  application:
-    name: discodeit
-  servlet:
-    multipart:
-      maxFileSize: 10MB
-      maxRequestSize: 30MB
-  datasource:
-    driver-class-name: org.postgresql.Driver
+  datasource: # 5432는 PostgreSQL 데이터베이스 서버가 사용하는 포트
     url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    username: discodeit_user # db 사용자 이름
+    password: discodeit1234 # db 비밀번호
   jpa:
-    hibernate:
-      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
-    open-in-view: false
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
 
 logging:
   level:
-    root: debug
+    com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
-    com.discodeit: debug
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/application-dev.log
 
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: .discodeit/storage 
+management:
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
