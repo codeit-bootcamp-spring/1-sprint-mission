@@ -58,4 +58,6 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
-
+logging:
+  level:
+    root: info

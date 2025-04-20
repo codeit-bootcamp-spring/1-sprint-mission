@@ -21,19 +21,18 @@ import static jakarta.persistence.FetchType.*;
 @Table(name = "messages")
 public class Message extends BaseUpdatableEntity {
 
+  @Column(columnDefinition = "text", nullable = false)
   private String content;
 
-  @ManyToOne(fetch = LAZY, cascade = REMOVE)
-  @JoinColumn(name = "channel_id", nullable = false)
+  @ManyToOne(fetch = LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
   private Channel channel;
 
-  @ManyToOne(fetch = LAZY)
+  @ManyToOne(fetch = LAZY, optional = false)
+  @JoinColumn(name = "author_id", columnDefinition = "uuid")
   @OnDelete(action = OnDeleteAction.SET_NULL)
   private User author;
 
-  // 설계도에서 OneToMany 관계를 JoinTable로 설계하도록 되어있어서...
-  // 이런 구조에서 Message삭제 시 binaryContent자동 삭제는 구현 못했습니다(수동으로 메서드 만들어서 해야될까요)
-  // MessageCascadeTest 파일에서 테스트 실패
   @OneToMany(fetch = LAZY, cascade = REMOVE, orphanRemoval = true)
   @JoinTable(
       name = "message_attachments",
@@ -49,13 +48,11 @@ public class Message extends BaseUpdatableEntity {
     return this;
   }
 
-  public Message(String content, Channel channel, User author) {
+  public Message(String content, Channel channel, User author, List<BinaryContent> messageAttachments) {
     this.content = content;
     this.channel = channel;
     this.author = author;
+    this.messageAttachments = messageAttachments;
   }
 
-  public void addAttachment(BinaryContent attachment) {
-    messageAttachments.add(attachment);
-  }
 }

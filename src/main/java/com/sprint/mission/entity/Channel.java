@@ -1,7 +1,10 @@
 package com.sprint.mission.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.EnumType.*;
 
 @Entity
 @EqualsAndHashCode(of = {"channelType", "name"}, callSuper = true)
@@ -20,6 +24,8 @@ import static jakarta.persistence.CascadeType.*;
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity {
 
+  @Enumerated(STRING)
+  @Column(nullable = false)
   private ChannelType channelType;
   private String name;
   private String description;

@@ -19,16 +19,23 @@ import static lombok.AccessLevel.*;
 @Getter //@Builder
 @NoArgsConstructor(access = PROTECTED)
 @Schema(description = "유저")
-@Table(name = "users")
+@Table(
+    name = "users",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username", "email"})
+    }
+)
 public class User extends BaseUpdatableEntity {
 
+  @Column(length = 50, nullable = false, unique = true)
   private String username;
+  @Column(length = 100, nullable = false, unique = true)
   private String email;
+  @Column(length = 60, nullable = false)
   private String password;
 
-  @OneToOne(fetch = LAZY)
-  @JoinColumn(name = "profile_id")
-  @OnDelete(action = OnDeleteAction.SET_NULL) // profile이 삭제되면 user의 profile은 null로 변경
+  @OneToOne(fetch = LAZY, cascade = ALL, orphanRemoval = true)
+  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
   private BinaryContent profile;
 
   @OneToOne(mappedBy = "user", cascade = REMOVE)

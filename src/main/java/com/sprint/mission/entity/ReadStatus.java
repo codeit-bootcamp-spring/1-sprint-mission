@@ -18,15 +18,15 @@ import static jakarta.persistence.FetchType.*;
 @Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {
 
-  @ManyToOne(fetch = LAZY)
-  @JoinColumn(name = "user_id", unique = true)
+  @ManyToOne(fetch = LAZY, optional = false)
+  @JoinColumn(name = "user_id", columnDefinition = "uuid", unique = true)
   private User user;
 
-  @ManyToOne(fetch = LAZY)
-  @JoinColumn(name = "channel_id", unique = true)
+  @ManyToOne(fetch = LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid", unique = true)
   private Channel channel;
 
-  @NotNull
+  @Column(nullable = false, columnDefinition = "timestamp with time zone")
   private Instant lastReadAt;
 
   public void update(Instant newLastReadAt) {

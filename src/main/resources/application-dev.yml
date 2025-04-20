@@ -16,6 +16,7 @@ spring:
 ---
 logging:
   level:
-    org.hibernate.sql: warn
+    com.sprint.mission: debug
+    org.hibernate.sql: debug
     org.hibernate.orm.jdbc.bind: trace
 

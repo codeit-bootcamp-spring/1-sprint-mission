@@ -20,10 +20,11 @@ import static jakarta.persistence.FetchType.*;
 @Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
 
-  @OneToOne(fetch = LAZY)
+  @OneToOne(fetch = LAZY, optional = false)
   @JoinColumn(name = "user_id", nullable = false, unique = true)
   private User user;
 
+  @Column(columnDefinition = "timestamp with the zone", nullable = false)
   private Instant lastActiveAt;
 
   public UserStatus(User user) {
@@ -38,8 +39,8 @@ public class UserStatus extends BaseUpdatableEntity {
   public boolean isOnline() {
     if (lastActiveAt == null) {
       return false;
-    } else {
-      return Duration.between(lastActiveAt, Instant.now()).toMinutes() < 5;
     }
+
+    return Duration.between(lastActiveAt, Instant.now()).toMinutes() < 5;
   }
 }
