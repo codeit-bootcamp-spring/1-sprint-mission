@@ -28,7 +28,7 @@ discodeit:
     file-directory: .discodeit/data/
     extension: .ser
   storage:
-    type: ${STORAGE_TYPE}
+    type: ${STORAGE_TYPE:local}
     local:
       root-path: .discodeit/data
 
