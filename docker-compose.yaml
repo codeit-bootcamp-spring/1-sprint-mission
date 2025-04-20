@@ -1,0 +1,57 @@
+name: discodeit-compose
+services:
+  app:
+    image: kayafrogrammer/discodeit:local
+    build:
+      dockerfile: ./Dockerfile
+      pull: true 
+      context: .
+    container_name: discodeit-compose-app
+    environment:
+      - PORT=${PORT}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:postgresql://host.docker.internal:5432/discodeit}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-discodeit_user}
+      - SPRING_BOOT_ADMIN_CLIENT_URL=${SPRING_BOOT_ADMIN_CLIENT_URL:-http://localhost:9090}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+      
+    ports:
+      - "8081:80"
+    networks:
+      - discodeit-network
+    # 포스트그리 다음으로 실행되도록 순서 지정정
+    depends_on:
+      db:
+      # 포스트그리 컨테이너가 정상 실행 됨을 확인 후 앱 컨테이너 실행
+        condition: service_healthy
+
+  db:
+    image: postgres:15
+    container_name: discodeit-compose-db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-discodeit_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-your_password}
+      - POSTGRES_DB=${POSTGRES_DB:-discodeit}
+    ports:
+      - "5432:5432"
+    networks:
+      - discodeit-network
+    volumes:
+      # 컨테이너 내부에서 DB를 저장하는 경로를 생성한 볼륨과 마운트해서 데이터 보존
+      - BinaryContentStorage:/var/lib/postgresql/data
+      # 컨테이너 최초 생성시 데이터 디렉터리가 비어있을 경우, 스키마 파일로 초기화.
+      # 호스트에 있는 초기화 SQL 파일 경로 : 포스트그리 컨테이너 내부 경로
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-discodeit_user} -d ${POSTGRES_DB:-discodeit}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  discodeit-network:
+    name: discodeit-network
+
+volumes:
+  BinaryContentStorage:
+    name: BinaryContentStorage
+
