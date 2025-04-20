@@ -1,73 +1,15 @@
+server:
+  port: 80
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  #  sql:
-  #    init:
-  #      mode: always
   jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: false
-    open-in-view: false
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: ${MAX_FILE_SIZE}
-      max-request-size: ${MAX_REQUEST_SIZE}
-
-
----
-discodeit:
-  storage:
-    type: ${STORAGE_TYPE:local}
-    local:
-      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
-    s3:
-      access-key: ${AWS_S3_ACCESS_KEY}
-      secret-key: ${AWS_S3_SECRET_KEY}
-      region: ${AWS_S3_REGION}
-      bucket: ${AWS_S3_BUCKET}
-      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION}
-
----
-management:
-  endpoints:
-    web:
-      exposure:
-        include: info, loggers, health, metrics
-  info:
-    env:
-      enabled: true
-
-info:
-  application-name: Discodeit
-  application-version: 1.7.0
-  java-version: 17
-  spring-boot-version: 3.4.0
-  key-settings:
-    datasource:
-      url: ${spring.datasource.url}
-      driver-class-name: ${spring.datasource.driver-class-name}
-    jpa:
-      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
-    storage:
-      type: ${discodeit.storage.type}
-      path: ${discodeit.storage.local.root-path}
-    multipart:
-      max-file-size: ${spring.servlet.multipart.max-file-size}
-      max-request-size: ${spring.servlet.multipart.max-request-size}
 
 ---
 logging:
   level:
-    org.hibernate.sql: warn
-    com.sprint.mission: info
-
-springdoc:
-  api-docs:
-    enabled: false
-  swagger-ui:
-    enabled: false
+    org.hibernate.sql: info
