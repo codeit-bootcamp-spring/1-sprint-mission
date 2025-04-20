@@ -1,0 +1,34 @@
+# Git
+.git
+.gitignore
+
+# IDE & Editor
+*.iml
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+target/
+build/
+
+# Logs
+*.log
+
+# Environment configs
+.env
+*.env
+
+# Test reports
+test-output/
+surefire-reports/
+
+# Docker itself
+Dockerfile
+docker-compose.yml
+
+# 기타
+.gradle/

@@ -206,3 +206,4 @@ ehthumbs_vista.db
 # End of https://www.toptal.com/developers/gitignore/api/java,macos,windows,intellij
 
 
+.env

@@ -5,15 +5,33 @@ services:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_USER: discodeit_user
-      POSTGRES_PASSWORD: discodeit1234
-      POSTGRES_DB: discodeit
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ${PG_VOLUME}:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    restart: always
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8080:${SPRING_PORT}" # 내부 포트가 80이면 8080:80
+    volumes:
+      - ${APP_VOLUME}:/app/storage/BinaryContentStorage
+    depends_on:
+      - postgres
     restart: always
 
 volumes:
-  pgdata:
-    driver: local
+  ${APP_VOLUME}:
+  ${PG_VOLUME}:
