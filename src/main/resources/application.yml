@@ -6,8 +6,8 @@ spring:
     version: 3.4.0
   profiles:
     active: ${PROFILES_ACTIVE:dev}
-  config:
-    import: optional:file:.env[.properties] # Spring Boot 3.1 이상에서만 작동
+  #  config:
+  #    import: optional:file:.env[.properties] # docker test 용, Spring Boot 3.1 이상에서만 작동
   servlet:
     multipart:
       max-file-size: 20MB
@@ -16,10 +16,11 @@ spring:
 logging:
   level:
     root: info
+    com.zaxxer.hikari.HikariConfig: DEBUG
 
 discodeit:
   storage:
-    type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
+    type: ${STORAGE_TYPE:local}
     local:
       root-path: ${STORAGE_LOCAL_ROOT_PATH:./binaryContents}
     s3:
