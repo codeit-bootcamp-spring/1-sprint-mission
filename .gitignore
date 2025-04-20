@@ -52,3 +52,6 @@ data/
 ### env ###
 .env
 discodeit.env
+
+### application ###
+application-dev.yaml
