@@ -6,6 +6,9 @@ spring:
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   jpa:
     hibernate:
       ddl-auto: validate
@@ -15,7 +18,7 @@ spring:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
-      
+
 springdoc:
   api-docs:
     path: /api-docs
@@ -29,10 +32,22 @@ discodeit:
     file-directory: .discodeit/data/
     extension: .ser
   storage:
-    type: local
+    type: ${STORAGE_TYPE}
     local:
-      root-path: .discodeit/data
+      root-path: ${STORAGE_LOCAL_ROOT_PATH}
+  s3:
+    access-key: ${AWS_S3_ACCESS_KEY}
+    secret-key: ${AWS_S3_SECRET_KEY}
+    region: ${AWS_S3_REGION}
+    bucket: ${AWS_S3_BUCKET}
+    presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION}
 
+cloud:
+  aws:
+    region:
+      static: ${AWS_S3_REGION:ap-northeast-2}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
 
 logging:
   level:
