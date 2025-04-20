@@ -1,115 +1,123 @@
--- DROP TABLE IF EXISTS public.binary_contents;
-CREATE TABLE IF NOT EXISTS binary_contents
+CREATE TABLE users
 (
-    id           uuid                                                NOT NULL,
-    created_at   timestamp with time zone                            NOT NULL,
-    file_name    character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    size         bigint                                              NOT NULL,
-    content_type character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    bytes        bytea                                               NOT NULL,
-    CONSTRAINT binary_contents_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE IF NOT EXISTS users
-(
-    id         uuid                                               NOT NULL,
-    created_at timestamp with time zone                           NOT NULL,
-    updated_at timestamp with time zone,
-    username   character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    email      character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    password   character varying(60) COLLATE pg_catalog."default" NOT NULL,
+    id         uuid PRIMARY KEY,
+    created_at timestamptz  NOT NULL,
+    updated_at timestamptz,
+    username   varchar(50)  NOT NULL,
+    email      varchar(100) NOT NULL,
+    password   varchar(60)  NOT NULL,
     profile_id uuid,
-    CONSTRAINT users_pkey PRIMARY KEY (id),
-    CONSTRAINT users_email_key UNIQUE (email),
-    CONSTRAINT users_username_key UNIQUE (username),
-    CONSTRAINT users_profile_id_fkey FOREIGN KEY (profile_id)
-        REFERENCES public.binary_contents (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE SET NULL
+    UNIQUE (username, email)
 );
 
-CREATE TABLE IF NOT EXISTS channels
+CREATE TABLE binary_contents
 (
-    id          uuid                                               NOT NULL,
-    created_at  timestamp with time zone                           NOT NULL,
-    updated_at  timestamp with time zone,
-    name        character varying(100) COLLATE pg_catalog."default",
-    description character varying(500) COLLATE pg_catalog."default",
-    type        character varying(10) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT channels_pkey PRIMARY KEY (id),
-    CONSTRAINT channels_type_check
-        CHECK (type::text = ANY
-               (ARRAY ['PUBLIC'::character varying, 'PRIVATE'::character varying]::text[]))
+    id           uuid PRIMARY KEY,
+    created_at   timestamptz  NOT NULL,
+    file_name    varchar(255) NOT NULL,
+    size         bigint       NOT NULL,
+    content_type varchar(100) NOT NULL,
+    bytes        bytea        NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS messages
+
+CREATE TABLE channels
 (
-    id         uuid                     NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone,
-    content    text COLLATE pg_catalog."default",
-    channel_id uuid                     NOT NULL,
-    author_id  uuid,
-    CONSTRAINT messages_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_author FOREIGN KEY (author_id)
-        REFERENCES public.users (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE SET NULL,
-    CONSTRAINT fk_channel FOREIGN KEY (channel_id)
-        REFERENCES public.channels (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE
+    id          uuid PRIMARY KEY,
+    created_at  timestamptz NOT NULL,
+    updated_at  timestamptz,
+    name        varchar(100),
+    description varchar(500),
+    type        varchar(10) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS read_statuses
+CREATE TABLE messages
 (
-    id           uuid                     NOT NULL,
-    created_at   timestamp with time zone NOT NULL,
-    updated_at   timestamp with time zone,
-    user_id      uuid,
-    last_read_at timestamp with time zone NOT NULL,
-    channel_id   uuid,
-    CONSTRAINT read_statuses_pkey PRIMARY KEY (id),
-    CONSTRAINT read_statuses_channel_id_key UNIQUE (channel_id),
-    CONSTRAINT unique_user_id UNIQUE (user_id),
-    CONSTRAINT fk_channel_id FOREIGN KEY (channel_id)
-        REFERENCES public.channels (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE,
-    CONSTRAINT fk_user_id FOREIGN KEY (user_id)
-        REFERENCES public.users (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE
+    id         uuid PRIMARY KEY,
+    created_at timestamptz NOT NULL,
+    updated_at timestamptz NOT NULL,
+    content    text,
+    channel_id uuid        NOT NULL,
+    author_id  uuid
 );
 
-
-CREATE TABLE IF NOT EXISTS user_statuses
+CREATE TABLE read_statuses
 (
-    id             uuid                     NOT NULL,
-    created_at     timestamp with time zone NOT NULL,
-    updated_at     timestamp with time zone,
-    user_id        uuid                     NOT NULL,
-    last_active_at timestamp with time zone NOT NULL,
-    CONSTRAINT user_statuses_pkey PRIMARY KEY (id),
-    CONSTRAINT user_statuses_user_id_key UNIQUE (user_id),
-    CONSTRAINT user_statuses_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES public.users (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE
+    id           uuid PRIMARY KEY,
+    created_at   timestamptz NOT NULL,
+    updated_at   timestamptz,
+    user_id      uuid        NOT NULL,
+    last_read_at timestamptz NOT NULL,
+    channel_id   uuid        NOT NULL,
+    UNIQUE (user_id, channel_id)
+);
+
+
+CREATE TABLE user_statuses
+(
+    id             uuid PRIMARY KEY,
+    created_at     timestamptz NOT NULL,
+    updated_at     timestamptz,
+    user_id        uuid UNIQUE NOT NULL,
+    last_active_at timestamptz NOT NULL
 );
 
 
 
-CREATE TABLE IF NOT EXISTS message_attachments
+CREATE TABLE message_attachments
 (
     message_id    uuid,
     attachment_id uuid,
-    CONSTRAINT fk_attachment FOREIGN KEY (attachment_id)
-        REFERENCES public.binary_contents (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE,
-    CONSTRAINT fk_message FOREIGN KEY (message_id)
-        REFERENCES public.messages (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE
+    PRIMARY KEY (message_id, attachment_id)
 );
+
+
+-- 제약 조건
+-- User (1) -> BinaryContent (1)
+ALTER TABLE users
+    ADD CONSTRAINT fk_user_binary_content
+        FOREIGN KEY (profile_id)
+            REFERENCES binary_contents (id)
+            ON DELETE SET NULL;
+
+-- UserStatus (1) -> User (1)
+ALTER TABLE user_statuses
+    ADD CONSTRAINT fk_user_status_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE;
+
+-- Message (N) -> Channel (1)
+ALTER TABLE messages
+    ADD CONSTRAINT fk_message_channel
+        FOREIGN KEY (channel_id)
+            REFERENCES channels (id)
+            ON DELETE CASCADE;
+
+-- Message (N) -> Author (1)
+ALTER TABLE messages
+    ADD CONSTRAINT fk_message_user
+        FOREIGN KEY (author_id)
+            REFERENCES users (id)
+            ON DELETE SET NULL;
+
+-- MessageAttachment (1) -> BinaryContent (1)
+ALTER TABLE message_attachments
+    ADD CONSTRAINT fk_message_attachment_binary_content
+        FOREIGN KEY (attachment_id)
+            REFERENCES binary_contents (id)
+            ON DELETE CASCADE;
+
+-- ReadStatus (N) -> User (1)
+ALTER TABLE read_statuses
+    ADD CONSTRAINT fk_read_status_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE;
+
+-- ReadStatus (N) -> User (1)
+ALTER TABLE read_statuses
+    ADD CONSTRAINT fk_read_status_channel
+        FOREIGN KEY (channel_id)
+            REFERENCES channels (id)
+            ON DELETE CASCADE;

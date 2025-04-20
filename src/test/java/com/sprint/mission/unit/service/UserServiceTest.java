@@ -9,7 +9,7 @@ import com.sprint.mission.entity.BinaryContent;
 import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.BinaryService;
-import com.sprint.mission.service.jcf.serviceImpl.UserServiceImpl;
+import com.sprint.mission.service.serviceImpl.UserServiceImpl;
 import com.sprint.mission.service.jcf.supporter.UserServiceSupporter;
 import com.sprint.mission.unit.util.MockFileFactory;
 import org.junit.jupiter.api.DisplayName;

@@ -18,7 +18,7 @@ import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.ReadStatusService;
-import com.sprint.mission.service.jcf.serviceImpl.ChannelServiceImpl;
+import com.sprint.mission.service.serviceImpl.ChannelServiceImpl;
 import com.sprint.mission.unit.util.ReflectionFieldSetter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

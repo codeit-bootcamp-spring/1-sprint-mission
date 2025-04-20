@@ -1,4 +1,4 @@
-package com.sprint.mission.service.jcf.serviceImpl;
+package com.sprint.mission.service.serviceImpl;
 
 
 import com.sprint.mission.common.exception.CustomException;

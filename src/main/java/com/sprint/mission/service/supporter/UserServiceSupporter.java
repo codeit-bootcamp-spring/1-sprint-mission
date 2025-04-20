@@ -1,4 +1,4 @@
-package com.sprint.mission.service.jcf.supporter;
+package com.sprint.mission.service.supporter;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;

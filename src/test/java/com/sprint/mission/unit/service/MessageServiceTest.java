@@ -16,7 +16,7 @@ import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.BinaryService;
-import com.sprint.mission.service.jcf.serviceImpl.MessageServiceImpl;
+import com.sprint.mission.service.serviceImpl.MessageServiceImpl;
 import com.sprint.mission.unit.util.MockFileFactory;
 import com.sprint.mission.unit.util.ReflectionFieldSetter;
 import org.junit.jupiter.api.DisplayName;

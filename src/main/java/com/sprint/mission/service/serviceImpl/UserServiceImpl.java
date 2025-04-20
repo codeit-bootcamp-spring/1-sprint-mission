@@ -1,4 +1,4 @@
-package com.sprint.mission.service.jcf.serviceImpl;
+package com.sprint.mission.service.serviceImpl;
 
 
 import com.sprint.mission.common.exception.CustomException;
@@ -10,7 +10,7 @@ import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.service.UserStatusService;
-import com.sprint.mission.service.jcf.supporter.UserServiceSupporter;
+import com.sprint.mission.service.supporter.UserServiceSupporter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
