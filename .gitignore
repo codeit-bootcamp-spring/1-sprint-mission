@@ -203,8 +203,7 @@ ehthumbs_vista.db
 # Windows shortcuts
 *.lnk
 
-#.env.dev 환경변수 파일들
+#.env 환경변수 파일들
 .env
-.env.*
 
 
