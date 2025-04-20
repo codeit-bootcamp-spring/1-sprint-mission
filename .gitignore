@@ -48,3 +48,7 @@ data/
 
 ### logs ###
 .logs/
+
+### env ###
+.env
+discodeit.env
