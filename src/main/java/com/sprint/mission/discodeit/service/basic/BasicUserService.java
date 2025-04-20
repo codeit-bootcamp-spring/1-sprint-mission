@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
@@ -70,12 +69,10 @@ public class BasicUserService implements UserService {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    User user = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(),
-        createUserDto.password(), null, AccountStatus.UNVERIFIED, null);
+    User user = new User(createUserDto.username(), createUserDto.email(),
+        createUserDto.password(), null);
     userRepository.save(user);
-
     UserStatus userStatus = new UserStatus(user);
-    user.setStatus(userStatus);
     userStatusRepository.save(userStatus);
 
     log.debug("사용자 상태 객체 생성 및 연결: {}", userStatus);
@@ -139,21 +136,6 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public List<UserDto> findAllContainsNickname(String nickname) {
-    return userRepository.findAll().stream()
-        .filter(user -> user.getNickname().contains(nickname))
-        .map(userMapper::toDto).toList();
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<UserDto> findAllByAccountStatus(AccountStatus accountStatus) {
-    return userRepository.findByAccountStatus(accountStatus)
-        .stream()
-        .map(userMapper::toDto).toList();
-  }
 
   @Override
   @Transactional
@@ -172,15 +154,11 @@ public class BasicUserService implements UserService {
     //to
     user.setUsername(
         updateUserDto.newUsername() == null ? user.getUsername() : updateUserDto.newUsername());
-    user.setNickname(
-        updateUserDto.newNickname() == null ? user.getNickname() : updateUserDto.newNickname());
     user.setEmail(updateUserDto.newEmail() == null ? user.getEmail() : updateUserDto.newEmail());
     user.setPassword(
         updateUserDto.newPassword() == null ? user.getPassword() : updateUserDto.newPassword());
     user.setUpdatedAt(
         updateUserDto.updatedAt() == null ? Instant.now() : updateUserDto.updatedAt());
-    user.setStatusMessage(updateUserDto.newStatusMessage() == null ? user.getStatusMessage()
-        : updateUserDto.newStatusMessage());
 
     User savedUser = userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", savedUser.getId());
@@ -202,7 +180,8 @@ public class BasicUserService implements UserService {
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
       throws DiscodeitException {
     log.info("사용자 프로필 사진과 함께 수정: userId = {}, updateUserDto = {} ", userId, updateUserDto);
-    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
     //todo - 유저 조회를 두 번 한다. 수정 필요
     updateUser(userId, updateUserDto);
 

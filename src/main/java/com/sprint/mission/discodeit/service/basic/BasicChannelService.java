@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelCategory;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
@@ -59,7 +58,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     Channel channel = new Channel(createPublicChannelDto.name(), ChannelType.PUBLIC,
-        ChannelCategory.TEXT, createPublicChannelDto.description());
+        createPublicChannelDto.description());
     channelRepository.save(channel);
     log.info("Public 채널 생성 완료: channelId = {}", channel.getId());
     return channelMapper.toDto(channel);
@@ -77,7 +76,7 @@ public class BasicChannelService implements ChannelService {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    Channel channel = new Channel(null, ChannelType.PRIVATE, ChannelCategory.TEXT, null);
+    Channel channel = new Channel(null, ChannelType.PRIVATE, null);
     channelRepository.save(channel);
 
     List<UUID> userIds = createPrivateChannelDTo.participantIds().stream().map(UUID::fromString)

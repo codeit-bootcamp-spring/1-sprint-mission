@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 public class BinaryContent extends BaseEntity {
 
   @Column(name = "file_name")
-  private String filename;
+  private String fileName;
   private String contentType;
   private long size;
 
-  public BinaryContent(String filename, String contentType, long size) {
-    this.filename = filename;
+  public BinaryContent(String fileName, String contentType, long size) {
+    this.fileName = fileName;
     this.contentType = contentType;
     this.size = size;
   }

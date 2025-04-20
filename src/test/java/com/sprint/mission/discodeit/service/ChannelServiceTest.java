@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service;
 
 import static com.jayway.jsonpath.internal.path.PathCompiler.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,9 +9,7 @@ import static org.mockito.Mockito.when;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDTo;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelCategory;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
@@ -25,14 +22,12 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -75,7 +70,6 @@ public class ChannelServiceTest {
       Channel channel = new Channel(
           "public test Channel",
           ChannelType.PUBLIC,
-          ChannelCategory.TEXT,
           "테스트용 공개 채널 입니다."
       );
 
@@ -94,7 +88,6 @@ public class ChannelServiceTest {
           channelId,
           "public test Channel",
           ChannelType.PUBLIC,
-          ChannelCategory.TEXT,
           "테스트용 공개 채널 입니다.",
           channel.getCreatedAt(),
           null,
@@ -112,7 +105,6 @@ public class ChannelServiceTest {
           () -> Assertions.assertNotNull(createdChannelDto),
           () -> Assertions.assertEquals(createPublicChannelDto.name(), createdChannelDto.name()),
           () -> Assertions.assertEquals(ChannelType.PUBLIC, createdChannelDto.type()),
-          () -> Assertions.assertEquals(ChannelCategory.TEXT, createdChannelDto.channelCategory()),
           () -> Assertions.assertEquals(createPublicChannelDto.description(),
               createdChannelDto.description())
       );
@@ -165,7 +157,6 @@ public class ChannelServiceTest {
       Channel channel = new Channel(
           null,
           ChannelType.PRIVATE,
-          ChannelCategory.TEXT,
           null
       );
 
@@ -184,7 +175,6 @@ public class ChannelServiceTest {
           channelId,
           null,
           ChannelType.PRIVATE,
-          ChannelCategory.TEXT,
           null,
           channel.getCreatedAt(),
           null,
@@ -217,7 +207,6 @@ public class ChannelServiceTest {
           () -> Assertions.assertNotNull(createdChannelDto),
           () -> Assertions.assertNull(createdChannelDto.name()),
           () -> Assertions.assertEquals(ChannelType.PRIVATE, createdChannelDto.type()),
-          () -> Assertions.assertEquals(ChannelCategory.TEXT, createdChannelDto.channelCategory()),
           () -> Assertions.assertNull(null, createdChannelDto.description())
       );
 

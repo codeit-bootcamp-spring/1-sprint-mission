@@ -25,9 +25,6 @@ public class Channel extends BaseUpdatableEntity {
   //채널명
   private String name;
 
-  //채널 종류 - 음성, 텍스트
-  private ChannelCategory channelCategory;
-
   //채널 공개 여부
   @Enumerated(EnumType.STRING)
   private ChannelType type;
@@ -42,10 +39,8 @@ public class Channel extends BaseUpdatableEntity {
   private List<ReadStatus> readStatuses = new ArrayList<>();
 
 
-  public Channel(String name, ChannelType type, ChannelCategory channelCategory,
-      String description) {
+  public Channel(String name, ChannelType type, String description) {
     this.name = name;
-    this.channelCategory = channelCategory;
     this.type = type;
     this.description = description;
   }

@@ -26,12 +26,6 @@ public interface UserService {
   //단건 조회 - 이메일로 조회
   UserDto findByEmail(String email);
 
-  //다건 조회 - 닉네임
-  List<UserDto> findAllContainsNickname(String nickname);
-
-  //다건 조회 - 계정 상태
-  List<UserDto> findAllByAccountStatus(AccountStatus accountStatus);
-
   //다건 조회 - 사용자 상태
   //List<User> getUserByUserStatus(UserStatus userStatus);
 
