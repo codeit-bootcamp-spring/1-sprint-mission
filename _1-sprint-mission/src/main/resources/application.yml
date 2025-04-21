@@ -2,10 +2,26 @@ spring:
   application:
     name: discodeit
 
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
   profiles:
-    active: dev
+    active:
+      - dev
 
 logging:
   level:
-    root: INFO
+    root: info
 
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: C:/storage/binaryContent

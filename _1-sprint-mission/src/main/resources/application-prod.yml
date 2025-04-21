@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
 
 spring:
   config:
@@ -8,26 +8,16 @@ spring:
       on-profile: prod
 
   datasource:
-    driver-class-name: org.postgresql.Driver
     url: ${PROD.DB.URL}
     username: ${PROD.DB.USERNAME}
     password: ${PROD.DB.PASSWORD}
 
   jpa:
-    hibernate:
-      ddl-auto: none  # 프로덕션 환경에서는 자동 DDL 생성을 비활성화
-      show-sql: false  # SQL 쿼리 출력 비활성화
-    open-in-view: false
-
+    properties:
+      hibernate:
+        format_sql: false
 
 logging:
   level:
-    root: info  # 운영 환경에서는 info 레벨로 설정
-    org.hibernate.SQL: DEBUG  # SQL 실행 로그를 DEBUG 레벨로 출력
-    org.hibernate.orm.jdbc.bind: trace  # SQL 바인딩 로그 출력
-
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: /prod/storage/binaryContent  # 프로덕션 환경에서는 다른 디렉토리 사용
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: info

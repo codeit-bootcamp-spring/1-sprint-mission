@@ -8,16 +8,14 @@ spring:
       on-profile: dev
 
   datasource:
-    driver-class-name: org.postgresql.Driver
     url: ${DEV.DB.URL}
     username: ${DEV.DB.USERNAME}
     password: ${DEV.DB.PASSWORD}
 
   jpa:
-    hibernate:
-      ddl-auto: update
-      show-sql: true
-    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
 
   springdoc:
     api-docs:
@@ -25,22 +23,11 @@ spring:
     swagger-ui:
       path: /swagger-ui.html
 
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 30MB
-
 logging:
   level:
-    root: DEBUG
-    org.hibernate.SQL: DEBUG  # SQL 실행 로그를 DEBUG 레벨로 출력
+    com.sprint.mission.discodeit: debug
+    org.hibernate.SQL: debug  # SQL 실행 로그를 DEBUG 레벨로 출력
     org.hibernate.orm.jdbc.bind: trace
-
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: C:/storage/binaryContent
 
 management:
   endpoints:
