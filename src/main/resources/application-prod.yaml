@@ -16,3 +16,14 @@ logging: # Hibernate SQL 로그 설정
   level:
     com.sprint.mission.discodeit: info
     org.hibernate.SQL: info  # Hibernate가 실행하는 SQL 쿼리를 로그로 출력
+
+cloud:
+  aws:
+    credentials:
+      accessKey: ${AWS_S3_ACCESS_KEY}
+      secretKey: ${AWS_S3_SECRET_KEY}
+    region: ${AWS_S3_REGION}
+    stack:
+      auto: false
+    s3:
+      bucket: ${AWS_S3_BUCKET}

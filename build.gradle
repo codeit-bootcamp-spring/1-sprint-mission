@@ -50,6 +50,9 @@ dependencies {
 
     // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // aws s3 sdk
+    implementation 'software.amazon.awssdk:s3:2.31.7'
 }
 
 tasks.named('test') {
