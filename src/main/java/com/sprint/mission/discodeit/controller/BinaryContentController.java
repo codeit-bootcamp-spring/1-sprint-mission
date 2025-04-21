@@ -31,7 +31,9 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping(path = "{binaryContentId}")
   public ResponseEntity<BinaryContentDto> find(
       @PathVariable("binaryContentId") UUID binaryContentId) {
+    log.info("바이너리 컨텐츠 조회 요청: id={}", binaryContentId);
     BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
+    log.debug("바이너리 컨텐츠 조회 응답: {}", binaryContent);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContent);
@@ -40,7 +42,9 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping
   public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+    log.info("바이너리 컨텐츠 목록 조회 요청: ids={}", binaryContentIds);
     List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    log.debug("바이너리 컨텐츠 목록 조회 응답: count={}", binaryContents.size());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContents);
@@ -48,9 +52,12 @@ public class BinaryContentController implements BinaryContentApi {
 
   @GetMapping(path = "{binaryContentId}/download")
   public ResponseEntity<?> download(@PathVariable("binaryContentId") UUID binaryContentId) {
-    log.info("파일 다운로드 요청: binaryContentId={}", binaryContentId);
+    log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
 
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
-    return binaryContentStorage.download(binaryContentDto);
+    ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
+    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}",
+            response.getHeaders().getContentType(), response.getHeaders().getContentLength());
+    return response;
   }
 }

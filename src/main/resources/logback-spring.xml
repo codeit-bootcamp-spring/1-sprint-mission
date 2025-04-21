@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration scan="true">
+<configuration>
+    <!-- 로그 레벨별 색상 설정 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
 
-    <!-- 로그 파일 저장 경로 설정 -->
-    <property name="LOG_PATH" value=".logs"/>
+    <!-- MDC 값을 포함한 로그 패턴 설정 -->
+    <property name="LOG_PATTERN" value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%-5level) %-36logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUri}] - %msg%n"/>
+    <property name="LOG_FILE_PATH" value=".logs"/>
+    <property name="LOG_FILE_NAME" value="application"/>
 
-    <!-- 콘솔 로그 출력 -->
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- 콘솔 출력 설정 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <!-- 파일 로그 출력 (일자별 롤링, 30일 보관) -->
-    <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/app.log</file>
+    <!-- 파일 출력 설정 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
-        <encoder>
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger - %msg%n</pattern>
-        </encoder>
     </appender>
 
-    <!-- 로그 레벨 설정 -->
-    <root level="INFO">
-        <appender-ref ref="Console"/>
-        <appender-ref ref="FileAppender"/>
+    <!-- 루트 로거 설정 - 레벨은 application.yaml에서 관리 -->
+    <root>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
     </root>
-
 </configuration>
