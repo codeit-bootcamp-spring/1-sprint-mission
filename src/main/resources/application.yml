@@ -1,12 +1,34 @@
 spring:
   application:
-    name: Discodeit
+    name: discodeit
+    version: 1.2-M8
+  boot:
+    version: 3.4.0
   profiles:
-    active: dev
+    active: ${PROFILES_ACTIVE:dev}
+  #  config:
+  #    import: optional:file:.env[.properties] # docker test 용, Spring Boot 3.1 이상에서만 작동
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 25MB
 
 logging:
   level:
     root: info
+    com.zaxxer.hikari.HikariConfig: DEBUG
+
+discodeit:
+  storage:
+    type: ${STORAGE_TYPE:local}
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:./binaryContents}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
 # swagger
 springdoc:

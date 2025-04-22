@@ -1,15 +1,19 @@
 server:
-  port: 8080
+  port: 80
 
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE}
+      minimum-idle: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE}
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
         show_sql: false
@@ -24,3 +28,28 @@ logging:
       max-history: 30
   level:
     root: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "health"
+          - "info"
+          - "metrics"
+          - "loggers"
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  info:
+    env:
+      enabled: true
+
+info:
+  name: ${spring.application.name}
+  version: ${spring.application.version}
+  java:
+    version: ${java.version}
+  spring-boot:
+    version: ${spring.boot.version}
+  profile: ${spring.profiles.active}

@@ -4,9 +4,9 @@ server:
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: none
@@ -25,8 +25,32 @@ logging:
   level:
     root: info
 
-discodeit:
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - "health"
+          - "info"
+          - "metrics"
+          - "loggers"
+  endpoint:
+    health:
+      show-details: "ALWAYS"
+  info:
+    env:
+      enabled: true
+
+info:
+  name: ${spring.application.name}
+  version: ${spring.application.version}
+  java:
+    version: ${java.version}
+  spring-boot:
+    version: ${spring.boot.version}
+  profile: ${spring.profiles.active}
   storage:
-    type: local
-    local:
-      root-path: ${user.dir}/binaryContents
+    type: ${discodeit.storage.type}
+    path: ${discodeit.storage.local.root-path}
+  jpa:
+    ddl-auto: ${spring.jpa.hibernate.ddl-auto}
