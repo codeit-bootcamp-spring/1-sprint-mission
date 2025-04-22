@@ -59,3 +59,8 @@ jacocoTestReport {
 		html.required = true
 	}
 }
+
+bootJar {
+	archiveBaseName.set("discodeit")
+	archiveVersion.set("1.2-M8")
+}
