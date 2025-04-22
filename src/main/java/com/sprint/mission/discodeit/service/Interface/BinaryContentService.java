@@ -12,13 +12,9 @@ public interface BinaryContentService {
 
   BinaryContent saveBinaryContent(BinaryContentDto request);
 
-  InputStream getBinaryContent(UUID id);
+  BinaryContentDto find(UUID id);
 
-  ResponseEntity<?> downloadBinaryContent(UUID id);
-
-  BinaryContent find(UUID id);
-
-  List<BinaryContent> findAllByIdIn(List<UUID> ids);
+  List<BinaryContentDto> findAllByIdIn(List<UUID> ids);
 
   void delete(UUID id);
 }

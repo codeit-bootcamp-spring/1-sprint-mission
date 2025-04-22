@@ -20,7 +20,7 @@ public class BinaryContentMapper {
     }
     String extension = getFileExtension(entity.getFileName());
     byte[] fileDate = convertInputStreamToByteArray(
-        binaryContentStorage.get(entity.getId(), extension));
+        binaryContentStorage.get(entity.getId()));
 
     return new BinaryContentDto(
         entity.getId(),

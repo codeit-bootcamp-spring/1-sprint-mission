@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: discodeit-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_BOOT_ADMIN_CLIENT_URL: ${SPRING_BOOT_ADMIN_CLIENT_URL}
+      STORAGE_TYPE: ${STORAGE_TYPE}
+      AWS_S3_ACCESS_KEY: ${AWS_S3_ACCESS_KEY}
+      AWS_S3_SECRET_KEY: ${AWS_S3_SECRET_KEY}
+      AWS_S3_REGION: ${AWS_S3_REGION}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_S3_PRESIGNED_URL_EXPIRATION: ${AWS_S3_PRESIGNED_URL_EXPIRATION}
+    volumes:
+      - app-storage:/path/to/storage
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+  app-storage:

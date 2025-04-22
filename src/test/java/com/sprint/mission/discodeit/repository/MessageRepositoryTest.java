@@ -106,12 +106,12 @@ class MessageRepositoryTest {
     for (int i = 0; i < 3; i++) {
       Message message = messageRepository.save(new Message("메시지 " + i, channel, user, List.of()));
       saved.add(message);
-      Thread.sleep(10);
+      Thread.sleep(1500);
     }
 
     em.flush();
     em.clear();
-
+    Message foundMessage = em.find(Message.class, saved.get(0).getId());
     Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
     Instant cursor = saved.get(2).getCreatedAt();
     Slice<Message> result = messageRepository.findNextMessages(channel.getId(), cursor, pageable);

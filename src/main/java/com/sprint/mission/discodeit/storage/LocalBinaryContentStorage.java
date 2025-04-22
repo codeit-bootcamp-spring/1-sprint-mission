@@ -3,30 +3,27 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.exception.file.FileUploadFailedException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.UUID;
 
-@Component
+
 @Conditional(LocalStorageCondition.class)
 @RequiredArgsConstructor
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final Path root;
 
-  @Autowired
   public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath) {
     this.root = Paths.get(rootPath);
   }
@@ -41,24 +38,21 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  public Path put(UUID id, byte[] data, String extension) {
-    String safeExtension = formatExtension(extension);
-    String fileName = id.toString() + safeExtension;
+  public UUID put(UUID id, byte[] data) {
+    String fileName = id.toString();
 
     Path filePath = resolvePath(fileName);
     try {
       Files.write(filePath, data);
-      return filePath;
+      return null;
     } catch (IOException e) {
       throw new FileUploadFailedException();
     }
   }
 
   @Override
-  public InputStream get(UUID id, String extension) {
-    String safeExtension = formatExtension(extension);
-    Path filePath = resolvePath(id.toString() + safeExtension);
-
+  public InputStream get(UUID id) {
+    Path filePath = resolvePath(id.toString());
     try {
       return Files.newInputStream(filePath);
     } catch (IOException e) {
@@ -67,51 +61,22 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  public ResponseEntity<?> download(BinaryContentDto binaryContentDto, String extension) {
-    String safeExtension = formatExtension(extension);
-    Path filePath = resolvePath(binaryContentDto.getId().toString() + safeExtension);
-
-    Resource resource = new FileSystemResource(filePath);
+  public ResponseEntity<?> download(BinaryContentDto binaryContentDto) {
+    InputStream inputStream = get(binaryContentDto.getId());
+    Resource resource = new InputStreamResource(inputStream);
     if (!resource.exists()) {
       return ResponseEntity.notFound().build();
     }
-
-    String contentType = binaryContentDto.getContentType();
-    if (contentType == null || contentType.isBlank()) {
-      contentType = "application/octet-stream";
-    }
-    return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(contentType))
+    return ResponseEntity
+        .status(HttpStatus.OK)
         .header(HttpHeaders.CONTENT_DISPOSITION,
-            "inline; filename=\"" + binaryContentDto.getFileName() + "\"")
+            "attachment; filename=\"" + binaryContentDto.getFileName() + "\"")
+        .header(HttpHeaders.CONTENT_TYPE, binaryContentDto.getContentType())
+        .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(binaryContentDto.getSize()))
         .body(resource);
-  }
-
-  @Override
-  public boolean exists(UUID id, String extension) {
-    String safeExtension = formatExtension(extension);
-    return Files.exists(resolvePath(id.toString() + safeExtension));
-  }
-
-  @Override
-  public void delete(UUID id, String extension) {
-    String safeExtension = formatExtension(extension);
-    try {
-      Files.deleteIfExists(resolvePath(id.toString() + safeExtension));
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to delete file", e);
-    }
   }
 
   private Path resolvePath(String fileName) {
     return root.resolve(fileName);
-  }
-
-  // 🔹 확장자 "."이 없으면 자동으로 추가하는 메서드
-  private String formatExtension(String extension) {
-    if (extension == null || extension.isEmpty()) {
-      return "";
-    }
-    return extension.startsWith(".") ? extension : "." + extension;
   }
 }

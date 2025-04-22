@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  driver-class-name: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 20
+
+  config:
+    activate:
+      on-profile: prod
+
+server:
+  port: 80
+
+
+logging:
+  level:
+    root: info
+    org.springframework.web: debug
+    org.springframework.web.servlet: INFO
+    org.springframework.web.multipart: INFO  # Multipart 파일 업로드 관련 로그
+

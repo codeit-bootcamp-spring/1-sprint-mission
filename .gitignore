@@ -16,7 +16,8 @@ build/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-*.yaml
+application-prod.yaml
+.env
 *.logs
 ### Eclipse ###
 .apt_generated

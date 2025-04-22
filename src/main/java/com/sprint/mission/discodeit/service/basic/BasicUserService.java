@@ -104,8 +104,7 @@ public class BasicUserService implements UserService {
       if (oldProfile == null || !oldProfile.getFileName().equals(profile.getOriginalFilename())) {
         log.debug("profile update: old={}, new={}", oldProfile, profile);
         if (oldProfile != null) {
-          binaryContentStorage.delete(oldProfile.getId(),
-              getFileExtension(oldProfile.getFileName()));
+          getFileExtension(oldProfile.getFileName());
           binaryContentRepository.deleteById(oldProfile.getId());
         }
 
@@ -129,8 +128,6 @@ public class BasicUserService implements UserService {
     log.info("user deleted: id={}, email={}", userId, user.getEmail());
     if (user.getProfile() != null) {
       UUID profileId = user.getProfile().getId();
-      String extension = getFileExtension(user.getProfile().getFileName());
-      binaryContentStorage.delete(profileId, extension);
       binaryContentRepository.delete(user.getProfile());
     }
 
@@ -155,12 +152,9 @@ public class BasicUserService implements UserService {
     );
 
     BinaryContent savedContent = binaryContentRepository.save(binaryContent);
-    String extension = getFileExtension(profileFile.getOriginalFilename());
 
     try {
-      Path filePath = binaryContentStorage.put(savedContent.getId(), profileFile.getBytes(),
-          extension);
-      savedContent.setFilePath(filePath.toString());
+      binaryContentStorage.put(savedContent.getId(), profileFile.getBytes());
     } catch (IOException e) {
       throw new FileUploadFailedException();
     }
@@ -181,12 +175,8 @@ public class BasicUserService implements UserService {
     );
     BinaryContent savedContent = binaryContentRepository.save(binaryContent);
 
-    String extension = getFileExtension(profileFile.getOriginalFilename());
-
     try {
-      Path filePath = binaryContentStorage.put(savedContent.getId(), profileFile.getBytes(),
-          extension);
-      binaryContent.setFilePath(filePath.toString());
+      binaryContentStorage.put(savedContent.getId(), profileFile.getBytes());
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
