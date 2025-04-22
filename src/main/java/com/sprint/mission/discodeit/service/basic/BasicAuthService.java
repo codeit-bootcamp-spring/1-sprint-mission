@@ -13,8 +13,6 @@ import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
-
 @RequiredArgsConstructor
 @Service
 public class BasicAuthService implements AuthService {

@@ -19,6 +19,7 @@ public class UserCreateRequest {
     @Email(message = "이메일 형식이 아닙니다.")
     private String email;
 
+    // TODO Pattern 커스텀 validation 만들어보기 (미션7 코드리뷰)
     @NotBlank(message = "비밀번호는 필수값입니다.")
     @Pattern(regexp = "(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{8,16}", message = "비밀번호는 8~16자 영문 대 소문자, 숫자, 특수문자를 사용하세요.")
     private String password;

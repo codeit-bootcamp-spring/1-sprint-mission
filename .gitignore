@@ -5,7 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### 내가 추가 ###
 uploads
+.env
 
 ### STS ###
 .apt_generated
