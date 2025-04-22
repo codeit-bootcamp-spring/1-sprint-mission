@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://host.docker.internal:5432/discodeit
+    username: discodeit_prod
+    password: discodeit_prod_1234
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: never
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+discodeit:
+  storage:
+    local:
+      root-path: /app/storage
+
+logging:
+  level:
+    root: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    com.sprint.mission.discodeit: info

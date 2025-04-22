@@ -1,0 +1,7 @@
+1-sprint-mission/.gradle
+build
+out
+*.iml
+*.log
+*.class
+.idea
