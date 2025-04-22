@@ -184,7 +184,7 @@ class ChannelServiceTest {
     PrivateChannelCreateRequest request = new PrivateChannelCreateRequest();
     request.setParticipantIds(Collections.emptyList());
 
-    // When & Then1
+    // When & Then
     RestApiException exception = assertThrows(RestApiException.class, () ->
         channelService.createPrivateChannel(request)
     );
