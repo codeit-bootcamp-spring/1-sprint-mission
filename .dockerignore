@@ -1,0 +1,24 @@
+/temp
+/.logs
+
+# 불필요한 빌드 산출물
+build/
+out/
+.gradle/
+
+# IDE 설정
+*.iml
+.idea/
+.vscode/
+
+# OS 파일
+.DS_Store
+
+# 버전 관리
+.git/
+.gitignore
+
+# 테스트/로컬 설정
+.env*
+*.log
+*.bak

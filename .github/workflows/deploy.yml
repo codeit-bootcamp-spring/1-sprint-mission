@@ -1,0 +1,112 @@
+name: Deploy to CodeIT Sprint mission (Springboot Application to AWS ECS)
+
+on:
+  pull_request:
+    branches:
+      - release
+  workflow_dispatch:  # 수동 실행도 허용
+
+# 공통 환경 변수
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
+  ECS_CONTAINER_NAME: ${{ vars.ECS_CONTAINER_NAME }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  docker-build-and-push: # AWS Credentials 및 ECR 로그인 - # Docker Build 및 ECR에 Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials # AWS 자격 증명
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR Public
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Build Docker Image (x86_64)
+        run: |
+          docker build \
+            --build-arg PROJECT_NAME=discodeit \
+            --build-arg PROJECT_VERSION=1.2-M8 \
+            -t $ECR_REPOSITORY_URI:latest \
+            -t $ECR_REPOSITORY_URI:$IMAGE_TAG \
+            .
+
+      - name: Push Docker Image to ECR (latest / github.sha)
+        run: |
+          docker push $ECR_REPOSITORY_URI:latest
+          docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  ecs-deploy: # ECS 배포
+    needs: docker-build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Scale down ECS service to 0 (save free tier) # ECS 서비스 일시 중단
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 0
+
+      - name: Wait for tasks to stop  # 기존 태스크가 완전히 종료될 때까지 기다리기
+        run: |
+          while aws ecs list-tasks \
+            --cluster $ECS_CLUSTER \
+            --service-name $ECS_SERVICE \
+            --desired-status RUNNING \
+            --query 'taskArns' --output text | grep -q .; do
+            echo "Waiting for old tasks to stop..."
+            sleep 10
+          done
+
+      - name: Get current ECS task definition # task-definition.json 파일 받기
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition $ECS_TASK_DEFINITION \
+            --query 'taskDefinition' \
+            > task-definition.json
+
+      - name: Render new ECS task definition with updated image # 업데이트 된 이미지 반영
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          image: ${{ env.ECR_REPOSITORY_URI }}:latest
+
+      - name: Deploy Amazon ECS task definition  # 새 태스크 정의 배포
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Scale up ECS service to 1 # ECS 서비스 재시작
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 1

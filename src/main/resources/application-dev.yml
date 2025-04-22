@@ -1,0 +1,102 @@
+# DEV
+
+spring:
+  application:
+    name: discodeit
+    boot:
+      admin:
+        client:
+          url: http://localhost:9090
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+  # JPA
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database: postgresql
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+        generate_statistics: true
+        cache:
+          use_second_level_cache: false
+      open-in-view: false
+    transaction:
+      default-timeout: 30
+
+# actuator
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health, info, metrics, loggers
+  info:
+    env:
+      enabled: true
+
+# actuator - info
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java:
+      version: 17
+    spring-boot:
+      version: 3.4.0
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}
+
+# logging
+logging:
+  level:
+    root: info
+    com.sprint.mission.discodeit: debug
+    org:
+      springframework:
+        core:
+          env: debug
+      hibernate:
+        sql: debug
+        type:
+          descriptor:
+            sql: debug
+
+# swagger
+springdoc:
+  api-docs:
+    path: /api-docs     # OpenAPI 명세서의 엔드포인트 설정 (기본값: /v3/api-docs)
+  default-consumes-media-type: application/json   # 기본 요청 Content-Type
+  default-produces-media-type: application/json   # 기본 응답 Content-Type
+  swagger-ui:
+    operations-sorter: alpha    # API 메서드 알파벳 순 정렬
+    tags-sorter: alpha          # API 태그 알파벳 순 정렬
+    path: /swagger-ui
+    display-request-duration: true
+    doc-expansion: none
+    filter: true
+    show-extensions: true
+
+# port
+server:
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: utf-8
+      enabled: true
+      force: true

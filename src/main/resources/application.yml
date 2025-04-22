@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: discodeit
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:prod}
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 30MB
+  boot:
+    admin:
+      client:
+        instance:
+          name: Discodeit
+
+discodeit:
+  storage:
+    type:
+      ${STORAGE_TYPE:local}
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:temp}
+    s3:
+      access-key-id: ${AWS_ACCESS_KEY_ID}
+      secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
+
+logging:
+  level:
+    root: info
