@@ -1,0 +1,78 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - release
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPO: discodeit
+  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
+  IMAGE_TAG: ${{ github.sha }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1
+
+      - uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - run: |
+          docker build -t $ECR_REPOSITORY_URI:$IMAGE_TAG -t $ECR_REPOSITORY_URI:latest .
+          docker push  $ECR_REPOSITORY_URI:$IMAGE_TAG
+          docker push  $ECR_REPOSITORY_URI:latest
+          
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{vars.AWS_REGION}}
+
+      - id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{vars.CONTAINER_NAME}}
+          image: ${{ env.ECR_REPOSITORY_URI }}:latest
+
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          cluster: ${{ vars.ECS_CLUSTER }}
+          service: ${{ vars.ECS_SERVICE }}
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          wait-for-service-stability: true
+          desired-count: 0
+
+
+      - uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          cluster: ${{ vars.ECS_CLUSTER }}
+          service: ${{ vars.ECS_SERVICE }}
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          wait-for-service-stability: true
+          desired-count: 1
+
+

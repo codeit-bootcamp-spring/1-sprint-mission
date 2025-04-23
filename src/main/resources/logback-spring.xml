@@ -3,7 +3,7 @@
   <conversionRule conversionWord="clr"
     class="org.springframework.boot.logging.logback.ColorConverter"/>
   <property name="CONSOLE_LOG_PATTERN"
-    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) - %msg%n"/>
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %cyan(%logger) [%X{requestId} | %X{requestMethod} | %X{requestUri}] - %msg%n"/>
   <property name="FILE_LOG_PATTERN"
     value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %5level %logger - %msg%n"/>
 
@@ -24,18 +24,9 @@
     </rollingPolicy>
   </appender>
 
-  <springProfile name="dev">
-    <logger name="com.sprint.mission.discodeit" level="DEBUG"/>
-    <root level="INFO">
-      <appender-ref ref="CONSOLE"/>
-      <appender-ref ref="FILE"/>
-    </root>
-  </springProfile>
-  <springProfile name="prod">
-    <root level="INFO">
-      <appender-ref ref="CONSOLE"/>
-      <appender-ref ref="FILE"/>
-    </root>
-  </springProfile>
+  <root>
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
 
 </configuration>

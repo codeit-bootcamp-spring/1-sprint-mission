@@ -12,7 +12,7 @@ public interface BinaryContentStorage {
 
   InputStream get(UUID id);
 
-  void delete(UUID id);
-
   ResponseEntity<Resource> download(BinaryContentResponse response);
+
+  void delete(UUID id);
 }

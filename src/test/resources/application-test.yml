@@ -5,14 +5,23 @@ spring:
     username: sa
     password:
   jpa:
-    show-sql: true
     properties:
       hibernate:
         format_sql: true
-    hibernate:
-      ddl-auto: create
+discodeit:
+  storage:
+    type: local # local | s3
+    local:
+      root-path: files
+    s3:
+      access-key: accsee-key
+      secret-key: secret-key
+      region: ap-northeast-2
+      bucket: discodeit-binary-content-storage-wjh
+      presigned-url-expiration: 600
 
 logging:
   level:
+    com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace

@@ -1,0 +1,59 @@
+{
+  "family": "discodeit-task",
+  "containerDefinitions": [
+    {
+      "name": "discodeit-app",
+      "image": "public.ecr.aws/q8a1a6g2/discodeit:latest",
+      "cpu": 256,
+      "memory": 512,
+      "memoryReservation": 256,
+      "portMappings": [
+        {
+          "name": "discodeit-app-80-tcp",
+          "containerPort": 80,
+          "hostPort": 80,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "essential": true,
+      "environment": [],
+      "environmentFiles": [
+        {
+          "value": "arn:aws:s3:::discodeit-binary-content-storage-wjh/discodeit.env",
+          "type": "s3"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "ulimits": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/discodeit-task",
+          "mode": "non-blocking",
+          "awslogs-create-group": "true",
+          "max-buffer-size": "25m",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        },
+        "secretOptions": []
+      },
+      "systemControls": []
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::129652295273:role/ecsTaskExecutionRole",
+  "networkMode": "bridge",
+  "volumes": [],
+  "placementConstraints": [],
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "enableFaultInjection": false
+}
