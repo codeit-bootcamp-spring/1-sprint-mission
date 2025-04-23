@@ -1,8 +1,4 @@
 spring:
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/discodeit

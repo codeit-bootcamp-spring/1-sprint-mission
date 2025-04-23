@@ -18,21 +18,15 @@ public class MDCLoggingInterceptor implements HandlerInterceptor {
   private static final String RESPONSE_HEADER_NAME = "Discodeit-Request-ID";
 
   @Override
-  public boolean preHandle(HttpServletRequest request,
-      HttpServletResponse response,
+  public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
       Object handler) {
-    try {
-      // 요청 정보 추출 및 MDC 설정
-      String requestId = UUID.randomUUID().toString();
-      MDC.put(REQUEST_ID, requestId);
-      MDC.put(REQUEST_METHOD, request.getMethod());
-      MDC.put(REQUEST_URI, request.getRequestURI());
+    String requestId = UUID.randomUUID().toString();
+    MDC.put(REQUEST_ID, requestId);
+    MDC.put(REQUEST_METHOD, request.getMethod());
+    MDC.put(REQUEST_URI, request.getRequestURI());
 
-      // 응답 헤더 추가
-      response.addHeader(RESPONSE_HEADER_NAME, requestId);
-    } catch (Exception e) {
-      log.error("Fail to setup MDC logging", e);
-    }
+    response.addHeader(RESPONSE_HEADER_NAME, requestId);
+
     return true;
   }
 
@@ -42,8 +36,6 @@ public class MDCLoggingInterceptor implements HandlerInterceptor {
       Object handler,
       Exception ex) {
     // MDC 정리
-    MDC.remove(REQUEST_ID);
-    MDC.remove(REQUEST_METHOD);
-    MDC.remove(REQUEST_URI);
+    MDC.clear();
   }
 }

@@ -40,3 +40,9 @@ bin/
 
 ### Discodeit ###
 .discodeit
+.qodo
+/.logs/
+
+# Docker environment variables
+.env
+/discodeit.env

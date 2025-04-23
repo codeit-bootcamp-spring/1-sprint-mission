@@ -1,0 +1,26 @@
+codecov:
+  coverage:
+    status:
+      project:
+        default:
+          target: auto
+          threshold: 0%
+          base: auto
+      patch:
+        default:
+          target: auto
+          threshold: 0%
+          base: auto
+
+  comment:
+    layout: "reach, diff, flags, files"
+    behavior: default
+    require_changes: false
+    require_base: no
+    require_head: yes
+    hide_project_coverage: false
+
+  ignore:
+    - "**/test/**"
+    - "**/*Test.java"
+    - "gradle/**"

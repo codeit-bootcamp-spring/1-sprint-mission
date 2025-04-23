@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '0.0.1-SNAPSHOT'
+version = '1.2-M8'
 
 java {
     toolchain {
@@ -29,9 +29,10 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
+
+    // AWS S3 SDK 의존성 추가
+    implementation 'software.amazon.awssdk:s3:2.31.7'
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.postgresql:postgresql'
@@ -47,7 +48,6 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-// JaCoCo 설정
 jacoco {
     toolVersion = "0.8.12"
 }
@@ -56,14 +56,12 @@ test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
 
-    // 테스트 실행 시 JaCoCo 에이전트 설정
     jacoco {
         destinationFile = file("${layout.buildDirectory.get()}/jacoco/jacocoTest.exec")
         classDumpDir = file("${layout.buildDirectory.get()}/jacoco/classpathdumps")
     }
 }
 
-// JaCoCo 리포트 생성 설정
 jacocoTestReport {
     dependsOn test
 

@@ -1,116 +1,66 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentException;
-import com.sprint.mission.discodeit.exception.channel.ChannelException;
-import com.sprint.mission.discodeit.exception.message.MessageException;
-import com.sprint.mission.discodeit.exception.user.UserException;
-import com.sprint.mission.discodeit.exception.userstatus.UserStatusException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(DiscodeitException.class)
   public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException e) {
     HttpStatus status = getStatus(e.getErrorCode());
+    logException(e, status);
+
     return ResponseEntity
         .status(status)
         .body(ErrorResponse.from(e, status.value()));
   }
-
-  //도메인별 예외 핸들러
-  @ExceptionHandler(UserException.class)
-  public ResponseEntity<ErrorResponse> handleUserException(UserException e) {
-    HttpStatus status = getStatus(e.getErrorCode());
-    return ResponseEntity
-        .status(status)
-        .body(ErrorResponse.from(e, status.value()));
-  }
-
-  @ExceptionHandler(ChannelException.class)
-  public ResponseEntity<ErrorResponse> handleChannelException(ChannelException e) {
-    HttpStatus status = getStatus(e.getErrorCode());
-    return ResponseEntity
-        .status(status)
-        .body(ErrorResponse.from(e, status.value()));
-  }
-
-  @ExceptionHandler(MessageException.class)
-  public ResponseEntity<ErrorResponse> handleMessageException(MessageException e) {
-    HttpStatus status = getStatus(e.getErrorCode());
-    return ResponseEntity
-        .status(status)
-        .body(ErrorResponse.from(e, status.value()));
-  }
-
-  @ExceptionHandler(BinaryContentException.class)
-  public ResponseEntity<ErrorResponse> handleBinaryContentException(BinaryContentException e) {
-    HttpStatus status = getStatus(e.getErrorCode());
-    return ResponseEntity
-        .status(status)
-        .body(ErrorResponse.from(e, status.value()));
-  }
-
-  @ExceptionHandler(UserStatusException.class)
-  public ResponseEntity<ErrorResponse> handleUserStatusException(UserStatusException e) {
-    HttpStatus status = getStatus(e.getErrorCode());
-    return ResponseEntity
-        .status(status)
-        .body(ErrorResponse.from(e, status.value()));
-  }
-
 
   //입력값 검증 예외 처리
   @ExceptionHandler({MethodArgumentNotValidException.class})
-  public ResponseEntity<ErrorResponse> handleValidationException(Exception e) {
+  public ResponseEntity<ErrorResponse> handleValidationException(
+      MethodArgumentNotValidException e) {
 
     Map<String, Object> details = new HashMap<>();
+    e.getBindingResult().getFieldErrors().forEach(error ->
+        details.put(error.getField(), error.getDefaultMessage()));
 
-    if (e instanceof MethodArgumentNotValidException validException) { /*
-(pattern matching for instanceof) 타입 체크와 캐스팅 동시 수행 java16
-          MethodArgumentNotValidException validException = (MethodArgumentNotValidException) e;
-*/
-      validException.getBindingResult()
-          .getFieldErrors().forEach(error ->
-              details.put(error.getField(), error.getDefaultMessage()));
-    }
-
-    ErrorResponse errorResponse = ErrorResponse.of(
-        Instant.now(),
-        ErrorCode.VALIDATION_ERROR.name(),
-        "Validation failed",
-        details,
-        e.getClass().getSimpleName(),
-        HttpStatus.BAD_REQUEST.value()
-    );
+    log.warn("Validation error occurred: {}", details, e);
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(errorResponse);
+        .body(ErrorResponse.of(
+            Instant.now(),
+            ErrorCode.VALIDATION_ERROR.name(),
+            "Validation failed",
+            details,
+            e.getClass().getSimpleName(),
+            HttpStatus.BAD_REQUEST.value()
+        ));
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception e) {
-
-    ErrorResponse errorResponse = ErrorResponse.of(
-        Instant.now(),
-        ErrorCode.INTERNAL_SERVER_ERROR.name(),
-        e.getMessage(),
-        new HashMap<>(),
-        e.getClass().getSimpleName(),
-        HttpStatus.INTERNAL_SERVER_ERROR.value()
-    );
+    log.error("Unexpected error occurred: {}", e.getMessage(), e);
 
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(errorResponse);
+        .body(ErrorResponse.of(
+            Instant.now(),
+            ErrorCode.INTERNAL_SERVER_ERROR.name(),
+            "Internal server error",
+            Map.of(),
+            e.getClass().getSimpleName(),
+            HttpStatus.INTERNAL_SERVER_ERROR.value()
+        ));
   }
 
   //errorcode 별 http 상태코드 매핑
@@ -126,8 +76,17 @@ public class GlobalExceptionHandler {
 
       case INVALID_PASSWORD, VALIDATION_ERROR, PRIVATE_CHANNEL_UPDATE -> HttpStatus.BAD_REQUEST;
 
-      case BINARY_CONTENT_STORAGE_ERROR, INTERNAL_SERVER_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
-
+      default -> HttpStatus.INTERNAL_SERVER_ERROR;
     };
+  }
+
+  private void logException(DiscodeitException e, HttpStatus status) {
+    if (status.is5xxServerError()) {
+      log.error("Server error occurred: [{}] {}",
+          e.getErrorCode().name(), e.getMessage(), e);
+    } else {
+      log.warn("Client error occurred: [{}] {} - Details: {}",
+          e.getErrorCode().name(), e.getMessage(), e.getDetails());
+    }
   }
 }
