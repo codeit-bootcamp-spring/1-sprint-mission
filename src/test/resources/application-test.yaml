@@ -1,7 +1,7 @@
 spring:
   datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
     username: sa
     password:
   jpa:
@@ -11,10 +11,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
 
 logging:
   level:
+    com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
-    com.sprint.mission.discodeit: debug 
+    org.hibernate.orm.jdbc.bind: trace

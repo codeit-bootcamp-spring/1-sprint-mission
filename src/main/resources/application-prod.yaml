@@ -1,39 +1,28 @@
+server:
+  port: 80
+
 spring:
-  application:
-    name: discodeit
-  servlet:
-    multipart:
-      maxFileSize: 10MB
-      maxRequestSize: 30MB
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:discodeit}
-    username: ${DB_USERNAME:discodeit_user}
-    password: ${DB_PASSWORD:discodeit1234}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
-    hibernate:
-      ddl-auto: validate
     properties:
       hibernate:
-        format_sql: false
-    open-in-view: false
-
+        format_sql: false # Hibernate SQL 로그를 예쁘게 출력할지 여부
+  boot:
+    admin:
+      client:
+        url: ${SPRING_BOOT_ADMIN_CLIENT_URL} #Spring Boot Admin 서버 URL을 설정하는 항목
 logging:
   level:
-    root: info
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
-    com.discodeit: info
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: /var/log/discodeit/application-prod.log
-    max-size: 10MB
-    max-history: 30
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: info
 
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: /app/storage 
+management:
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: false
