@@ -1,0 +1,9 @@
+#name: 코드잇 스프린트 미션8 심화 요구사항 GitHub Action CI/CD
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#
+#jobs:
+#  name :

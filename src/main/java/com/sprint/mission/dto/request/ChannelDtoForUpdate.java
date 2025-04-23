@@ -1,0 +1,18 @@
+package com.sprint.mission.dto.request;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record ChannelDtoForUpdate(
+
+    @Schema(example = "새로운 코드잇 채널명")
+    @NotBlank(message = "이름은 필수입니다.")
+    @Size(min = 2, max = 10, message = "이름은 2자 이상 10자 이하로 입력해주세요.")
+    String name,
+
+    @Schema(example = "node.js 교육과정입니다.")
+    @NotBlank(message = "설명은 필수입니다.")
+    String description) {
+
+}

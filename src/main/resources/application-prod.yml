@@ -1,0 +1,16 @@
+server:
+  port: 80
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+
+---
+logging:
+  level:
+    com.sprint.mission: info
+    org.hibernate.sql: info

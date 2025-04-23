@@ -1,0 +1,41 @@
+services:
+  discodeit-server:
+    container_name: discodeit-app
+    build: .
+    ports:
+      - 8081:80
+#    command:
+#      - ./gradlew test
+    volumes:
+      - app-storage:/.discodeit/storage
+    env_file:
+      - .env
+
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+
+  postgres-db:
+    container_name: postgres-db
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+
+    volumes:
+      - discodeit-postgres:/var/lib/postgresql/data
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+    env_file:
+      - .env
+
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "${DB_NAME}", "-U", "${DB_USERNAME}"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  app-storage:
+  discodeit-postgres:
