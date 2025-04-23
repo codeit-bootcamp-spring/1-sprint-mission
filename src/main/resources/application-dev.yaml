@@ -1,27 +1,26 @@
+server:
+  port: 8080
+
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
     password: discodeit1234
   jpa:
-    hibernate:
-      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
-    open-in-view: false
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
 
 logging:
   level:
-    root: info
+    com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
 
-server:
-  port: 8081
-
+management:
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true

@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/readStatuses")
@@ -28,8 +30,10 @@ public class ReadStatusController implements ReadStatusApi {
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatusDto> create(@Valid @RequestBody ReadStatusCreateRequest request) {
+  public ResponseEntity<ReadStatusDto> create(@RequestBody @Valid ReadStatusCreateRequest request) {
+    log.info("읽음 상태 생성 요청: {}", request);
     ReadStatusDto createdReadStatus = readStatusService.create(request);
+    log.debug("읽음 상태 생성 응답: {}", createdReadStatus);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdReadStatus);
@@ -37,8 +41,10 @@ public class ReadStatusController implements ReadStatusApi {
 
   @PatchMapping(path = "{readStatusId}")
   public ResponseEntity<ReadStatusDto> update(@PathVariable("readStatusId") UUID readStatusId,
-      @Valid @RequestBody ReadStatusUpdateRequest request) {
+      @RequestBody @Valid ReadStatusUpdateRequest request) {
+    log.info("읽음 상태 수정 요청: id={}, request={}", readStatusId, request);
     ReadStatusDto updatedReadStatus = readStatusService.update(readStatusId, request);
+    log.debug("읽음 상태 수정 응답: {}", updatedReadStatus);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedReadStatus);
@@ -46,7 +52,9 @@ public class ReadStatusController implements ReadStatusApi {
 
   @GetMapping
   public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
+    log.info("사용자별 읽음 상태 목록 조회 요청: userId={}", userId);
     List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
+    log.debug("사용자별 읽음 상태 목록 조회 응답: count={}", readStatuses.size());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(readStatuses);
