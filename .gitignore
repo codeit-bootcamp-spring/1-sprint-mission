@@ -3,6 +3,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+.env
+discodeit.env
 
 .idea
 ### IntelliJ IDEA ###
@@ -18,6 +20,7 @@ out/
 !**/src/test/**/out/
 /Users/parkjihyun/Desktop/CodeitProjects/Codeit/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/mentoring
 /src/main/java/com/sprint/mission/discodeit/mentoring
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -29,11 +32,15 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+
 # 로컬 환경 설정 파일 제외
 application-local.yaml
 application-local.yml
 application-dev.yml
 application-dev.yaml
+application-test.yaml
+application-test.yml
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
