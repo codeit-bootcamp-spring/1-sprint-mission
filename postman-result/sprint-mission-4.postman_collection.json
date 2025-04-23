@@ -1,0 +1,423 @@
+{
+	"info": {
+		"_postman_id": "edfc42a3-6be4-4ebc-ae5a-af057d49e0a1",
+		"name": "sprint-mission-4",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "36588044"
+	},
+	"item": [
+		{
+			"name": "유저 생성",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "email11@email.com",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "PWpw11!!",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "name1",
+							"type": "text"
+						},
+						{
+							"key": "nickname",
+							"value": "nickname1",
+							"type": "text"
+						},
+						{
+							"key": "phoneNumber",
+							"value": "010-0000-1111",
+							"type": "text"
+						},
+						{
+							"key": "profileImageFile",
+							"type": "file",
+							"src": "postman-cloud:///1eff0ddd-06e6-4870-a011-d3ca7239453f"
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/user"
+			},
+			"response": []
+		},
+		{
+			"name": "유저 다건 조회",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/api/user"
+			},
+			"response": []
+		},
+		{
+			"name": "유저 수정",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "nameupdate",
+							"type": "text"
+						},
+						{
+							"key": "nickname",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "phoneNumber",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "profileImageFile",
+							"type": "file",
+							"src": "postman-cloud:///1eff0d96-f43d-42a0-ac1f-d3364dfaa68e"
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/user/ec5270a1-6e2a-4fd4-ba77-56e6ab7ddb25"
+			},
+			"response": []
+		},
+		{
+			"name": "유저 삭제",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/api/user/8129b3e6-d51e-4392-b17d-6ac78ea663c3"
+			},
+			"response": []
+		},
+		{
+			"name": "유저 온라인 상태 수정",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8080/api/user/ec5270a1-6e2a-4fd4-ba77-56e6ab7ddb25/online"
+			},
+			"response": []
+		},
+		{
+			"name": "로그인",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "name",
+							"value": "name1",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "PWpw11!!",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/auth"
+			},
+			"response": []
+		},
+		{
+			"name": "공개 채널 생성",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "ownerId",
+							"value": "660ffbac-a798-4dc7-905f-c4b02f023ead",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "testChannel2",
+							"type": "text"
+						},
+						{
+							"key": "explanation",
+							"value": "testChannel2입니다",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/channel/public"
+			},
+			"response": []
+		},
+		{
+			"name": "비공개 채널 생성",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "ownerId",
+							"value": "660ffbac-a798-4dc7-905f-c4b02f023ead",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/channel/private"
+			},
+			"response": []
+		},
+		{
+			"name": "채널 다건 조회",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/api/channel/660ffbac-a798-4dc7-905f-c4b02f023ead"
+			},
+			"response": []
+		},
+		{
+			"name": "공개 채널 수정",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "category",
+							"value": "update-category",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "update-name",
+							"type": "text"
+						},
+						{
+							"key": "explanation",
+							"value": "update-explanation",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/channel/d53824af-3a0c-43c8-a126-fdbc7dd9d8d0"
+			},
+			"response": []
+		},
+		{
+			"name": "채널 삭제",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/api/channel/d1139ea6-b263-4fb8-9269-21ec026f293d"
+			},
+			"response": []
+		},
+		{
+			"name": "메시지 생성",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "channelId",
+							"value": "d53824af-3a0c-43c8-a126-fdbc7dd9d8d0",
+							"type": "text"
+						},
+						{
+							"key": "writerId",
+							"value": "ec5270a1-6e2a-4fd4-ba77-56e6ab7ddb25",
+							"type": "text"
+						},
+						{
+							"key": "context",
+							"value": "테스트 메시지2",
+							"type": "text"
+						},
+						{
+							"key": "images",
+							"type": "file",
+							"src": [
+								"postman-cloud:///1eff0ddd-06e6-4870-a011-d3ca7239453f",
+								"postman-cloud:///1eff0ddb-babc-4590-90b7-73460bb7270f"
+							]
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/message"
+			},
+			"response": []
+		},
+		{
+			"name": "메시지 조회",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/api/message/ec5270a1-6e2a-4fd4-ba77-56e6ab7ddb25"
+			},
+			"response": []
+		},
+		{
+			"name": "메시지 수정",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "context",
+							"value": "메시지 수정 테스트",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/message/ae56c15c-8e87-4827-b1c0-e34b6bb9d8dd"
+			},
+			"response": []
+		},
+		{
+			"name": "메시지 삭제",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8080/api/message/3e85dd0e-76c4-458f-b2b5-4df9afd374da"
+			},
+			"response": []
+		},
+		{
+			"name": "바이너리 콘텐츠 다건 조회",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/api/binaryContent"
+			},
+			"response": []
+		},
+		{
+			"name": "바이너리 콘텐츠 단건 조회",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/api/binaryContent/f679b1da-62e2-4061-867e-68c0605dfe83"
+			},
+			"response": []
+		},
+		{
+			"name": "readstatus 생성",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userId",
+							"value": "ec5270a1-6e2a-4fd4-ba77-56e6ab7ddb25",
+							"type": "text"
+						},
+						{
+							"key": "channelId",
+							"value": "d53824af-3a0c-43c8-a126-fdbc7dd9d8d0",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8080/api/readStatus"
+			},
+			"response": []
+		},
+		{
+			"name": "readstust 조회",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8080/api/readStatus/6fde7a65-48ff-474d-8016-8ab60b2c4796"
+			},
+			"response": []
+		}
+	]
+}
