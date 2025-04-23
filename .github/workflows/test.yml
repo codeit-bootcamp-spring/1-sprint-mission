@@ -1,0 +1,32 @@
+name: CI Test
+
+on:
+  push:         # 브랜치에 push만 해도 실행!
+    branches:
+      - '**'    # 모든 브랜치 대상
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: Grant execute permission to Gradle
+        run: chmod +x gradlew    # gradlew 실행권한 추가
+
+      - name: Build and Test with Gradle
+        run: ./gradlew clean build --no-daemon
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: build/reports/jacoco/test/jacocoTestReport.xml
+          fail_ci_if_error: true
