@@ -1,0 +1,18 @@
+# Gradle 빌드 캐시
+.gradle
+
+# 빌드 결과물
+build
+
+# IDE 설정
+.idea
+*.iml
+
+# macOS 불필요 파일
+.DS_Store
+
+# 로그 파일
+*.log
+
+# 환경 파일 (필요 없으면)
+.env
