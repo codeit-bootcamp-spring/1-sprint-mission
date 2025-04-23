@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 //
 import java.util.*;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Service
@@ -93,12 +94,15 @@ public class BasicMessageService implements MessageService {
     log.info("메세지 생성 시도 성공: messageContent={}, createdAt={}",
         message.getContent(),
         message.getCreatedAt());
+    log.info("메세지 생성 시도 성공: messageID={}",
+        message.getId());
     return messageMapper.toDto(message);
   }
 
   // 페이징 처리가 필요
   @Override
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+  public PageResponse<MessageDto> findAllByChannelId(
+      @RequestParam UUID channelId, Pageable pageable) {
     // 왜 이렇게 변환하는거지 (이해가 필요...)
 
     channelRepository.findById(channelId).orElseThrow(() -> {

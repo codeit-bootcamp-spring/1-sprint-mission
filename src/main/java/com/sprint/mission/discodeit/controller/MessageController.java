@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.MessageApi;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
@@ -29,15 +30,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
-public class MessageController {
+public class MessageController implements MessageApi {
 
   private final MessageService messageService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<MessageDto> createMessage(
       @Valid @RequestPart(value = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
-      @RequestPart(value = "binaryContents", required = false) List<MultipartFile> attachments)
-      throws Exception {
+      @RequestPart(value = "binaryContents", required = false) List<MultipartFile> attachments) {
     log.info("메세지 생성 요청(Request): messageContent={}, hasProfileImage={}",
         messageCreateRequest.content(),
         attachments != null);
@@ -72,7 +72,8 @@ public class MessageController {
   }
 
   @PatchMapping(value = "/{messageId}")
-  public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
+  public ResponseEntity<MessageDto> updateMessage(
+      @PathVariable("messageId") UUID messageId,
       @Valid @RequestBody MessageUpdateRequest messageUpdateRequest) {
     log.info("메세지 수정 요청(Request): messageChanged={}", !messageUpdateRequest.newMessage().isEmpty());
 
@@ -85,7 +86,7 @@ public class MessageController {
   }
 
   @DeleteMapping(value = "/{messageId}")
-  public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+  public ResponseEntity<Void> deleteMessage(@PathVariable("messageId") UUID messageId) {
     log.info("메세지 삭제 요청(Request)");
     // 메세지 삭제
     messageService.deleteMessageById(messageId);
@@ -95,10 +96,10 @@ public class MessageController {
 
   @GetMapping
   public ResponseEntity<PageResponse<MessageDto>> getMessageByChannelId(
-      @RequestParam UUID channelId,
+      @RequestParam("channelId") UUID channelId,
       @RequestParam(defaultValue = "0") int page, // 0페이지 부터
       @RequestParam(defaultValue = "50") int size, // 50개씩
-      @RequestParam(defaultValue = "createDate") String sortBy, // 정렬 기준
+      @RequestParam(defaultValue = "createdAt") String sortBy, // 정렬 기준
       @RequestParam(defaultValue = "desc") String direction) { // 내림차순 --> 최신 것부터
     // PageRequest.of(page, size, sort)
     // 0, 10, Sort.by("orderDate").descending()

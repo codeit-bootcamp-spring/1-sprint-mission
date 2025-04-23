@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.ChannelApi;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
-public class ChannelController {
+public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
 
@@ -45,7 +46,7 @@ public class ChannelController {
 
 
   @PatchMapping(value = "/{channelId}")
-  public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable("channelId") UUID channelId,
+  public ResponseEntity<ChannelDto> updateChannel(@PathVariable("channelId") UUID channelId,
       @Valid @RequestBody ChannelUpdateRequest channelUpdateRequest) {
     log.info("채널 수정 요청(Request): nameChanged={}, descriptionChanged={}",
         channelUpdateRequest.newName() != null,

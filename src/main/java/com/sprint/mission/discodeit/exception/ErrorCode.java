@@ -5,6 +5,10 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
+
+  // Validation 에러 추가
+  VALIDATION_FAILED(HttpStatus.NOT_FOUND, "입력값 검증에 실패했습니다."),
+
   // 유저
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다."), // 404
   USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 사용자 이름입니다."), // 409

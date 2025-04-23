@@ -32,7 +32,7 @@ public interface UserApi {
       ),
       @ApiResponse(
           responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
-          content = @Content(examples = @ExampleObject(value = "User with email {email} already exists"))
+          content = @Content(examples = @ExampleObject(value = "이미 존재하는 사용자 이름입니다. | 이미 존재하는 이메일입니다."))
       ),
   })
   ResponseEntity<UserDto> createUser(
@@ -54,11 +54,11 @@ public interface UserApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "User를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject("User with id {userId} not found"))
+          content = @Content(examples = @ExampleObject("유저를 찾을 수 없습니다."))
       ),
       @ApiResponse(
           responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
-          content = @Content(examples = @ExampleObject("user with email {newEmail} already exists"))
+          content = @Content(examples = @ExampleObject("이미 존재하는 사용자 이름입니다. | 이미 존재하는 이메일입니다."))
       )
   })
   ResponseEntity<UserDto> updateUser(
@@ -75,7 +75,7 @@ public interface UserApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "UserStatus with userId {userId} not found"))
+          content = @Content(examples = @ExampleObject(value = "유저 상태를 찾을 수 없습니다."))
       )
   })
   ResponseEntity<UserStatusDto> updateUserStateByUserId(
@@ -92,7 +92,7 @@ public interface UserApi {
       @ApiResponse(
           responseCode = "404",
           description = "User를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "User with id {id} not found"))
+          content = @Content(examples = @ExampleObject(value = "유저를 찾을 수 없습니다."))
       )
   })
   ResponseEntity<Void> deleteUser(
