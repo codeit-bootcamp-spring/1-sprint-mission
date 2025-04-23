@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public interface UserStatusService {
+public interface    UserStatusService {
 
     UserStatusDto create(UserStatusCreateRequest request);
 

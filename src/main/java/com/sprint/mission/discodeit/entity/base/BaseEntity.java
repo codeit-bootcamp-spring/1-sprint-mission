@@ -24,4 +24,8 @@ public abstract class BaseEntity {
     @CreatedDate
     @Column(columnDefinition = "timestamp with time zone", updatable = false, nullable = false)
     private Instant createdAt;
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 }
