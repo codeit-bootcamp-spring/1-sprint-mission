@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 80
 
 spring:
   datasource:
@@ -9,7 +9,7 @@ spring:
   application:
     name: discodeit
   profiles:
-    active: dev # 로컬환경은 dev 배포환경은 prod
+    active: prod # 로컬환경은 dev 배포환경은 prod
   jpa:
     hibernate:
       ddl-auto: none
