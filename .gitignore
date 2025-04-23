@@ -3,6 +3,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+**/application.yaml
+**/application-*.yaml
+.logs
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -41,3 +44,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# 환경변수 파일
+.env
+discodeit.env
