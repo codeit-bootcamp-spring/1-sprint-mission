@@ -1,0 +1,79 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.0' // 최신 Spring Boot 버전 확인 필요 (현재 시점 기준으로는 3.x.x)
+    id 'io.spring.dependency-management' version '1.1.6' // 최신 버전 확인 필요
+    id 'jacoco'
+}
+
+group = 'com.sprint.mission'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Testcontainers BOM 버전 변수화 (선택 사항)
+ext {
+    testcontainersVersion = '1.19.7' // 사용할 Testcontainers 버전 지정
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4' // 최신 버전 확인 필요
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    runtimeOnly 'org.postgresql:postgresql' // PostgreSQL 드라이버 유지
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.mapstruct:mapstruct:1.6.3' // 최신 버전 확인 필요
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3' // 최신 버전 확인 필요
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5' // 최신 버전 확인 필요
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // testImplementation 'com.h2database:h2' // H2 의존성 제거 또는 주석 처리
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // AWS S3 SDK 의존성
+    implementation 'software.amazon.awssdk:s3:2.31.7' // 최신 버전 확인 필요
+
+
+    compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // Testcontainers 의존성 추가
+    testImplementation platform("org.testcontainers:testcontainers-bom:${testcontainersVersion}") // BOM 사용
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.testcontainers:junit-jupiter' // JUnit 5 연동용
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    // systemProperty "spring.profiles.active", "test" // @ActiveProfiles("test")로 대체 가능하므로 유지하거나 제거해도 됨
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}

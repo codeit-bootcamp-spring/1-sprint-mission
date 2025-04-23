@@ -1,0 +1,27 @@
+# .dockerignore
+
+# Git
+.git
+.gitignore
+
+# IDE files
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+
+# Build artifacts
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.properties
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Local env files
+.env

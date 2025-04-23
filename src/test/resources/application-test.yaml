@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+    import: optional:envfile:./.env # .env 파일 사용 시 유지
+    # datasource: # H2 설정 제거
+    # url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    # driver-class-name: org.h2.Driver
+    # username: sa
+    # password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop # 또는 none (schema.sql 있다면)
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect # PostgreSQL Dialect 명시 (선택 사항)
+  sql:
+    init:
+      mode: always # schema.sql, data.sql 있으면 항상 실행 (src/main or test/resources 경로)
+
+discodeit:
+  storage:
+    type: local    # S3 테스트도 로컬 구현을 쓰도록 (이 설정은 유지)

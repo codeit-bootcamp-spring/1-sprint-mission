@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PROJECT_NAME: ${PROJECT_NAME}
+        PROJECT_VERSION: ${PROJECT_VERSION}
+    container_name: discodeit-app
+    ports:
+      - "8081:80"
+    # .envv 파일에서 AWS_S3_*, STORAGE_TYPE 등을 읽어옵니다.
+    env_file:
+      - .env
+    environment:
+      # DB 연결 URL (env_file 로 읽어도 됩니다)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/discodeit
+      # S3 모드를 사용하려면 s3, 로컬로 남기려면 local
+      STORAGE_TYPE: s3
+      # (로컬 스토리지 마운트 경로를 바꾸고 싶다면)
+      # STORAGE_LOCAL_ROOT_PATH: /app/storage
+    volumes:
+      - binary-content:/app/storage
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: discodeit-db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: discodeit
+      # POSTGRES_USER, POSTGRES_PASSWORD 도 .envv 에 정의하세요
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+volumes:
+  binary-content:
+  pgdata:
