@@ -48,3 +48,10 @@ data/
 
 ### logs ###
 .logs/
+
+### env ###
+.env
+discodeit.env
+
+### application ###
+application-dev.yaml

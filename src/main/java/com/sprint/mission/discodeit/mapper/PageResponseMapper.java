@@ -1,46 +1,40 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import org.springframework.data.domain.Page;
+import org.mapstruct.Mapper;
 import org.springframework.data.domain.Slice;
-import org.springframework.stereotype.Component;
 
-@Component
-public class PageResponseMapper {
+@Mapper(componentModel = "spring")
+public interface PageResponseMapper {
 
-//  public <T> PageResponse<T> fromSlice(Slice<T> slice) {
-//    return PageResponse.<T>builder()
-//        .contents(slice.getContent())
-//        .number(slice.getNumber())
-//        .size(slice.getSize())
-//        .hasNext(slice.hasNext())
-//        .totalElements(null) // Slice는 전체 데이터 수를 계산하지 않는다.
-//        .build();
-//  }
-
-  public <T> PageResponse<T> fromPage(Page<T> page) {
-    return PageResponse.<T>builder()
-        .contents(page.getContent())
-        .size(page.getSize())
-        .hasNext(page.hasNext())
-        .totalElements(page.getTotalElements())
-        .build();
+  default <T> PageResponse<T> fromSlice(Slice<T> slice, Object nextCursor) {
+    return new PageResponse<>(
+        slice.getContent(),
+        (String) nextCursor,
+        slice.getSize(),
+        null,
+        slice.hasNext()
+    );
   }
 
-  public <T> PageResponse<T> fromCursorResult(
+
+  default <T> PageResponse<T> fromPage(
       List<T> contents,
       boolean hasNext,
       int size,
       Object nextCursor,
       Long totalElements) {
 
+    // contents가 null이면 빈 리스트로 대체
+    List<T> safeContents = contents != null ? contents : new ArrayList<>();
+
     return PageResponse.<T>builder()
-        .contents(contents)
+        .content(safeContents)
         .hasNext(hasNext)
         .size(size)
-        .nextCursor((Objects) nextCursor)
+        .nextCursor((String) nextCursor)
         .totalElements(totalElements)
         .build();
   }

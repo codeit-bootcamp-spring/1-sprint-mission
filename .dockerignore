@@ -1,0 +1,21 @@
+### IDEA ###
+.idea
+
+### git ###
+.gitignore
+.git
+.github
+*.md
+
+### Docker ###
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+### app data ###
+.discodeit/*
+.logs
+
+### env ###
+discodeit.env
+.env

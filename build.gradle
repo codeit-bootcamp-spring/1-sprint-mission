@@ -34,6 +34,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
 
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
@@ -43,14 +46,24 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+    implementation 'software.amazon.awssdk:s3:2.31.7'
+    implementation("software.amazon.awssdk:s3")
+    
+
 }
 
 test {
     useJUnitPlatform()
 }
 
+
 checkstyle {
     toolVersion = '1.0' // Checkstyle 버전
     configFile = rootProject.file('checkstyle.xml') // Checkstyle 설정 파일 경로
+}
+
+bootJar {
+    archiveBaseName = 'discodeit'
+    archiveVersion = '1.2-M8'
 }
 

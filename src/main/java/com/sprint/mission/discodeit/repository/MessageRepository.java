@@ -23,8 +23,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   List<Message> findByContentContains(String content);
 
   //가장 최근 메세지 1개 조회
-  @Query("SELECT m FROM Message m WHERE m.channel.id = :channelId ORDER BY m.createdAt DESC")
-  Optional<Message> findLatestMessageByChannelId(@Param("channelId") UUID channelId);
+  Optional<Message> findFirstByChannelIdOrderByCreatedAtDesc(@Param("channelId") UUID channelId);
 
   //채널 ID에 해당하는 메시지를 페이징하여 조회. 생성일시 기준 내림차순(최신순)으로 정렬. 오프셋 기반
   @Query("SELECT m FROM Message m WHERE m.channel.id = :channelId ORDER BY m.createdAt DESC")
@@ -35,7 +34,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   @Query(value = "SELECT DISTINCT m FROM Message m " +
       "JOIN FETCH m.author a " +
-      "LEFT JOIN FETCH a.userStatus " +
+      "LEFT JOIN FETCH a.status " +
       "WHERE m.channel.id = :channelId " +
       "ORDER BY m.createdAt DESC",
       countQuery = "SELECT COUNT(m) FROM Message m WHERE m.channel.id = :channelId")
@@ -59,4 +58,21 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
       @Param("channelId") UUID channelId,
       @Param("lastCreatedAt") Instant lastCreatedAt);
 
+  @Query("SELECT distinct m FROM Message m "
+      + "LEFT JOIN FETCH m.author a "
+      + "JOIN FETCH a.status "
+      + "LEFT JOIN FETCH a.profile "
+      + "WHERE m.channel.id=:channelId AND m.createdAt < :createdAt")
+  List<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,
+      @Param("createdAt") Instant createdAt,
+      Pageable pageable);
+
+
+  Long countMessagesByChannelId(UUID channelId);
+
+  @Query("SELECT m.createdAt "
+      + "FROM Message m "
+      + "WHERE m.channel.id = :channelId "
+      + "ORDER BY m.createdAt DESC LIMIT 1")
+  Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
 }

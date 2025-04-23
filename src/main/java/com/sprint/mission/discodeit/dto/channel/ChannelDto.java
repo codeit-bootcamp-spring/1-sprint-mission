@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelCategory;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.time.Instant;
@@ -16,8 +14,6 @@ public record ChannelDto(
     String name,
     //채널 종류 - 공개, 비공개
     ChannelType type,
-    //채널 종류 - 음성, 텍스트
-    ChannelCategory channelCategory,
     //채널 설명
     String description,
     //채널 생성 시점

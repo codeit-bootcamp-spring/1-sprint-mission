@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service;
 
 import static com.jayway.jsonpath.internal.path.PathCompiler.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,7 +19,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -85,10 +83,8 @@ class UserServiceTest {
 
       User user = new User();
       user.setUsername("test");
-      user.setNickname("테스트");
       user.setEmail("test@discodeit.com");
       user.setPassword("test1234");
-      user.setStatusMessage("테스트 유저 입니다.");
 
       // 리플렉션을 사용하여 id 필드 설정
       try {
@@ -102,26 +98,22 @@ class UserServiceTest {
       UserDto expectedUserDto = new UserDto(
           userId,
           "test",
-          "테스트",
           "test@discodeit.com",
           true,
-          "테스트 유저 입니다.",
-          AccountStatus.UNVERIFIED,  // 프로필 이미지는 null,
           null
       );
+      UserStatus userStatus = new UserStatus(user);
 
       // Mock: 가짜 user 객체 반환하도록 설정
       when(userRepository.save(any(User.class))).thenReturn(user);
-
       when(userMapper.toDto(any(User.class))).thenReturn(expectedUserDto);
+      when(userStatusRepository.save(any(UserStatus.class))).thenReturn(userStatus);
 
       // when
       UserDto userDto = userService.create(createUserDto);
 
       //then
-      Assertions.assertEquals(userDto.nickname(), user.getNickname());
       Assertions.assertEquals(userDto.email(), user.getEmail());
-      Assertions.assertEquals(userDto.statusMessage(), user.getStatusMessage());
 
       // userRepository.save가 정확히 한 번 호출되었는지 검증
       verify(userRepository, times(1)).save(any(User.class));
@@ -149,10 +141,8 @@ class UserServiceTest {
 
       User user = new User();
       user.setUsername("test");
-      user.setNickname("테스트");
       user.setEmail("test@discodeit.com");
       user.setPassword("test1234");
-      user.setStatusMessage("테스트 유저 입니다.");
 
       // 리플렉션을 사용하여 id 필드 설정
       try {
@@ -166,11 +156,8 @@ class UserServiceTest {
       UserDto expectedUserDto = new UserDto(
           userId,
           "test",
-          "테스트",
           "test@discodeit.com",
           true,
-          "테스트 유저 입니다.",
-          AccountStatus.UNVERIFIED,  // 프로필 이미지는 null,
           null
       );
 
@@ -215,10 +202,8 @@ class UserServiceTest {
 
       User user = new User();
       user.setUsername("test");
-      user.setNickname("테스트");
       user.setEmail("test@discodeit.com");
       user.setPassword("test1234");
-      user.setStatusMessage("테스트 유저 입니다.");
 
       // 리플렉션을 사용하여 id 필드 설정
       try {
@@ -249,8 +234,7 @@ class UserServiceTest {
 
       BinaryContentDto binaryContentDto = new BinaryContentDto(
           binaryContent.getId(),
-          binaryContent.getFilename(),
-          "test".getBytes(),
+          binaryContent.getFileName(),
           binaryContent.getContentType(),
           binaryContent.getCreatedAt(),
           binaryContent.getSize()
@@ -260,11 +244,9 @@ class UserServiceTest {
       UserDto expectedUserDto = new UserDto(
           userId,
           "test",
-          "테스트",
           "test@discodeit.com",
           true,
-          "테스트 유저 입니다.",
-          AccountStatus.UNVERIFIED,  // 프로필 이미지는 null,
+          // 프로필 이미지는 null,
           binaryContentDto
       );
 
@@ -277,10 +259,8 @@ class UserServiceTest {
 
       //then
       Assertions.assertAll(
-          () -> Assertions.assertEquals(userDto.nickname(), user.getNickname()),
           () -> Assertions.assertEquals(userDto.email(), user.getEmail()),
-          () -> Assertions.assertEquals(userDto.statusMessage(), user.getStatusMessage()),
-          () -> Assertions.assertEquals(userDto.profileId().id(), binaryId)
+          () -> Assertions.assertEquals(userDto.profile().id(), binaryId)
       );
 
       // userRepository.save가 정확히 한 번 호출되었는지 검증
@@ -308,10 +288,8 @@ class UserServiceTest {
 
       user = new User();
       user.setUsername("test");
-      user.setNickname("테스트");
       user.setEmail("test@discodeit.com");
       user.setPassword("test1234");
-      user.setStatusMessage("테스트 유저 입니다.");
 
       // 리플렉션을 사용하여 id 필드 설정
       try {
@@ -325,11 +303,8 @@ class UserServiceTest {
       expectedUserDto = new UserDto(
           userId,
           "test",
-          "테스트",
           "test@discodeit.com",
           true,
-          "테스트 유저 입니다.",
-          AccountStatus.UNVERIFIED,
           null
       );
 
@@ -340,12 +315,10 @@ class UserServiceTest {
     void updateUserSuccess() {
       UpdateUserDto updateUserDto = new UpdateUserDto(
           "new name",
-          "new nickname",
-          "newtest1234",
+          "1234",
           "new_test@discodeit.com",
           true,
           null,
-          AccountStatus.VERIFIED,
           Instant.now()
       );
 
@@ -361,11 +334,8 @@ class UserServiceTest {
       UserDto updatedDto = new UserDto(
           userId,
           "new name",
-          "new nickname",
           "new_test@discodeit.com",
           true,
-          "테스트 유저 입니다.",
-          AccountStatus.VERIFIED,
           null
       );
 
@@ -378,9 +348,7 @@ class UserServiceTest {
       Assertions.assertAll(
           () -> Assertions.assertNotNull(result),
           () -> Assertions.assertEquals("new name", result.username()),
-          () -> Assertions.assertEquals("new nickname", result.nickname()),
-          () -> Assertions.assertEquals("new_test@discodeit.com", result.email()),
-          () -> Assertions.assertEquals(AccountStatus.VERIFIED, result.accountStatus())
+          () -> Assertions.assertEquals("new_test@discodeit.com", result.email())
       );
 
       verify(userRepository, times(1)).findById(userId);
@@ -413,10 +381,8 @@ class UserServiceTest {
 
       user = new User();
       user.setUsername("test");
-      user.setNickname("테스트");
       user.setEmail("test@discodeit.com");
       user.setPassword("test1234");
-      user.setStatusMessage("테스트 유저 입니다.");
 
       // 리플렉션을 사용하여 id 필드 설정
       try {
@@ -430,16 +396,13 @@ class UserServiceTest {
       expectedUserDto = new UserDto(
           userId,
           "test",
-          "테스트",
           "test@discodeit.com",
           true,
-          "테스트 유저 입니다.",
-          AccountStatus.UNVERIFIED,
           null
       );
 
       userStatus = new UserStatus(user);
-      user.setUserStatus(userStatus);
+      user.setStatus(userStatus);
 
     }
 

@@ -2,14 +2,18 @@ spring:
   application:
     name: discodeit
   datasource:
-    url: ${DATASOURCE_URL}
-    username: ${DATASOURCE_USERNAME}
-    password: ${DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
     open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 springdoc:
   api-docs:
@@ -24,9 +28,19 @@ discodeit:
     file-directory: .discodeit/data/
     extension: .ser
   storage:
-    type: local
+    type: ${STORAGE_TYPE}
     local:
       root-path: .discodeit/data
+
+cloud:
+  aws:
+    region:
+      static: ${AWS_S3_REGION:ap-northeast-2}
+    credentials:
+      access-key: ${AWS_S3_ACCESS_KEY:#{null}}
+      secret-key: ${AWS_S3_SECRET_KEY:#{null}}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
 
 
 logging:

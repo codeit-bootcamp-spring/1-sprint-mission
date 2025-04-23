@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import java.awt.print.Pageable;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
@@ -37,7 +37,8 @@ public interface MessageService {
   //PageResponse<MessageDto> findAllByChannelIdWithPaging(String channelId, Pageable pageable);
 
   //페이징 - 커서 기반
-  PageResponse<MessageDto> findAllByChannelIdWithCursor(String channelId, Instant cursor, int size);
+  PageResponse<MessageDto> findAllByChannelIdWithCursor(String channelId, Instant cursor,
+      Pageable pageable);
 
   //수정
   MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);

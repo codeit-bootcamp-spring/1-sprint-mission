@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
@@ -77,13 +77,13 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @Transactional
-  public UserStatusDto updateByUserId(String id, UpdateUserStatusDto updateUserStatusDto) {
+  public UserStatusDto updateByUserId(String id, UserStatusUpdateRequest userStatusUpdateRequest) {
 
     User user = userRepository.findById(UUID.fromString(id))
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    UserStatus userStatus = user.getUserStatus();
-    userStatus.setUpdatedAt(updateUserStatusDto.updateAt());
+    UserStatus userStatus = user.getStatus();
+    userStatus.setUpdatedAt(userStatusUpdateRequest.newLastActiveAt());
     userStatusRepository.save(userStatus);
 
     return userStatusMapper.toDto(userStatus);
@@ -94,7 +94,7 @@ public class BasicUserStatusService implements UserStatusService {
   public boolean delete(String userStatusId) {
     UserStatus userStatus = userStatusRepository.findById(UUID.fromString(userStatusId))
         .orElseThrow(() -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
-    
+
     userStatusRepository.delete(userStatus);
 
     return true;

@@ -8,7 +8,6 @@ import java.util.UUID;
 public record BinaryContentDto(
     UUID id,
     String fileName,
-    byte[] bytes,
     String contentType,
     Instant createdAt,
     Long size

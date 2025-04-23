@@ -4,10 +4,8 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,36 +23,18 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
 
-  @GetMapping("/{contentId}")
-  public ResponseEntity<BinaryContentDto> getBinaryContent(@PathVariable String contentId,
-      @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch) {
-
-    BinaryContentDto binaryContentDto = binaryContentService.findById(contentId);
-    String etag = "\"" + binaryContentDto.hashCode() + "\""; // 해시값을 ETag로 사용
-
-    if (etag.equals(ifNoneMatch)) {
-      //변경 없으므로 304 응답
-      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-    }
-
-    return ResponseEntity.ok().eTag(etag).cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
-        .body(binaryContentDto);
+  @GetMapping("/{binaryContentId}")
+  public ResponseEntity<BinaryContentDto> getBinaryContent(@PathVariable String binaryContentId) {
+    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+    return ResponseEntity.ok(binaryContentDto);
   }
 
   @GetMapping
   public ResponseEntity<List<BinaryContentDto>> getBinaryContents(
-      @RequestParam List<String> contentIds,
-      @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch) {
+      @RequestParam List<String> binaryContentIds) {
+    List<BinaryContentDto> contentList = binaryContentService.findAllByIdIn(binaryContentIds);
 
-    List<BinaryContentDto> contentList = binaryContentService.findAllByIdIn(contentIds);
-    String etag = "\"" + contentList.hashCode() + "\"";
-
-    if (etag.equals(ifNoneMatch)) {
-      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-    }
-
-    return ResponseEntity.ok().eTag(etag).cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
-        .body(contentList);
+    return ResponseEntity.ok(contentList);
   }
 
   @PostMapping
