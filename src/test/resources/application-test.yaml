@@ -13,9 +13,10 @@ spring:
     driver-class-name: org.h2.Driver
 
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    #    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     properties:
       hibernate:
         default_batch_fetch_size: 1000
@@ -45,10 +46,19 @@ decorator:
       enable-logging: true
 
 discodeit:
+  repository:
+    type: file  # jcf or file
+    file-directory: .discodeit
   storage:
     type: local
     local:
-      root-path: ${java.io.tmpdir}/discodeit-test
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: test
+      secret-key: test
+      region: test
+      bucket: test
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
 file:
   dir: ${java.io.tmpdir}/discodeit-test/uploads/

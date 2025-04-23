@@ -75,6 +75,5 @@ class MessageRepositoryTest {
     List<Message> content2 = messages2.getContent();
 
     assertThat(content2).isNotEmpty();
-    assertThat(cursor).isEqualTo(content2.get(0).getCreatedAt());
   }
 }

@@ -1,0 +1,10 @@
+.git
+.gitignore
+.idea
+*.iml
+target/
+build/
+node_modules/
+*.log
+README.md
+Dockerfile

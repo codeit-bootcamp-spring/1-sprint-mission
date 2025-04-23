@@ -8,14 +8,18 @@ import com.sprint.mission.discodeit.entity.user.dto.UserCreateResponse;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateResponse;
 import com.sprint.mission.discodeit.service.UserService;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.ByteArrayResource;
@@ -25,6 +29,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -32,6 +37,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 
 @Transactional
+@Rollback
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserApiIntegrationTest {
@@ -44,6 +50,45 @@ public class UserApiIntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @Value("${file.dir}")
+  private String fileDir;
+
+  @Value("${discodeit.storage.local.root-path:.discodeit/storage}")
+  private String storagePath;
+
+  // 테스트 실행 전에 필요한 디렉토리 생성
+  @BeforeAll
+  public static void setUp() throws IOException {
+    // 테스트 필요 디렉토리들 생성
+    String tmpDir = System.getProperty("java.io.tmpdir");
+    File uploadDir = new File(tmpDir + "/discodeit-test/uploads/");
+    if (!uploadDir.exists()) {
+      uploadDir.mkdirs();
+    }
+
+    File storageDir = new File(".discodeit/storage");
+    if (!storageDir.exists()) {
+      storageDir.mkdirs();
+    }
+
+    // 테스트용 더미 이미지 파일 생성 (CI 환경에서도 사용 가능)
+    createDummyImageFile(".discodeit/storage/test-image.jpg");
+  }
+
+  // 테스트용 더미 이미지 파일 생성 메소드
+  private static void createDummyImageFile(String path) throws IOException {
+    File file = new File(path);
+    if (!file.exists()) {
+      file.getParentFile().mkdirs();
+      // 간단한 더미 이미지 데이터 생성 (실제로는 올바른 이미지 형식이 아님)
+      byte[] dummyImageContent = new byte[100];
+      for (int i = 0; i < dummyImageContent.length; i++) {
+        dummyImageContent[i] = (byte) i;
+      }
+      Files.write(file.toPath(), dummyImageContent);
+    }
+  }
 
   @Test
   @DisplayName("유저 생성")
@@ -96,7 +141,8 @@ public class UserApiIntegrationTest {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-    Path path = Paths.get(".discodeit/storage/4d6496bf-d0c8-4df8-9cb2-3aa6a9d82eae");
+    // 테스트용 더미 이미지 파일 사용
+    Path path = Paths.get(".discodeit/storage/test-image.jpg");
     byte[] content = Files.readAllBytes(path);
 
     ByteArrayResource fileResource = new ByteArrayResource(content) {
@@ -173,7 +219,8 @@ public class UserApiIntegrationTest {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-    Path path = Paths.get(".discodeit/storage/4d6496bf-d0c8-4df8-9cb2-3aa6a9d82eae");
+    // 테스트용 더미 이미지 파일 사용
+    Path path = Paths.get(".discodeit/storage/test-image.jpg");
     byte[] content = Files.readAllBytes(path);
 
     ByteArrayResource fileResource = new ByteArrayResource(content) {

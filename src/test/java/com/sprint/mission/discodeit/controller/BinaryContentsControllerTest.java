@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+
 @WebMvcTest(BinaryContentsController.class)
 @SuppressWarnings("unchecked")
 class BinaryContentsControllerTest {

@@ -1,19 +1,15 @@
-DROP TABLE IF EXISTS message_attachments;
-DROP TABLE IF EXISTS messages;
-DROP TABLE IF EXISTS read_statuses;
-DROP TABLE IF EXISTS channels;
-DROP TABLE IF EXISTS user_statuses;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS binary_contents;
+CREATE USER discodeit_user WITH PASSWORD 'discodeit1234';
+CREATE DATABASE discodeit_db;
+GRANT ALL PRIVILEGES ON DATABASE discodeit_db TO discodeit_user;
 
-create table if not exists binary_contents
+create table binary_contents
 (
     id           uuid primary key,
     created_at   timestamp with time zone not null,
     file_name    varchar(255)             not null,
     size         bigint                   not null,
     content_type varchar(100)             not null
---     bytes        bytea        not null
+    --bytes        bytea        not null
 );
 
 create table users

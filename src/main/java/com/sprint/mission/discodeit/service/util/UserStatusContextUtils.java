@@ -9,10 +9,12 @@ public class UserStatusContextUtils {
   /**
    * 유저 상태 저장
    */
-  public static void saveUserStatus(User savedMember) {
-    UserStateService userStateService = SpringContextUtils.getBean(UserStateService.class);
+  public static void saveUserStatus(User savedMember, UserStateService service) {
+    if (service == null) {
+      service = SpringContextUtils.getBean(UserStateService.class);
+    }
 
-    UserStatus userStatus = userStateService.create(new UserStatus(savedMember));
+    UserStatus userStatus = service.create(new UserStatus(savedMember));
     savedMember.changeUserStatus(userStatus);
   }
 }

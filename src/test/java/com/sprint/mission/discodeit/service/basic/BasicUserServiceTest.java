@@ -42,6 +42,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,6 +72,7 @@ class BasicUserServiceTest {
 
 
   @Test
+  @Rollback
   @DisplayName("user create 성공")
   void createUser() throws IOException {
 
@@ -106,6 +108,7 @@ class BasicUserServiceTest {
     when(binaryContentStorage.put(any(), any())).thenReturn(binaryContent.getId());
 
     User user = new User("test", "test@mail.com", "1234", binaryContent, null);
+    setUserId(user, UUID.randomUUID());
     when(userRepository.save(any(User.class))).thenReturn(user);
 
     UserStatus userStatus = new UserStatus(user, Instant.now());

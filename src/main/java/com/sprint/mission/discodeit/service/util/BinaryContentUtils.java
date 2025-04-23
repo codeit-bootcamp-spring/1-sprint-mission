@@ -24,6 +24,14 @@ public class BinaryContentUtils {
     }
   }
 
+  public static void saveProfileImg(MultipartFile file, User savedMember,
+      BinaryContentStorage binaryContentStorage) throws IOException {
+    if (file != null && savedMember.getProfile() != null) {
+      binaryContentStorage.put(savedMember.getProfile().getId(), file.getBytes());
+      log.info("profile image 저장: {}", file.getOriginalFilename());
+    }
+  }
+
   /**
    * 프로필 객체 생성
    */

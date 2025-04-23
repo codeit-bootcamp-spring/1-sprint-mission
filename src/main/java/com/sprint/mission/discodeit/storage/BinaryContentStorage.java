@@ -14,6 +14,8 @@ public interface BinaryContentStorage {
 
   ResponseEntity<?> download(BinaryContentDto file);
 
-  Path resolvePath(UUID id);
+  default Path resolvePath(UUID id) {
+    return null;
+  }
 
 }

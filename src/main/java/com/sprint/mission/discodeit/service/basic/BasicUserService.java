@@ -67,8 +67,8 @@ public class BasicUserService implements UserService {
     BinaryContent profile = BinaryContentUtils.getProfile(file);
     User savedMember = saveUser(request, profile);
 
-    UserStatusContextUtils.saveUserStatus(savedMember);
-    BinaryContentUtils.saveProfileImg(file, savedMember);
+    UserStatusContextUtils.saveUserStatus(savedMember, userStateService);
+    BinaryContentUtils.saveProfileImg(file, savedMember, binaryContentStorage);
 
     return new UserCreateResponse(
         savedMember.getId(),

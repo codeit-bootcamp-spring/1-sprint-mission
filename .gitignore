@@ -7,12 +7,13 @@ build/
 *.ser
 *.json
 *.log
+.env
+discodeit.env
 .DS_Store
 **/.DS_Store
 
-/data_storage
-
-/frontend
+!/.discodeit/
+!/discodeit.env
 
 ### STS ###
 .apt_generated
@@ -45,3 +46,4 @@ out/
 ### VS Code ###
 .vscode/
 !/.discodeit/
+!/discodeit.env

@@ -1,23 +1,20 @@
 spring:
   application:
     name: discodeit
-  boot:
-    admin:
-      client:
-        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 500MB
       enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         highlight_sql: true
@@ -27,7 +24,7 @@ spring:
     open-in-view: false
 logging:
   level:
-    com.sprint.mission.discodeit: info
+    com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
 
 decorator:
@@ -37,10 +34,20 @@ decorator:
 
 
 discodeit:
+  repository:
+    type: file  # jcf or file
+    file-directory: .discodeit
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: ~/Desktop/1-sprint-mission
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region: ${AWS_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+
 
 file:
   #dir: C:/Users/leeco/Desktop/codeit_sprint/mission/1-sprint-mission/data_storage/
@@ -76,3 +83,6 @@ info:
     multipart:
       max-file-size: ${spring.servlet.multipart.max-file-size}
       max-request-size: ${spring.servlet.multipart.max-request-size}
+
+server:
+  port: 80

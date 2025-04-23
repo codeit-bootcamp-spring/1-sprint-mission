@@ -1,0 +1,129 @@
+name: ECS Full CI/CD
+
+# 트리거 설정: release 브랜치에 코드 푸시될 때만 워크플로우 실행
+on:
+  push:
+    branches:
+      - release
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Java 설정
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Gradle 권한 설정
+        run: chmod +x gradlew
+
+      - name: Gradle 빌드 및 테스트
+        run: ./gradlew clean test
+
+  # Docker 이미지 빌드 및 ECR에 푸시하는 작업
+  build_and_push:
+    name: Docker 이미지 빌드 및 푸시
+    runs-on: ubuntu-latest
+    needs: [ build_and_test ]  # 테스트가 성공한 후에만 실행
+    # OIDC 권한 설정
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: AWS 자격 증명 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+          aws-region: us-east-1
+
+      # ECR 로그인
+      - name: Amazon ECR Public 로그인
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      # 필요한 경우 Gradle 빌드 (JAR 생성)
+      - name: Java 설정
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Gradle 권한 설정
+        run: chmod +x gradlew
+
+      - name: JAR 파일 빌드
+        run: ./gradlew clean build -x test
+
+      # Docker 이미지 빌드 및 푸시
+      - name: Docker 이미지 빌드 및 푸시
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REPOSITORY_URI:latest -t $ECR_REPOSITORY_URI:$IMAGE_TAG .
+          docker push $ECR_REPOSITORY_URI:latest
+          docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
+          echo "image=$ECR_REPOSITORY_URI:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+  # ECS 서비스 업데이트 작업
+  deploy:
+    name: Amazon ECS 배포
+    runs-on: ubuntu-latest
+    needs: build_and_push
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: AWS 자격 증명 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # ECS Task Definition 업데이트
+      - name: ECS Task Definition 실행
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        id: render-task-def
+        with:
+          task-definition: ecs/task-definition.json
+          container-name: ${{ vars.CONTAINER_NAME }}
+          image: ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
+
+      - name: 실행 중인 태스크 중지
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER }} \
+                               --service ${{ vars.ECS_SERVICE }} \
+                               --desired-count 0
+
+      # ECS 서비스 업데이트 및 배포
+      - name: ECS 서비스 배포
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: ${{ vars.ECS_SERVICE }}
+          cluster: ${{ vars.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          desired-count: 1  # 태스크 수 1개로 설정

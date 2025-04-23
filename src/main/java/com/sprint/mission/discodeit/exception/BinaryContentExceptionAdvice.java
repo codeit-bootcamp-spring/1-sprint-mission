@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
+import com.sprint.mission.discodeit.exception.binary.AWSException;
 import com.sprint.mission.discodeit.exception.binary.BinaryContentNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -13,6 +14,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class BinaryContentExceptionAdvice {
+
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ExceptionHandler(AWSException.class)
+  public ErrorResponse awsError(AWSException e) {
+
+    return ErrorResponse.builder()
+        .timestamp(e.getTimestamp())
+        .code(e.getErrorCode().getCode())
+        .message(e.getMessage())
+        .details(e.getDetails())
+        .exceptionType(e.getClass().getSimpleName())
+        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .build();
+  }
 
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(BinaryContentNotFoundException.class)

@@ -2,27 +2,21 @@ spring:
   application:
     name: discodeit
   profiles:
-    active: default
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
-        instance:
-          name: discodeit
+    active: dev
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 500MB
       enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         highlight_sql: true
@@ -45,16 +39,22 @@ discodeit:
     type: file  # jcf or file
     file-directory: .discodeit
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: .discodeit/storage
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region: ${AWS_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
 file:
   dir: .discodeit/storage
 
 server:
   address: 0.0.0.0
-  port: 8080
+  port: 80
 
 management:
   endpoints:

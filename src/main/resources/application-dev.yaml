@@ -14,14 +14,14 @@ spring:
       max-request-size: 500MB
       enabled: true
   datasource:
-    url: jdbc:h2:~/discodeit
+    url: jdbc:h2:mem:testdb
     username: sa
     password:
     driver-class-name: org.h2.Driver
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     properties:
       hibernate:
         highlight_sql: true
@@ -41,12 +41,20 @@ decorator:
 
 
 discodeit:
+  repository:
+    type: file  # jcf or file
+    file-directory: .discodeit
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: ~/Desktop/1-sprint-mission
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+      region: ${AWS_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
 file:
-  #dir: C:/Users/leeco/Desktop/codeit_sprint/mission/1-sprint-mission/data_storage/
-  dir: ${user.home}/app_uploads/
+  dir: .discodeit/storage
 

@@ -24,6 +24,11 @@ VALUES ('1f17a8d1-77d7-437d-811e-d98db3bd30bc', CURRENT_TIMESTAMP, CURRENT_TIMES
         'channel 2', 'PUBLIC');
 
 INSERT INTO channels (id, created_at, updated_at, name, description, type)
+VALUES ('2c17a8d1-77d7-437d-811e-d98db3bd30bc', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
+        'ch3',
+        'channel 3', 'PUBLIC');
+
+INSERT INTO channels (id, created_at, updated_at, name, description, type)
 VALUES ('0017a8d1-77d7-437d-811e-d98db3bd30bc', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,
         null,
         null, 'PRIVATE');
@@ -57,6 +62,14 @@ VALUES ('39358af2-7bf8-4b1a-ac79-32f417ce391c',
         '2025-03-31 02:43:54.899593 +00:00',
         '안녕하세요',
         '6f17a8d1-77d7-437d-811e-d98db3bd30bc',
+        '3a2c1f0d-6b9e-4e8a-a7c5-d4f2e9b8c1a0');
+
+INSERT INTO messages (id, created_at, updated_at, content, channel_id, author_id)
+VALUES ('40658af2-7bf8-4b1a-ac79-32f417ce391c',
+        '2025-03-31 02:43:54.899593 +00:00',
+        '2025-03-31 02:43:54.899593 +00:00',
+        '안녕하세요',
+        '2c17a8d1-77d7-437d-811e-d98db3bd30bc',
         '3a2c1f0d-6b9e-4e8a-a7c5-d4f2e9b8c1a0');
 
 INSERT INTO messages (id, created_at, updated_at, content, channel_id, author_id)
