@@ -6,21 +6,20 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record UserCreateRequest(
-        @NotBlank(message = "Username cannot be blank.")
-        @Size(min = 1, max = 50, message = "Username must be between 1 and 50 characters.")
-        String username,
-
-        @NotBlank(message = "Email cannot be blank.")
-        @Email(message = "Invalid email.")
-        String email,
-
-        @NotBlank(message = "Password cannot be blank.")
-        @Size(min = 1, max = 60, message = "Password must be between 1 and 60 characters.")
-        @Pattern(
-                regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
-                message = "Password must contain at least one letter, one number, and one special character."
-        )
-        String password
+    @NotBlank(message = "사용자 이름은 필수입니다")
+    @Size(min = 3, max = 50, message = "사용자 이름은 3자 이상 50자 이하여야 합니다")
+    String username,
+    
+    @NotBlank(message = "이메일은 필수입니다")
+    @Email(message = "유효한 이메일 형식이어야 합니다")
+    @Size(max = 100, message = "이메일은 100자 이하여야 합니다")
+    String email,
+    
+    @NotBlank(message = "비밀번호는 필수입니다")
+    @Size(min = 8, max = 60, message = "비밀번호는 8자 이상 60자 이하여야 합니다")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*]).{8,}$", 
+             message = "비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다")
+    String password
 ) {
 
 }

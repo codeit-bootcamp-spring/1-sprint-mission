@@ -5,8 +5,13 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.UUID;
 
 public class PrivateChannelUpdateException extends ChannelException {
-    public PrivateChannelUpdateException(UUID id) {
+    public PrivateChannelUpdateException() {
         super(ErrorCode.PRIVATE_CHANNEL_UPDATE);
-        this.getDetails().put("id", id);
     }
-}
+    
+    public static PrivateChannelUpdateException forChannel(UUID channelId) {
+        PrivateChannelUpdateException exception = new PrivateChannelUpdateException();
+        exception.addDetail("channelId", channelId);
+        return exception;
+    }
+} 

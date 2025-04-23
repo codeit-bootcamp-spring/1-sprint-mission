@@ -1,57 +1,61 @@
 spring:
   profiles:
-    active: dev
-  application:
-    name: discodeit
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 30MB
+    active: prod
+  datasource:
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
+    open-in-view: false
     properties:
       hibernate:
-        format_sql: false
-    open-in-view: false
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
-    root: info
-
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: .discodeit/storage
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
 
 management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics,loggers"
+        include: health,info,metrics,loggers
   endpoint:
     health:
       show-details: always
 
 info:
-  app:
-    name: Discodeit
-    version: 1.7.0
+  name: Discodeit
+  version: 1.7.0
   java:
     version: 17
   spring-boot:
     version: 3.4.0
-  datasource:
-    url: jdbc:postgresql://localhost:5432/mydb
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    ddl-auto: update
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.maxFileSize}
+      max-request-size: ${spring.servlet.multipart.maxRequestSize}
+
+discodeit:
   storage:
-    type: file
-    path: /var/data/uploads
-  multipart:
-    max-file-size: 10MB
-    max-request-size: 30MB
+    type: ${STORAGE_TYPE:local}
+    local:
+      root-path: .discodeit/storage
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+
+logging:
+  level:
+    root: info
