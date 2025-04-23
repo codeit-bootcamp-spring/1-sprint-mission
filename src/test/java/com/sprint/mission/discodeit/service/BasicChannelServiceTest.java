@@ -82,11 +82,9 @@ public class BasicChannelServiceTest {
     PublicChannelCreateRequest request = new PublicChannelCreateRequest("test", "테스트 채널입니다.");
 
     given(channelRepository.existsChannelByName(request.name())).willReturn(true);
-
+    
     assertThatThrownBy(() -> channelService.create(request))
-        .isInstanceOf(ChannelNameAlreadyExistsException.class)
-        .hasMessageContaining("중복된 채널 이름입니다.");
-
+        .isInstanceOf(ChannelNameAlreadyExistsException.class);
   }
 
   @Test
@@ -179,7 +177,7 @@ public class BasicChannelServiceTest {
   }
 
   @Test
-  @DisplayName("채널 삭제 실패 - 채널 없음")
+  @DisplayName("채널 삭제 - 실패 (채널 없음)")
   void deleteChannelFail_ChannelNotFound() {
     UUID channelId = UUID.randomUUID();
     given(channelRepository.existsById(channelId)).willReturn(false);

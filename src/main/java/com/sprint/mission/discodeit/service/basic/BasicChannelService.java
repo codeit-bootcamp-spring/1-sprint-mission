@@ -44,6 +44,9 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(ChannelType.PUBLIC, name, description);
     log.info("[공개 채널 생성 시도] 채널 이름: {}", name);
 
+    if (channelRepository.existsChannelByName(channel.getName())) {
+      throw new ChannelNameAlreadyExistsException();
+    }
     channelRepository.save(channel);
     log.info("[공개 채널 생성 성공] 채널 이름: {}", name);
 
