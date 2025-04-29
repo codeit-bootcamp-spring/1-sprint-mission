@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: Discodeit
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit  # PostgreSQL DB 주소
+    username: discodeit_user                         # DB 사용자
+    password: discodeit1234                          # DB 비밀번호
+    driver-class-name: org.postgresql.Driver         # PostgreSQL 드라이버
+
+  jpa:
+    hibernate:
+      ddl-auto: none   # DDL로 직접 만들 예정 / 테이블 생성: create, update, none
+    show-sql: true        # (옵션) SQL 로그 출력
+    properties:
+      hibernate:
+        format_sql: true  # SQL을 보기 좋게 포맷
+        highlight_sql: true
+        use_sql_comments: true  # SQL에 주석 추가 (디버깅 용이)
+    logging:
+      level:
+        org.hibernate.SQL: info  # Hibernate SQL 로그 레벨 설정
+        org.hibernate.type.descriptor.sql.BasicBinder: trace  # 바인딩된 파라미터 출력
+    database: postgresql
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
+
+## Actuator 엔드포인트 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: always  # health 상세 정보 노출
+    loggers:
+      enabled: true         # 로그 레벨 변경 가능하도록 활성화
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring:
+    boot:
+      version: 3.4.0
+  settings:
+    datasource:
+      url: ${spring.datasource.url}
+      driver: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-file-size}
+      max-request-size: ${spring.servlet.multipart.max-request-size}

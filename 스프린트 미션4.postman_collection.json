@@ -1,0 +1,528 @@
+{
+	"info": {
+		"_postman_id": "f4696a68-95ab-49e4-89cc-fce9dda75cfa",
+		"name": "스프린트 미션4",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42135875"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "User 등록",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"\",\r\n    \"password\" : \"6223\",\r\n    \"email\":\"cat@gmail.com2\",\r\n    \"filePath\" : \"cat_file\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 모두 조회",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 단건 조회",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/5487bdef-f0dc-459e-83d4-7acfe4629ec7",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"5487bdef-f0dc-459e-83d4-7acfe4629ec7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 업데이트",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"newName\":\"감자\",\r\n    \"newPassword\": \"12345\",\r\n    \"newEmail\": \"gamza@email\",\r\n    \"newFilePAth\": \"gamzaFile\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/3ab24c93-30b3-46fe-ae4a-7480172a26a2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"3ab24c93-30b3-46fe-ae4a-7480172a26a2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 삭제",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/user/aba18319-389f-4a33-8d19-80b25686b6db",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"aba18319-389f-4a33-8d19-80b25686b6db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User 온라인 상태 업데이트",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"time\":\"2025-02-18T05:50:42.520+00:00\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/user/8a8014f0-47ee-42e3-82c8-2304f310e53f/online",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"user",
+								"8a8014f0-47ee-42e3-82c8-2304f310e53f",
+								"online"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "로그인",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"name\":\"홍길동\",\r\n    \"password\":\"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Channel",
+			"item": [
+				{
+					"name": "공개 Channel 등록",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"공개 채널2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/channel",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "비공개 채널 등록",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"비공개 채널2\",\r\n    \"userList\": [\"b009f691-a13c-48f6-8f1f-71a30dbb0864\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/channel/private",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channel",
+								"private"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "특정 사용자가 볼 수 있는 채널 목록 조회",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/channel/b009f691-a13c-48f6-8f1f-71a30dbb0864",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channel",
+								"b009f691-a13c-48f6-8f1f-71a30dbb0864"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Channel 모두 조회",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/channel",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "공개 채널 정보 수정",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"uuid\":\"d0b35a98-580f-4aaa-95f2-01125e5e5a94\",\r\n    \"name\" : \"new 공개채널\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/channel/d0b35a98-580f-4aaa-95f2-01125e5e5a94",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channel",
+								"d0b35a98-580f-4aaa-95f2-01125e5e5a94"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "채널 삭제",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Message",
+			"item": [
+				{
+					"name": "특정 채널 메시지  조회",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "특정 채널 메시지 ",
+							"host": [
+								"특정 채널 메시지 "
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "메시지 전송",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "메시지 전송",
+							"host": [
+								"메시지 전송"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "메시지  수정",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "메시지 ",
+							"host": [
+								"메시지 "
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "메시지 삭제",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "메시지 삭제",
+							"host": [
+								"메시지 삭제"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ReadStatus",
+			"item": [
+				{
+					"name": "특정 사용자의 메시지 수신 정보 조회",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/readstatus/user/6b4ce7a0-ffbc-4c30-93f5-71fe9083d747",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"readstatus",
+								"user",
+								"6b4ce7a0-ffbc-4c30-93f5-71fe9083d747"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "메시지 수신 정보 업데이트",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\" : \"1ccd5d31-108f-468f-a467-817c74b8bbec\",\r\n    \"channelLastReadTimes\": \"2025-02-06T00:22:59.772462900Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/readstatus/1ccd5d31-108f-468f-a467-817c74b8bbec",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"readstatus",
+								"1ccd5d31-108f-468f-a467-817c74b8bbec"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "등록",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"channelId\":\"b81404cb-45cb-44d2-baef-88374b33fa84\",\r\n    \"userId\":\"0f1c92be-c9c7-48a4-b75f-b56f07f4d245\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/readstatus",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"readstatus"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BinaryContent",
+			"item": [
+				{
+					"name": "단일 바이너리 콘텐츠 조회",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/binarycontent/42261be5-e8a1-4357-9cf8-ac715013e6d9",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"binarycontent",
+								"42261be5-e8a1-4357-9cf8-ac715013e6d9"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
