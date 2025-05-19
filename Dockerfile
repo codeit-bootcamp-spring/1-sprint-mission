@@ -2,10 +2,11 @@
 FROM gradle:8.5.0-jdk17-alpine AS build
 WORKDIR /app
 # 변경 적은 것 먼저 복사해서 캐시 활용
+COPY gradlew ./
+COPY gradlew ./gradle
 COPY settings.gradle ./
 COPY build.gradle ./
 RUN chmod +x gradlew
-RUN gradle dependencies --no-daemon || true
 
 # 변경 자주 되는 것 아래로 ↓
 COPY . .
