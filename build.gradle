@@ -45,6 +45,7 @@ dependencies {
 
     // Spring Actuator 의존성
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     // Lombok 의존성 (간결한 코드 작성)
     compileOnly 'org.projectlombok:lombok'             // 컴파일 타임에만 Lombok을 사용
@@ -70,6 +71,11 @@ dependencies {
 
     // AWS S3 SDK 의존성
     implementation 'software.amazon.awssdk:s3:2.31.7'
+
+    // Spring Security 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation("org.springframework.security:spring-security-test")
+
 }
 
 
