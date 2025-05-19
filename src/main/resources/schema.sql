@@ -1,15 +1,3 @@
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS channels CASCADE;
-DROP TABLE IF EXISTS messages CASCADE;
-DROP TABLE IF EXISTS binary_contents CASCADE;
-DROP TABLE IF EXISTS user_statuses CASCADE;
-DROP TABLE IF EXISTS read_statuses CASCADE;
-DROP TABLE IF EXISTS message_attachments CASCADE;
-
-
-
-
-
 -- 테이블
 -- User
 CREATE TABLE users
@@ -31,7 +19,7 @@ CREATE TABLE binary_contents
     file_name    varchar(255)             NOT NULL,
     size         bigint                   NOT NULL,
     content_type varchar(100)             NOT NULL
-
+--     ,bytes        bytea        NOT NULL
 );
 
 -- UserStatus

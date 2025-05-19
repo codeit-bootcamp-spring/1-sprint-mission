@@ -1,18 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -21,24 +14,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContent extends BaseEntity {
 
-  @Column(nullable = false, unique = true)
-  private UUID storageId;
-
-  @Column(nullable = false, length = 255)
+  @Column(nullable = false)
   private String fileName;
-
   @Column(nullable = false)
   private Long size;
-
-  @Column(nullable = false, length = 100)
+  @Column(length = 100, nullable = false)
   private String contentType;
 
-
-  public BinaryContent(UUID storageId, String fileName, Long size, String contentType) {
-    this.storageId = storageId;
+  public BinaryContent(String fileName, Long size, String contentType) {
     this.fileName = fileName;
     this.size = size;
     this.contentType = contentType;
-
   }
 }
