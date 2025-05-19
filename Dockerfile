@@ -25,4 +25,4 @@ EXPOSE 80
 ENV JVM_OPTS=""
 
 # 앱 실행
-CMD ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+CMD ["sh", "-c", "exec", "java $JVM_OPTS -jar app.jar"]
