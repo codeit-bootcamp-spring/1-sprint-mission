@@ -16,6 +16,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
                 "/",
+                "/api/auth/csrf-token",
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
                 "/actuator/**").permitAll()
