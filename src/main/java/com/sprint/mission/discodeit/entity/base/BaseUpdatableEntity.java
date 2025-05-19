@@ -14,7 +14,7 @@ import java.time.Instant;
 @MappedSuperclass
 public abstract class BaseUpdatableEntity extends BaseEntity {
 
-    @LastModifiedDate
-    @Column(columnDefinition = "timestamp with time zone")
-    private Instant updatedAt;
+  @LastModifiedDate
+  @Column(columnDefinition = "timestamp with time zone")
+  private Instant updatedAt;
 }

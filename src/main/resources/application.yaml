@@ -9,11 +9,13 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
+      ddl-auto: validate
     open-in-view: false
   profiles:
     active:
       - dev
+  config:
+    import: optional:file:.env[.properties]
 
 management:
   endpoints:
@@ -54,7 +56,7 @@ discodeit:
       secret-key: ${AWS_S3_SECRET_KEY}
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
-      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}  # 기본값 10분
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
 logging:
   level:

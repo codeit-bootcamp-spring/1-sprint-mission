@@ -8,5 +8,7 @@ public class UserException extends DiscodeitException {
         super(errorCode);
     }
 
-    public UserException(ErrorCode errorCode, Throwable cause) {super(errorCode, cause);}
-}
+    public UserException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode, cause);
+    }
+} 

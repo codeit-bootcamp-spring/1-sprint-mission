@@ -8,5 +8,7 @@ public class ReadStatusException extends DiscodeitException {
         super(errorCode);
     }
 
-    public ReadStatusException(ErrorCode errorCode, Throwable cause) {super(errorCode, cause);}
-}
+    public ReadStatusException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode, cause);
+    }
+} 

@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-    List<Channel> findAllByTypeOrIdIn(ChannelType type, List<UUID> ids);
+  List<Channel> findAllByTypeOrIdIn(ChannelType type, List<UUID> ids);
 }

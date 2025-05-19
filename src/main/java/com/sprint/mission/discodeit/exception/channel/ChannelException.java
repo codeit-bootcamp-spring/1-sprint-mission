@@ -8,5 +8,7 @@ public class ChannelException extends DiscodeitException {
         super(errorCode);
     }
 
-    public ChannelException(ErrorCode errorCode, Throwable cause) {super(errorCode, cause);}
-}
+    public ChannelException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode, cause);
+    }
+} 

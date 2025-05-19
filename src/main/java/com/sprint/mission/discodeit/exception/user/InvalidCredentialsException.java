@@ -11,4 +11,4 @@ public class InvalidCredentialsException extends UserException {
         InvalidCredentialsException exception = new InvalidCredentialsException();
         return exception;
     }
-}
+} 
