@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,12 +36,14 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public UserResponse createUser(UserRequest.Create request, MultipartFile userProfileImage) {
 
         checkDuplicateEmail(request.getEmail());
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         BinaryContent newProfile = null;
         if (userProfileImage != null && !userProfileImage.isEmpty()) {
@@ -52,7 +55,7 @@ public class BasicUserService implements UserService {
         }
 
         User newUser = userRepository.save(User.createUser(
-            request.getUsername(), request.getEmail(), request.getPassword(), newProfile));
+            request.getUsername(), request.getEmail(), encodedPassword, newProfile));
         UserStatus newUserStatus = userStatusRepository.save(UserStatus.createUserStatus(newUser));
         newUser.updateStatus(newUserStatus);
 
