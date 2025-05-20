@@ -28,7 +28,6 @@ public class AuthController {
 
     @GetMapping("/csrf-token")
     public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
-        // Spring Security가 필터에서 CsrfToken 객체를 Request attribute에 넣어줌
         return ResponseEntity.ok(csrfToken);
     }
 }
