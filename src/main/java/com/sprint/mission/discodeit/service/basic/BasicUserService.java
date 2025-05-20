@@ -30,106 +30,107 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
-  private final UserRepository userRepository;
-  private final UserMapper userMapper;
-  private final UserStatusRepository userStatusRepository;
-  private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentStorage binaryContentStorage;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
-  @Override
-  @Transactional
-  public UserResponse createUser(UserRequest.Create request, MultipartFile userProfileImage) {
+    @Override
+    @Transactional
+    public UserResponse createUser(UserRequest.Create request, MultipartFile userProfileImage) {
 
-    checkDuplicateEmail(request.getEmail());
+        checkDuplicateEmail(request.getEmail());
 
-    BinaryContent newProfile = null;
-    if (userProfileImage != null && !userProfileImage.isEmpty()) {
-      newProfile = binaryContentRepository.save(BinaryContent.createBinaryContent(
-          userProfileImage.getOriginalFilename(),
-          userProfileImage.getSize(),
-          userProfileImage.getContentType()));
-      binaryContentStorage.put(newProfile.getId(), convertToBytes(userProfileImage));
+        BinaryContent newProfile = null;
+        if (userProfileImage != null && !userProfileImage.isEmpty()) {
+            newProfile = binaryContentRepository.save(BinaryContent.createBinaryContent(
+                userProfileImage.getOriginalFilename(),
+                userProfileImage.getSize(),
+                userProfileImage.getContentType()));
+            binaryContentStorage.put(newProfile.getId(), convertToBytes(userProfileImage));
+        }
+
+        User newUser = userRepository.save(User.createUser(
+            request.getUsername(), request.getEmail(), request.getPassword(), newProfile));
+        UserStatus newUserStatus = userStatusRepository.save(UserStatus.createUserStatus(newUser));
+        newUser.updateStatus(newUserStatus);
+
+        log.info("Created user - id: {}", newUser.getId());
+        return userMapper.entityToDto(newUser);
     }
 
-    User newUser = userRepository.save(User.createUser(
-        request.getUsername(), request.getEmail(), request.getPassword(), newProfile));
-    UserStatus newUserStatus = userStatusRepository.save(UserStatus.createUserStatus(newUser));
-    newUser.updateStatus(newUserStatus);
-
-    log.info("Created user - id: {}", newUser.getId());
-    return userMapper.entityToDto(newUser);
-  }
-
-  @Override
-  public List<UserResponse> findAll() {
-    return userRepository.findAll().stream()
-        .map(userMapper::entityToDto)
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public UserResponse findById(UUID id) {
-    return userMapper.entityToDto(findByIdOrThrow(id));
-  }
-
-  @Override
-  @Transactional
-  public UserResponse update(UUID id, UserRequest.Update request, MultipartFile userProfileImage) {
-    User user = findByIdOrThrow(id);
-
-    Optional.ofNullable(request.getUsername()).ifPresent(user::updateName);
-    Optional.ofNullable(request.getPassword()).ifPresent(user::updatePassword);
-
-    Optional.ofNullable(request.getEmail())
-        .ifPresent(email -> {
-          checkDuplicateEmail(email);
-          user.updateEmail(email);
-        });
-
-    Optional.ofNullable(userProfileImage)
-        .ifPresent(profile -> {
-          if (!profile.isEmpty()) { // 파라미터는 있는데, 파일이 안 들어올 때
-            BinaryContent binaryContent = binaryContentRepository.save(
-                BinaryContent.createBinaryContent(
-                    profile.getOriginalFilename(),
-                    profile.getSize(),
-                    profile.getContentType()));
-            binaryContentStorage.put(binaryContent.getId(), convertToBytes(profile));
-            user.updateProfile(binaryContent);
-          }
-        });
-
-    log.info("Updated user - id: {}", user.getId());
-    return userMapper.entityToDto(user);
-  }
-
-  @Override
-  public void deleteById(UUID id) {
-    findByIdOrThrow(id);
-    userRepository.deleteById(id);
-    log.info("Deleted user - id: {}", id);
-  }
-
-  private User findByIdOrThrow(UUID id) {
-    return userRepository.findById(id)
-        .orElseThrow(
-            () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("id", id)));
-  }
-
-  private void checkDuplicateEmail(String email) {
-    if (userRepository.existsByEmail(email)) {
-      throw new UserAlreadyExistsException(ErrorCode.USER_EMAIL_ALREADY_EXIST,
-          Map.of("email", email));
+    @Override
+    public List<UserResponse> findAll() {
+        return userRepository.findAll().stream()
+            .map(userMapper::entityToDto)
+            .collect(Collectors.toList());
     }
-  }
 
-  private byte[] convertToBytes(MultipartFile imageFile) {
-    try {
-      return imageFile.getBytes();
-    } catch (IOException e) {
-      throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR,
-          Map.of("fileName", imageFile.getOriginalFilename()));
+    @Override
+    public UserResponse findById(UUID id) {
+        return userMapper.entityToDto(findByIdOrThrow(id));
     }
-  }
+
+    @Override
+    @Transactional
+    public UserResponse update(UUID id, UserRequest.Update request,
+        MultipartFile userProfileImage) {
+        User user = findByIdOrThrow(id);
+
+        Optional.ofNullable(request.getNewUsername()).ifPresent(user::updateName);
+        Optional.ofNullable(request.getNewPassword()).ifPresent(user::updatePassword);
+
+        Optional.ofNullable(request.getNewEmail())
+            .ifPresent(email -> {
+                checkDuplicateEmail(email);
+                user.updateEmail(email);
+            });
+
+        Optional.ofNullable(userProfileImage)
+            .ifPresent(profile -> {
+                if (!profile.isEmpty()) { // 파라미터는 있는데, 파일이 안 들어올 때
+                    BinaryContent binaryContent = binaryContentRepository.save(
+                        BinaryContent.createBinaryContent(
+                            profile.getOriginalFilename(),
+                            profile.getSize(),
+                            profile.getContentType()));
+                    binaryContentStorage.put(binaryContent.getId(), convertToBytes(profile));
+                    user.updateProfile(binaryContent);
+                }
+            });
+
+        log.info("Updated user - id: {}", user.getId());
+        return userMapper.entityToDto(user);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        findByIdOrThrow(id);
+        userRepository.deleteById(id);
+        log.info("Deleted user - id: {}", id);
+    }
+
+    private User findByIdOrThrow(UUID id) {
+        return userRepository.findById(id)
+            .orElseThrow(
+                () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("id", id)));
+    }
+
+    private void checkDuplicateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new UserAlreadyExistsException(ErrorCode.USER_EMAIL_ALREADY_EXIST,
+                Map.of("email", email));
+        }
+    }
+
+    private byte[] convertToBytes(MultipartFile imageFile) {
+        try {
+            return imageFile.getBytes();
+        } catch (IOException e) {
+            throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR,
+                Map.of("fileName", imageFile.getOriginalFilename()));
+        }
+    }
 
 }

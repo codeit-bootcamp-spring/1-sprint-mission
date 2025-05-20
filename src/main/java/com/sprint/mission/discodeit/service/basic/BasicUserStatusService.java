@@ -26,83 +26,84 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-  private final UserStatusRepository userStatusRepository;
-  private final UserStatusMapper userStatusMapper;
-  private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final UserStatusMapper userStatusMapper;
+    private final UserRepository userRepository;
 
-  @Override
-  public UserStatusResponse create(UUID userId) {
+    @Override
+    public UserStatusResponse create(UUID userId) {
 
-    User user = findUserByUserIdOrThrow(userId);
-    if (userStatusRepository.existsByUserId(userId)) {
-      throw new UserStatusAlreadyExistsException(ErrorCode.USER_STATUS_IS_ALREADY_EXIST,
-          Map.of("userId", userId));
+        User user = findUserByUserIdOrThrow(userId);
+        if (userStatusRepository.existsByUserId(userId)) {
+            throw new UserStatusAlreadyExistsException(ErrorCode.USER_STATUS_IS_ALREADY_EXIST,
+                Map.of("userId", userId));
+        }
+
+        UserStatus newUserStatus = UserStatus.createUserStatus(user);
+        log.info("Created UserStatus - id: {}", newUserStatus.getId());
+        return userStatusMapper.entityToDto(userStatusRepository.save(newUserStatus));
     }
 
-    UserStatus newUserStatus = UserStatus.createUserStatus(user);
-    log.info("Created UserStatus - id: {}", newUserStatus.getId());
-    return userStatusMapper.entityToDto(userStatusRepository.save(newUserStatus));
-  }
+    @Override
+    public UserStatusResponse findById(UUID id) {
+        UserStatus userStatus = findByIdOrThrow(id);
+        return userStatusMapper.entityToDto(userStatus);
+    }
 
-  @Override
-  public UserStatusResponse findById(UUID id) {
-    UserStatus userStatus = findByIdOrThrow(id);
-    return userStatusMapper.entityToDto(userStatus);
-  }
+    @Override
+    public UserStatusResponse findByUserId(UUID userId) {
+        findUserByUserIdOrThrow(userId);
+        UserStatus userStatus = findByUserIdOrThrow(userId);
 
-  @Override
-  public UserStatusResponse findByUserId(UUID userId) {
-    findUserByUserIdOrThrow(userId);
-    UserStatus userStatus = findByUserIdOrThrow(userId);
+        return userStatusMapper.entityToDto(userStatus);
+    }
 
-    return userStatusMapper.entityToDto(userStatus);
-  }
+    @Override
+    public UserStatusResponse updateByUserId(UUID userId, UserStatusRequest.Update request) {
+        findUserByUserIdOrThrow(userId);
+        UserStatus userStatus = findByUserIdOrThrow(userId);
 
-  @Override
-  public UserStatusResponse updateByUserId(UUID userId, UserStatusRequest.Update request) {
-    findUserByUserIdOrThrow(userId);
-    UserStatus userStatus = findByUserIdOrThrow(userId);
+        userStatus.updateLastActiveAt(request.getNewLastActiveAt());
+        return userStatusMapper.entityToDto(userStatusRepository.save(userStatus));
+    }
 
-    userStatus.updateLastActiveAt(request.getNewLastActiveAt());
-    return userStatusMapper.entityToDto(userStatusRepository.save(userStatus));
-  }
+    @Override
+    public List<UserStatusResponse> findAll() {
+        return userStatusRepository.findAll().stream()
+            .map(userStatusMapper::entityToDto)
+            .collect(Collectors.toList());
+    }
 
-  @Override
-  public List<UserStatusResponse> findAll() {
-    return userStatusRepository.findAll().stream()
-        .map(userStatusMapper::entityToDto)
-        .collect(Collectors.toList());
-  }
+    @Override
+    public void deleteById(UUID id) {
+        findByIdOrThrow(id);
+        userStatusRepository.deleteById(id);
+    }
 
-  @Override
-  public void deleteById(UUID id) {
-    findByIdOrThrow(id);
-    userStatusRepository.deleteById(id);
-  }
+    @Override
+    public void deleteByUserId(UUID userId) {
+        findByUserIdOrThrow(userId);
+        userStatusRepository.deleteByUserId(userId);
+    }
 
-  @Override
-  public void deleteByUserId(UUID userId) {
-    findByUserIdOrThrow(userId);
-    userStatusRepository.deleteByUserId(userId);
-  }
+    private UserStatus findByIdOrThrow(UUID id) {
+        return userStatusRepository.findById(id)
+            .orElseThrow(
+                () -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND,
+                    Map.of("id", id)));
+    }
 
-  private UserStatus findByIdOrThrow(UUID id) {
-    return userStatusRepository.findById(id)
-        .orElseThrow(
-            () -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND,
-                Map.of("id", id)));
-  }
+    private UserStatus findByUserIdOrThrow(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+            .orElseThrow(
+                () -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND,
+                    Map.of("userId", userId)));
+    }
 
-  private UserStatus findByUserIdOrThrow(UUID userId) {
-    return userStatusRepository.findById(userId)
-        .orElseThrow(
-            () -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND,
-                Map.of("userId", userId)));
-  }
-
-  private User findUserByUserIdOrThrow(UUID userId) {
-    return userRepository.findById(userId)
-        .orElseThrow(
-            () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
-  }
+    private User findUserByUserIdOrThrow(UUID userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(
+                () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,
+                    Map.of("userId", userId)));
+    }
 }

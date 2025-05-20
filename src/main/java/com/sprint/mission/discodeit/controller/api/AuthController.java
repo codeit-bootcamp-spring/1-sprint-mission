@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController implements AuthApiDocs {
 
-  private final AuthService authService;
+    private final AuthService authService;
 
-  @PostMapping("/login")
-  @Override
-  public ResponseEntity<CustomApiResponse<UserResponse>> login(
-      @Valid @RequestBody UserRequest.Login userRequestLogin) {
+    @PostMapping("/login")
+    @Override
+    public ResponseEntity<UserResponse> login(
+        @Valid @RequestBody UserRequest.Login userRequestLogin) {
 
-    log.info("POST /api/login - login attempt for user: {}", userRequestLogin.getUsername());
-    return ResponseEntity.ok(CustomApiResponse.success(authService.login(userRequestLogin)));
-  }
+        log.info("POST /api/login - login attempt for user: {}", userRequestLogin.getUsername());
+        return ResponseEntity.ok(authService.login(userRequestLogin));
+    }
 }

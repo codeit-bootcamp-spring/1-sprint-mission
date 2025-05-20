@@ -19,30 +19,29 @@ import java.util.UUID;
 @RequestMapping("/api/binaryContents")
 public class BinaryContentController implements BinaryContentApiDocs {
 
-  private final BinaryContentService binaryContentService;
-  private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
-  @GetMapping("/{binaryContentId}")
-  @Override
-  public ResponseEntity<CustomApiResponse<BinaryContentResponse>> getFile(
-      @PathVariable(value = "binaryContentId") UUID fileId
-  ) {
-    return ResponseEntity.ok(
-        CustomApiResponse.success(binaryContentService.findById(fileId)));
-  }
+    @GetMapping("/{binaryContentId}")
+    @Override
+    public ResponseEntity<BinaryContentResponse> getFile(
+        @PathVariable(value = "binaryContentId") UUID fileId
+    ) {
+        return ResponseEntity.ok(binaryContentService.findById(fileId));
+    }
 
-  @GetMapping
-  @Override
-  public ResponseEntity<CustomApiResponse<List<BinaryContentResponse>>> getFileList(
-      @RequestParam("binaryContentIds") List<UUID> fileIds) {
-    return ResponseEntity.ok(
-        CustomApiResponse.success(binaryContentService.findAllByIdIn(fileIds)));
-  }
+    @GetMapping
+    @Override
+    public ResponseEntity<List<BinaryContentResponse>> getFileList(
+        @RequestParam("binaryContentIds") List<UUID> fileIds) {
+        return ResponseEntity.ok(binaryContentService.findAllByIdIn(fileIds));
+    }
 
-  @GetMapping("/{binaryContentId}/download")
-  @Override
-  public ResponseEntity<?> downloadFile(@PathVariable UUID binaryContentId) {
-    log.info("GET /api/binaryContents/{}/download - download attempt for file", binaryContentId);
-    return binaryContentStorage.download(binaryContentService.findById(binaryContentId));
-  }
+    @GetMapping("/{binaryContentId}/download")
+    @Override
+    public ResponseEntity<?> downloadFile(@PathVariable UUID binaryContentId) {
+        log.info("GET /api/binaryContents/{}/download - download attempt for file",
+            binaryContentId);
+        return binaryContentStorage.download(binaryContentService.findById(binaryContentId));
+    }
 }

@@ -2,13 +2,16 @@ package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.MessageApiDocs;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.request.MessageRequest;
 import com.sprint.mission.discodeit.dto.response.MessageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,48 +27,53 @@ import java.util.UUID;
 @RequestMapping("/api/messages")
 public class MessageController implements MessageApiDocs {
 
-  private final MessageService messageService;
+    private final MessageService messageService;
 
-  @Override
-  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
-      MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<CustomApiResponse<MessageResponse>> createMessage(
-      @Valid @RequestPart(value = "messageCreateRequest") MessageRequest.Create messageRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> files
-  ) {
-    log.info("POST /api/messages");
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CustomApiResponse.created(messageService.createMessage(messageRequest, files)));
-  }
+    @Override
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+        MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<MessageResponse> createMessage(
+        @Valid @RequestPart(value = "messageCreateRequest") MessageRequest.Create messageRequest,
+        @RequestPart(value = "attachments", required = false) List<MultipartFile> files
+    ) {
+        log.info("POST /api/messages");
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(messageService.createMessage(messageRequest, files));
+    }
 
-  @Override
-  @PutMapping(value = "/{messageId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
-      MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<CustomApiResponse<MessageResponse>> updateMessage(
-      @PathVariable UUID messageId,
-      @Valid @RequestBody MessageRequest.Update messageRequest
-  ) {
-    log.info("PUT /api/messages/{}", messageId);
-    return ResponseEntity.ok(
-        CustomApiResponse.success(messageService.update(messageId, messageRequest))
-    );
-  }
+    @Override
+    @PatchMapping(value = "/{messageId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+        MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<MessageResponse> updateMessage(
+        @PathVariable UUID messageId,
+        @Valid @RequestBody MessageRequest.Update messageRequest
+    ) {
+        log.info("PUT /api/messages/{}", messageId);
+        return ResponseEntity.ok(messageService.update(messageId, messageRequest));
+    }
 
-  @Override
-  @DeleteMapping("/{messageId}")
-  public ResponseEntity<CustomApiResponse<Void>> deleteMessage(@PathVariable UUID messageId) {
+    @Override
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
 
-    messageService.deleteById(messageId);
-    log.info("DELETE /api/messages/{}", messageId);
-    return ResponseEntity.ok(CustomApiResponse.success("Message deleted successfully"));
-  }
+        messageService.deleteById(messageId);
+        log.info("DELETE /api/messages/{}", messageId);
+        return ResponseEntity.noContent().build();
+    }
 
-  @Override
-  @GetMapping
-  public ResponseEntity<CustomApiResponse<PageResponse<MessageResponse>>> getMessageListByChannel(
-      @RequestParam("channelId") UUID channelId) {
-    return ResponseEntity.ok(
-        CustomApiResponse.success(messageService.findAllByChannelId(channelId))
-    );
-  }
+    @Override
+    @GetMapping
+    public ResponseEntity<PageResponse<MessageResponse>> getMessageListByChannel(
+        @RequestParam("channelId") UUID channelId,
+        @RequestParam(value = "cursor", required = false) Instant cursor,
+        @PageableDefault(
+            size = 50,
+            page = 0,
+            sort = "createdAt",
+            direction = Direction.DESC
+        ) Pageable pageable) {
+        log.info("GET /api/messages/{} : channelId={}, cursor={}, pageable={}",
+            channelId, channelId, cursor, pageable);
+        return ResponseEntity.ok((messageService.findAllByChannelId(channelId, cursor, pageable)));
+    }
 }

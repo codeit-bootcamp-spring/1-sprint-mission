@@ -18,37 +18,35 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/read-status")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController implements ReadStatusApiDocs {
 
-  private final ReadStatusService readStatusService;
+    private final ReadStatusService readStatusService;
 
-  @PostMapping
-  @Override
-  public ResponseEntity<CustomApiResponse<ReadStatusResponse>> createReadStatus(
-      @Valid @RequestBody ReadStatusRequest.Create readStatusRequest) {
+    @PostMapping
+    @Override
+    public ResponseEntity<ReadStatusResponse> createReadStatus(
+        @Valid @RequestBody ReadStatusRequest.Create readStatusRequest) {
 
-    log.info("POST /api/read-status");
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CustomApiResponse.created(readStatusService.create(readStatusRequest)));
-  }
+        log.info("POST /api/readStatuses");
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(readStatusService.create(readStatusRequest));
+    }
 
-  @PutMapping("/{readStatusId}")
-  @Override
-  public ResponseEntity<CustomApiResponse<ReadStatusResponse>> updateReadStatus(
-      @PathVariable UUID readStatusId,
-      @Valid @RequestBody ReadStatusRequest.Update readStatusRequest) {
+    @PatchMapping("/{readStatusId}")
+    @Override
+    public ResponseEntity<ReadStatusResponse> updateReadStatus(
+        @PathVariable UUID readStatusId,
+        @Valid @RequestBody ReadStatusRequest.Update readStatusRequest) {
 
-    log.info("PUT /api/read-status/{}", readStatusId);
-    return ResponseEntity.ok(
-        CustomApiResponse.success(readStatusService.update(readStatusId, readStatusRequest))
-    );
-  }
+        log.info("PUT /api/readStatuses/{}", readStatusId);
+        return ResponseEntity.ok(readStatusService.update(readStatusId, readStatusRequest));
+    }
 
-  @GetMapping
-  @Override
-  public ResponseEntity<CustomApiResponse<List<ReadStatusResponse>>> getReadStatusByUser(
-      @RequestParam("userId") UUID userId) {
-    return ResponseEntity.ok(CustomApiResponse.success(readStatusService.findAllByUserId(userId)));
-  }
+    @GetMapping
+    @Override
+    public ResponseEntity<List<ReadStatusResponse>> getReadStatusByUser(
+        @RequestParam("userId") UUID userId) {
+        return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
+    }
 }

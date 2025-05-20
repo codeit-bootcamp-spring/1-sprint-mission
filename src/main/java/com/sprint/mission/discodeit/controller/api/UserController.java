@@ -26,61 +26,57 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController implements UserApiDocs {
 
-  private final UserService userService;
-  private final UserStatusService userStatusService;
+    private final UserService userService;
+    private final UserStatusService userStatusService;
 
-  @GetMapping
-  @Override
-  public ResponseEntity<CustomApiResponse<List<UserResponse>>> getAllUser() {
+    @GetMapping
+    @Override
+    public ResponseEntity<List<UserResponse>> getAllUser() {
+        log.info("GET /api/users - getAllUsers");
+        return ResponseEntity.ok(userService.findAll());
+    }
 
-    return ResponseEntity.ok(CustomApiResponse.success(userService.findAll()));
-  }
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+        MediaType.APPLICATION_JSON_VALUE})
+    @Override
+    public ResponseEntity<UserResponse> createUser(
+        @Valid @RequestPart("userCreateRequest") UserRequest.Create userRequest,
+        @RequestPart(value = "profile", required = false) MultipartFile userProfileImage
+    ) {
+        log.info("POST /api/users - user: {}", userRequest.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(userService.createUser(userRequest, userProfileImage));
+    }
 
-  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
-      MediaType.APPLICATION_JSON_VALUE})
-  @Override
-  public ResponseEntity<CustomApiResponse<UserResponse>> createUser(
-      @Valid @RequestPart("user") UserRequest.Create userRequest,
-      @RequestPart(value = "image", required = false) MultipartFile userProfileImage
-  ) {
-    log.info("POST /api/users - user: {}", userRequest.getUsername());
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CustomApiResponse.created(userService.createUser(userRequest, userProfileImage)));
-  }
+    @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+        MediaType.APPLICATION_JSON_VALUE})
+    @Override
+    public ResponseEntity<UserResponse> updateUser(
+        @PathVariable UUID userId,
+        @Valid @RequestPart("userUpdateRequest") UserRequest.Update userRequest,
+        @RequestPart(value = "profile", required = false) MultipartFile userProfileImage
+    ) {
 
-  @PutMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
-      MediaType.APPLICATION_JSON_VALUE})
-  @Override
-  public ResponseEntity<CustomApiResponse<UserResponse>> updateUser(
-      @PathVariable UUID userId,
-      @Valid @RequestPart("user") UserRequest.Update userRequest,
-      @RequestPart(value = "image", required = false) MultipartFile userProfileImage
-  ) {
+        log.info("PUT /api/users/{}", userId);
+        return ResponseEntity.ok(userService.update(userId, userRequest, userProfileImage));
+    }
 
-    log.info("PUT /api/users/{}", userId);
-    return ResponseEntity.ok(
-        CustomApiResponse.success(userService.update(userId, userRequest, userProfileImage))
-    );
-  }
+    @DeleteMapping("/{userId}")
+    @Override
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        userService.deleteById(userId);
 
-  @DeleteMapping("/{userId}")
-  @Override
-  public ResponseEntity<CustomApiResponse<Void>> deleteUser(@PathVariable UUID userId) {
-    userService.deleteById(userId);
+        log.info("DELETE /api/users/{}", userId);
+        return ResponseEntity.noContent().build();
+    }
 
-    log.info("DELETE /api/users/{}", userId);
-    return ResponseEntity.ok(CustomApiResponse.success("User deleted successfully"));
-  }
-
-  @PutMapping("/{userId}/userStatus")
-  @Override
-  public ResponseEntity<CustomApiResponse<UserStatusResponse>> updateUserStatus(
-      @PathVariable UUID userId,
-      @Valid @RequestBody UserStatusRequest.Update request
-  ) {
-    return ResponseEntity.ok(
-        CustomApiResponse.success(userStatusService.updateByUserId(userId, request))
-    );
-  }
+    @PatchMapping("/{userId}/userStatus")
+    @Override
+    public ResponseEntity<UserStatusResponse> updateUserStatus(
+        @PathVariable UUID userId,
+        @Valid @RequestBody UserStatusRequest.Update request
+    ) {
+        return ResponseEntity.ok(userStatusService.updateByUserId(userId, request));
+    }
 
 }

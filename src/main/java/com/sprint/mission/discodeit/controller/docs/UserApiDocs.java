@@ -17,49 +17,49 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "User API", description = "User 관련 API")
 public interface UserApiDocs {
 
-  @Operation(summary = "모든 유저 정보", description = "모든 유저 정보 가져오기")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "모든 유저 정보 가져오기 성공"),
-      @ApiResponse(responseCode = "400", description = "모든 유저 정보 가져오기 실패")
-  })
-  ResponseEntity<CustomApiResponse<List<UserResponse>>> getAllUser();
+    @Operation(summary = "모든 유저 정보", description = "모든 유저 정보 가져오기")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "모든 유저 정보 가져오기 성공"),
+        @ApiResponse(responseCode = "400", description = "모든 유저 정보 가져오기 실패")
+    })
+    ResponseEntity<List<UserResponse>> getAllUser();
 
-  @Operation(summary = "유저 생성", description = "유저 생성하기")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "유저 생성 성공"),
-      @ApiResponse(responseCode = "400", description = "유저 생성 실패")
-  })
-  ResponseEntity<CustomApiResponse<UserResponse>> createUser(
-      UserRequest.Create userRequest,
-      MultipartFile userProfileImage
-  );
+    @Operation(summary = "유저 생성", description = "유저 생성하기")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "유저 생성 성공"),
+        @ApiResponse(responseCode = "400", description = "유저 생성 실패")
+    })
+    ResponseEntity<UserResponse> createUser(
+        UserRequest.Create userRequest,
+        MultipartFile userProfileImage
+    );
 
-  @Operation(summary = "유저 정보 수정", description = "유저 정보 수정하기")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "유저 정보 수정 성공"),
-      @ApiResponse(responseCode = "400", description = "유저 정보 수정 실패"),
-      @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않습니다.")
-  })
-  ResponseEntity<CustomApiResponse<UserResponse>> updateUser(
-      UUID userId,
-      UserRequest.Update userRequest,
-      MultipartFile userProfileImage
-  );
+    @Operation(summary = "유저 정보 수정", description = "유저 정보 수정하기")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "유저 정보 수정 성공"),
+        @ApiResponse(responseCode = "400", description = "유저 정보 수정 실패"),
+        @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않습니다.")
+    })
+    ResponseEntity<UserResponse> updateUser(
+        UUID userId,
+        UserRequest.Update userRequest,
+        MultipartFile userProfileImage
+    );
 
-  @Operation(summary = "유저 삭제", description = "유저 삭제 수정하기")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "유저 삭제 성공"),
-      @ApiResponse(responseCode = "400", description = "유저 삭제 실패"),
-  })
-  ResponseEntity<CustomApiResponse<Void>> deleteUser(UUID userId);
+    @Operation(summary = "유저 삭제", description = "유저 삭제 수정하기")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "유저 삭제 성공"),
+        @ApiResponse(responseCode = "400", description = "유저 삭제 실패"),
+    })
+    ResponseEntity<Void> deleteUser(UUID userId);
 
-  @Operation(summary = "유저 상태 업데이트", description = "유저 상태 업데이트(online or offline)")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "유저 상태 업데이트 성공"),
-      @ApiResponse(responseCode = "400", description = "유저 상태 업데이트 실패, 잘못된 요청입니다."),
-      @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않습니다.")
-  })
-  ResponseEntity<CustomApiResponse<UserStatusResponse>> updateUserStatus(UUID userId,
-      UserStatusRequest.Update request);
+    @Operation(summary = "유저 상태 업데이트", description = "유저 상태 업데이트(online or offline)")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "유저 상태 업데이트 성공"),
+        @ApiResponse(responseCode = "400", description = "유저 상태 업데이트 실패, 잘못된 요청입니다."),
+        @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않습니다.")
+    })
+    ResponseEntity<UserStatusResponse> updateUserStatus(UUID userId,
+        UserStatusRequest.Update request);
 
 }

@@ -22,6 +22,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -41,93 +42,103 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicMassageService implements MessageService {
 
-  private final MessageRepository messageRepository;
-  private final MessageMapper messageMapper;
-  private final UserRepository userRepository;
-  private final ChannelRepository channelRepository;
-  private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentStorage binaryContentStorage;
+    private final MessageRepository messageRepository;
+    private final MessageMapper messageMapper;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
-  @Override
-  @Transactional
-  public MessageResponse createMessage(MessageRequest.Create request,
-      List<MultipartFile> messageFiles) {
+    @Override
+    @Transactional
+    public MessageResponse createMessage(MessageRequest.Create request,
+        List<MultipartFile> messageFiles) {
 
-    UUID userId = request.getUserId();
-    UUID channelId = request.getChannelId();
+        UUID userId = request.getAuthorId();
+        UUID channelId = request.getChannelId();
 
-    User user = userRepository.findById(userId).orElseThrow(() ->
-        new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
+        User user = userRepository.findById(userId).orElseThrow(() ->
+            new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
 
-    Channel channel = channelRepository.findById(channelId).orElseThrow(() ->
-        new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
+        Channel channel = channelRepository.findById(channelId).orElseThrow(() ->
+            new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId)));
 
-    Message message = Message.createMessage(request.getContent(), channel, user);
-    Optional.ofNullable(messageFiles).ifPresent(files ->
-        files.forEach(file -> {
-              BinaryContent binaryContent = binaryContentRepository.save(
-                  BinaryContent.createBinaryContent(
-                      file.getOriginalFilename(),
-                      file.getSize(),
-                      file.getContentType()));
-              binaryContentStorage.put(binaryContent.getId(), convertToBytes(file));
-              message.insertAttachments(binaryContent);
-            }
-        )
-    );
-    messageRepository.save(message);
+        Message message = Message.createMessage(request.getContent(), channel, user);
+        Optional.ofNullable(messageFiles).ifPresent(files ->
+            files.forEach(file -> {
+                    BinaryContent binaryContent = binaryContentRepository.save(
+                        BinaryContent.createBinaryContent(
+                            file.getOriginalFilename(),
+                            file.getSize(),
+                            file.getContentType()));
+                    binaryContentStorage.put(binaryContent.getId(), convertToBytes(file));
+                    message.insertAttachments(binaryContent);
+                }
+            )
+        );
+        messageRepository.save(message);
 
-    log.info("Created message - id: {}", message.getId());
-    return messageMapper.entityToDto(message);
-  }
-
-  @Override
-  public PageResponse<MessageResponse> findAllByChannelId(UUID channelId) {
-    channelRepository.findById(channelId).orElseThrow(() ->
-        new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
-
-    Pageable pageable = PageRequest.of(0, 50, Sort.by("createdAt").descending());
-    Slice<Message> slice = messageRepository.findAllByChannelId(channelId, pageable);
-    Slice<MessageResponse> responseSlice = slice.map(messageMapper::entityToDto);
-
-    return PageResponseMapper.fromSlice(responseSlice);
-  }
-
-  @Override
-  public MessageResponse findById(UUID id) {
-    return messageMapper.entityToDto(findByIdOrThrow(id));
-  }
-
-  @Override
-  @Transactional
-  public MessageResponse update(UUID id, MessageRequest.Update request) {
-    Message message = findByIdOrThrow(id);
-    message.updateContent(request.getNewContent());
-    messageRepository.save(message);
-
-    log.info("Updated message - id: {}", message.getId());
-    return messageMapper.entityToDto(message);
-  }
-
-  @Override
-  public void deleteById(UUID id) {
-    findByIdOrThrow(id);
-    messageRepository.deleteById(id);
-    log.info("Deleted message - id: {}", id);
-  }
-
-  private Message findByIdOrThrow(UUID id) {
-    return messageRepository.findById(id)
-        .orElseThrow(
-            () -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("id", id)));
-  }
-
-  private byte[] convertToBytes(MultipartFile imageFile) {
-    try {
-      return imageFile.getBytes();
-    } catch (IOException e) {
-      throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR,
-          Map.of("fileName", imageFile.getOriginalFilename()));
+        log.info("Created message - id: {}", message.getId());
+        return messageMapper.entityToDto(message);
     }
-  }
+
+    @Override
+    public PageResponse<MessageResponse> findAllByChannelId(UUID channelId, Instant createdAt,
+        Pageable pageable) {
+        channelRepository.findById(channelId).orElseThrow(() ->
+            new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId)));
+
+//        Pageable pageable = PageRequest.of(0, 50, Sort.by("createdAt").descending());
+        Slice<Message> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+            Optional.ofNullable(createdAt).orElse(Instant.now()), pageable);
+        Slice<MessageResponse> responseSlice = slice.map(messageMapper::entityToDto);
+
+        Instant nextCursor = null;
+        if (!slice.getContent().isEmpty()) {
+            nextCursor = slice.getContent().get(slice.getContent().size() - 1)
+                .getCreatedAt();
+        }
+
+        return PageResponseMapper.fromSlice(responseSlice, nextCursor);
+    }
+
+    @Override
+    public MessageResponse findById(UUID id) {
+        return messageMapper.entityToDto(findByIdOrThrow(id));
+    }
+
+    @Override
+    @Transactional
+    public MessageResponse update(UUID id, MessageRequest.Update request) {
+        Message message = findByIdOrThrow(id);
+        message.updateContent(request.getNewContent());
+        messageRepository.save(message);
+
+        log.info("Updated message - id: {}", message.getId());
+        return messageMapper.entityToDto(message);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        findByIdOrThrow(id);
+        messageRepository.deleteById(id);
+        log.info("Deleted message - id: {}", id);
+    }
+
+    private Message findByIdOrThrow(UUID id) {
+        return messageRepository.findById(id)
+            .orElseThrow(
+                () -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("id", id)));
+    }
+
+    private byte[] convertToBytes(MultipartFile imageFile) {
+        try {
+            return imageFile.getBytes();
+        } catch (IOException e) {
+            throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR,
+                Map.of("fileName", imageFile.getOriginalFilename()));
+        }
+    }
 }
