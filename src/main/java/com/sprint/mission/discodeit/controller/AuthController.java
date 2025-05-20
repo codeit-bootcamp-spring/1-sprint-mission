@@ -5,9 +5,13 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,5 +34,15 @@ public class AuthController implements AuthApi {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(user);
+  }
+
+  @GetMapping(path = "csrf-token")
+  public ResponseEntity<Map<String,String>>getCsrfToken(CsrfToken csrfToken){
+    Map<String,String> token = new HashMap<>();
+    token.put("headerName", csrfToken.getHeaderName());
+    token.put("parameterName", csrfToken.getParameterName());
+    token.put("token", csrfToken.getToken());
+
+    return ResponseEntity.ok(token);
   }
 }
