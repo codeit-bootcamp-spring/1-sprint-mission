@@ -22,12 +22,12 @@ public class Channel extends BaseUpdatableEntity {      // 채널 (게시판)
   @Column(name = "type", nullable = false)
   private ChannelType type;   // 채널 타입 (공개/비공개)
 
-  @Column(length = 100)
+  @Column(name = "name", length = 100)
   private String name;    // 채널 이름
 
-  @Column(length = 500)
+  @Column(name = "description", length = 500)
   private String description;   // 채널 설명
-  
+
   // 채널 수정
   public void update(String newName, String newDescription) {
     if (newName != null && !newName.equals(this.name)) {

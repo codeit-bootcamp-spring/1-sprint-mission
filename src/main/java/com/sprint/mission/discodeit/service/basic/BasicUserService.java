@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor  // 사용 시 필수 필드에 private final 필수
 public class BasicUserService implements UserService {
 
@@ -36,18 +37,20 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  @Transactional
   public UserDto create(CreateUserRequest userRequest,
       Optional<CreateBinaryContentRequest> profileRequest) {
+
+    log.debug("사용자 생성 시작: {}", userRequest);
+
     String username = userRequest.username();
     String email = userRequest.email();
     String password = userRequest.password();
 
     if (userRepository.existsByEmail(email)) {
-      throw new UserAlreadyExistException("email", email);
+      throw UserAlreadyExistException.withEmail(email);
     }
     if (userRepository.existsByUsername(username)) {
-      throw new UserAlreadyExistException("username", username);
+      throw UserAlreadyExistException.withUsername(username);
     }
 
     BinaryContent profile = convertToBinaryContent(profileRequest);
@@ -56,58 +59,84 @@ public class BasicUserService implements UserService {
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
 
-    userStatusRepository.save(userStatus);
     userRepository.save(user);
+
+    log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
+
     return userMapper.toDto(user);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserDto find(UUID userId) {
-    return userRepository.findById(userId)
+
+    log.debug("사용자 조회 시작: id={}", userId);
+
+    UserDto userDto = userRepository.findById(userId)
         .map(userMapper::toDto)
-        .orElseThrow(() -> new UserNotFoundException(userId));
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
+
+    log.info("사용자 조회 완료: id={}", userId);
+
+    return userDto;
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserDto> findAll() {
-    return userRepository.findAllWithProfileAndStatus().stream()
+
+    log.debug("모든 사용자 조회 시작");
+
+    List<UserDto> userDtos = userRepository.findAllWithProfileAndStatus().stream()
         .map(userMapper::toDto)
         .toList();
+
+    log.info("모든 사용자 조회 완료: count={}", userDtos.size());
+
+    return userDtos;
   }
 
   @Override
-  @Transactional
   public UserDto update(UUID userId, UpdateUserRequest userRequest,
       Optional<CreateBinaryContentRequest> profileRequest) {
+
+    log.debug("사용자 수정 시작: id={}, request={}", userId, userRequest);
+
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(userId));
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
 
     String newUsername = userRequest.newUsername();
     String newEmail = userRequest.newEmail();
     String newPassword = userRequest.newPassword();
 
     if (userRepository.existsByEmail(newEmail)) {
-      throw new UserAlreadyExistException("email", newEmail);
+      throw UserAlreadyExistException.withEmail(newEmail);
     }
     if (userRepository.existsByUsername(newUsername)) {
-      throw new UserAlreadyExistException("username", newUsername);
+      throw UserAlreadyExistException.withUsername(newUsername);
     }
 
     BinaryContent profile = convertToBinaryContent(profileRequest);
 
     user.update(newUsername, newEmail, newPassword, profile);
 
+    log.info("사용자 수정 완료: id={}", userId);
+
     return userMapper.toDto(user);
   }
 
   @Override
-  @Transactional
   public void delete(UUID userId) {
+
+    log.debug("사용자 삭제 시작: id={}", userId);
+
     if (!userRepository.existsById(userId)) {
-      throw new UserNotFoundException(userId);
+      throw UserNotFoundException.withId(userId);
     }
 
     userRepository.deleteById(userId);
+
+    log.info("사용자 삭제 완료: id={}", userId);
   }
 
 

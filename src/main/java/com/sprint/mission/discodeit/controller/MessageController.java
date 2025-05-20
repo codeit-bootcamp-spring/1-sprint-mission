@@ -46,13 +46,11 @@ public class MessageController implements MessageApi {
       @Valid @RequestPart(value = "CreateMessageRequest") CreateMessageRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-    log.info("Message 생성 요청 : content={}", request.content());
-
+    log.info("메시지 생성 요청 : request={}, attachmentCount={}", request, attachments.size());
     List<CreateBinaryContentRequest> attachmentRequests = BinaryContentUtil.convertToBinaryContentRequests(
         attachments);
     MessageDto messageDto = messageService.create(request, attachmentRequests);
-
-    log.info("Message 생성 성공 : messageId={}", messageDto.id());
+    log.info("메시지 생성 응답 : {}", messageDto);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -65,11 +63,9 @@ public class MessageController implements MessageApi {
       @PathVariable("messageId") UUID messageId,
       @RequestBody UpdateMessageRequest request) {
 
-    log.info("Message 수정 요청 : messageId={}", messageId);
-
+    log.info("Message 수정 요청 : id={}, request={}", messageId, request);
     MessageDto messageDto = messageService.update(messageId, request);
-
-    log.info("Message 수정 성공 : messageId={}", messageId);
+    log.info("Message 수정 응답 : {}", messageDto);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -80,11 +76,9 @@ public class MessageController implements MessageApi {
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
 
-    log.info("Message 삭제 요청 : messageId={}", messageId);
-
+    log.info("메시지 삭제 요청 : id={}", messageId);
     messageService.delete(messageId);
-
-    log.info("Message 삭제 성공 : messageId={}", messageId);
+    log.info("Message 삭제 완료");
 
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -99,12 +93,14 @@ public class MessageController implements MessageApi {
       @PageableDefault(
           size = 50,
           page = 0,
-          sort = "createAt",
+          sort = "createdAt",
           direction = Direction.DESC
       ) Pageable pageable) {
 
+    log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}", channelId, cursor, pageable);
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);
+    log.debug("채널별 메시지 목록 조회 응답: totalElements={}", messages.totalElements());
 
     return ResponseEntity
         .status(HttpStatus.OK)

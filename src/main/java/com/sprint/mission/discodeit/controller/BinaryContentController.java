@@ -30,7 +30,9 @@ public class BinaryContentController implements BinaryContentApi {
   public ResponseEntity<BinaryContentDto> find(
       @PathVariable("binaryContentId") UUID binaryContentId) {
 
+    log.info("바이너리 컨텐츠 조회 요청: id={}", binaryContentId);
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+    log.debug("바이너리 컨텐츠 조회 응답: {}", binaryContentDto);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -42,7 +44,9 @@ public class BinaryContentController implements BinaryContentApi {
   public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
 
+    log.info("바이너리 컨텐츠 목록 조회 요청: ids={}, count={}", binaryContentIds, binaryContentIds.size());
     List<BinaryContentDto> binaryContentDtos = binaryContentService.findAllByIdIn(binaryContentIds);
+    log.debug("바이너리 컨텐츠 목록 조회 응답: count={}", binaryContentDtos.size());
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -54,12 +58,12 @@ public class BinaryContentController implements BinaryContentApi {
   public ResponseEntity<?> download(
       @PathVariable("binaryContentId") UUID binaryContentId) {
 
-    log.info("BinaryContent 다운로드 요청 : binaryContentId={}", binaryContentId);
-
+    log.info("바이너리 컨텐츠 다운로드 요청 : id={}", binaryContentId);
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+    ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
+    log.info("바이너리 컨텐츠 다운로드 응답 : contentType={}, contentLength={}",
+        response.getHeaders().getContentType(), response.getHeaders().getContentLength());
 
-    log.info("BinaryContent 다운로드 성공 : fileName={}", binaryContentDto.fileName());
-
-    return binaryContentStorage.download(binaryContentDto);
+    return response;
   }
 }

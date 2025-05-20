@@ -46,3 +46,19 @@ bin/
 
 ### data ###
 /data/
+
+### Discodeit ###
+.discodeit
+
+### env ###
+*.env
+
+### 숨김 파일 ###
+.*
+!.gitignore
+
+### Github Actions ###
+!.github/
+
+### log ###
+/logs

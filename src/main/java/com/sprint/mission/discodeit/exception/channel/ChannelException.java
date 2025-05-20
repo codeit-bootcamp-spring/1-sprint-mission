@@ -6,8 +6,11 @@ import java.util.Map;
 
 public class ChannelException extends DiscodeitException {
 
-  public ChannelException(ErrorCode errorCode,
-      Map<String, Object> detail) {
-    super(errorCode, detail);
+  public ChannelException(ErrorCode errorCode) {
+    super(errorCode);
+  }
+
+  public ChannelException(ErrorCode errorCode, Throwable cause) {
+    super(errorCode, cause);
   }
 }

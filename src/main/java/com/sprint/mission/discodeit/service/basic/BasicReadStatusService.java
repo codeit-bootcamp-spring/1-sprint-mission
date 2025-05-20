@@ -19,10 +19,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 
@@ -32,57 +35,87 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusMapper readStatusMapper;
 
   @Override
-  @Transactional
   public ReadStatusDto create(CreateReadStatusRequest request) {
+
+    log.debug("읽음 상태 생성 시작: userId={}, channelId={}", request.userId(), request.channelId());
+
     UUID userId = request.userId();
     UUID channelId = request.channelId();
 
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(userId));
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new ChannelNotFoundException(channelId));
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
 
     if (readStatusRepository.existsByUserIdAndChannelId(userId, channelId)) {
-      throw new ReadStatusAlreadyExistException(userId, channelId);
+      throw ReadStatusAlreadyExistException.withUserIdAndChannelId(userId, channelId);
     }
 
     Instant lastReadAt = request.lastReadAt();
     ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
     readStatusRepository.save(readStatus);
 
+    log.info("읽음 상태 생성 완료: id={}, userId={}, channelId={}",
+        readStatus.getId(), readStatus.getUser().getId(), readStatus.getChannel().getId());
+
     return readStatusMapper.toDto(readStatus);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ReadStatusDto find(UUID readStatusId) {
-    return readStatusRepository.findById(readStatusId)
+
+    log.debug("읽음 상태 조회 시작: id={}", readStatusId);
+
+    ReadStatusDto readStatusDto = readStatusRepository.findById(readStatusId)
         .map(readStatusMapper::toDto)
-        .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
+        .orElseThrow(() -> ReadStatusNotFoundException.withId(readStatusId));
+
+    log.info("읽음 상태 조회 완료: id={}", readStatusId);
+
+    return readStatusDto;
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ReadStatusDto> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId).stream()
+
+    log.debug("사용자별 읽음 상태 목록 조회 시작: userId={}", userId);
+
+    List<ReadStatusDto> readStatusDtos = readStatusRepository.findAllByUserId(userId).stream()
         .map(readStatusMapper::toDto)
         .toList();
+
+    log.info("사용자별 읽음 상태 목록 조회 완료: userId={}, 조회된 항목 수={}", userId, readStatusDtos.size());
+
+    return readStatusDtos;
   }
 
   @Override
-  @Transactional
   public ReadStatusDto update(UUID readStatusId, UpdateReadStatusRequest request) {
+
+    log.debug("읽음 상태 수정 시작: id={}, newLastReadAt={}", readStatusId, request.newLastReadAt());
+
     Instant newLastReadAt = request.newLastReadAt();
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
+        .orElseThrow(() -> ReadStatusNotFoundException.withId(readStatusId));
     readStatus.update(newLastReadAt);
+
+    log.info("읽음 상태 수정 완료: id={}", readStatusId);
+
     return readStatusMapper.toDto(readStatus);
   }
 
   @Override
-  @Transactional
   public void delete(UUID readStatusId) {
+
+    log.debug("읽음 상태 삭제 시작: id={}", readStatusId);
+
     if (!readStatusRepository.existsById(readStatusId)) {
-      throw new ReadStatusNotFoundException(readStatusId);
+      throw ReadStatusNotFoundException.withId(readStatusId);
     }
     readStatusRepository.deleteById(readStatusId);
+
+    log.info("읽음 상태 삭제 완료: id={}", readStatusId);
   }
 }

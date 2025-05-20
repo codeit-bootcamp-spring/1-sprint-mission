@@ -1,0 +1,60 @@
+2025-05-20 14:07:14:085 [35m[background-preinit][0;39m [34m[INFO ][0;39m o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final 
+2025-05-20 14:07:14:165 [35m[Test worker][0;39m [34m[INFO ][0;39m c.s.m.d.DiscodeitApplicationTests - Starting DiscodeitApplicationTests using Java 17.0.11 with PID 39808 (started by tjdwl in C:\Source\1-sprint-mission) 
+2025-05-20 14:07:14:165 [35m[Test worker][0;39m [39m[DEBUG][0;39m c.s.m.d.DiscodeitApplicationTests - Running with Spring Boot v3.4.0, Spring v6.2.0 
+2025-05-20 14:07:14:165 [35m[Test worker][0;39m [34m[INFO ][0;39m c.s.m.d.DiscodeitApplicationTests - The following 1 profile is active: "dev" 
+2025-05-20 14:07:18:365 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. 
+2025-05-20 14:07:18:761 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 332 ms. Found 6 JPA repository interfaces. 
+2025-05-20 14:07:20:769 [35m[Test worker][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting... 
+2025-05-20 14:07:21:558 [35m[Test worker][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3f321f8 
+2025-05-20 14:07:21:566 [35m[Test worker][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed. 
+2025-05-20 14:07:21:845 [35m[Test worker][0;39m [34m[INFO ][0;39m o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default] 
+2025-05-20 14:07:22:095 [35m[Test worker][0;39m [34m[INFO ][0;39m org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.2.Final 
+2025-05-20 14:07:22:245 [35m[Test worker][0;39m [34m[INFO ][0;39m o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled 
+2025-05-20 14:07:23:317 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer 
+2025-05-20 14:07:23:690 [35m[Test worker][0;39m [34m[INFO ][0;39m o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown 
+2025-05-20 14:07:26:445 [35m[Test worker][0;39m [34m[INFO ][0;39m o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration) 
+2025-05-20 14:07:26:568 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' 
+2025-05-20 14:07:27:386 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used. 
+2025-05-20 14:07:30:880 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html] 
+2025-05-20 14:07:33:877 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator' 
+2025-05-20 14:07:34:145 [35m[Test worker][0;39m [34m[INFO ][0;39m c.s.m.d.DiscodeitApplicationTests - Started DiscodeitApplicationTests in 21.498 seconds (process running for 26.548) 
+2025-05-20 14:07:35:243 [35m[SpringApplicationShutdownHook][0;39m [34m[INFO ][0;39m o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default' 
+2025-05-20 14:07:35:257 [35m[SpringApplicationShutdownHook][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated... 
+2025-05-20 14:07:36:243 [35m[SpringApplicationShutdownHook][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed. 
+2025-05-20 14:10:23:480 [35m[background-preinit][0;39m [34m[INFO ][0;39m o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final 
+2025-05-20 14:10:23:660 [35m[Test worker][0;39m [34m[INFO ][0;39m c.s.m.d.DiscodeitApplicationTests - Starting DiscodeitApplicationTests using Java 17.0.11 with PID 31948 (started by tjdwl in C:\Source\1-sprint-mission) 
+2025-05-20 14:10:23:666 [35m[Test worker][0;39m [39m[DEBUG][0;39m c.s.m.d.DiscodeitApplicationTests - Running with Spring Boot v3.4.0, Spring v6.2.0 
+2025-05-20 14:10:23:666 [35m[Test worker][0;39m [34m[INFO ][0;39m c.s.m.d.DiscodeitApplicationTests - The following 1 profile is active: "dev" 
+2025-05-20 14:10:27:020 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode. 
+2025-05-20 14:10:27:304 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 256 ms. Found 6 JPA repository interfaces. 
+2025-05-20 14:10:28:616 [35m[Test worker][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting... 
+2025-05-20 14:10:29:223 [35m[Test worker][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@cfe4f8c 
+2025-05-20 14:10:29:236 [35m[Test worker][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed. 
+2025-05-20 14:10:29:565 [35m[Test worker][0;39m [34m[INFO ][0;39m o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default] 
+2025-05-20 14:10:29:760 [35m[Test worker][0;39m [34m[INFO ][0;39m org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.2.Final 
+2025-05-20 14:10:29:890 [35m[Test worker][0;39m [34m[INFO ][0;39m o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled 
+2025-05-20 14:10:31:050 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer 
+2025-05-20 14:10:31:335 [35m[Test worker][0;39m [34m[INFO ][0;39m o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown 
+2025-05-20 14:10:34:094 [35m[Test worker][0;39m [34m[INFO ][0;39m o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration) 
+2025-05-20 14:10:34:200 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default' 
+2025-05-20 14:10:35:194 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used. 
+2025-05-20 14:10:38:357 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html] 
+2025-05-20 14:10:41:562 [35m[Test worker][0;39m [34m[INFO ][0;39m o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator' 
+2025-05-20 14:10:41:911 [35m[Test worker][0;39m [34m[INFO ][0;39m c.s.m.d.DiscodeitApplicationTests - Started DiscodeitApplicationTests in 19.458 seconds (process running for 23.81) 
+2025-05-20 14:10:42:910 [35m[SpringApplicationShutdownHook][0;39m [34m[INFO ][0;39m o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default' 
+2025-05-20 14:10:42:910 [35m[SpringApplicationShutdownHook][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated... 
+2025-05-20 14:10:43:769 [35m[SpringApplicationShutdownHook][0;39m [34m[INFO ][0;39m com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed. 
