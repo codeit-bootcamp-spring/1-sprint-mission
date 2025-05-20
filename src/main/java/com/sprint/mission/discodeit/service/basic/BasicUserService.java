@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +36,8 @@ public class BasicUserService implements UserService {
   private final BinaryContentService binaryContentService;
   private final BinaryContentRepository binaryContentRepository;
 
+  private final PasswordEncoder passwordEncoder;
+
   @Override
   @Transactional
   public UserDto create(UserCreateRequest userRequest, MultipartFile file) {
@@ -47,7 +50,11 @@ public class BasicUserService implements UserService {
         .flatMap(dto -> binaryContentRepository.findById(dto.id()))
         .orElse(null);
 
-    User user = new User(userRequest.username(), userRequest.email(), userRequest.password(), profile);
+    User user = new User(
+        userRequest.username(),
+        userRequest.email(),
+        passwordEncoder.encode(userRequest.password()),
+        profile);
     User savedUser = userRepository.save(user);
     log.info("User entity saved: id = {}", savedUser.getId());
 
@@ -102,7 +109,7 @@ public class BasicUserService implements UserService {
       log.info("User entity updated - email changed: id = {}", user.getId());
     }
     if (userUpdateRequest.newPassword() != null && !userUpdateRequest.newPassword().isBlank()) {
-      user.updatePassword(userUpdateRequest.newPassword());
+      user.updatePassword(userUpdateRequest.newPassword(), passwordEncoder);
       log.info("User entity updated - password changed: id = {}", user.getId());
     }
     if (profile != null) {

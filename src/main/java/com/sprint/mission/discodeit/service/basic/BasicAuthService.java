@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +20,8 @@ public class BasicAuthService implements AuthService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
 
+  private final PasswordEncoder passwordEncoder;
+
   @Override
   public UserDto login(LoginRequest request) {
     User user = userRepository.findByUsername(request.username())
@@ -27,7 +30,7 @@ public class BasicAuthService implements AuthService {
             Map.of("username", request.username())
         ));
 
-    if (!user.isSamePassword(request.password())) {
+    if (!user.isSamePassword(request.password(), passwordEncoder)) {
       throw new InvalidCredentialsException(
           ErrorCode.INVALID_CREDENTIALS,
           Map.of("username", request.username())

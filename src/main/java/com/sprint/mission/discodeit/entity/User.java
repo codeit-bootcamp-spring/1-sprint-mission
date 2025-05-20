@@ -17,7 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "users")
@@ -46,9 +46,7 @@ public class User extends BaseUpdatableEntity {
   public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
-    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-    this.password = Base64.getEncoder()
-        .encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+    this.password = password;
 
     this.profile = profile;
     this.status = new UserStatus(this, Instant.now());
@@ -72,21 +70,14 @@ public class User extends BaseUpdatableEntity {
     }
   }
 
-  public void updatePassword(String newPassword) {
-    String decodedPassword = new String(Base64.getDecoder().decode(this.password),
-        StandardCharsets.UTF_8);
-    if (BCrypt.checkpw(newPassword, decodedPassword)) {
-      return;
+  public void updatePassword(String newPassword, PasswordEncoder encoder) {
+    if (!encoder.matches(newPassword, this.password)) {
+      this.password = encoder.encode(password);
     }
-    String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-    this.password = Base64.getEncoder()
-        .encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
   }
 
-  public boolean isSamePassword(String password) {
-    String decodedPassword = new String(Base64.getDecoder().decode(this.password),
-        StandardCharsets.UTF_8);
-    return BCrypt.checkpw(password, decodedPassword);
+  public boolean isSamePassword(String password, PasswordEncoder encoder) {
+    return encoder.matches(password, this.password);
   }
 
   public void validateDuplicateName(String name) {
