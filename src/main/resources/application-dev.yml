@@ -23,7 +23,7 @@ logging:
     rollingpolicy:
       max-history: 30
   level:
-    root: debug
+    root: info
     org.springframework.security.web.FilterChainProxy: TRACE
 
 management:
