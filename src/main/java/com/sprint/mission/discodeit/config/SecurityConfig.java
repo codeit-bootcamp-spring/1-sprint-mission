@@ -13,6 +13,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -65,7 +66,6 @@ public class SecurityConfig {
     return filter;
   }
 
-  // 수정해야 한다
   @Bean
   SecurityFilterChain chain(
       HttpSecurity http,
@@ -85,16 +85,24 @@ public class SecurityConfig {
         .securityContext(context -> context
             .securityContextRepository(securityContextRepository)
         )
+        // h2-console 설정
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers("/h2-console/**")) // CSRF 무시
+        .headers(headers -> headers
+            .frameOptions(
+                FrameOptionsConfig::sameOrigin)) // X-Frame-Options 를 SAMEORIGIN 설정 (H2 콘솔 프레임 허용)
         // URL 별 접근 권한 설정
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
             .requestMatchers(
                 "/",
+                "/h2-console/**",
                 "/api/auth/login",
                 "/api/auth/csrf-token",
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
                 "/actuator/**").permitAll()
+            .anyRequest().authenticated()
         )
         // 기본 로그아웃 비활성화
         .logout(AbstractHttpConfigurer::disable);

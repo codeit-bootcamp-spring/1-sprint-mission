@@ -60,7 +60,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     try {
       // User 조회
       User user = userRepository.findByUsername(username)
-
           .orElseThrow(() -> new UserNotFoundException(Map.of("username", username)));
       UserDto userDto = userMapper.toDto(user);
 
