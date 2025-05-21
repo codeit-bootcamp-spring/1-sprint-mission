@@ -42,7 +42,7 @@ public class UserController implements UserApi {
   @Override
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(
-      @Valid @RequestPart("userRequest") UserCreateRequest request,
+      @Valid @RequestPart("userCreateRequest") UserCreateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
     log.info("사용자 생성 요청 : {}", request);
@@ -60,7 +60,7 @@ public class UserController implements UserApi {
   @PatchMapping(path = "{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @Valid @RequestPart("userRequest") UserUpdateRequest request,
+      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest request,
       @RequestPart("profile") MultipartFile profile) {
 
     log.info("사용자 수정 요청 : id={}, request={}", userId, request);
