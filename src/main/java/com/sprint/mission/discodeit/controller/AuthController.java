@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +41,17 @@ public class AuthController implements AuthApi {
   }
 
   @PostMapping(path = "/logout")
-  public ResponseEntity<Void> logout() {
-    
+  public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+
+    // 세션 무효화
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.invalidate();
+    }
+
+    // securityContext 초기화
+    SecurityContextHolder.clearContext();
+
+    return ResponseEntity.ok().build();
   }
 }
