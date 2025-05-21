@@ -1,5 +1,12 @@
 SET search_path TO public;
 
+CREATE TABLE IF NOT EXISTS persistent_logins (
+    username VARCHAR(64) NOT NULL,
+    series VARCHAR(64) PRIMARY KEY,
+    token VARCHAR(64) NOT NULL,
+    last_used timestamp with time zone NOT NULL
+);
+
 -- binary_contents 테이블 (파일 저장)
 CREATE TABLE IF NOT EXISTS binary_contents (
     id UUID PRIMARY KEY,
@@ -18,6 +25,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) NOT NULL,
     password VARCHAR(60) NOT NULL,
+    role VARCHAR(30) NOT NULL DEFAULT 'ROLE_USER',
     profile_id UUID,
     CONSTRAINT fk_users_profile FOREIGN KEY (profile_id) REFERENCES binary_contents(id) ON DELETE set null
 );
@@ -42,16 +50,6 @@ CREATE TABLE IF NOT EXISTS messages (
     author_id UUID,
     CONSTRAINT fk_messages_channel FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE,
     CONSTRAINT fk_messages_author FOREIGN KEY (author_id) REFERENCES "users"(id) ON DELETE SET NULL
-);
-
--- user_statuses 테이블 (사용자 상태 정보)
-CREATE TABLE IF NOT EXISTS user_statuses (
-    id UUID PRIMARY KEY,
-    created_at timestamp with time zone NOT NULL,
-    updated_at timestamp with time zone,
-    user_id UUID NOT NULL UNIQUE,
-    last_active_at timestamp with time zone NOT NULL,
-    CONSTRAINT fk_user_statuses_user FOREIGN KEY (user_id) REFERENCES "users"(id) ON DELETE CASCADE
 );
 
 -- read_statuses 테이블 (메시지 읽음 상태)

@@ -34,17 +34,16 @@ public abstract class UserMapper {
     return dto;
   }*/
 
-  @Autowired
-  protected BinaryContentMapper binaryContentMapper;
+    @Autowired
+    protected BinaryContentMapper binaryContentMapper;
 
-  @Mapping(source = "status.online", target = "online")
-  public abstract UserDto toDto(User entity);
+    public abstract UserDto toDto(User entity);
 
-  @AfterMapping
-  protected void initializeProfile(@MappingTarget UserDto dto, User entity) {
-    if (entity.getProfile() != null) {
-      Hibernate.initialize(entity.getProfile()); // Lazy 로딩된 필드 강제 초기화
-      dto.setProfile(binaryContentMapper.toDto(entity.getProfile()));
+    @AfterMapping
+    protected void initializeProfile(@MappingTarget UserDto dto, User entity) {
+        if (entity.getProfile() != null) {
+            Hibernate.initialize(entity.getProfile());
+            dto.setProfile(binaryContentMapper.toDto(entity.getProfile()));
+        }
     }
-  }
 }

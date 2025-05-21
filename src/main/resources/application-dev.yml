@@ -24,6 +24,10 @@ logging:
   level:
     root: info
     org.hibernate.sql: DEBUG
+    org.springframework.security.web.csrf: TRACE
+    org.springframework.security.web.session: debug
+    org.springframework.security.session: debug
+    org.springframework.security.core.session: debug
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.web: DEBUG
     org.springframework.web.servlet: DEBUG
@@ -31,7 +35,7 @@ logging:
 
 discodeit:
   storage:
-    type: ${STORAGE_TYPE:s3}
+    type: ${STORAGE_TYPE:local}
     s3:
       access-key: ${AWS_S3_ACCESS_KEY}
       secret-key: ${AWS_S3_SECRET_KEY}

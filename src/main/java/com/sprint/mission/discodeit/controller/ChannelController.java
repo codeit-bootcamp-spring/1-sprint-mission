@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,42 +21,45 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ChannelController implements ChannelApi {
 
-  private final ChannelService channelService;
+    private final ChannelService channelService;
 
-  @Override
-  @PostMapping("/public")
-  public ResponseEntity<ChannelDto> createChannel(
-      @Valid @RequestBody PublicChannelCreateRequestDto request) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(channelService.createPublicChannel(request));
-  }
+    @Override
+    @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
+    @PostMapping("/public")
+    public ResponseEntity<ChannelDto> createChannel(
+            @Valid @RequestBody PublicChannelCreateRequestDto request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(channelService.createPublicChannel(request));
+    }
 
-  @Override
-  @PostMapping("/private")
-  public ResponseEntity<ChannelDto> createChannel(
-      @Valid @RequestBody PrivateChannelCreateRequestDto request) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(channelService.createPrivateChannel(request));
-  }
+    @Override
+    @PostMapping("/private")
+    public ResponseEntity<ChannelDto> createChannel(
+            @Valid @RequestBody PrivateChannelCreateRequestDto request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(channelService.createPrivateChannel(request));
+    }
 
-  @Override
-  @PatchMapping("/{channelId}")
-  public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId,
-      @Valid @RequestBody ChannelUpdateRequestDto request) {
-    return ResponseEntity.ok(channelService.updateChannel(channelId, request));
-  }
+    @Override
+    @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
+    @PatchMapping("/{channelId}")
+    public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId,
+            @Valid @RequestBody ChannelUpdateRequestDto request) {
+        return ResponseEntity.ok(channelService.updateChannel(channelId, request));
+    }
 
-  @Override
-  @DeleteMapping("/{channelId}")
-  public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
-    channelService.deleteChannel(channelId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-  }
+    @Override
+    @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
+    @DeleteMapping("/{channelId}")
+    public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
+        channelService.deleteChannel(channelId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
-  @Override
-  @GetMapping
-  public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
-    List<ChannelDto> channels = channelService.findAllByUserId(userId);
-    return ResponseEntity.ok(channels);
-  }
+    @Override
+    @GetMapping
+    public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
+        List<ChannelDto> channels = channelService.findAllByUserId(userId);
+        return ResponseEntity.ok(channels);
+    }
 }
