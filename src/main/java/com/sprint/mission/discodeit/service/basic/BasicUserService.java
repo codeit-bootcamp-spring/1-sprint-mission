@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
@@ -140,6 +141,16 @@ public class BasicUserService implements UserService {
     log.info("사용자 삭제 완료: id={}", userId);
   }
 
+  @Override
+  public UserDto updateRole(RoleUpdateRequest request) {
+
+    User user = userRepository.findById(request.userId())
+        .orElseThrow(() -> UserNotFoundException.withId(request.userId()));
+
+    user.updateRole(request.newRole());
+
+    return userMapper.toDto(user);
+  }
 
   // Optional<CreateBinaryContentRequest> -> BinaryContent
   private BinaryContent convertToBinaryContent(

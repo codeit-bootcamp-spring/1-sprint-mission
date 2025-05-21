@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
@@ -26,4 +27,7 @@ public interface UserService {
 
   // 유저 삭제
   void delete(UUID userId);
+
+  // 유저 권한 수정
+  UserDto updateRole(RoleUpdateRequest request);
 }

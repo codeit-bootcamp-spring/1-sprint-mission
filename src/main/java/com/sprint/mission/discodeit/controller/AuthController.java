@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.AuthApi;
+import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -9,10 +12,13 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController implements AuthApi {
+
+  private final UserService userService;
 
   @GetMapping(path = "/csrf-token")
   public CsrfToken getCsrfToken(CsrfToken csrfToken) {
@@ -53,5 +61,14 @@ public class AuthController implements AuthApi {
     SecurityContextHolder.clearContext();
 
     return ResponseEntity.ok().build();
+  }
+
+  @PutMapping(path = "/role")
+  @PreAuthorize("hasRole('ADMIN')") // ROLE_ADMIN만 가능
+  public ResponseEntity<UserDto> updateRole(@RequestBody RoleUpdateRequest request) {
+
+    UserDto userDto = userService.updateRole(request);
+
+    return ResponseEntity.ok(userDto);
   }
 }

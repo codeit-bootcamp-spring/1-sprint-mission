@@ -8,7 +8,8 @@ CREATE TABLE users
     username   VARCHAR(50) UNIQUE       NOT NULL,
     email      VARCHAR(100) UNIQUE      NOT NULL,
     password   VARCHAR(60)              NOT NULL,
-    profile_id UUID
+    profile_id UUID,
+    role       VARCHAR(30)              NOT NULL
 );
 
 -- 채널 테이블 생성
