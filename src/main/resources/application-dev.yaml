@@ -20,6 +20,7 @@ logging:
     root: info
     com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
+    org.springframework.security: TRACE
 
 discodeit:
   storage:
