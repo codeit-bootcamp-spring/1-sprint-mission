@@ -27,5 +27,4 @@ public class AuthController {
   public ResponseEntity<UserDto> me() {
     return ResponseEntity.ok(authService.getUserBySession());
   }
-
 }

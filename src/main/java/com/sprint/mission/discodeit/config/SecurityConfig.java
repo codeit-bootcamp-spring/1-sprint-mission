@@ -5,9 +5,11 @@ import com.sprint.mission.discodeit.security.filter.CustomLoginFilter;
 import com.sprint.mission.discodeit.security.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.handler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -19,9 +21,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -67,7 +71,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  SecurityFilterChain chain(
+  public SecurityFilterChain chain(
       HttpSecurity http,
       CustomLoginFilter customLoginFilter,
       SecurityContextRepository securityContextRepository) throws Exception {
@@ -85,9 +89,12 @@ public class SecurityConfig {
         .securityContext(context -> context
             .securityContextRepository(securityContextRepository)
         )
-        // h2-console 설정
+        // CSRF 무시
         .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/h2-console/**")) // CSRF 무시
+            .ignoringRequestMatchers(
+                "/h2-console/**",
+                "/api/auth/logout")
+        )
         .headers(headers -> headers
             .frameOptions(
                 FrameOptionsConfig::sameOrigin)) // X-Frame-Options 를 SAMEORIGIN 설정 (H2 콘솔 프레임 허용)
@@ -104,8 +111,13 @@ public class SecurityConfig {
                 "/actuator/**").permitAll()
             .anyRequest().authenticated()
         )
-        // 기본 로그아웃 비활성화
-        .logout(AbstractHttpConfigurer::disable);
+        // 로그아웃
+        .logout(logout -> logout
+            .logoutUrl("/api/auth/logout")
+            .invalidateHttpSession(true) // 세션 무효화 처리
+            .clearAuthentication(true) // securityContext 초기화
+            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+        );
 
     http.addFilterAt(customLoginFilter, UsernamePasswordAuthenticationFilter.class);
 
