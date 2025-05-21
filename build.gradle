@@ -32,6 +32,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
     // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -53,6 +56,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {

@@ -13,3 +13,4 @@ logging: # Hibernate SQL 로그 설정
     com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug  # Hibernate가 실행하는 SQL 쿼리를 로그로 출력
     org.hibernate.orm.jdbc.bind: trace  # SQL에 바인딩된 실제 값을 출력 (? 대신 실제 값 보임)
+    org.springframework.security: trace # Spring Security 모듈의 로깅 레벨을 trace로 설정
