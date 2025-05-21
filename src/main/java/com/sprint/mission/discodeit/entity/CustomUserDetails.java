@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.Collection;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,16 +12,10 @@ public class CustomUserDetails implements UserDetails {
 
   private final User user;
 
-  public UUID getId() {
-    return user.getId();
-  }
-
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     // 사용자 권한 정보 반환
-    return user.getRoles().stream()
-        .map(role -> new SimpleGrantedAuthority(role.getName()))
-        .collect(Collectors.toList());
+    return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
   }
 
   @Override
@@ -34,23 +26,5 @@ public class CustomUserDetails implements UserDetails {
   @Override
   public String getUsername() {
     return user.getUsername();
-  }
-
-  // SessionRegistry 세션 찾기
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) { // 같은 객체인지
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    CustomUserDetails that = (CustomUserDetails) o;
-    return Objects.equals(this.getUsername(), that.getUsername()); // username 으로 실질적인 비교
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.getUsername());
   }
 }

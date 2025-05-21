@@ -15,17 +15,4 @@ public class AuthService {
   private final UserRepository userRepository;
   //
   private final BCryptPasswordEncoder passwordEncoder;
-
-  public User login(UserLoginRequest userLoginRequest) {
-
-    User existUser = userRepository.findAll().stream()
-        .filter(user -> user.getUsername().equals(userLoginRequest.username()))
-        .findAny()
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자입니다.")); // 전역 404
-
-    if (passwordEncoder.matches(userLoginRequest.password(), existUser.getPassword())) {
-      throw new IllegalArgumentException("비밀번호가 일치하지 않습니다."); // 전역 400
-    }
-    return existUser;
-  }
 }
