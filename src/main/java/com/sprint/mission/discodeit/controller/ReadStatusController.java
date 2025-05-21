@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
-import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -32,7 +32,7 @@ public class ReadStatusController implements ReadStatusApi {
   @Override
   @PostMapping
   public ResponseEntity<ReadStatusDto> create(
-      @Valid @RequestBody CreateReadStatusRequest request) {
+      @Valid @RequestBody ReadStatusCreateRequest request) {
 
     log.info("읽음 상태 생성 요청: {}", request);
     ReadStatusDto readStatusDto = readStatusService.create(request);
@@ -47,7 +47,7 @@ public class ReadStatusController implements ReadStatusApi {
   @PatchMapping(path = "{readStatusId}")
   public ResponseEntity<ReadStatusDto> update(
       @PathVariable("readStatusId") UUID readStatusId,
-      @Valid @RequestBody UpdateReadStatusRequest request) {
+      @Valid @RequestBody ReadStatusUpdateRequest request) {
 
     log.info("읽음 상태 수정 요청: id={}, request={}", readStatusId, request);
     ReadStatusDto readStatusDto = readStatusService.update(readStatusId, request);

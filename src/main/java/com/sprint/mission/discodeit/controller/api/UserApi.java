@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.userStatusDto.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -38,7 +38,7 @@ public interface UserApi {
       @Parameter(
           description = "User 생성 정보",
           content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
-      ) CreateUserRequest userRequest,
+      ) UserCreateRequest userRequest,
       @Parameter(
           description = "User 프로필 이미지",
           content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -62,7 +62,7 @@ public interface UserApi {
   })
   ResponseEntity<UserDto> update(
       @Parameter(description = "수정할 User ID") UUID userId,
-      @Parameter(description = "수정할 User 정보") UpdateUserRequest userRequest,
+      @Parameter(description = "수정할 User 정보") UserUpdateRequest userRequest,
       @Parameter(description = "수정할 User 프로필 이미지") MultipartFile profile
   );
 
@@ -104,6 +104,6 @@ public interface UserApi {
   })
   ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @Parameter(description = "상태를 변경할 User ID") UUID userId,
-      @Parameter(description = "변경할 User 온라인 상태 정보") UpdateUserStatusRequest request
+      @Parameter(description = "변경할 User 온라인 상태 정보") UserStatusUpdateRequest request
   );
 }

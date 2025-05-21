@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageApi;
-import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
@@ -43,11 +43,11 @@ public class MessageController implements MessageApi {
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
-      @Valid @RequestPart(value = "CreateMessageRequest") CreateMessageRequest request,
+      @Valid @RequestPart(value = "CreateMessageRequest") MessageCreateRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
     log.info("메시지 생성 요청 : request={}, attachmentCount={}", request, attachments.size());
-    List<CreateBinaryContentRequest> attachmentRequests = BinaryContentUtil.convertToBinaryContentRequests(
+    List<BinaryContentCreateRequest> attachmentRequests = BinaryContentUtil.convertToBinaryContentRequests(
         attachments);
     MessageDto messageDto = messageService.create(request, attachmentRequests);
     log.info("메시지 생성 응답 : {}", messageDto);
@@ -61,7 +61,7 @@ public class MessageController implements MessageApi {
   @PatchMapping(path = "{messageId}")
   public ResponseEntity<MessageDto> update(
       @PathVariable("messageId") UUID messageId,
-      @RequestBody UpdateMessageRequest request) {
+      @RequestBody MessageUpdateRequest request) {
 
     log.info("Message 수정 요청 : id={}, request={}", messageId, request);
     MessageDto messageDto = messageService.update(messageId, request);

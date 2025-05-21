@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -37,8 +37,8 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  public UserDto create(CreateUserRequest userRequest,
-      Optional<CreateBinaryContentRequest> profileRequest) {
+  public UserDto create(UserCreateRequest userRequest,
+      Optional<BinaryContentCreateRequest> profileRequest) {
 
     log.debug("사용자 생성 시작: {}", userRequest);
 
@@ -97,8 +97,8 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserDto update(UUID userId, UpdateUserRequest userRequest,
-      Optional<CreateBinaryContentRequest> profileRequest) {
+  public UserDto update(UUID userId, UserUpdateRequest userRequest,
+      Optional<BinaryContentCreateRequest> profileRequest) {
 
     log.debug("사용자 수정 시작: id={}, request={}", userId, userRequest);
 
@@ -142,7 +142,7 @@ public class BasicUserService implements UserService {
 
   // Optional<CreateBinaryContentRequest> -> BinaryContent
   private BinaryContent convertToBinaryContent(
-      Optional<CreateBinaryContentRequest> binaryContentRequest) {
+      Optional<BinaryContentCreateRequest> binaryContentRequest) {
     return binaryContentRequest
         .map(request -> {
           String fileName = request.fileName();

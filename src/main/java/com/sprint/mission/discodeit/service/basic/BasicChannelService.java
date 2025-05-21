@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
-import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
-import com.sprint.mission.discodeit.dto.channel.UpdatePublicChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -35,7 +35,7 @@ public class BasicChannelService implements ChannelService {
   private final ChannelMapper channelMapper;
 
   @Override
-  public ChannelDto create(CreatePublicChannelRequest request) {
+  public ChannelDto create(PublicChannelCreateRequest request) {
 
     log.debug("공개 채널 생성 시작: {}", request);
 
@@ -51,7 +51,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public ChannelDto create(CreatePrivateChannelRequest request) {
+  public ChannelDto create(PrivateChannelCreateRequest request) {
 
     log.debug("비공개 채널 생성 시작: {}", request);
 
@@ -92,7 +92,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public ChannelDto update(UUID channelId, UpdatePublicChannelRequest request) {
+  public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
 
     log.debug("채널 수정 시작: id={}, request={}", channelId, request);
 

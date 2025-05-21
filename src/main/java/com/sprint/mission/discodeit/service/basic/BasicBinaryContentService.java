@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
@@ -26,7 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  public BinaryContentDto create(CreateBinaryContentRequest request) {
+  public BinaryContentDto create(BinaryContentCreateRequest request) {
 
     log.debug("바이너리 컨텐츠 생성 시작 : fileName={}, size={}, contentType={}"
         , request.fileName(), request.bytes().length, request.contentType());

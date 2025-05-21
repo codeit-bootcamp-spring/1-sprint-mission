@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
 
-public record CreateReadStatusRequest(
+public record ReadStatusCreateRequest(
 
     @NotBlank(message = "유저 ID를 입력해주세요.")
     UUID userId,

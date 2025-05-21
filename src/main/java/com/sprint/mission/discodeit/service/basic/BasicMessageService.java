@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -46,8 +46,8 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  public MessageDto create(CreateMessageRequest messageRequest,
-      List<CreateBinaryContentRequest> binaryContentRequests) {
+  public MessageDto create(MessageCreateRequest messageRequest,
+      List<BinaryContentCreateRequest> binaryContentRequests) {
 
     log.debug("메시지 생성 시작: request={}", messageRequest);
 
@@ -101,7 +101,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  public MessageDto update(UUID messageId, UpdateMessageRequest request) {
+  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
 
     log.debug("메시지 수정 시작: id={}, request={}", messageId, request);
 
@@ -135,7 +135,7 @@ public class BasicMessageService implements MessageService {
   // List<CreateBinaryContentRequest> -> List<BinaryContent>
   // binaryContentRepository와 binaryContentStorage에 대한 의존성을 가지고 있어 util이 아닌 private 메서드로 분리
   private List<BinaryContent> convertToBinaryContents(
-      List<CreateBinaryContentRequest> binaryContentRequests) {
+      List<BinaryContentCreateRequest> binaryContentRequests) {
     return binaryContentRequests.stream()
         .map(attachmentRequest -> {
           String fileName = attachmentRequest.fileName();

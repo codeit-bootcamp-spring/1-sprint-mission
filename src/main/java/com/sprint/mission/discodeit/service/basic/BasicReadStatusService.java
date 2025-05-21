@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -35,7 +35,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusMapper readStatusMapper;
 
   @Override
-  public ReadStatusDto create(CreateReadStatusRequest request) {
+  public ReadStatusDto create(ReadStatusCreateRequest request) {
 
     log.debug("읽음 상태 생성 시작: userId={}, channelId={}", request.userId(), request.channelId());
 
@@ -92,7 +92,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public ReadStatusDto update(UUID readStatusId, UpdateReadStatusRequest request) {
+  public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
 
     log.debug("읽음 상태 수정 시작: id={}, newLastReadAt={}", readStatusId, request.newLastReadAt());
 

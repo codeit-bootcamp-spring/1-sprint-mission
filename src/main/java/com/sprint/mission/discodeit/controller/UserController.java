@@ -2,11 +2,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
-import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.userStatusDto.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -43,11 +43,11 @@ public class UserController implements UserApi {
   @Override
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(
-      @Valid @RequestPart("userRequest") CreateUserRequest request,
+      @Valid @RequestPart("userRequest") UserCreateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
     log.info("사용자 생성 요청 : {}", request);
-    Optional<CreateBinaryContentRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
+    Optional<BinaryContentCreateRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
         profile);
     UserDto userDto = userService.create(request, profileRequest);
     log.debug("사용자 생성 응답 : {}", userDto);
@@ -61,12 +61,12 @@ public class UserController implements UserApi {
   @PatchMapping(path = "{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @Valid @RequestPart("userRequest") UpdateUserRequest request,
+      @Valid @RequestPart("userRequest") UserUpdateRequest request,
       @RequestPart("profile") MultipartFile profile) {
 
     log.info("사용자 수정 요청 : id={}, request={}", userId, request);
 
-    Optional<CreateBinaryContentRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
+    Optional<BinaryContentCreateRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
         profile);
     UserDto userDto = userService.update(userId, request, profileRequest);
 
@@ -109,7 +109,7 @@ public class UserController implements UserApi {
   @PatchMapping(path = "{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @PathVariable("userId") UUID userId,
-      @Valid @RequestBody UpdateUserStatusRequest request) {
+      @Valid @RequestBody UserStatusUpdateRequest request) {
 
     log.info("사용자 상태 수정 요청 : userId={}, request={}", userId, request);
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, request);

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatusDto.CreateUserStatusRequest;
-import com.sprint.mission.discodeit.dto.userStatusDto.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -31,7 +31,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserStatusMapper userStatusMapper;
 
   @Override
-  public UserStatusDto create(CreateUserStatusRequest request) {
+  public UserStatusDto create(UserStatusCreateRequest request) {
 
     log.debug("사용자 상태 생성 시작: userId={}", request.userId());
 
@@ -83,7 +83,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatusDto update(UUID userStatusId, UpdateUserStatusRequest request) {
+  public UserStatusDto update(UUID userStatusId, UserStatusUpdateRequest request) {
 
     Instant newLastActiveAt = request.newLastActiveAt();
 
@@ -100,7 +100,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatusDto updateByUserId(UUID userId, UpdateUserStatusRequest request) {
+  public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
 
     Instant newLastActiveAt = request.newLastActiveAt();
 
