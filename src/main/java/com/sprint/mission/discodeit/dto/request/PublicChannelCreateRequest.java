@@ -1,19 +1,15 @@
 package com.sprint.mission.discodeit.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Size;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class PublicChannelCreateRequest {
+public record PublicChannelCreateRequest(
+    @NotBlank(message = "채널명은 필수입니다")
+    @Size(min = 2, max = 50, message = "채널명은 2자 이상 50자 이하여야 합니다")
+    String name,
     
-    @NotBlank(message = "채널 이름은 필수입니다")
-    private String name;
-    
-    private String description;
-} 
+    @Size(max = 255, message = "채널 설명은 255자 이하여야 합니다")
+    String description
+) {
+
+}

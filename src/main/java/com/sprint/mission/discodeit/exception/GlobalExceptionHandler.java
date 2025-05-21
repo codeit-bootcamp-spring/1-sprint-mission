@@ -1,94 +1,75 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.dto.response.ApiResponse;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(RestApiException.class)
-  public ResponseEntity<ApiResponse<Object>> handleRestApiException(RestApiException e) {
-    log.debug("RestApiException: {}", e.getDetails(), e);
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+    ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR.value());
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(errorResponse);
+  }
 
-    DomainErrorCode errorCode = e.getErrorCode();
-    HttpStatus status = errorCode.getHttpStatus();
-
-    ApiResponse<Object> response = new ApiResponse<>(
-        false,
-        e.getDetails() != null ? e.getDetails() : errorCode.getMessage()
-    );
-
-    return ResponseEntity.status(status).body(response);
+  @ExceptionHandler(DiscodeitException.class)
+  public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException exception) {
+    log.error("커스텀 예외 발생: code={}, message={}", exception.getErrorCode(), exception.getMessage(), exception);
+    HttpStatus status = determineHttpStatus(exception);
+    ErrorResponse response = new ErrorResponse(exception, status.value());
+    return ResponseEntity
+        .status(status)
+        .body(response);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiResponse<Object>> handleValidationException(
-      MethodArgumentNotValidException e) {
-    log.debug("ValidationException: {}", e.getMessage(), e);
-
-    BindingResult bindingResult = e.getBindingResult();
-    List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-
-    String errorMessage = fieldErrors.stream()
-        .map(error -> error.getField() + ": " + error.getDefaultMessage())
-        .collect(Collectors.joining(", "));
-
-    ApiResponse<Object> response = new ApiResponse<>(false, "입력값이 유효하지 않습니다: " + errorMessage);
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    log.error("요청 유효성 검사 실패: {}", ex.getMessage());
+    
+    Map<String, Object> validationErrors = new HashMap<>();
+    ex.getBindingResult().getAllErrors().forEach(error -> {
+      String fieldName = ((FieldError) error).getField();
+      String errorMessage = error.getDefaultMessage();
+      validationErrors.put(fieldName, errorMessage);
+    });
+    
+    ErrorResponse response = new ErrorResponse(
+        Instant.now(), 
+        "VALIDATION_ERROR",
+        "요청 데이터 유효성 검사에 실패했습니다",
+        validationErrors,
+        ex.getClass().getSimpleName(),
+        HttpStatus.BAD_REQUEST.value()
+    );
+    
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(response);
   }
 
-  @ExceptionHandler(MissingServletRequestPartException.class)
-  public ResponseEntity<ApiResponse<Object>> handleMissingPartException(
-      MissingServletRequestPartException e) {
-    log.debug("MissingServletRequestPartException: {}", e.getMessage(), e);
-    ApiResponse<Object> response = new ApiResponse<>(false,
-        "필수 입력값이 누락되었습니다: " + e.getRequestPartName());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-  }
-
-  @ExceptionHandler(MissingServletRequestParameterException.class)
-  public ResponseEntity<ApiResponse<Object>> handleMissingParameterException(
-      MissingServletRequestParameterException e) {
-    log.debug("MissingServletRequestParameterException: {}", e.getMessage(), e);
-    ApiResponse<Object> response = new ApiResponse<>(false,
-        "필수 파라미터가 누락되었습니다: " + e.getParameterName());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-  }
-
-  @ExceptionHandler(IOException.class)
-  public ResponseEntity<ApiResponse<Object>> handleIOException(IOException e) {
-    log.error("IOException: {}", e.getMessage(), e);
-    ApiResponse<Object> response = new ApiResponse<>(false, "파일 처리 중 오류가 발생했습니다.");
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-  }
-
-  @ExceptionHandler(MaxUploadSizeExceededException.class)
-  public ResponseEntity<ApiResponse<Object>> handleMaxSizeException(
-      MaxUploadSizeExceededException e) {
-    log.debug("MaxUploadSizeExceededException: {}", e.getMessage(), e);
-    ApiResponse<Object> response = new ApiResponse<>(false, "파일 크기가 너무 큽니다.");
-    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(response);
-  }
-
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiResponse<Object>> handleGlobalException(Exception e) {
-    log.error("Unhandled exception: {}", e.getMessage(), e);
-    ApiResponse<Object> response = new ApiResponse<>(false, "서버 내부 오류가 발생했습니다.");
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+  private HttpStatus determineHttpStatus(DiscodeitException exception) {
+    ErrorCode errorCode = exception.getErrorCode();
+    return switch (errorCode) {
+      case USER_NOT_FOUND, CHANNEL_NOT_FOUND, MESSAGE_NOT_FOUND, BINARY_CONTENT_NOT_FOUND, 
+           READ_STATUS_NOT_FOUND, USER_STATUS_NOT_FOUND -> HttpStatus.NOT_FOUND;
+      case DUPLICATE_USER, DUPLICATE_READ_STATUS, DUPLICATE_USER_STATUS -> HttpStatus.CONFLICT;
+      case INVALID_USER_CREDENTIALS -> HttpStatus.UNAUTHORIZED;
+      case PRIVATE_CHANNEL_UPDATE, INVALID_REQUEST -> HttpStatus.BAD_REQUEST;
+      case INTERNAL_SERVER_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
+    };
   }
 }
