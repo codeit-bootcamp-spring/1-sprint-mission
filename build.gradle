@@ -1,14 +1,9 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.0'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'io.spring.dependency-management' version '1.1.6'
     id 'checkstyle'
-    id 'com.gorylenko.gradle-git-properties' version '2.4.1' // git 정보 읽기
-}
-
-gitProperties {
-    dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-    dateFormatTimeZone = "UTC"
+    id 'jacoco'
 }
 
 checkstyle {
@@ -25,7 +20,7 @@ tasks.withType(Checkstyle) {
 }
 
 group = 'com.sprint.mission'
-version = '0.0.1-SNAPSHOT'
+version = '2.0-M9'
 
 java {
     toolchain {
@@ -44,42 +39,38 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'software.amazon.awssdk:s3:2.31.7'
+    runtimeOnly 'org.postgresql:postgresql'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.mockito:mockito-core'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    runtimeOnly 'com.h2database:h2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-    implementation 'org.postgresql:postgresql:42.6.0'
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
-    // AWS S3 SDK
-    implementation 'software.amazon.awssdk:s3:2.31.7'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.h2database:h2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-// build.gradle 에 빌드 정보 추가: build.properties 파일이 다음과 같이 생성
-tasks.register('writeBuildProperties') {
-    doLast {
-        def props = new Properties()
-        props.setProperty('version', project.version.toString())
-        props.setProperty('time', new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone("UTC")))
-
-        def file = file("$buildDir/resources/main/build.properties")
-        file.parentFile.mkdirs()
-        props.store(file.newWriter(), null)
-    }
+test {
+    finalizedBy jacocoTestReport
 }
 
-processResources.dependsOn writeBuildProperties
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
