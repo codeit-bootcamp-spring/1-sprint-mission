@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomAuthenticationFilter;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,7 +25,10 @@ import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+  private final UserMapper userMapper;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -30,6 +36,23 @@ public class SecurityConfig {
       throws Exception {
 
     CustomAuthenticationFilter customFilter = new CustomAuthenticationFilter(authManager);
+
+    // 로그인 성공 시 세션에 사용자 정보 저장
+    customFilter.setAuthenticationSuccessHandler((request, response, authentication) -> {
+      // 인증된 사용자 정보
+      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+      // UserDto로 변환
+      UserDto userDto = userMapper.toDto(userDetails.getUser());
+
+      // 세션에 사용자 정보 저장
+      request.getSession().setAttribute("LOGIN_USER", userDto);
+
+      response.setStatus(HttpServletResponse.SC_OK);
+      response.setContentType("application/json");
+      response.getWriter().write("{\"message\":\"로그인 성공\"}");
+    });
+
     // 실패 시 JSON 메시지 반환
     customFilter.setAuthenticationFailureHandler((request, response, exception) -> {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -46,7 +69,8 @@ public class SecurityConfig {
             .requestMatchers(
                 "/api/auth/csrf-token",
                 "/api/users",
-                "/api/auth/login"
+                "/api/auth/login",
+                "/api/auth/me"
             ).permitAll()
             .requestMatchers("/api/**").authenticated() // /api/를 포함할 경우 인증 필요
             .anyRequest().permitAll())  // 그 외 모든 url 요청에 대해 인증 X
