@@ -1,35 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "binary_contents")
-@Getter @Setter
-@SuperBuilder
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class BinaryContent extends BaseEntity {
 
-    @Column(name = "file_name")
-    private String fileName;
+  @Column(nullable = false)
+  private String fileName;
+  @Column(nullable = false)
+  private Long size;
+  @Column(length = 100, nullable = false)
+  private String contentType;
 
-    @Lob
-    @Column(name = "content")
-    private byte[] content;
-
-    @Column(name = "size")
-    private Long size;
-
-    @Column(name = "content_type")
-    private String contentType;
-
-    @OneToMany(mappedBy = "binaryContent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<MessageAttachment> messageAttachments = new ArrayList<>();
+  public BinaryContent(String fileName, Long size, String contentType) {
+    this.fileName = fileName;
+    this.size = size;
+    this.contentType = contentType;
+  }
 }

@@ -1,24 +1,19 @@
 spring:
-  profiles:
-    active: dev
-
+  application:
+    name: discodeit
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
     driver-class-name: org.postgresql.Driver
-
-  thymeleaf:
-    cache: false
-      
-  h2:
-    console:
-      enabled: true
-
   jpa:
     hibernate:
-      ddl-auto: update
-      dialect: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: validate
+    open-in-view: false
+  profiles:
+    active:
+      - dev
     properties:
       hibernate:
         #      show_sql: true
@@ -80,20 +75,10 @@ management:
   endpoint:
     health:
       show-details: always
-  info:
-    env:
-      enabled: true
-    java:
-      enabled: true
-    build:
-      enabled: true
 
-# 애플리케이션 정보 설정
 info:
-  app:
-    name: ${spring.application.name}
-    version: 1.7.0
-    description: Discodeit Application
+  name: Discodeit
+  version: 1.7.0
   java:
     version: 17
   spring-boot:
@@ -108,5 +93,21 @@ info:
       type: ${discodeit.storage.type}
       path: ${discodeit.storage.local.root-path}
     multipart:
-      max-file-size: ${spring.servlet.multipart.max-file-size}
-      max-request-size: ${spring.servlet.multipart.max-request-size}
+      max-file-size: ${spring.servlet.multipart.maxFileSize}
+      max-request-size: ${spring.servlet.multipart.maxRequestSize}
+
+discodeit:
+  storage:
+    type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+
+logging:
+  level:
+    root: info

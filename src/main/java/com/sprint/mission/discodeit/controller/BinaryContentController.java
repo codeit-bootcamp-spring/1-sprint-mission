@@ -1,56 +1,60 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import io.swagger.v3.oas.annotations.Operation;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binaryContents")
-public class BinaryContentController {
+public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
-  private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentStorage binaryContentStorage;
 
-  @Operation(summary = "조회", description = "단건 조회")
-  @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentDto> getBinaryContent(
+  @GetMapping(path = "{binaryContentId}")
+  public ResponseEntity<BinaryContentDto> find(
       @PathVariable("binaryContentId") UUID binaryContentId) {
+    log.info("바이너리 컨텐츠 조회 요청: id={}", binaryContentId);
     BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
-    return ResponseEntity.ok(binaryContent);
+    log.debug("바이너리 컨텐츠 조회 응답: {}", binaryContent);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContent);
   }
 
-  @Operation(summary = "조회", description = "전부 조회")
   @GetMapping
-  public ResponseEntity<List<BinaryContentDto>> getBinaryContents(
-      @RequestParam("ids") List<UUID> binaryContentIds) {
-
-    if (binaryContentIds == null || binaryContentIds.isEmpty()) {
-      return ResponseEntity.badRequest().build();
-    }
-
+  public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
+      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+    log.info("바이너리 컨텐츠 목록 조회 요청: ids={}", binaryContentIds);
     List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-    return ResponseEntity.ok(binaryContents);
+    log.debug("바이너리 컨텐츠 목록 조회 응답: count={}", binaryContents.size());
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContents);
   }
 
-  @GetMapping({"/download"})
-  public ResponseEntity<?> downloadContent(
-      @RequestParam("binaryContentId") UUID binaryContentId) throws IOException {
-    try {
-      BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
-      return binaryContentStorage.download(binaryContent);
-    } catch (IOException e) {
-      return ResponseEntity.notFound().build();
-    }
+  @GetMapping(path = "{binaryContentId}/download")
+  public ResponseEntity<?> download(
+      @PathVariable("binaryContentId") UUID binaryContentId) {
+    log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
+    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+    ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
+    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}", 
+        response.getHeaders().getContentType(), response.getHeaders().getContentLength());
+    return response;
   }
 }
