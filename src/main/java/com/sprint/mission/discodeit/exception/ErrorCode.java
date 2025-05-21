@@ -14,6 +14,9 @@ public enum ErrorCode {
   USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 사용자 이름입니다."), // 409
   EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
 
+  // 유저 인증, 인가
+  USER_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증되지 않은 유저입니다."), // 401
+
   // 채널
   CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾을 수 없습니다."), // 404
   CHANNEL_MODIFICATION_NOT_ALLOWED(HttpStatus.FORBIDDEN, "채널의 수정을 허용하지 않습니다."), // 403
