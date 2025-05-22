@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.security.CustomAuthenticationProvider;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.handler.CustomAuthenticationFailureHandler;
 import com.sprint.mission.discodeit.security.handler.CustomAuthenticationSuccessHandler;
@@ -32,7 +33,8 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain chain(
         HttpSecurity http,
-        DaoAuthenticationProvider provider,
+//        DaoAuthenticationProvider provider,
+        CustomAuthenticationProvider provider,
         JsonUsernamePasswordAuthenticationFilter loginFilter,
         SecurityContextRepository securityContextRepository) throws Exception {
 
