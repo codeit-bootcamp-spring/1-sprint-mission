@@ -38,10 +38,15 @@ public class SecurityConfig {
         JsonUsernamePasswordAuthenticationFilter loginFilter,
         SecurityContextRepository securityContextRepository) throws Exception {
 
+        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        csrfTokenRepository.setCookieName("Csrf-Token");
+        csrfTokenRepository.setHeaderName("X-Csrf-Token");
+        csrfTokenRepository.setCookiePath("/");
+
         http
             .logout(logout -> logout.logoutUrl("/disabled"))
             .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRepository(csrfTokenRepository)
             )
             .authenticationProvider(provider)
             .securityContext(

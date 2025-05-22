@@ -37,6 +37,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             List.of(() -> "ROLE_USER"));
     }
 
+    // UsernamePasswordAuthenticationToken 토큰만 처리
     @Override
     public boolean supports(Class<?> authentication) {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
