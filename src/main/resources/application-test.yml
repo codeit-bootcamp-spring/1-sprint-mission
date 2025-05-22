@@ -9,6 +9,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+    database-platform: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
         show_sql: true
@@ -23,3 +24,4 @@ logging:
       max-history: 30
   level:
     root: info
+    org.springframework.security: DEBUG

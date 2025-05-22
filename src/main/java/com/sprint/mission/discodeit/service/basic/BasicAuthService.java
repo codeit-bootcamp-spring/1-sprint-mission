@@ -19,20 +19,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class BasicAuthService implements AuthService {
 
-  private final UserRepository userRepository;
-  private final UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-  public UserResponse login(UserRequest.Login request) {
-    User findUser = userRepository.findByUsername(request.getUsername())
-        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,
-            Map.of("userName", request.getUsername())));
-
-    if (!findUser.getPassword().equals(request.getPassword())) {
-      throw new AuthenticationFailedException(ErrorCode.LOGIN_FAILED,
-          Map.of("userName", request.getUsername()));
-    }
-
-    log.info("Login success - userId: {}", findUser.getId());
-    return userMapper.entityToDto(findUser);
-  }
 }

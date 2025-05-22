@@ -48,6 +48,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.testcontainers:localstack:1.20.6'
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation 'com.h2database:h2'
 
     // db
     runtimeOnly 'org.postgresql:postgresql'

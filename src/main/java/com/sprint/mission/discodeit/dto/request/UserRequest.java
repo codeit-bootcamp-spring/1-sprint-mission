@@ -39,14 +39,4 @@ public class UserRequest {
         private String newPassword;
     }
 
-    @Getter
-    @NoArgsConstructor
-    public static class Login {
-
-        @NotBlank(message = "아이디(이름)는 필수입니다.")
-        private String username;
-
-        @NotBlank(message = "비밀번호는 필수입니다.")
-        private String password;
-    }
 }
