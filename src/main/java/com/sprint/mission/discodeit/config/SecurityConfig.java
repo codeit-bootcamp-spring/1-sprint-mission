@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.security.CustomAuthenticationProvider;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.handler.CustomAuthenticationFailureHandler;
 import com.sprint.mission.discodeit.security.handler.CustomAuthenticationSuccessHandler;
+import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -33,10 +34,10 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain chain(
         HttpSecurity http,
-//        DaoAuthenticationProvider provider,
-        CustomAuthenticationProvider provider,
+        CustomAuthenticationProvider provider, // DaoAuthenticationProvider provider,
         JsonUsernamePasswordAuthenticationFilter loginFilter,
-        SecurityContextRepository securityContextRepository) throws Exception {
+        SecurityContextRepository securityContextRepository,
+        CustomLogoutHandler customLogoutHandler) throws Exception {
 
         CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrfTokenRepository.setCookieName("Csrf-Token");
@@ -44,7 +45,11 @@ public class SecurityConfig {
         csrfTokenRepository.setCookiePath("/");
 
         http
-            .logout(logout -> logout.logoutUrl("/disabled"))
+            .logout(logout -> logout
+                .logoutUrl("/api/auth/logout")
+                .addLogoutHandler(customLogoutHandler)
+                .logoutSuccessUrl("/")
+            )
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
                 .ignoringRequestMatchers("/api/auth/logout")

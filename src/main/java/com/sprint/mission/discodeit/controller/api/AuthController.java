@@ -31,17 +31,10 @@ public class AuthController implements AuthApiDocs {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getUserWithSessionId(
+    public ResponseEntity<UserResponse> getUserWithSession(
         @AuthenticationPrincipal CustomUserDetails user) {
 
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal()
-//            .equals("anonymousUser")) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        }
-//        CustomUserDetails customUserDetails = (CustomUserDetails) auth.getPrincipal();
         UUID userId = user.getUser().getId();
-
         UserResponse userResponse = userService.findById(userId);
         return ResponseEntity.ok(userResponse);
     }
