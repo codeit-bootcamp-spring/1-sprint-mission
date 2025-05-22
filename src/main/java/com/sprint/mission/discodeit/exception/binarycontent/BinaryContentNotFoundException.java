@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.exception.binaryContent;
+package com.sprint.mission.discodeit.exception.binarycontent;
 
 import com.sprint.mission.discodeit.exception.ErrorCode;
 
