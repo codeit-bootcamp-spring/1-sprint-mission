@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -10,6 +11,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
+@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
 public class S3Service {
 
   private final S3Client s3Client;
