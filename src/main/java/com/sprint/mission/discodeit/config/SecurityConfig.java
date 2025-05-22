@@ -4,9 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Collections;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -37,11 +44,13 @@ public class SecurityConfig {
             .ignoringRequestMatchers("/api/auth/logout") // 로그아웃은 CSRF 예외
         )
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/csrf-token", "/api/users").permitAll()
-            .requestMatchers("/api/auth/logout").authenticated()
+            .requestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/login").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**", "/static/**")
             .permitAll()
-            .anyRequest().authenticated()
+            .requestMatchers("/api/channels/**").hasRole("CHANNEL_MANAGER")
+            .requestMatchers("/api/auth/role").hasRole("ADMIN")
+            .requestMatchers("/api/auth/logout").authenticated()
+            .anyRequest().hasRole("USER")
         )
         .securityContext(securityContext -> securityContext
             .securityContextRepository(new HttpSessionSecurityContextRepository())
@@ -80,6 +89,36 @@ public class SecurityConfig {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       response.setContentType("application/json");
       response.getWriter().write("{\"error\": \"로그인 실패\"}");
+    };
+  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+    roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_CHANNEL_MANAGER > ROLE_USER");
+    return roleHierarchy;
+  }
+
+  @Bean
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+      RoleHierarchy roleHierarchy) {
+    DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+    expressionHandler.setRoleHierarchy(roleHierarchy);
+    return expressionHandler;
+  }
+
+  @Bean
+  public CommandLineRunner initAdmin(UserRepository userRepository,
+      PasswordEncoder passwordEncoder) {
+    return args -> {
+      if (!userRepository.existsByUsername("admin")) {
+        User admin = User.builder()
+            .username("admin")
+            .password(passwordEncoder.encode("admin123"))
+            .roles(Collections.singletonList("ROLE_ADMIN"))
+            .build();
+        userRepository.save(admin);
+      }
     };
   }
 }
