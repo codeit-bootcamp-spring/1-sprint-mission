@@ -45,14 +45,22 @@ public class AuthController {
     return csrfToken;
   }
 
-  @PostMapping("/login")
-  public ResponseEntity<UserDto> login(@Valid @RequestBody UserLoginDto userLoginDto) {
+  @GetMapping("/me")
+  public ResponseEntity<UserDto> getCurrentUser(Authentication authentication) {
+
+    if (authentication == null || !authentication.isAuthenticated()
+        || authentication instanceof AnonymousAuthenticationToken) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
     try {
-      UserDto loginUser = authService.login(userLoginDto);
-      return ResponseEntity.ok(loginUser);
-    } catch (UserException e) {
-      log.error(e.getMessage());
-      throw e;
+      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+      UserDto userDto = userService.findByUsername(userDetails.getUsername());
+
+      return ResponseEntity.ok(userDto);
+
+    } catch (Exception e) {
+      log.error("Failed to get current user", e);
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
   }
 }

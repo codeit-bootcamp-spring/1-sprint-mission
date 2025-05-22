@@ -234,4 +234,32 @@ public class BasicUserService implements UserService {
     log.info("사용자 삭제 완료: userId = {}", userId);
     return true;
   }
+
+  @Override
+  public UserDto findByUsername(String username) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+
+    return UserDto.builder()
+        .id(user.getId())
+        .username(user.getUsername())
+        .email(user.getEmail())
+        .role(user.getRole())
+        // 필요한 추가 정보
+        .build();
+  }
+
+//  @Override
+//  public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
+//    if (roleUpdateRequest == null || roleUpdateRequest.getUserId() == null
+//        || roleUpdateRequest.getNewRole() == null) {
+//      throw new IllegalArgumentException("Empty Data");
+//    }
+//
+//    User user = userRepository.findById(roleUpdateRequest.getUserId())
+//        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+//
+//    return userMapper.toDto(user);
+//  }
+
 }

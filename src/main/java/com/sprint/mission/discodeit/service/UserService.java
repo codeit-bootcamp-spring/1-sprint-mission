@@ -38,4 +38,7 @@ public interface UserService {
   //삭제
   boolean deleteUser(String userId);
 
+  UserDto findByUsername(String username);
+
+  //UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest);
 }
