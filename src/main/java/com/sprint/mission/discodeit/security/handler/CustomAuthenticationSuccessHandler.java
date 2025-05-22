@@ -30,6 +30,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         User user = principal.getUser();
         UserResponse userDto = userMapper.entityToDto(user);
 
+        request.getSession().setAttribute("userId", userDto.id());
+
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
         objectMapper.writeValue(response.getWriter(), userDto);

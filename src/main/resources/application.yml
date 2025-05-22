@@ -13,6 +13,8 @@ spring:
       enabled: true
       max-file-size: 20MB
       max-request-size: 25MB
+    session:
+      timeout: 30m
 
 logging:
   level:
