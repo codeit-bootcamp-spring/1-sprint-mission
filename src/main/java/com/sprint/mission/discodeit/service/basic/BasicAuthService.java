@@ -13,6 +13,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,15 +28,20 @@ public class BasicAuthService implements AuthService {
   private final UserStatusService userStatusService;
   private final UserMapper userMapper;
 
-  @Override
+  //@Override
   @Transactional(readOnly = true)
   public UserDto login(UserLoginDto userLoginDto) throws DiscodeitException {
     if (userLoginDto == null || userLoginDto.username() == null
         || userLoginDto.password() == null) {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
+
     User user = userRepository.findByUsername(userLoginDto.username()).orElse(null);
-    if (user == null || !user.getPassword().equals(userLoginDto.password())) {
+
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+    if (user == null || !encoder.matches(user.getPassword(),
+        encoder.encode(userLoginDto.password()))) {
       throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
     }
     // 이것도 마찬가지로 제어할 수 없는 값이라 이 방식을 쓰면 안되는지?
