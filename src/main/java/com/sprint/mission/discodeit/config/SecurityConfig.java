@@ -47,6 +47,7 @@ public class SecurityConfig {
             .logout(logout -> logout.logoutUrl("/disabled"))
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
+                .ignoringRequestMatchers("/api/auth/logout")
             )
             .authenticationProvider(provider)
             .securityContext(
@@ -66,12 +67,14 @@ public class SecurityConfig {
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
         AuthenticationManager authManager,
         CustomAuthenticationSuccessHandler successHandler,
-        CustomAuthenticationFailureHandler failureHandler
+        CustomAuthenticationFailureHandler failureHandler,
+        SecurityContextRepository securityContextRepository
     ) {
         JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
             authManager);
         filter.setAuthenticationSuccessHandler(successHandler);
         filter.setAuthenticationFailureHandler(failureHandler);
+        filter.setSecurityContextRepository(securityContextRepository);
         return filter;
     }
 

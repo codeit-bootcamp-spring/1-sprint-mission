@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,8 +32,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
-        return new UsernamePasswordAuthenticationToken(user, null,
-            List.of(() -> "ROLE_USER"));
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        return new UsernamePasswordAuthenticationToken(userDetails, null,
+            userDetails.getAuthorities());
     }
 
     // UsernamePasswordAuthenticationToken 토큰만 처리

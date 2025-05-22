@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.AuthApiDocs;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,14 +31,18 @@ public class AuthController implements AuthApiDocs {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getUserWithSessionId(HttpSession session) {
+    public ResponseEntity<UserResponse> getUserWithSessionId(
+        @AuthenticationPrincipal CustomUserDetails user) {
 
-        UUID userId = (UUID) session.getAttribute("userID");
-        if (userId == null) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal()
+//            .equals("anonymousUser")) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//        CustomUserDetails customUserDetails = (CustomUserDetails) auth.getPrincipal();
+        UUID userId = user.getUser().getId();
+
         UserResponse userResponse = userService.findById(userId);
-
         return ResponseEntity.ok(userResponse);
     }
 }
