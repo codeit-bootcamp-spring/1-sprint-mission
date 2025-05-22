@@ -33,8 +33,12 @@ public class SecurityConfig {
     loginFilter.setAuthenticationFailureHandler(failureHandler());
 
     http
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers("/api/auth/logout") // 로그아웃은 CSRF 예외
+        )
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/csrf-token", "/api/users").permitAll()
+            .requestMatchers("/api/auth/logout").authenticated()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**", "/static/**")
             .permitAll()
             .anyRequest().authenticated()
