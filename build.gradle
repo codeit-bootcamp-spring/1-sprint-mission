@@ -50,6 +50,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation("org.springframework.security:spring-security-test")
 
+    implementation("org.springframework.security:spring-security-crypto:6.4.5")
+
     implementation 'software.amazon.awssdk:s3:2.31.7'
     implementation("software.amazon.awssdk:s3")
 
