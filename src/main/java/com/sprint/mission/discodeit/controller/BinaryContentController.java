@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.api.BinaryContentApi;
+import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.binarycontetnt.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -22,7 +22,9 @@ public class BinaryContentController implements BinaryContentApi {
   @Override
   public ResponseEntity<BinaryContentResponse> getBinaryContent(UUID id) {
     Optional<BinaryContentResponse> binaryContent = binaryContentService.getBinaryContent(id);
-    return binaryContent.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    return binaryContent.map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.notFound()
+            .build());
   }
 
   @Override
@@ -35,7 +37,8 @@ public class BinaryContentController implements BinaryContentApi {
   @Override
   public ResponseEntity<Void> deleteBinaryContent(UUID id) {
     binaryContentService.deleteBinaryContent(id);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.noContent()
+        .build();
   }
 
   @Override

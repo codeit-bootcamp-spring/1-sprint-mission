@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: jdbc:postgresql://localhost:5432/mydb
+    username: myuser
+    password: mypassword
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -10,7 +10,7 @@ spring:
     generate_statistics: true
     database: postgresql
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -21,3 +21,4 @@ spring:
 logging:
   level:
     root: INFO
+    org.springframework.security: TRACE

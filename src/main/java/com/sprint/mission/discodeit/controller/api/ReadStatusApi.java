@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.api;
+package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.status.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -39,5 +39,8 @@ public interface ReadStatusApi {
       @ApiResponse(responseCode = "204", description = "읽음 상태 업데이트 성공"),
       @ApiResponse(responseCode = "404", description = "해당 사용자 또는 채널을 찾을 수 없음")
   })
-  ResponseEntity<Void> updateReadStatus(UUID userId, UUID channelId);
+  ResponseEntity<Void> updateReadStatus(
+      UUID userId,
+      UUID channelId
+  );
 }

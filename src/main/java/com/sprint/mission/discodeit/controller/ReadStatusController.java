@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.api.ReadStatusApi;
+import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.status.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -22,7 +22,8 @@ public class ReadStatusController implements ReadStatusApi {
   @PostMapping
   public ResponseEntity<ReadStatus> createReadStatus(@RequestBody CreateReadStatusRequest request) {
     ReadStatus readStatus = readStatusService.create(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(readStatus);
   }
 
   @Override
@@ -56,8 +57,13 @@ public class ReadStatusController implements ReadStatusApi {
   @Override
   @PatchMapping("/{userId}/{channelId}")
   public ResponseEntity<Void> updateReadStatus(
-      @PathVariable UUID userId, @PathVariable UUID channelId) {
-    readStatusService.updateReadStatusByUserIdAndChannelId(userId, channelId);
-    return ResponseEntity.noContent().build();
+      @PathVariable UUID userId,
+      @PathVariable UUID channelId
+  ) {
+    readStatusService.updateReadStatusByUserIdAndChannelId(
+        userId,
+        channelId);
+    return ResponseEntity.noContent()
+        .build();
   }
 }

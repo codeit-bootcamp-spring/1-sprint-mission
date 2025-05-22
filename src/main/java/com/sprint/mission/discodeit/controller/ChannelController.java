@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.api.ChannelApi;
+import com.sprint.mission.discodeit.controller.api.ChannelApi;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
@@ -33,7 +33,8 @@ public class ChannelController implements ChannelApi {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(response);
   }
 
   @Override
@@ -41,7 +42,8 @@ public class ChannelController implements ChannelApi {
       @RequestBody CreatePrivateChannelRequest request
   ) {
     ChannelResponse response = channelService.createPrivateChannel(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(response);
   }
 
   @Override
@@ -70,7 +72,9 @@ public class ChannelController implements ChannelApi {
       @Parameter(description = "수정할 채널의 ID", required = true) @PathVariable UUID id,
       @RequestBody UpdateChannelRequest request
   ) {
-    return ResponseEntity.ok(channelService.updateChannel(id, request));
+    return ResponseEntity.ok(channelService.updateChannel(
+        id,
+        request));
   }
 
   @Override
@@ -78,6 +82,7 @@ public class ChannelController implements ChannelApi {
       @Parameter(description = "삭제할 채널의 ID", required = true) @PathVariable UUID id
   ) {
     channelService.deleteChannel(id);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.noContent()
+        .build();
   }
 }

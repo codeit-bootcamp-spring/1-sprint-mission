@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.api.MessageApi;
+import com.sprint.mission.discodeit.controller.api.MessageApi;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
@@ -28,7 +28,8 @@ public class MessageController implements MessageApi {
   @Override
   public ResponseEntity<MessageResponse> createMessage(CreateMessageRequest request) {
     MessageResponse response = messageService.createMessage(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(response);
   }
 
   @Override
@@ -37,13 +38,23 @@ public class MessageController implements MessageApi {
   }
 
   @Override
-  public ResponseEntity<PageResponse<MessageResponse>> getAllPagingMessages(int page, int size) {
-    return ResponseEntity.ok(messageService.getPageMessages(page, size));
+  public ResponseEntity<PageResponse<MessageResponse>> getAllPagingMessages(
+      int page,
+      int size
+  ) {
+    return ResponseEntity.ok(messageService.getPageMessages(
+        page,
+        size));
   }
 
   @Override
-  public ResponseEntity<CursorResponse<Message>> getAllCursorMessages(Instant cursor, int size) {
-    return ResponseEntity.ok(messageService.getCursorPages(cursor, size));
+  public ResponseEntity<CursorResponse<Message>> getAllCursorMessages(
+      Instant cursor,
+      int size
+  ) {
+    return ResponseEntity.ok(messageService.getCursorPages(
+        cursor,
+        size));
   }
 
   @Override
@@ -57,13 +68,19 @@ public class MessageController implements MessageApi {
   }
 
   @Override
-  public ResponseEntity<MessageResponse> updateMessage(UUID id, UpdateMessageRequest request) {
-    return ResponseEntity.ok(messageService.updateMessage(id, request));
+  public ResponseEntity<MessageResponse> updateMessage(
+      UUID id,
+      UpdateMessageRequest request
+  ) {
+    return ResponseEntity.ok(messageService.updateMessage(
+        id,
+        request));
   }
 
   @Override
   public ResponseEntity<Void> deleteMessage(UUID id) {
     messageService.deleteMessage(id);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.noContent()
+        .build();
   }
 }

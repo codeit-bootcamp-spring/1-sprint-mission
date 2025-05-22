@@ -18,15 +18,4 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
-
-  @Override
-  @Transactional(readOnly = true)
-  public UserResponse login(LoginRequest request) {
-    User user = userRepository.findByEmail(request.email())
-        .orElseThrow(() -> new NoSuchElementException("User not found"));
-    if (!user.getPassword().equals(request.password())) {
-      throw new IllegalArgumentException("Wrong password");
-    }
-    return UserMapper.INSTANCE.userToUserResponse(user);
-  }
 }

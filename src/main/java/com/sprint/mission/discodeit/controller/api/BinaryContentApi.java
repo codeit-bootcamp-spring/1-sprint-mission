@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.api;
+package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.binarycontetnt.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -44,11 +44,13 @@ public interface BinaryContentApi {
       @ApiResponse(responseCode = "500", description = "조회 실패")})
   @GetMapping
   ResponseEntity<List<BinaryContentResponse>> findAllByIdIn(
-      @RequestBody List<UUID> binaryContentIds);
+      @RequestBody List<UUID> binaryContentIds
+  );
 
   @Operation(summary = "파일 다운로드", description = "특정 바이너리 파일을 다운로드한다.")
   @ApiResponses({@ApiResponse(responseCode = "200", description = "파일 다운로드 성공")})
   @GetMapping("/{binaryContentId}/download")
   ResponseEntity<?> download(
-      @Parameter(description = "다운로드할 파일 ID") @PathVariable UUID binaryContentId);
+      @Parameter(description = "다운로드할 파일 ID") @PathVariable UUID binaryContentId
+  );
 }
