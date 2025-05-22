@@ -1,8 +1,3 @@
-CREATE TYPE type AS ENUM (
-    'PUBLIC',
-    'PRIVATE'
-    );
-
 CREATE TABLE binary_contents
 (
     "id"           UUID PRIMARY KEY,
@@ -21,6 +16,7 @@ CREATE TABLE users
     "email"      varchar(100) UNIQUE NOT NULL,
     "password"   varchar(60)         NOT NULL,
     "profile_id" UUID,
+    "role"       varchar(50)         NOT NULL,
     FOREIGN KEY ("profile_id") REFERENCES "binary_contents" ("id") ON DELETE SET NULL
 );
 
@@ -41,7 +37,7 @@ CREATE TABLE "channels"
     "updated_at"  timestamptz,
     "name"        varchar(100),
     "description" varchar(500),
-    "type"        type        NOT NULL
+    "type"        varchar(50) NOT NULL
 );
 
 CREATE TABLE "read_statuses"

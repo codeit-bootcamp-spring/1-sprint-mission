@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
@@ -23,6 +24,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +43,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
+  private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -70,7 +74,7 @@ public class BasicUserService implements UserService {
     }
 
     User user = new User(createUserDto.username(), createUserDto.email(),
-        createUserDto.password(), null);
+        bCryptPasswordEncoder.encode(createUserDto.password()), null);
     userRepository.save(user);
     UserStatus userStatus = new UserStatus(user);
     userStatusRepository.save(userStatus);

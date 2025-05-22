@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import java.util.UUID;
+import lombok.Builder;
 
+@Builder
 public record UserDto(
     //객체 식별용 id
     UUID id,
@@ -13,7 +15,9 @@ public record UserDto(
     //접속 상태
     boolean online,
     //사용자 프로필 사진
-    BinaryContentDto profile
+    BinaryContentDto profile,
+    //사용자 역할
+    String role
 ) {
 
 }
