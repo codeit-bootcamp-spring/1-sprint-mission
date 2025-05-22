@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.api;
+package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
@@ -36,14 +36,16 @@ public interface MessageApi {
   @ApiResponse(responseCode = "200", description = "메시지 목록 조회 성공")
   @GetMapping("/page")
   ResponseEntity<PageResponse<MessageResponse>> getAllPagingMessages(
-      @RequestParam int page, @RequestParam int size
+      @RequestParam int page,
+      @RequestParam int size
   );
 
   @Operation(summary = "전체 메시지 커서 조회", description = "저장된 모든 메시지를 커서 페이징으로 조회합니다.")
   @ApiResponse(responseCode = "200", description = "메시지 목록 조회 성공")
   @GetMapping("/cursor")
   ResponseEntity<CursorResponse<Message>> getAllCursorMessages(
-      @RequestParam Instant cursor, @RequestParam int size
+      @RequestParam Instant cursor,
+      @RequestParam int size
   );
 
   @Operation(summary = "특정 메시지 조회", description = "메시지 ID를 이용하여 특정 메시지를 조회합니다.")

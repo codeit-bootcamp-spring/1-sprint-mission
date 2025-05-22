@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.api;
+package com.sprint.mission.discodeit.controller.api;
 
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
@@ -47,7 +47,8 @@ public interface ChannelApi {
   @ApiResponse(responseCode = "200", description = "Channel 목록 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChannelResponse.class)))
   @GetMapping("/userId")
   ResponseEntity<List<ChannelResponse>> findAll_1(
-      @Parameter(description = "검색할 userId") UUID userId);
+      @Parameter(description = "검색할 userId") UUID userId
+  );
 
   @Operation(summary = "특정 채널 조회", description = "채널 ID를 이용하여 특정 채널을 조회합니다.")
   @ApiResponses({
@@ -55,7 +56,8 @@ public interface ChannelApi {
       @ApiResponse(responseCode = "404", description = "해당 ID의 채널을 찾을 수 없음")})
   @GetMapping("/{id}")
   ResponseEntity<ChannelResponse> getChannel(
-      @Parameter(description = "조회할 채널의 ID", required = true) @PathVariable UUID id);
+      @Parameter(description = "조회할 채널의 ID", required = true) @PathVariable UUID id
+  );
 
   @Operation(summary = "채널 정보 수정", description = "채널의 이름을 변경합니다.")
   @ApiResponses({
@@ -64,12 +66,14 @@ public interface ChannelApi {
   @PatchMapping("/{id}")
   ResponseEntity<ChannelResponse> updateChannel(
       @Parameter(description = "수정할 채널의 ID", required = true) UUID id,
-      @RequestBody UpdateChannelRequest request);
+      @RequestBody UpdateChannelRequest request
+  );
 
   @Operation(summary = "채널 삭제", description = "채널 ID를 이용하여 채널을 삭제합니다.")
   @ApiResponses({@ApiResponse(responseCode = "204", description = "채널 삭제 성공"),
       @ApiResponse(responseCode = "404", description = "해당 ID의 채널을 찾을 수 없음")})
   @DeleteMapping("/{id}")
   ResponseEntity<Void> deleteChannel(
-      @Parameter(description = "삭제할 채널의 ID", required = true) UUID id);
+      @Parameter(description = "삭제할 채널의 ID", required = true) UUID id
+  );
 }
