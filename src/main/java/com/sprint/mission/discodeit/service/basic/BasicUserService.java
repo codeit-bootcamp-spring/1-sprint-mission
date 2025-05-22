@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -34,6 +35,7 @@ public class BasicUserService implements UserService {
 
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
+  private final PasswordEncoder passwordEncoder;
 
 
   @Override
@@ -50,7 +52,9 @@ public class BasicUserService implements UserService {
 
     BinaryContent nullableProfile = saveBinaryFile(optionalProfileCreateRequest);
 
-    User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword(), nullableProfile);
+    String encodePwd = passwordEncoder.encode(dto.getPassword());
+
+    User user = new User(dto.getUsername(), dto.getEmail(), encodePwd, nullableProfile);
 
     //cascade persist
     user.addUserStatus(new UserStatus(Instant.now()));
