@@ -81,6 +81,14 @@ CREATE TABLE role
     name       VARCHAR(255) NOT NULL UNIQUE
 );
 
+CREATE TABLE persistent_logins
+(
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
+);
+
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)
