@@ -20,7 +20,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -114,7 +113,6 @@ public class SecurityConfig {
                 FrameOptionsConfig::sameOrigin)) // X-Frame-Options 를 SAMEORIGIN 설정 (H2 콘솔 프레임 허용)
         // URL 별 접근 권한 설정
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
             .requestMatchers(
                 "/",
                 "/h2-console/**",
@@ -123,6 +121,14 @@ public class SecurityConfig {
                 "/swagger-ui/**",
                 "/v3/api-docs/**",
                 "/actuator/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+            .requestMatchers("/api/auth/role").hasRole("ADMIN")
+            .requestMatchers("/api/channels/public").hasRole("CHANNEL_MANAGER")
+            .requestMatchers(HttpMethod.PATCH, "/api/channels/{channelId}")
+            .hasRole("CHANNEL_MANAGER")
+            .requestMatchers(HttpMethod.DELETE, "/api/channels/{channelId}")
+            .hasRole("CHANNEL_MANAGER")
+            .requestMatchers("/api/**").hasRole("USER")
             .anyRequest().authenticated()
         )
         // 로그아웃
