@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 //
 import java.util.*;
@@ -127,6 +128,7 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
+  @PreAuthorize("@messageRepository.findById(#messageId).orElse(null)?.author.id == authentication.principal.id")
   @Transactional
   @Override
   public MessageDto updateMessageText(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
@@ -151,30 +153,28 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or @messageRepository.findById(#id).orElse(null)?.author.id == authentication.principal.id")
   @Transactional
   @Override
   public void deleteMessageById(UUID id) {
     log.info("메세지 삭제 시도");
 
-    String keyword = inputHandler.getYesNOInput();
-    if (keyword.equalsIgnoreCase("y")) {
-      // 메세지 찾기
-      if (messageRepository.findById(id).isEmpty()) {
-        log.error("메세지 삭제 단계에서 메세지를 찾지 못함: messageId={}", id);
-        throw new MessageNotFoundException(Map.of("messageId", id));
-      }
-
-      log.info("메세지 첨부 파일 삭제");
-      // 메세지 첨부 파일 삭제
-      messageRepository.findById(id).stream()
-          .map(Message::getAttachments)
-          .flatMap(List::stream) // List에서 하나씩
-          .map(BaseEntity::getId)
-          .forEach(binaryContentService::deleteBinaryContentById);
-
-      // 메세지 삭제
-      messageRepository.deleteById(id);
-      log.info("메세지 삭제 시도 성공");
+    // 메세지 찾기
+    if (messageRepository.findById(id).isEmpty()) {
+      log.error("메세지 삭제 단계에서 메세지를 찾지 못함: messageId={}", id);
+      throw new MessageNotFoundException(Map.of("messageId", id));
     }
+
+    log.info("메세지 첨부 파일 삭제");
+    // 메세지 첨부 파일 삭제
+    messageRepository.findById(id).stream()
+        .map(Message::getAttachments)
+        .flatMap(List::stream) // List에서 하나씩
+        .map(BaseEntity::getId)
+        .forEach(binaryContentService::deleteBinaryContentById);
+
+    // 메세지 삭제
+    messageRepository.deleteById(id);
+    log.info("메세지 삭제 시도 성공");
   }
 }

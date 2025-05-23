@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 //
@@ -143,6 +144,7 @@ public class BasicUserService implements UserService {
   }
 
 
+  @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
   @Transactional
   @Override
   public UserDto updateUserInfo(UUID id, UserUpdateRequest userUpdateRequest,
@@ -207,6 +209,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
   @Transactional
   @Override
   public void removeUserById(UUID id) {
