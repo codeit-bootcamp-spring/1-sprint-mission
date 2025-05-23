@@ -6,17 +6,21 @@ import com.sprint.mission.discodeit.security.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.handler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -38,6 +42,13 @@ public class SecurityConfig {
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    return RoleHierarchyImpl.fromHierarchy(
+        "ROLE_ADMIN > ROLE_CHANNEL_MANAGER\n" + "ROLE_CHANNEL_MANAGER > ROLE_USER"
+    );
   }
 
   @Bean
@@ -74,7 +85,8 @@ public class SecurityConfig {
   public SecurityFilterChain chain(
       HttpSecurity http,
       CustomLoginFilter customLoginFilter,
-      SecurityContextRepository securityContextRepository) throws Exception {
+      SecurityContextRepository securityContextRepository,
+      SessionRegistry sessionRegistry) throws Exception {
 
     // formLogin 비활성화
     http.formLogin(AbstractHttpConfigurer::disable)
@@ -83,7 +95,9 @@ public class SecurityConfig {
         .httpBasic(AbstractHttpConfigurer::disable)
         // 세션 관리 설정
         .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .sessionRegistry(sessionRegistry)
+            //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         )
         // SecurityContext 저장소 설정
         .securityContext(context -> context

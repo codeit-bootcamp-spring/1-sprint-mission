@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.RoleRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.time.Instant;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +32,7 @@ public class AdminInitializer implements CommandLineRunner {
     Role userRole = createRoleIfNotExists("ROLE_USER");
 
     if (!userRepository.existsByUsername("admin")) {
+      Role role = new Role("ROLE_ADMIN");
       User admin = User.builder()
           .username("admin")
           .password(passwordEncoder.encode("adminPassword00"))

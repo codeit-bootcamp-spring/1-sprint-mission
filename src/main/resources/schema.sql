@@ -74,6 +74,13 @@ CREATE TABLE read_statuses
     UNIQUE (user_id, channel_id)
 );
 
+CREATE TABLE role
+(
+    id         uuid PRIMARY KEY,
+    created_at timestamp,
+    name       VARCHAR(255) NOT NULL UNIQUE
+);
+
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)
