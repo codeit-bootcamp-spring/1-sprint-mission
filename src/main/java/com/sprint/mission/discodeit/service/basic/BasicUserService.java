@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
@@ -24,6 +25,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -249,17 +252,30 @@ public class BasicUserService implements UserService {
         .build();
   }
 
-//  @Override
-//  public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
-//    if (roleUpdateRequest == null || roleUpdateRequest.getUserId() == null
-//        || roleUpdateRequest.getNewRole() == null) {
-//      throw new IllegalArgumentException("Empty Data");
-//    }
-//
-//    User user = userRepository.findById(roleUpdateRequest.getUserId())
-//        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
-//
-//    return userMapper.toDto(user);
-//  }
+  @Override
+  public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
+
+    log.info("사용자 권한 변경 시작: userId = {}, role = {}", roleUpdateRequest.getUserId(),
+        roleUpdateRequest.getNewRole().toString());
+
+    if (roleUpdateRequest == null || roleUpdateRequest.getUserId() == null
+        || roleUpdateRequest.getNewRole() == null) {
+      throw new IllegalArgumentException("Empty Data");
+    }
+
+    User user = userRepository.findById(roleUpdateRequest.getUserId())
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+    String previousRole = user.getRole();
+
+    user.setRole(roleUpdateRequest.getNewRole().toString());
+    userRepository.save(user);
+    log.info("사용자 권한 변경 완료: userId = {}, role = {}", user.getId(), user.getRole());
+
+    eventPublisher.publishEvent(
+        new UserRoleChangedEvent(user.getUsername(), previousRole, roleUpdateRequest.getNewRole()));
+
+    return userMapper.toDto(user);
+  }
 
 }

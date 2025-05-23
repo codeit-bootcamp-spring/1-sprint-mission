@@ -27,6 +27,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,6 +51,12 @@ public class SecurityConfig {
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
+
+  //권한 변경 이벤트를 위한 세션 레지스트리 빈 등록
+  @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
+  }
 
   //비밀번호 암호화를 위한 빈
   @Bean
@@ -193,6 +201,8 @@ public class SecurityConfig {
                 , "/favicon.ico").permitAll()
             .requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
             .requestMatchers("/api/**").authenticated()
+            // 사용자 권한 수정
+            .requestMatchers(HttpMethod.PATCH, "/api/auth/role").hasRole("ADMIN")
             .anyRequest().permitAll())
 
         // HTTP Basic 인증 비활성화

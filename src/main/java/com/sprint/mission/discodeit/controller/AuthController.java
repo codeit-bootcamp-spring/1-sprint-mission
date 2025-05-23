@@ -63,4 +63,12 @@ public class AuthController {
       return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
   }
+
+  @PutMapping("/role")
+  public ResponseEntity<UserDto> updateRole(@RequestBody RoleUpdateRequest userRoleUpdateRequest) {
+
+    UserDto userDto = userService.updateUserRole(userRoleUpdateRequest);
+    return ResponseEntity.ok(userDto);
+  }
+
 }
