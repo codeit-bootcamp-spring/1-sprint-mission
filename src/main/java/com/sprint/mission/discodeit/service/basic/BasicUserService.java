@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
@@ -15,6 +16,7 @@ import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.RoleRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -26,6 +28,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -53,6 +56,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   //
   private final BCryptPasswordEncoder passwordEncoder;
+  private final RoleRepository roleRepository;
 
   @Transactional
   @Override
@@ -94,12 +98,16 @@ public class BasicUserService implements UserService {
                 })
             .orElse(null);
 
+    // 권한 생성
+    Role role = roleRepository.findByName("ROLE_USER")
+        .orElseThrow(() -> new RuntimeException("ROLE_USER 가 존재하지 않습니다."));
     // 유저 생성 : User 도메인 객체 생성
     User user = User.builder()
         .username(userCreateRequest.username())
         .email(userCreateRequest.email())
         .password(passwordEncoder.encode(userCreateRequest.password()))
         .profile(nullableProfile)
+        .roles(Set.of(role))
         .build();
 
     user = userRepository.save(user);

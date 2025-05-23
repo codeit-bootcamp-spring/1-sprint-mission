@@ -4,9 +4,13 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.Collection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +34,14 @@ public class User extends BaseUpdatableEntity {
   @OneToOne
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
+
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+      name = "user_roles", // 중간 조인 테이블
+      joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+  )
+  private Collection<Role> roles;
 
   // mappedBy : 비주인 객체, 컬럼 만들지 마. 읽기 전용
   @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -56,6 +68,11 @@ public class User extends BaseUpdatableEntity {
 
   public void updateProfile(BinaryContent newProfile) {
     this.profile = newProfile;
+  }
+
+  public void updateRole(Collection<Role> roles) {
+    this.roles.clear();
+    this.roles.addAll(roles);
   }
 
   public void updateUserStatus(UserStatus userStatus) {
