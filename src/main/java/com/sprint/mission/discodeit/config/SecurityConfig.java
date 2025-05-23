@@ -6,11 +6,15 @@ import com.sprint.mission.discodeit.security.CustomLogoutFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,7 +23,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 
-
+@EnableMethodSecurity
 @RequiredArgsConstructor
 @Configuration
 public class SecurityConfig {
@@ -27,15 +31,33 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint entryPoint;
 
     @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setRoleHierarchy(roleHierarchy);
+        return handler;
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.fromHierarchy(
+        "ROLE_ADMIN > ROLE_CHANNEL_MANAGER\n" +
+        "ROLE_CHANNEL_MANAGER > ROLE_USER"
+        );
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
+    public AuthenticationProvider authenticationProvider(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder
+    ) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
 
@@ -72,22 +94,22 @@ public class SecurityConfig {
                 //.cors(Customizer.withDefaults())
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers(
-                                        "/api/auth/login",
-                                        "/api/auth/logout",
-                                        "/api/auth/csrf-token", // csrf 토큰 발급 api
-                                        "/api/users", // 회원가입 api 허용
-                                        "/",
-                                        "/index.html",
-                                        "/favicon.ico",  // 파비콘
-                                        "/assets/**", // JS/CSS 번들
-                                        "/static/**", // 정적 리소스
-                                        "/swagger-ui/**",
-                                        "/v3/api-docs/**",
-                                        "/actuator/**"
-                                ).permitAll()
-                                .anyRequest().authenticated()
-                        )
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/logout",
+                                "/api/auth/csrf-token", // csrf 토큰 발급 api
+                                "/api/users", // 회원가입 api 허용
+                                "/",
+                                "/index.html",
+                                "/favicon.ico",  // 파비콘
+                                "/assets/**", // JS/CSS 번들
+                                "/static/**", // 정적 리소스
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/actuator/**"
+                        ).permitAll()
+                        .anyRequest().hasRole("USER")
+                )
                 .formLogin(form -> form.disable())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(entryPoint)

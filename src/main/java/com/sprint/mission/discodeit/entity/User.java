@@ -61,5 +61,9 @@ public class User extends BaseUpdatableEntity {
     this.profile = profile;
   }
 
+  public void updateRole(Role role) {
+    this.role = role;
+  }
+
 }
 

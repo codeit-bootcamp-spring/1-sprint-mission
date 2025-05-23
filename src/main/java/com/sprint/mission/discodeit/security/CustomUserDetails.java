@@ -4,10 +4,12 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
@@ -24,14 +26,16 @@ public class CustomUserDetails implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 null, // BinaryContentDto는 생략하거나 직접 매핑
-                user.getStatus().isOnline()
+                false,
+                user.getRole()
         );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 권한 정보가 없다면 빈 컬렉션 반환
-        return Collections.emptyList();
+        //return Collections.emptyList();
+        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
     }
 
     @Override

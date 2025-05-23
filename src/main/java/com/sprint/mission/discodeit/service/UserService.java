@@ -5,12 +5,15 @@ import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -26,4 +29,7 @@ public interface UserService {
       Optional<BinaryContentCreateRequest> profileCreateRequest);
 
   void delete(UUID id);
+
+  UserDto updateRole(UUID userId, Role newRole);
+
 }

@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
 
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @PostMapping("public")
   public ResponseEntity<ChannelDto> createPublic(
       @Valid @RequestBody ChannelCreatePublicDTO request) {
@@ -38,6 +40,7 @@ public class ChannelController implements ChannelApi {
         .body(channelService.create(request));
   }
 
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @PatchMapping("{channelId}")
   public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateDTO request) {
@@ -46,6 +49,7 @@ public class ChannelController implements ChannelApi {
         .body(channelService.update(channelId, request));
   }
 
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @DeleteMapping("{channelId}")
   public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
     channelService.delete(channelId);

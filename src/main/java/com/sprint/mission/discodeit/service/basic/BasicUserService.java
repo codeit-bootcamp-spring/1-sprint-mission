@@ -17,6 +17,8 @@ import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -133,6 +135,14 @@ public class BasicUserService implements UserService {
           return binaryContent;
         })
         .orElse(null);
+  }
+
+  @Transactional
+  public UserDto updateRole(UUID userId, Role newRole) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+    user.updateRole(newRole);
+    return userMapper.toDto(user);
   }
 
 }
