@@ -5,12 +5,15 @@ import com.sprint.mission.discodeit.dto.CustomUserDetails;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.filter.CustomAuthenticationFilter;
 import com.sprint.mission.discodeit.filter.CustomLogoutFilter;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -37,12 +40,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 @Slf4j
 @Configuration
@@ -51,7 +55,6 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 public class SecurityConfig {
 
   private final UserRepository userRepository;
-  private final UserMapper userMapper;
 
   //권한 변경 이벤트를 위한 세션 레지스트리 빈 등록
   @Bean
@@ -84,6 +87,28 @@ public class SecurityConfig {
 
     //요청 → JSESSIONID 쿠키 → 세션 식별 → SecurityContext 로드 → 인증 정보 사용 → 필요시 SecurityContext 갱신 → 세션에 저장
 
+  }
+
+  @Bean
+  public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+    List<SessionAuthenticationStrategy> strategies = new ArrayList<>();
+    //인증된 사용자의 세션을 등록하고 추적
+    strategies.add(new RegisterSessionAuthenticationStrategy(sessionRegistry()));
+    //세션 고정 공격(Session Fixation Attack) 방어 -> 세션 고정 보호는 SecurityFilterChain에서 처리하므로 제거
+    //strategies.add(new SessionFixationProtectionStrategy());
+
+    //여러 세션 전략을 조합하여 순차적으로 실행
+    return new CompositeSessionAuthenticationStrategy(strategies);
+
+    // 인증 성공 시 실행 순서:
+    //1. RegisterSessionAuthenticationStrategy 실행
+    //   → sessionRegistry.registerNewSession() 호출
+    //   → 사용자별 세션 목록에 현재 세션 등록
+    //
+    //2. SessionFixationProtectionStrategy 실행
+    //   → 현재 세션 ID 무효화
+    //   → 새로운 세션 ID 생성 및 할당
+    //   → 세션 데이터는 새 세션으로 이전
   }
 
   @Bean
@@ -152,6 +177,9 @@ public class SecurityConfig {
     filter.setAuthenticationManager(authenticationManager);
     filter.setFilterProcessesUrl("/api/auth/login");
 
+    // SessionAuthenticationStrategy 설정 추가
+    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
+
     filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
       // 성공 처리 로직
 
@@ -173,8 +201,19 @@ public class SecurityConfig {
 
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
-      response.getWriter().write(new ObjectMapper().writeValueAsString(userMapper.toDto(user)));
 
+      //순환참조 피하기위해 UserDto 구조에 맞게 Map으로 응답 데이터 구성
+      Map<String, Object> responseData = new HashMap<>();
+      responseData.put("id", user.getId());
+      responseData.put("username", user.getUsername());
+      responseData.put("email", user.getEmail());
+      responseData.put("online", true); // 로그인 직후이므로 true
+      responseData.put("profile", user.getProfile() != null ?
+          Map.of("id", user.getProfile().getId()) : null); // BinaryContentDto 간단히 처리
+      responseData.put("role", user.getRole());
+
+      response.getWriter()
+          .write(new ObjectMapper().writeValueAsString(responseData));
     });
     filter.setAuthenticationFailureHandler((request, response, exception) -> {
       // 실패 처리 로직
@@ -228,7 +267,8 @@ public class SecurityConfig {
             authenticationManager(http.getSharedObject(AuthenticationConfiguration.class))))
 
         // 로그아웃 필터 구현
-        .addFilterBefore(new CustomLogoutFilter(), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new CustomLogoutFilter(sessionRegistry()),
+            UsernamePasswordAuthenticationFilter.class)
 
         //securityContext 설정
         .securityContext(securityContext -> securityContext

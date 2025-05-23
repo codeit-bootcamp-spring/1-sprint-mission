@@ -50,8 +50,7 @@ class UserServiceTest {
   private BinaryContentService binaryContentService;
   @Mock
   private BinaryContentRepository binaryContentRepository;
-  @Mock
-  private UserStatusRepository userStatusRepository;
+
   @Mock
   private UserMapper userMapper;
 
@@ -100,12 +99,10 @@ class UserServiceTest {
           null,
           "ROLE_USER"
       );
-      UserStatus userStatus = new UserStatus(user);
 
       // Mock: 가짜 user 객체 반환하도록 설정
       when(userRepository.save(any(User.class))).thenReturn(user);
-      when(userMapper.toDto(any(User.class))).thenReturn(expectedUserDto);
-      when(userStatusRepository.save(any(UserStatus.class))).thenReturn(userStatus);
+      when(userMapper.toDto(any(User.class), any(boolean.class))).thenReturn(expectedUserDto);
 
       // when
       UserDto userDto = userService.create(createUserDto);
@@ -115,7 +112,8 @@ class UserServiceTest {
 
       // userRepository.save가 정확히 한 번 호출되었는지 검증
       verify(userRepository, times(1)).save(any(User.class));
-      verify(userMapper, times(1)).toDto(any(User.class)); // userMapper가 호출되었는지 확인
+      verify(userMapper, times(1)).toDto(any(User.class),
+          any(boolean.class)); // userMapper가 호출되었는지 확인
 
     }
 
@@ -170,7 +168,7 @@ class UserServiceTest {
       // userRepository.save가 정확히 한 번 호출되었는지 검증
       verify(userRepository, never()).save(any(User.class));
       verify(userRepository, times(1)).findByEmail("test@discodeit.com");
-      verify(userMapper, never()).toDto(any(User.class));
+      verify(userMapper, never()).toDto(any(User.class), any(boolean.class));
     }
 
     @Test
@@ -252,7 +250,7 @@ class UserServiceTest {
 
       // Mock: 가짜 user 객체 반환하도록 설정
       when(userRepository.save(any(User.class))).thenReturn(user);
-      when(userMapper.toDto(any(User.class))).thenReturn(expectedUserDto);
+      when(userMapper.toDto(any(User.class), any(boolean.class))).thenReturn(expectedUserDto);
 
       // when
       UserDto userDto = userService.create(createUserDto);
@@ -265,7 +263,8 @@ class UserServiceTest {
 
       // userRepository.save가 정확히 한 번 호출되었는지 검증
       verify(userRepository, times(1)).save(any(User.class));
-      verify(userMapper, times(1)).toDto(any(User.class)); // userMapper가 호출되었는지 확인
+      verify(userMapper, times(1)).toDto(any(User.class),
+          any(boolean.class)); // userMapper가 호출되었는지 확인
 
     }
   }
@@ -337,7 +336,7 @@ class UserServiceTest {
           "ROLE_USER"
       );
 
-      when(userMapper.toDto(any(User.class))).thenReturn(updatedDto);
+      when(userMapper.toDto(any(User.class), any(boolean.class))).thenReturn(updatedDto);
 
       //when
       UserDto result = userService.updateUser(userId.toString(), updateUserDto);
@@ -350,9 +349,8 @@ class UserServiceTest {
       );
 
       verify(userRepository, times(1)).findById(userId);
-      verify(userStatusRepository, times(1)).findByUser(any(User.class));
       verify(userRepository, times(2)).save(any(User.class));
-      verify(userMapper, times(1)).toDto(any(User.class));
+      verify(userMapper, times(1)).toDto(any(User.class), any(boolean.class));
     }
 
     @Test
