@@ -88,7 +88,8 @@ class UserControllerTest {
         "testuser",
         "test@example.com",
         profileDto,
-        false
+        false,
+        null
     );
 
     given(userService.create(any(UserCreateRequest.class), any(Optional.class)))
@@ -143,7 +144,8 @@ class UserControllerTest {
         "user1",
         "user1@example.com",
         null,
-        true
+        true,
+        null
     );
 
     UserDto user2 = new UserDto(
@@ -151,7 +153,8 @@ class UserControllerTest {
         "user2",
         "user2@example.com",
         null,
-        false
+        false,
+        null
     );
 
     List<UserDto> users = List.of(user1, user2);
@@ -207,7 +210,8 @@ class UserControllerTest {
         "updateduser",
         "updated@example.com",
         profileDto,
-        true
+        true,
+        null
     );
 
     given(userService.update(eq(userId), any(UserUpdateRequest.class), any(Optional.class)))
