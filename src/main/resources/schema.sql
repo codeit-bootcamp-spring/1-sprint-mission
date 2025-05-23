@@ -25,6 +25,8 @@ create table users
 alter table users
     add constraint fk_user_profile_id
         foreign key (profile_id) references binary_contents (id) on delete cascade;
+ALTER TABLE users
+    ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER';
 
 -- user_statuses
 create table user_statuses
