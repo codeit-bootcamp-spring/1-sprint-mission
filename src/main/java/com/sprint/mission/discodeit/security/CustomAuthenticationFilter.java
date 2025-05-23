@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
 
@@ -28,13 +29,16 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
   private final SecurityContextRepository securityContextRepository;
+  private final SessionRegistry sessionRegistry;
 
   public CustomAuthenticationFilter(AuthenticationManager authenticationManager,
-      SecurityContextRepository securityContextRepository, UserMapper userMapper) {
+      SecurityContextRepository securityContextRepository, UserMapper userMapper, SessionRegistry sessionRegistry) {
     super(authenticationManager);
     this.userMapper = userMapper;
     this.authenticationManager = authenticationManager;
     this.securityContextRepository = securityContextRepository;
+    this.sessionRegistry = sessionRegistry;
+
     setFilterProcessesUrl("/api/auth/login");
   }
 
@@ -66,8 +70,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     SecurityContextHolder.getContext().setAuthentication(authResult);
     securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
+    sessionRegistry.registerNewSession(request.getSession().getId(), authResult.getPrincipal());
 
-    // 성공 응답
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");

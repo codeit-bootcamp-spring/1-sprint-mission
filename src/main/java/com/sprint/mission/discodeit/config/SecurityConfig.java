@@ -10,6 +10,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +38,12 @@ public class SecurityConfig {
             .requestMatchers("/api/**").authenticated()
             .anyRequest().permitAll())
         .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            .maximumSessions(1)
+            .maxSessionsPreventsLogin(false)
+            .sessionRegistry(sessionRegistry())
+        )
         .httpBasic(AbstractHttpConfigurer::disable)
         .logout(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
@@ -70,7 +80,13 @@ public class SecurityConfig {
   @Bean
   public CustomAuthenticationFilter customAuthFilter(AuthenticationManager authenticationManager,
       HttpSessionSecurityContextRepository securityContextRepository,
-      UserMapper userMapper) {
-    return new CustomAuthenticationFilter(authenticationManager, securityContextRepository, userMapper);
+      UserMapper userMapper, SessionRegistry sessionRegistry) {
+    return new CustomAuthenticationFilter(authenticationManager, securityContextRepository,
+        userMapper, sessionRegistry);
+  }
+
+  @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
   }
 }

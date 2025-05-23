@@ -3,6 +3,9 @@ spring:
     active: dev
 
 server:
+  servlet:
+    session:
+      timeout: 30m
   error:
     include-stacktrace: never
 
