@@ -12,10 +12,9 @@ import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.io.InputHandler;
@@ -23,16 +22,14 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.never;
 
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -58,19 +55,7 @@ public class UserServiceTest {
   private UserRepository userRepository;
 
   @Mock
-  private BinaryContentStorage binaryContentStorage;
-
-  @Mock
-  private BinaryContentRepository binaryContentRepository;
-
-  @Mock
   private BinaryContentService binaryContentService;
-
-  @Mock
-  private UserStatusRepository userStatusRepository;
-
-  @Mock
-  private UserStatusService userStatusService;
 
   @Mock
   private UserMapper userMapper;
@@ -90,7 +75,6 @@ public class UserServiceTest {
   private String password;
   private User user;
   private UserDto userDto;
-  private UserStatus userStatus;
 
   @BeforeEach
   void setUp() {
@@ -99,23 +83,21 @@ public class UserServiceTest {
     email = "test@example.com";
     password = "password123";
 
+    Role role = new Role("ROLE_USER");
+
     user = User.builder()
         .username(username)
         .email(email)
         .password(password)
         .build();
     ReflectionTestUtils.setField(user, "id", userId); // private, final 필드 강제 값 주입
-    userStatus = new UserStatus(Instant.now(), user);
-    // given(userStatusRepository.save(any(UserStatus.class))).willReturn(userStatus);
-
-    user.updateUserStatus(userStatus);
 
     userDto = new UserDto(
         user.getId(),
         user.getUsername(),
         user.getEmail(),
         null,
-        true
+        Set.of(role)
     );
   }
 
@@ -174,7 +156,6 @@ public class UserServiceTest {
     then(userRepository).should(never()).existsByEmail("test@example.com");
     then(userRepository).should(never()).save(any(User.class));
 
-    then(userStatusService).should(never()).createUserStatus(any(UserStatusCreateRequest.class));
     then(userMapper).should(never()).toDto(any(User.class));
   }
 
@@ -197,12 +178,14 @@ public class UserServiceTest {
         .password("newPassword123")
         .build();
 
+    Role role = new Role("ROLE_USER");
+
     UserDto updateUserDto = new UserDto(
         updateUser.getId(),
         updateUser.getUsername(),
         updateUser.getEmail(),
         null,
-        true
+        Set.of(role)
     );
 
     // userRepository.findById() 메서드 호출시 existingUser를 반환한다.
@@ -296,7 +279,6 @@ public class UserServiceTest {
 
     /**then**/
     // void 반환들은 호출되는 것만 확인한다.
-    then(userStatusService).should().delteUserStatusByUserId(user.getId());
     then(binaryContentService).should().deleteBinaryContentById(profile.getId());
     then(userRepository).should().deleteById(deleteId);
   }
@@ -319,7 +301,6 @@ public class UserServiceTest {
     basicUserService.removeUserById(deleteId);
 
     // then
-    then(userStatusService).should(never()).deleteUserStatusById(user.getId());
     then(binaryContentService).should(never()).deleteBinaryContentById(any());
     then(userRepository).should(never()).deleteById(deleteId);
   }

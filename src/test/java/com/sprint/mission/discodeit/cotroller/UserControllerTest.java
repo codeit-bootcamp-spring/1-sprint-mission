@@ -6,29 +6,22 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.controller.UserController;
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +42,6 @@ import static org.mockito.BDDMockito.given;
 
 
 @WebMvcTest(UserController.class)
-@Import(BasicUserStatusService.class)
 public class UserControllerTest {
 
   @Autowired
@@ -58,8 +50,6 @@ public class UserControllerTest {
   @MockBean
   private UserService userService; // Mocking
 
-  @MockBean
-  private UserStatusService userStatusService;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -82,7 +72,7 @@ public class UserControllerTest {
         "binaryContent",
         "profile.jpg",
         MediaType.IMAGE_JPEG_VALUE,
-        "dummy content".getBytes()
+        "dummy content" .getBytes()
     );
 
     // JSON 데이터를 위한 multipart 파일 생성
@@ -106,7 +96,7 @@ public class UserControllerTest {
         .username("testUsername")
         .email("test@example.com")
         .profile(profileDto)
-        .online(true)
+//        .online(true)
         .build();
 
     given(userService.createUser(any(UserCreateRequest.class), any(Optional.class))).willReturn(
@@ -156,12 +146,14 @@ public class UserControllerTest {
     UUID userId1 = UUID.randomUUID();
     UUID userId2 = UUID.randomUUID();
 
+    Role role = new Role("ROLE_USER");
+
     UserDto user1 = new UserDto(
         userId1,
         "user1",
         "user1@example.com",
         null,
-        true
+        Set.of(role)
     );
 
     UserDto user2 = new UserDto(
@@ -169,7 +161,7 @@ public class UserControllerTest {
         "user2",
         "user2@example.com",
         null,
-        false
+        Set.of(role)
     );
 
     List<UserDto> users = List.of(user1, user2);
@@ -209,7 +201,7 @@ public class UserControllerTest {
         "binaryContent",
         "updated-profile.jpg",
         MediaType.IMAGE_JPEG_VALUE,
-        "dummy content".getBytes()
+        "dummy content" .getBytes()
     );
 
     UUID userId = UUID.randomUUID();
@@ -225,7 +217,7 @@ public class UserControllerTest {
         .username("updatedUsername")
         .email("updated@example.com")
         .profile(profileDto)
-        .online(true)
+//        .online(true)
         .build();
 
     given(userService.updateUserInfo(eq(userId), any(UserUpdateRequest.class), any(Optional.class)))
@@ -306,32 +298,4 @@ public class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound());
   }
-
-  @Test
-  @DisplayName("사용자 상태 업데이트 성공 테스트")
-  void updateUserStatus_Success() throws Exception {
-    // Given
-    UUID userId = UUID.randomUUID();
-    UUID statusId = UUID.randomUUID();
-    Instant lastActiveAt = Instant.now();
-
-    UserStatusUpdateByUserIdRequest updateRequest = new UserStatusUpdateByUserIdRequest(
-        lastActiveAt);
-    UserStatusDto userStatusDto = new UserStatusDto(statusId, userId, lastActiveAt);
-
-    given(userStatusService.updateUserStatusByUserId(any(UUID.class),
-        any(UserStatusUpdateByUserIdRequest.class)))
-        .willReturn(userStatusDto);
-
-    // When & Then
-    mockMvc.perform(patch("/api/users/{userId}/userStatus", userId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(updateRequest)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(statusId.toString()))
-        .andExpect(jsonPath("$.userId").value(userId.toString()))
-        .andExpect(content().json(objectMapper.writeValueAsString(userStatusDto)));
-  }
-
-
 }

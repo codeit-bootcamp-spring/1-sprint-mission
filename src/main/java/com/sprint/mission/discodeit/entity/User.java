@@ -43,13 +43,6 @@ public class User extends BaseUpdatableEntity {
   )
   private Collection<Role> roles;
 
-  // mappedBy : 비주인 객체, 컬럼 만들지 마. 읽기 전용
-  @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
-  // 읽기 전용으로 만들고,
-  // users 테이블에는 컬럼을 만들지 않는다.
-  // mappedBy ->> userStatus의 user 필드에 본 객체가 참조되도록 만든다
-  private UserStatus userStatus;
-
   // JPA용 기본 생성자, JPA만 접근할 수 있도록 protected 접근자 설정
   protected User() {
   }
@@ -73,9 +66,5 @@ public class User extends BaseUpdatableEntity {
   public void updateRole(Collection<Role> roles) {
     this.roles.clear();
     this.roles.addAll(roles);
-  }
-
-  public void updateUserStatus(UserStatus userStatus) {
-    this.userStatus = userStatus;
   }
 }
