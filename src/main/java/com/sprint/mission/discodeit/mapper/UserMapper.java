@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 // UserMapper가 BinaryContentMapper를 사용 -> 메퍼라서 uses 이용
-@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class, UserStatusMapper.class})
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
   // DTO 객체 반환
@@ -14,6 +14,5 @@ public interface UserMapper {
   // @Mapping(source = "profile", target = "profile") 에서
   // User 엔티티의 profile 필드를 BinaryContentMapper를 통해 BinaryContentDto로 변환하여 UserDto에 전달
   @Mapping(source = "profile", target = "profile")
-  @Mapping(target = "online", expression = "java(user.getUserStatus().isOnline())")
   UserDto toDto(User user);
 }

@@ -3,11 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.*;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +26,6 @@ import java.util.UUID;
 public class UserController implements UserApi {
 
   private final UserService userService;
-  private final UserStatusService userStatusService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> createUser(
@@ -73,19 +69,6 @@ public class UserController implements UserApi {
     log.debug("유저 수정 응답(Response) {}", userDto);
     return ResponseEntity.status(HttpStatus.OK).body(userDto);
 
-  }
-
-
-  @PatchMapping(value = "/{userId}/userStatus")
-  public ResponseEntity<UserStatusDto> updateUserStateByUserId(
-      @PathVariable UUID userId,
-      @RequestBody UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
-
-    // 유저 상태 수정
-    UserStatusDto userStatusDto = userStatusService.updateUserStatusByUserId(userId,
-        userStatusUpdateByUserIdRequest);
-
-    return ResponseEntity.ok(userStatusDto);
   }
 
   @DeleteMapping(value = "/{userId}")

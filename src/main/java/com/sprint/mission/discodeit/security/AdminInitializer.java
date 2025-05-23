@@ -2,10 +2,8 @@ package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.RoleRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import java.time.Instant;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +20,6 @@ public class AdminInitializer implements CommandLineRunner {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final RoleRepository roleRepository;
-  private final UserStatusRepository userStatusRepository;
 
   @Override
   public void run(String... args) throws Exception {
@@ -43,9 +40,6 @@ public class AdminInitializer implements CommandLineRunner {
           .roles(Set.of(adminRole))
           .build();
       userRepository.save(admin);
-      UserStatus userStatus = new UserStatus(Instant.now(), admin);
-      userStatus = userStatusRepository.save(userStatus);
-      admin.updateUserStatus(userStatus);
       log.debug("admin 계정 생성 완료");
     }
   }

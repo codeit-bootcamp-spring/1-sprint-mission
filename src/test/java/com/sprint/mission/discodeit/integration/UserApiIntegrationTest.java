@@ -14,13 +14,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 
-import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,8 +52,6 @@ class UserApiIntegrationTest {
   @MockBean
   InputHandler inputHandler;
   private UserRepository userRepository;
-  @Autowired
-  private UserStatusService userStatusService;
 
 
   @Test
@@ -79,7 +75,7 @@ class UserApiIntegrationTest {
         "binaryContent",
         "profile.jpg",
         MediaType.IMAGE_JPEG_VALUE,
-        "test-image".getBytes()
+        "test-image" .getBytes()
     );
 
     // When & Then
@@ -181,7 +177,7 @@ class UserApiIntegrationTest {
         "profile",
         "updated-profile.jpg",
         MediaType.IMAGE_JPEG_VALUE,
-        "updated-image".getBytes()
+        "updated-image" .getBytes()
     );
 
     // When & Then
@@ -263,51 +259,6 @@ class UserApiIntegrationTest {
 
     // When & Then
     mockMvc.perform(delete("/api/users/{userId}", nonExistentUserId))
-        .andExpect(status().isNotFound());
-  }
-
-  @Test
-  @DisplayName("사용자 상태 업데이트 API 통합 테스트")
-  void updateUserStatus_Success() throws Exception {
-    // Given
-    // 테스트 사용자 생성 - Service를 통해 초기화
-    UserCreateRequest createRequest = new UserCreateRequest(
-        "statususer",
-        "status@example.com",
-        "Password1!"
-    );
-
-    UserDto createdUser = userService.createUser(createRequest, Optional.empty());
-    UUID userId = createdUser.id();
-
-    Instant newLastActiveAt = Instant.now();
-    UserStatusUpdateByUserIdRequest statusUpdateRequest = new UserStatusUpdateByUserIdRequest(
-        newLastActiveAt
-    );
-    String requestBody = objectMapper.writeValueAsString(statusUpdateRequest);
-
-    // When & Then
-    mockMvc.perform(patch("/api/users/{userId}/userStatus", userId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.lastActiveAt", is(newLastActiveAt.toString())));
-  }
-
-  @Test
-  @DisplayName("사용자 상태 업데이트 실패 API 통합 테스트 - 존재하지 않는 사용자")
-  void updateUserStatus_Failure_UserNotFound() throws Exception {
-    // Given
-    UUID nonExistentUserId = UUID.randomUUID();
-    UserStatusUpdateByUserIdRequest statusUpdateRequest = new UserStatusUpdateByUserIdRequest(
-        Instant.now()
-    );
-    String requestBody = objectMapper.writeValueAsString(statusUpdateRequest);
-
-    // When & Then
-    mockMvc.perform(patch("/api/users/{userId}/userStatus", nonExistentUserId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody))
         .andExpect(status().isNotFound());
   }
 }

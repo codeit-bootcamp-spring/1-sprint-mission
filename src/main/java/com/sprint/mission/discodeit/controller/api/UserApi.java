@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -65,22 +62,6 @@ public interface UserApi {
       @Parameter(description = "수정할 User Id") UUID userId,
       @Parameter(description = "수정할 User 정보") UserUpdateRequest userUpdateRequest,
       @Parameter(description = "수정할 User 프로필 이미지") MultipartFile file
-  );
-
-  @Operation(summary = "User 온라인 상태 업데이트")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200", description = "User 온라인 상태가 성공적으로 업데이트됨",
-          content = @Content(schema = @Schema(implementation = UserStatusDto.class))
-      ),
-      @ApiResponse(
-          responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "유저 상태를 찾을 수 없습니다."))
-      )
-  })
-  ResponseEntity<UserStatusDto> updateUserStateByUserId(
-      @Parameter(description = "상태를 변경할 User ID") UUID userId,
-      @Parameter(description = "변경할 User 온라인 상태 정보") UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest
   );
 
   @Operation(summary = "User 삭제")

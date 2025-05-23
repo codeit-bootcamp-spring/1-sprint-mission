@@ -2,27 +2,22 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.io.InputHandler;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.RoleRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 //
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -35,7 +30,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 //
-import java.time.Instant;
 import java.util.UUID;
 
 @Slf4j
@@ -44,11 +38,9 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
 
   //
   private final BinaryContentService binaryContentService;
-  private final UserStatusService userStatusService;
   //
   private final UserMapper userMapper;
   //
@@ -112,16 +104,6 @@ public class BasicUserService implements UserService {
         .build();
 
     user = userRepository.save(user);
-
-    log.info("유저 상태 생성 시도");
-    // 유저 상태 생성 : UserStatus 도메인 객체 생성
-    UserStatus userStatus = UserStatus.builder()
-        .user(user)
-        .lastActiveAt(Instant.now())
-        .build();
-    userStatus = userStatusRepository.save(userStatus);
-
-    user.updateUserStatus(userStatus);
 
     /* 중복이 없는 유저 이름과 만들어진 시각을 log.info에 담는다.*/
     log.info("사용자 생성 시도 성공: username={}, createdAt={}", user.getUsername(), user.getCreatedAt());
@@ -222,9 +204,6 @@ public class BasicUserService implements UserService {
             log.error("유저 삭제 단계에서 유저를 찾지 못함: userId={}", id);
             return new UserNotFoundException(Map.of("UserId", id));
           });
-      log.info("유저 상태 삭제");
-      // 유저 상태 삭제
-      userStatusService.delteUserStatusByUserId(user.getId());
       if (user.getProfile() != null) {
         log.info("유저 프로필 이미지 삭제: profileName={}", user.getProfile().getFileName());
         // 유저의 프로필 이미지 삭제
