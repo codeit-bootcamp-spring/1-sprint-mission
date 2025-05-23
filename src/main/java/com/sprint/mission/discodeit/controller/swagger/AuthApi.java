@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 @Tag(name = "Auth", description = "인증 API")
 public interface AuthApi {
 
-  @Operation(summary = "로그인")
+/*  @Operation(summary = "로그인")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "로그인 성공",
@@ -33,5 +33,7 @@ public interface AuthApi {
   })
   ResponseEntity<UserDto> login(
       @Parameter(description = "로그인 정보") AuthLoginDTO request
-  );
+  );*/
+
+
 } 

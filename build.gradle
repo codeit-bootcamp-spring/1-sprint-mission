@@ -44,6 +44,7 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.31.7'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {
