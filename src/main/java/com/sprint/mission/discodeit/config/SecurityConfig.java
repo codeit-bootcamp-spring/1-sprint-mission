@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -142,6 +141,9 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
                 "/",
+                "/index.html",
+                "/assets/**",
+                "/favicon.ico",
                 "/h2-console/**",
                 "/api/auth/login",
                 "/api/auth/csrf-token",
