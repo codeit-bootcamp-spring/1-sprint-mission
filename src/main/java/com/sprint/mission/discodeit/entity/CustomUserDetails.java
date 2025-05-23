@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class CustomUserDetails implements UserDetails {
 
   private final User user;
+
+  public UUID getId() {
+    return user.getId();
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

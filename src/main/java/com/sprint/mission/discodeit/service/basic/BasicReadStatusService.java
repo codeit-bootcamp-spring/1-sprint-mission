@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,6 +32,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusMapper readStatusMapper;
 
 
+  @PreAuthorize("#request.user.id == authentication.principal.id")
   @Transactional
   @Override
   public ReadStatusDto createReadStatus(ReadStatusCreateRequest request) {
@@ -90,6 +92,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
 
+  @PreAuthorize("#id == authentication.principal.id")
   @Transactional
   @Override
   public ReadStatusDto updateReadStatus(
