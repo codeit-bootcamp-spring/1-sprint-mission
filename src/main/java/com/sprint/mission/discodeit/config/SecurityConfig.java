@@ -20,6 +20,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.SessionFixationConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -96,6 +97,8 @@ public class SecurityConfig {
         .httpBasic(AbstractHttpConfigurer::disable)
         // 세션 관리 설정
         .sessionManagement(session -> session
+                .sessionFixation(SessionFixationConfigurer::changeSessionId
+                )
                 .maximumSessions(1)
                 .sessionRegistry(sessionRegistry)
             //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
