@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.filter.CustomLoginFilter;
 import com.sprint.mission.discodeit.security.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.handler.LoginSuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
@@ -100,6 +101,11 @@ public class SecurityConfig {
                 .sessionFixation(SessionFixationConfigurer::changeSessionId
                 )
                 .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+                .expiredSessionStrategy(ev -> {
+                  HttpServletResponse res = ev.getResponse();
+                  res.sendRedirect("/login?concurrent");
+                })
                 .sessionRegistry(sessionRegistry)
             //.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         )
