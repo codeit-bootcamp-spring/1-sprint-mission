@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +26,10 @@ public class AuthController implements AuthControllerDocs {
   public ResponseEntity<UserResponse> login(@RequestBody @Valid UserLoginRequest userLoginRequest) {
     UserResponse userResponse = authService.login(userLoginRequest);
     return ResponseEntity.ok(userResponse);
+  }
+
+  @GetMapping("/csrf-token")
+  public ResponseEntity<CsrfToken> csrfToken(CsrfToken token) {
+    return ResponseEntity.ok(token);
   }
 }
