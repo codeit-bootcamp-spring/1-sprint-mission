@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
@@ -68,7 +69,7 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    User user = new User(username, email, encodedPassword, nullableProfile);
+    User user = new User(username, email, encodedPassword, nullableProfile, Role.ROLE_USER);
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
 
@@ -106,8 +107,7 @@ public class BasicUserService implements UserService {
     
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
-          UserNotFoundException exception = UserNotFoundException.withId(userId);
-          return exception;
+          return UserNotFoundException.withId(userId);
         });
 
     String newUsername = userUpdateRequest.newUsername();

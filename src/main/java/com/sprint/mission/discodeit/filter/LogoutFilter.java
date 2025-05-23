@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class LogoutFilter extends OncePerRequestFilter {
 
-  private static final String LOGOUT_URI = "api/auth/logout";
+  private static final String LOGOUT_URI = "/api/auth/logout";
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
