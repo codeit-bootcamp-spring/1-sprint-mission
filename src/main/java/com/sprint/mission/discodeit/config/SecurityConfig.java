@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.filter.CustomLoginFilter;
+import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
 import com.sprint.mission.discodeit.security.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.handler.LoginSuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
@@ -28,6 +30,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 
@@ -85,11 +89,23 @@ public class SecurityConfig {
   }
 
   @Bean
+  public PersistentTokenRepository tokenRepository(DataSource dataSource) {
+    JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
+    repository.setDataSource(dataSource);
+
+    repository.setCreateTableOnStartup(false);
+
+    return repository;
+  }
+
+  @Bean
   public SecurityFilterChain chain(
       HttpSecurity http,
       CustomLoginFilter customLoginFilter,
       SecurityContextRepository securityContextRepository,
-      SessionRegistry sessionRegistry) throws Exception {
+      SessionRegistry sessionRegistry,
+      PersistentTokenRepository tokenRepository, CustomLogoutHandler customLogoutHandler)
+      throws Exception {
 
     // formLogin 비활성화
     http.formLogin(AbstractHttpConfigurer::disable)
@@ -145,12 +161,24 @@ public class SecurityConfig {
         // 로그아웃
         .logout(logout -> logout
             .logoutUrl("/api/auth/logout")
+            .addLogoutHandler(customLogoutHandler)
             .invalidateHttpSession(true) // 세션 무효화 처리
             .clearAuthentication(true) // securityContext 초기화
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+            .deleteCookies("remember-me-cookie", "JSESSIONID")
         );
 
     http.addFilterAt(customLoginFilter, UsernamePasswordAuthenticationFilter.class);
+
+    http
+        .rememberMe(r -> r
+            .rememberMeParameter("remember-me")
+            .rememberMeCookieName("remember-me-cookie")
+            .tokenRepository(tokenRepository)
+            .tokenValiditySeconds(60 * 60 * 24 * 21)
+            .userDetailsService(userDetailsService)
+            .key("my!secret!key0cr!")
+        );
 
     return http.build();
   }
