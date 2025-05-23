@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
@@ -54,7 +55,7 @@ public class BasicUserService implements UserService {
 
     String encodePwd = passwordEncoder.encode(dto.getPassword());
 
-    User user = new User(dto.getUsername(), dto.getEmail(), encodePwd, nullableProfile);
+    User user = new User(dto.getUsername(), dto.getEmail(), encodePwd, nullableProfile, Role.ROLE_USER);
 
     //cascade persist
     user.addUserStatus(new UserStatus(Instant.now()));
