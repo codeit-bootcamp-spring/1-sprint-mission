@@ -17,14 +17,11 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.entity.status.AccountStatus;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.lang.reflect.Field;
@@ -100,7 +97,8 @@ class UserServiceTest {
           "test",
           "test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
       UserStatus userStatus = new UserStatus(user);
 
@@ -158,7 +156,8 @@ class UserServiceTest {
           "test",
           "test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
 
       // Mock: 가짜 user 객체 반환하도록 설정
@@ -247,7 +246,8 @@ class UserServiceTest {
           "test@discodeit.com",
           true,
           // 프로필 이미지는 null,
-          binaryContentDto
+          binaryContentDto,
+          "ROLE_USER"
       );
 
       // Mock: 가짜 user 객체 반환하도록 설정
@@ -278,7 +278,6 @@ class UserServiceTest {
     private UUID userId;
     private User user;
     private UserDto expectedUserDto;
-    private UserStatus userStatus;
 
     @BeforeEach
     void setUp() {
@@ -305,10 +304,10 @@ class UserServiceTest {
           "test",
           "test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
 
-      userStatus = new UserStatus(user);
     }
 
     @Test
@@ -325,8 +324,6 @@ class UserServiceTest {
       // 사용자 상태 모킹
       //userRepository 가 findById를 사용한다면, user를 return
       when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-      //userStatusRepository가 어떤 객체든 User 클래스에 속하는 객체를 파라미터로 findByUser를 사용한다면,userStatus 를 Return
-      when(userStatusRepository.findByUser(any(User.class))).thenReturn(Optional.of(userStatus));
       // userRepository가 save를 어떤 객체든, User 클래스인 객체로 save를 한다면, user를 return
       when(userRepository.save(any(User.class))).thenReturn(user);
 
@@ -336,7 +333,8 @@ class UserServiceTest {
           "new name",
           "new_test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
 
       when(userMapper.toDto(any(User.class))).thenReturn(updatedDto);
@@ -371,7 +369,6 @@ class UserServiceTest {
     private UUID userId;
     private User user;
     private UserDto expectedUserDto;
-    private UserStatus userStatus;
 
     @BeforeEach
     void setUp() {
@@ -398,11 +395,10 @@ class UserServiceTest {
           "test",
           "test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
 
-      userStatus = new UserStatus(user);
-      user.setStatus(userStatus);
 
     }
 

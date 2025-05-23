@@ -2,13 +2,11 @@ package com.sprint.mission.discodeit.event;
 
 import com.sprint.mission.discodeit.dto.CustomUserDetails;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,6 @@ public class AuthEventListener {
   private final SessionRegistry sessionRegistry;
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
 
   @EventListener
   @Async

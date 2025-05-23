@@ -9,15 +9,12 @@ import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
@@ -43,7 +40,6 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentService binaryContentService;
   private final BinaryContentRepository binaryContentRepository;
-  private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
@@ -79,10 +75,6 @@ public class BasicUserService implements UserService {
     User user = new User(createUserDto.username(), createUserDto.email(),
         bCryptPasswordEncoder.encode(createUserDto.password()), null);
     userRepository.save(user);
-    UserStatus userStatus = new UserStatus(user);
-    userStatusRepository.save(userStatus);
-
-    log.debug("사용자 상태 객체 생성 및 연결: {}", userStatus);
 
     log.info("사용자 생성 완료: id = {}, email = {}, username = {}", user.getId(), user.getEmail(),
         user.getUsername());
@@ -170,10 +162,6 @@ public class BasicUserService implements UserService {
     User savedUser = userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", savedUser.getId());
 
-    UserStatus userStatus = userStatusRepository.findByUser(savedUser)
-        .orElseThrow(() -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
-
-    user.setStatus(userStatus);
     log.debug("사용자 상태 객체 연결");
 
     userRepository.save(user);
@@ -215,10 +203,6 @@ public class BasicUserService implements UserService {
 
     user.setUpdatedAt(updateUserDto.updatedAt());
 
-    UserStatus userStatus = user.getStatus();
-    userStatus.setUpdatedAt(updateUserDto.updatedAt());
-
-    userStatusRepository.save(userStatus);
     userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", userId);
 

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -141,7 +142,7 @@ public class SecurityConfig {
       AuthenticationManager authenticationManager) throws Exception {
 
     //UsernamePasswordAuthenticationFilter 주요 기능:
-    // - 요청에서 사용자명/비밀번호 파라미터 추출
+    // - 요청에서 사용자명/비밀번호 파라미터 추출 --> 하지만 우리는 form로그인이 아니기 때문에 직접 Json에서 추출해야함
     // - UsernamePasswordAuthenticationToken 생성
     // - AuthenticationManager에 인증 위임
     // - 인증 성공/실패 핸들러 호출
@@ -200,9 +201,21 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/login"
                 , "/favicon.ico").permitAll()
             .requestMatchers("/api/auth/me", "/api/auth/logout").authenticated()
-            .requestMatchers("/api/**").authenticated()
+
+            // 퍼블릭 채널 생성
+            .requestMatchers(HttpMethod.POST, "/api/channels/public")
+            .hasAnyRole("CHANNEL_MANAGER", "ADMIN")
+            // 퍼블릭 채널 수정
+            .requestMatchers(HttpMethod.PATCH, "/api/channels/public")
+            .hasAnyRole("CHANNEL_MANAGER", "ADMIN")
+            // 퍼블릭 채널 삭제
+            .requestMatchers(HttpMethod.DELETE, "/api/channels/public")
+            .hasAnyRole("CHANNEL_MANAGER", "ADMIN")
+
             // 사용자 권한 수정
             .requestMatchers(HttpMethod.PATCH, "/api/auth/role").hasRole("ADMIN")
+
+            .requestMatchers("/api/**").hasRole("USER")
             .anyRequest().permitAll())
 
         // HTTP Basic 인증 비활성화
@@ -235,6 +248,7 @@ public class SecurityConfig {
             // change Session 세션은 동일하나, 전달해주는 세션 cookie id 값을 다르게 반환하여 해커가 가진 값과 다르도록
             .maximumSessions(1) // 동시 로그인 가능 개수
             .maxSessionsPreventsLogin(false)// 동일 계정으로 로그인 했을때, 이미 로그인 되어있는 계정을 로그아웃 시킬지
+            .sessionRegistry(sessionRegistry())// 세션 이벤트 처리를 위해 필요
         );
 
     return http.build();

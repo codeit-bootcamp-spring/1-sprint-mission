@@ -14,8 +14,6 @@ import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundExcep
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.userStatus.UserStatusException;
-import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -175,28 +173,6 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MessageNotFoundException.class)
   public ResponseEntity<ErrorResponse> MessageNotFoundException(MessageNotFoundException e) {
     log.warn("메세지를 찾을 수 없는 예외 발생: 타입={}, 메시지={}", e.getClass().getSimpleName(), e.getMessage());
-
-    ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.NOT_FOUND.value());
-
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-  }
-
-  //4. 사용자 상태(UserStatus) 관련 예외
-  // UserStatusException
-  @ExceptionHandler(UserStatusException.class)
-  public ResponseEntity<ErrorResponse> handleUserStatusException(UserStatusException e) {
-    log.warn("사용자 상태 관련 예외 발생: 타입={}, 메시지={}", e.getClass().getSimpleName(), e.getMessage());
-
-    ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.NOT_FOUND.value());
-
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-  }
-
-  // UserStatusNotFoundException - 존재하지 않는 사용자 상태
-  @ExceptionHandler(UserStatusNotFoundException.class)
-  public ResponseEntity<ErrorResponse> handleUserStatusNotFoundException(UserNotFoundException e) {
-    log.warn("사용자 상태를 찾을 수 없는 예외 발생: 타입 = {}, 메세지={} ", e.getClass().getSimpleName(),
-        e.getMessage());
 
     ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.NOT_FOUND.value());
 

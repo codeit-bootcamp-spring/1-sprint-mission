@@ -34,7 +34,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   @Query(value = "SELECT DISTINCT m FROM Message m " +
       "JOIN FETCH m.author a " +
-      "LEFT JOIN FETCH a.status " +
       "WHERE m.channel.id = :channelId " +
       "ORDER BY m.createdAt DESC",
       countQuery = "SELECT COUNT(m) FROM Message m WHERE m.channel.id = :channelId")
@@ -60,7 +59,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   @Query("SELECT distinct m FROM Message m "
       + "LEFT JOIN FETCH m.author a "
-      + "JOIN FETCH a.status "
       + "LEFT JOIN FETCH a.profile "
       + "WHERE m.channel.id=:channelId AND m.createdAt < :createdAt")
   List<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,

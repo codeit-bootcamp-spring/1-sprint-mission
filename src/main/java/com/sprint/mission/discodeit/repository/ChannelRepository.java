@@ -27,7 +27,6 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
   @Query("SELECT DISTINCT c FROM Channel c " +
       "JOIN FETCH c.readStatuses rs " +
       "JOIN FETCH rs.user u " +
-      "LEFT JOIN FETCH u.status " +
       "WHERE c.id = :channelId AND c.type = com.sprint.mission.discodeit.entity.ChannelType.PRIVATE")
   Optional<Channel> findPrivateChannelWithParticipantsById(@Param("channelId") UUID channelId);
 

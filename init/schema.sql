@@ -20,16 +20,6 @@ CREATE TABLE users
     FOREIGN KEY ("profile_id") REFERENCES "binary_contents" ("id") ON DELETE SET NULL
 );
 
-CREATE TABLE user_statuses
-(
-    "id"             UUID PRIMARY KEY,
-    "created_at"     timestamptz NOT NULL,
-    "updated_at"     timestamptz,
-    "user_id"        UUID UNIQUE,
-    "last_active_at" timestamptz NOT NULL,
-    FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE
-);
-
 CREATE TABLE "channels"
 (
     "id"          UUID PRIMARY KEY,
