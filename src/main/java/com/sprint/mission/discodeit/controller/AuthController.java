@@ -75,6 +75,6 @@ public class AuthController {
         user.setRole(request.newRole());
         userRepository.save(user);
         sessionRegistry.getAllSessions(user, false).forEach(SessionInformation::expireNow);
-        return ResponseEntity.ok(userMapper.toDto(user));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }
