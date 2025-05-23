@@ -35,6 +35,9 @@ class BasicUserServiceTest {
   @Mock
   private UserMapper userMapper;
 
+  @Mock
+  private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
   @InjectMocks
   private BasicUserService userService;
 
@@ -54,7 +57,7 @@ class BasicUserServiceTest {
 
     user = new User(username, email, password, null);
     ReflectionTestUtils.setField(user, "id", userId);
-    userDto = new UserDto(userId, username, email, null, true);
+    userDto = new UserDto(userId, username, email, null, true, null);
   }
 
   @Test
@@ -64,6 +67,7 @@ class BasicUserServiceTest {
     UserCreateRequest request = new UserCreateRequest(username, email, password);
     given(userRepository.existsByEmail(eq(email))).willReturn(false);
     given(userRepository.existsByUsername(eq(username))).willReturn(false);
+    given(passwordEncoder.encode(eq(password))).willReturn("encodedPassword");
     given(userMapper.toDto(any(User.class))).willReturn(userDto);
 
     // when

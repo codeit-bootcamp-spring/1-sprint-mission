@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,7 +70,13 @@ public class BasicUserService implements UserService {
     String rawPassword = userCreateRequest.password();
     String encodedPassword = passwordEncoder.encode(rawPassword);
 
-    User user = new User(username, email, encodedPassword, nullableProfile);
+    User user = User.builder()
+        .username(username)
+        .email(email)
+        .password(encodedPassword)
+        .profile(nullableProfile)
+        .roles(Collections.singletonList("ROLE_USER"))
+        .build();
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
 
@@ -137,6 +144,9 @@ public class BasicUserService implements UserService {
         .orElse(null);
 
     String newPassword = userUpdateRequest.newPassword();
+    if (newPassword != null && !newPassword.isEmpty()) {
+      newPassword = passwordEncoder.encode(newPassword);
+    }
     user.update(newUsername, newEmail, newPassword, nullableProfile);
 
     log.info("사용자 수정 완료: id={}", userId);
