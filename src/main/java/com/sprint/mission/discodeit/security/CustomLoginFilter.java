@@ -17,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import java.io.IOException;
@@ -24,9 +25,13 @@ import java.util.Map;
 
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    public CustomLoginFilter(AuthenticationManager authenticationManager) {
+    private final SessionAuthenticationStrategy sessionStrategy;
+
+    public CustomLoginFilter(AuthenticationManager authenticationManager,
+                             SessionAuthenticationStrategy sessionStrategy) {
         super.setAuthenticationManager(authenticationManager);
         setFilterProcessesUrl("/api/auth/login"); // 요청 URL 설정
+        this.sessionStrategy = sessionStrategy;
     }
 
     @Override
@@ -59,7 +64,15 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         HttpSession session = request.getSession(true);
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
-        // 3. 응답
+        // 3. 세션 등록 전략 호출
+        sessionStrategy.onAuthentication(authResult, request, response);
+
+        // 4. Remember-Me 처리
+        if (getRememberMeServices() != null) {
+            getRememberMeServices().loginSuccess(request, response, authResult);
+        }
+
+        // 5. 응답
         CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
         UserDto userDto = customUserDetails.toDto();
 
