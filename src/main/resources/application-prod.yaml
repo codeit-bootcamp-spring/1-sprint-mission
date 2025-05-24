@@ -1,5 +1,5 @@
 server:
-  port: ${APP_PORT:8080}
+  port: 80
 
 spring:
   datasource:
