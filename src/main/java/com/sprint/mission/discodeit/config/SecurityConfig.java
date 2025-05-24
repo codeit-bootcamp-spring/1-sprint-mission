@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomAuthenticationFilter;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -44,10 +46,24 @@ public class SecurityConfig {
             .maxSessionsPreventsLogin(false)
             .sessionRegistry(sessionRegistry())
         )
+        .logout(logout -> logout
+            .logoutUrl("/api/auth/logout")
+            .logoutSuccessHandler((request, response, authentication) -> {
+              Cookie cookie = new Cookie("JSESSIONID", "");
+              cookie.setMaxAge(0);
+              cookie.setPath("/");
+              cookie.setHttpOnly(true);
+              response.addCookie(cookie);
+
+              response.setStatus(HttpServletResponse.SC_OK);
+            })
+            .invalidateHttpSession(true)
+            .clearAuthentication(true)
+        )
         .httpBasic(AbstractHttpConfigurer::disable)
-        .logout(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
 //        .csrf(csrf -> csrf
+//              .ignoringRequestMatchers("/api/auth/logout")
 //            .csrfTokenRepository(csrfTokenRepository())
 //        );
         .csrf(AbstractHttpConfigurer::disable);
@@ -88,5 +104,10 @@ public class SecurityConfig {
   @Bean
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
+  }
+
+  @Bean
+  public HttpSessionEventPublisher httpSessionEventPublisher() {
+    return new HttpSessionEventPublisher();
   }
 }
