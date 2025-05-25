@@ -43,6 +43,8 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             new UsernamePasswordAuthenticationToken(username, password);
         //UsernamePasswordAuthenticationToken에 명시적으로 넣어주기(form 형태가 아닌 Json으로 받으므로!)
 
+        setDetails(request, authRequest);
+
         return this.getAuthenticationManager().authenticate(authRequest);
       } catch (IOException e) {
         throw new AuthenticationServiceException("JSON 요청 파싱 예외", e);
@@ -51,5 +53,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     // 기본 form 데이터 처리 (fallback)
     return super.attemptAuthentication(request, response);
+  }
+
+  @Override
+  protected void setDetails(HttpServletRequest request,
+      UsernamePasswordAuthenticationToken authRequest) {
+    authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
   }
 }

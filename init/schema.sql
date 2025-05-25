@@ -65,3 +65,13 @@ CREATE TABLE "message_attachments"
     FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE,
     CONSTRAINT unique_message_attachment UNIQUE (message_id, attachment_id)
 );
+
+CREATE TABLE persistent_logins
+(
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
+);
+
+CREATE INDEX ix_persistent_logins_username ON persistent_logins (username);

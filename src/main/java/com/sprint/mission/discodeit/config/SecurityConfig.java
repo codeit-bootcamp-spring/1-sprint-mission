@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.CustomPermissionEvaluator;
 import com.sprint.mission.discodeit.dto.CustomUserDetails;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.filter.CustomAuthenticationFilter;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +27,8 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,6 +46,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -57,6 +65,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 public class SecurityConfig {
 
   private final UserRepository userRepository;
+  private final DataSource dataSource;
 
   //권한 변경 이벤트를 위한 세션 레지스트리 빈 등록
   @Bean
@@ -91,6 +100,23 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
+  @Bean
+  public PersistentTokenBasedRememberMeServices rememberMeServices() {
+    PersistentTokenBasedRememberMeServices rememberMeServices =
+        new PersistentTokenBasedRememberMeServices("discodeitSecretKey123",
+            userDetailsService(), persistentTokenRepository());
+
+    rememberMeServices.setParameter("remember-me");
+    rememberMeServices.setTokenValiditySeconds(60 * 60 * 24 * 21);
+
+    return rememberMeServices;
+  }
+
+
+  @Bean
+  public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
+    return new RememberMeAuthenticationProvider("discodeitSecretKey123");
+  }
 
   @Bean
   public SecurityContextRepository securityContextRepository() {
@@ -138,8 +164,7 @@ public class SecurityConfig {
   public RoleHierarchy roleHierarchy() {
     return RoleHierarchyImpl.fromHierarchy("""
         ROLE_ADMIN > ROLE_CHANNEL_MANAGER > ROLE_USER
-        """
-    );
+        """);
   }
 
   @Bean
@@ -203,6 +228,9 @@ public class SecurityConfig {
     // SessionAuthenticationStrategy 설정 추가
     filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
 
+    // Remember-Me 서비스 설정
+    filter.setRememberMeServices(rememberMeServices());
+
     filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
       // 성공 처리 로직
 
@@ -222,6 +250,10 @@ public class SecurityConfig {
       session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
           context);
 
+      // Remember-Me 토큰 생성 및 저장
+      rememberMeServices().loginSuccess(request, response, authentication);
+      log.info("Remember-Me 토큰 생성 시도");
+
       response.setContentType("application/json");
       response.setCharacterEncoding("UTF-8");
 
@@ -239,7 +271,9 @@ public class SecurityConfig {
           .write(new ObjectMapper().writeValueAsString(responseData));
     });
     filter.setAuthenticationFailureHandler((request, response, exception) -> {
-      // 실패 처리 로직
+      // Remember-Me 실패 처리
+      rememberMeServices().loginFail(request, response);
+
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       response.setContentType("application/json");
       response.getWriter().write("{\"status\":\"failure\"}");
@@ -248,9 +282,12 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain chain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain chain(HttpSecurity http)
+      throws Exception {
 
     CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+    PersistentTokenRepository rememberMeTokenRepository = persistentTokenRepository();
+
     tokenRepository.setCookieName("CSRF-TOKEN");    // 쿠키 이름 변경
     tokenRepository.setHeaderName("X-CSRF-TOKEN");  // 헤더 이름 변경
 
@@ -290,7 +327,7 @@ public class SecurityConfig {
             authenticationManager(http.getSharedObject(AuthenticationConfiguration.class))))
 
         // 로그아웃 필터 구현
-        .addFilterBefore(new CustomLogoutFilter(sessionRegistry()),
+        .addFilterBefore(new CustomLogoutFilter(sessionRegistry(), persistentTokenRepository()),
             UsernamePasswordAuthenticationFilter.class)
 
         //securityContext 설정
@@ -312,6 +349,9 @@ public class SecurityConfig {
             .maximumSessions(1) // 동시 로그인 가능 개수
             .maxSessionsPreventsLogin(false)// 동일 계정으로 로그인 했을때, 이미 로그인 되어있는 계정을 로그아웃 시킬지
             .sessionRegistry(sessionRegistry())// 세션 이벤트 처리를 위해 필요
+        )
+        .rememberMe(rememberMe -> rememberMe
+            .rememberMeServices(rememberMeServices())
         );
 
     return http.build();
