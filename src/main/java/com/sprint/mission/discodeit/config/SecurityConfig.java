@@ -2,27 +2,15 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.CustomAuthenticationProvider;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
-import com.sprint.mission.discodeit.security.handler.CustomAuthenticationFailureHandler;
-import com.sprint.mission.discodeit.security.handler.CustomAuthenticationSuccessHandler;
 import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -30,123 +18,71 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    /**
-     * 1. discodeit은 로그아웃 페이지를 CSR로 처리하므로 LogoutFilter 제외,
-     * <p>
-     * 2. HttpOnly를 false로 설정하여 JavaScript에서 쿠키에 접근 가능하게 함
-     */
     @Bean
     SecurityFilterChain chain(
         HttpSecurity http,
-        CustomAuthenticationProvider provider, // DaoAuthenticationProvider provider,
+        CustomAuthenticationProvider authProvider, // DaoAuthenticationProvider provider,
         JsonUsernamePasswordAuthenticationFilter loginFilter,
         SecurityContextRepository securityContextRepository,
         CustomLogoutHandler customLogoutHandler) throws Exception {
 
-        CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        csrfTokenRepository.setCookieName("Csrf-Token");
-        csrfTokenRepository.setHeaderName("X-Csrf-Token");
-        csrfTokenRepository.setCookiePath("/");
+        return http
 
-        http
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(csrfTokenRepository())
+                .ignoringRequestMatchers("/api/auth/logout")
+            )
 
-            // logout
             .logout(logout -> logout
                 .logoutUrl("/api/auth/logout")
                 .addLogoutHandler(customLogoutHandler)
                 .logoutSuccessUrl("/")
             )
 
-            // CSRF
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(csrfTokenRepository)
-                .ignoringRequestMatchers("/api/auth/logout")
-            )
+            .authenticationProvider(authProvider)
 
-            .authenticationProvider(provider)
             .securityContext(
                 context -> context.securityContextRepository(securityContextRepository))
-            .authorizeHttpRequests(auth -> auth
 
-                // 허용
-                .requestMatchers("/api/auth/csrf-token").permitAll()
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+            .authorizeHttpRequests(this::configureAuthorization)
 
-                // 채널 생성, 수정, 삭제
-                .requestMatchers(HttpMethod.DELETE, "/api/channels").hasRole("CHANNEL_MANAGER")
-                .requestMatchers("/api/channels/public/**").hasRole("CHANNEL_MANAGER")
+            .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
 
-                // 유저 권한 수정
-                .requestMatchers("/api/auth/role").hasRole("ADMIN")
+            .build();
 
-                // 기본 인증
-                .requestMatchers("/api/**").hasRole("USER")
-
-                // anyRequest
-                .anyRequest().permitAll())
-
-            // 로그인
-            .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
     }
 
-    // 로그인 필터 Bean 등록
-    @Bean
-    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
-        AuthenticationManager authManager,
-        CustomAuthenticationSuccessHandler successHandler,
-        CustomAuthenticationFailureHandler failureHandler,
-        SecurityContextRepository securityContextRepository
-    ) {
-        JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
-            authManager);
-        filter.setAuthenticationSuccessHandler(successHandler);
-        filter.setAuthenticationFailureHandler(failureHandler);
-        filter.setSecurityContextRepository(securityContextRepository);
-        return filter;
+    // 인가 정책
+    private void configureAuthorization(
+        AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
+        auth
+
+            // 허용
+            .requestMatchers("/api/auth/csrf-token").permitAll()
+            .requestMatchers("/api/auth/login").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+
+            // 채널 관리
+            .requestMatchers(HttpMethod.DELETE, "/api/channels").hasRole("CHANNEL_MANAGER")
+            .requestMatchers("/api/channels/public/**").hasRole("CHANNEL_MANAGER")
+
+            // 유저 권한 수정
+            .requestMatchers("/api/auth/role").hasRole("ADMIN")
+
+            // 기본 인증
+            .requestMatchers("/api/**").hasRole("USER")
+
+            // anyRequest
+            .anyRequest().permitAll();
     }
 
-    // AuthenticationManager Bean 등록 (AuthenticationManager 는 자동 Bean 등록이 안 됨)
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-        throws Exception {
-        return config.getAuthenticationManager();
+    // csrf
+    private CookieCsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieName("Csrf-Token");
+        repository.setHeaderName("X-Csrf-Token");
+        repository.setCookiePath("/");
+        return repository;
     }
 
-    // 인증 정보 저장소 (세션)
-    @Bean
-    public SecurityContextRepository securityContextRepository() {
-        return new HttpSessionSecurityContextRepository();
-    }
-
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(
-        UserDetailsService userDetailsService,
-        PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService); // 유저 정보 조회
-        provider.setPasswordEncoder(passwordEncoder); // 비밀번호 검증
-        return provider;
-    }
-
-    @Bean
-    PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    // 계층 권한 단순화
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.fromHierarchy("""
-            ROLE_ADMIN > ROLE_CHANNEL_MANAGER
-            ROLE_CHANNEL_MANAGER > ROLE_USER
-            """);
-    }
-
-    @Bean
-    public SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
-    }
 }
