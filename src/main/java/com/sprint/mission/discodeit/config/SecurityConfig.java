@@ -70,6 +70,7 @@ public class SecurityConfig {
 
                 // 허용
                 .requestMatchers("/api/auth/csrf-token").permitAll()
+                .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 
                 // 채널 생성, 수정, 삭제
