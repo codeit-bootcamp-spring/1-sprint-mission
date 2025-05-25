@@ -72,8 +72,15 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/csrf-token").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 
-                // 인증
-                .requestMatchers("/api/**").authenticated()
+                // 채널 생성, 수정, 삭제
+                .requestMatchers(HttpMethod.DELETE, "/api/channels").hasRole("CHANNEL_MANAGER")
+                .requestMatchers("/api/channels/public/**").hasRole("CHANNEL_MANAGER")
+
+                // 유저 권한 수정
+                .requestMatchers("/api/auth/role").hasRole("ADMIN")
+
+                // 기본 인증
+                .requestMatchers("/api/**").hasRole("USER")
 
                 // anyRequest
                 .anyRequest().permitAll())

@@ -37,8 +37,6 @@ public class BasicAuthService implements AuthService {
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND,
                 Map.of("userId", targetUserId)));
 
-        // TODO: 권한 변경 가능 확인
-
         // 권한 변경
         Role oldRole = targetUser.getRole();
 
