@@ -28,9 +28,6 @@ public class User extends BaseUpdatableEntity {
   @Column(nullable = false)
   private String password;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  private UserStatus status;
-
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
@@ -42,11 +39,6 @@ public class User extends BaseUpdatableEntity {
     this.password = password;
     this.profile = profile;
     this.role = role;
-  }
-
-  public void addUserStatus(UserStatus status) {
-    this.status = status;
-    status.addUser(this);
   }
 
   public void updateProfile(BinaryContent profile) {

@@ -32,4 +32,6 @@ public interface UserService {
 
   UserDto updateRole(UUID userId, Role newRole);
 
+  boolean isUserOnline(User user);
+
 }

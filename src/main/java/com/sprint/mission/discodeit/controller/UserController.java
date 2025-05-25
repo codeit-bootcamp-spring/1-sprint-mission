@@ -8,8 +8,6 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
@@ -18,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController implements UserApi {
 
   private final UserService userService;
-  private final UserStatusService userStatusService;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(
@@ -49,6 +47,7 @@ public class UserController implements UserApi {
         .body(userService.create(userCreateRequest, profileRequest));
   }
 
+  @PreAuthorize("@accessManager.isSelfOrAdmin(#userId, authentication)")
   @PatchMapping("{userId}")
   public ResponseEntity<UserDto> update(@PathVariable UUID userId,
       @Valid @RequestPart("userUpdateDTO") UserUpdateDTO userUpdateRequest,
@@ -65,6 +64,7 @@ public class UserController implements UserApi {
         .body(userService.update(userId, userUpdateRequest, profileRequest));
   }
 
+  @PreAuthorize("@accessManager.isSelfOrAdmin(#userId, authentication)")
   @DeleteMapping("{userId}")
   public ResponseEntity<Void> delete(@PathVariable UUID userId) {
     userService.delete(userId);
@@ -80,14 +80,6 @@ public class UserController implements UserApi {
         .body(userService.findAll());
   }
 
-  @PatchMapping("{userId}/userStatus")
-  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
-      @Valid @RequestBody UserStatusUpdateDTO request) {
-
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(userStatusService.updateByUserId(userId, request.getNewLastActiveAt()));
-  }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
     if (profileFile.isEmpty()) {

@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.repository.jpa;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.helper.UserTestFactory;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;

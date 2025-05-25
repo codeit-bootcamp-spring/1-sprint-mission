@@ -36,7 +36,7 @@ public class AuthController implements AuthApi {
   @GetMapping("/me")
   public ResponseEntity<UserDto> me(Authentication authentication) {
     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    return ResponseEntity.ok(userMapper.toDto(userDetails.getUser()));
+    return ResponseEntity.ok(userMapper.toDto(userDetails.getUser(), true));
   }
 
   @PutMapping("/role")
@@ -53,5 +53,7 @@ public class AuthController implements AuthApi {
     UserDto updated = userService.updateRole(request.getUserId(), request.getNewRole());
     return ResponseEntity.ok(updated);
   }
+
+
 
 }

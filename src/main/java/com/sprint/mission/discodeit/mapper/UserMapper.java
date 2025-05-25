@@ -13,7 +13,7 @@ public class UserMapper {
 
   private final BinaryContentMapper binaryContentMapper;
 
-  public UserDto toDto(User user) {
+  public UserDto toDto(User user, boolean isOnline) {
     return new UserDto(
         user.getId(),
         user.getUsername(),
@@ -21,7 +21,7 @@ public class UserMapper {
         binaryContentMapper.toDto(user.getProfile()),
 
         //userStatus fetch join으로 가져오자
-        true, //user.getStatus().isOnline(),
+        isOnline,
         user.getRole()
     );
   }

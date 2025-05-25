@@ -19,14 +19,6 @@ CREATE TABLE IF NOT EXISTS users
     role       VARCHAR(30)         NOT NULL
     );
 
-CREATE TABLE IF NOT EXISTS user_statuses
-(
-    id             UUID PRIMARY KEY,
-    created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at     TIMESTAMP WITH TIME ZONE,
-    user_id        UUID        NOT NULL UNIQUE REFERENCES users (id) ON DELETE CASCADE,
-    last_active_at TIMESTAMP WITH TIME ZONE NOT NULL
-                                                                         );
 
 CREATE TABLE IF NOT EXISTS channels
 (

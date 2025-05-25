@@ -20,6 +20,7 @@ public class CustomUserDetails implements UserDetails {
         return user;
     }
 
+/*
     public UserDto toDto() {
         return new UserDto(
                 user.getId(),
@@ -30,6 +31,7 @@ public class CustomUserDetails implements UserDetails {
                 user.getRole()
         );
     }
+*/
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -28,6 +28,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -99,9 +100,10 @@ public class SecurityConfig {
     public CustomLoginFilter customLoginFilter(
             AuthenticationManager authenticationManager,
             RememberMeServices rememberMeServices,
-            SessionAuthenticationStrategy sessionStrategy
+            SessionAuthenticationStrategy sessionStrategy,
+            AuthenticationSuccessHandler successHandler
     ) {
-        CustomLoginFilter filter = new CustomLoginFilter(authenticationManager, sessionStrategy);
+        CustomLoginFilter filter = new CustomLoginFilter(authenticationManager, sessionStrategy, successHandler);
         filter.setRememberMeServices(rememberMeServices); // 추가
         return filter;
     }
@@ -147,6 +149,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(entryPoint)
                 )
                 .sessionManagement(session -> session
+                        .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId) //세션고정보호
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
                         .sessionRegistry(sessionRegistry)

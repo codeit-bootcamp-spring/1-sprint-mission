@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class ReadStatusController implements ReadStatusApi {
 
   private final ReadStatusService readStatusService;
 
+  @PreAuthorize("@accessManager.isSelf(#request.userId(), authentication)")
   @PostMapping
   public ResponseEntity<ReadStatusDto> create(@Valid @RequestBody ReadStatusCreateDTO request) {
     return ResponseEntity
@@ -28,6 +30,7 @@ public class ReadStatusController implements ReadStatusApi {
         .body(readStatusService.create(request));
   }
 
+  @PreAuthorize("@accessManager.isReadStatusOwner(#readStatusId, authentication)")
   @PatchMapping("{readStatusId}")
   public ResponseEntity<ReadStatusDto> update(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateDTO request) {

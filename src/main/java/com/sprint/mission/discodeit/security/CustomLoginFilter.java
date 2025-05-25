@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -16,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -26,12 +28,17 @@ import java.util.Map;
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final SessionAuthenticationStrategy sessionStrategy;
+    private final AuthenticationSuccessHandler successHandler;
+
 
     public CustomLoginFilter(AuthenticationManager authenticationManager,
-                             SessionAuthenticationStrategy sessionStrategy) {
+                             SessionAuthenticationStrategy sessionStrategy,
+                             AuthenticationSuccessHandler successHandler
+                             ) {
         super.setAuthenticationManager(authenticationManager);
         setFilterProcessesUrl("/api/auth/login"); // 요청 URL 설정
         this.sessionStrategy = sessionStrategy;
+        this.successHandler = successHandler;
     }
 
     @Override
@@ -54,7 +61,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                            FilterChain chain, Authentication authResult) throws IOException {
+                                            FilterChain chain, Authentication authResult) throws IOException, ServletException {
         // 1. SecurityContext 생성 및 설정
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authResult);
@@ -72,13 +79,16 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             getRememberMeServices().loginSuccess(request, response, authResult);
         }
 
-        // 5. 응답
+        // 5. 성공 핸들러 위임
+        successHandler.onAuthenticationSuccess(request, response, authResult);
+
+/*        //응답
         CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
         UserDto userDto = customUserDetails.toDto();
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getWriter(), userDto);
+        new ObjectMapper().writeValue(response.getWriter(), userDto);*/
     }
 
     @Override
