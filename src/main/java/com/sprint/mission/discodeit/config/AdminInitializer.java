@@ -41,7 +41,7 @@ public class AdminInitializer implements ApplicationRunner {
 
     private void initializeAdmin() {
 
-        if (userRepository.existsByRole(Role.ROLE_ADMIN)) {
+        if (userRepository.existsByRole(Role.ADMIN)) {
             log.info("관리자 계정이 이미 존재합니다.");
             return;
         }
@@ -56,7 +56,7 @@ public class AdminInitializer implements ApplicationRunner {
             passwordEncoder.encode(adminPassword),
             adminEmail,
             null,
-            Role.ROLE_ADMIN
+            Role.ADMIN
         );
 
         userRepository.save(admin);

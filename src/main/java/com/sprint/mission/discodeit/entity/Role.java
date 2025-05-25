@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
 public enum Role {
-    ROLE_USER(1, "일반 사용자"),
-    ROLE_CHANNEL_MANAGER(2, "채널 매니저"),
-    ROLE_ADMIN(3, "관리자");
+    USER(1, "일반 사용자"),
+    CHANNEL_MANAGER(2, "채널 매니저"),
+    ADMIN(3, "관리자");
 
     private final int level;
     private final String description;
@@ -20,13 +20,5 @@ public enum Role {
     public String getDescription() {
         return description;
     }
-
-    // 현재 권한이 요구된 권한을 가지고 있는지 확인하기
-    public boolean hasAuthority(Role requiredRole) {
-        return this.level >= requiredRole.level;
-    }
-
-    public boolean isHigherThan(Role otherRole) {
-        return this.level > otherRole.level;
-    }
+    
 }

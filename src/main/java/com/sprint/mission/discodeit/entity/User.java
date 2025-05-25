@@ -41,7 +41,7 @@ public class User extends BaseUpdatableEntity {
 
     public static User createUser(String name, String email, String password,
         BinaryContent profile) {
-        return new User(name, email, password, profile, Role.ROLE_USER);
+        return new User(name, email, password, profile, Role.USER);
     }
 
     public static User createUserWithRole(String name, String email, String password,
