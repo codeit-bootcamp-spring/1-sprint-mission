@@ -53,3 +53,6 @@ discodeit.env
 .env
 .env.*
 *.envdiscodeit.env
+
+# 로그 파일
+.logs
