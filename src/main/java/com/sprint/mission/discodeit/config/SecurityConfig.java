@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -55,15 +56,26 @@ public class SecurityConfig {
             .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
         )
         .authorizeHttpRequests(auth -> auth
+            // 정적 리소스
             .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/**favicon.ico")
             .permitAll()
             .requestMatchers("/", "/index.html", "/assets/**").permitAll()
-            .requestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/login").permitAll()
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/**", "/static/**")
             .permitAll()
-            .requestMatchers("/api/channels", "/api/readStatuses").permitAll()
+
+            // 관리자 전용
             .requestMatchers("/api/auth/role").hasRole("ADMIN")
+
+            // 인증된 사용자
+            .requestMatchers("/api/channels/**", "/api/readStatuses/**",
+                "api/users/{userId}/userStatus", "/api/messages/**").permitAll()
+
+            // 인증 불필요
+            .requestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/login").permitAll()
+
+            // 로그아웃
             .requestMatchers("/api/auth/logout").authenticated()
+
             .anyRequest().hasRole("USER")
         )
         .securityContext(securityContext -> securityContext
@@ -181,8 +193,15 @@ public class SecurityConfig {
 
   @Bean
   public UserDetailsService userDetailsService(UserRepository userRepository) {
-    return username -> userRepository.findByUsername(username)
-        .map(UserDetailsAdapter::new)
-        .orElseThrow(() -> UserNotFoundException.withUsername(username));
+    return username -> {
+      User user = userRepository.findByUsername(username)
+          .orElseThrow(() -> UserNotFoundException.withUsername(username));
+
+      // 디버깅용 로그 (나중에 제거)
+      System.out.println("Loading user: " + username);
+      System.out.println("User roles: " + user.getRoles());
+
+      return new UserDetailsAdapter(user);
+    };
   }
 }
