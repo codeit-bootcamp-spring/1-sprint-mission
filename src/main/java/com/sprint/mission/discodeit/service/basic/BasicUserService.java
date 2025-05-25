@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -75,8 +76,10 @@ public class BasicUserService implements UserService {
         .email(email)
         .password(encodedPassword)
         .profile(nullableProfile)
-        .roles(Collections.singletonList("ROLE_USER"))
+        .roles(new ArrayList<>())
         .build();
+
+    user.addRole("ROLE_USER");
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
 

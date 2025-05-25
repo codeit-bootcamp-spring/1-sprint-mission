@@ -70,4 +70,13 @@ public class User extends BaseUpdatableEntity {
       this.profile = newProfile;
     }
   }
+
+  public void addRole(String role) {
+    if (this.roles == null) {
+      this.roles = new ArrayList<>();
+    }
+    if (!this.roles.contains(role)) {
+      this.roles.add(role);
+    }
+  }
 }

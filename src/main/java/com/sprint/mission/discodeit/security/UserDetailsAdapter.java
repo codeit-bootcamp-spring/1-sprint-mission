@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.security;
 
 
 import com.sprint.mission.discodeit.entity.User;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,11 +19,20 @@ public class UserDetailsAdapter implements UserDetails {
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     List<String> userRoles = user.getRoles();
-    System.out.println("User 엔티티의 roles: " + userRoles);
+    System.out.println("DB roles: " + userRoles);
 
-    return userRoles.stream()
-        .map(SimpleGrantedAuthority::new)
-        .collect(Collectors.toList());
+    // 무조건 ROLE_USER 부여
+    List<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+    if (userRoles != null) {
+      userRoles.stream()
+          .map(SimpleGrantedAuthority::new)
+          .forEach(authorities::add);
+    }
+
+    System.out.println("최종 authorities: " + authorities);
+    return authorities;
   }
 
   @Override
