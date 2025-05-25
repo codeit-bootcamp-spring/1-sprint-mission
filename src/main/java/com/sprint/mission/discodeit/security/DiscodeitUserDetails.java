@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.security;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,16 +12,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class DiscodeitUserDetails implements UserDetails {
 
   private final User user;
-  private final List<GrantedAuthority> authorities;
 
-  public DiscodeitUserDetails(User user, List<GrantedAuthority> authorities) {
+  public DiscodeitUserDetails(User user) {
     this.user = user;
-    this.authorities = authorities;
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return this.authorities;
+    return List.of(user.getRole());
   }
 
   @Override
@@ -31,5 +30,9 @@ public class DiscodeitUserDetails implements UserDetails {
   @Override
   public String getUsername() {
     return this.user.getUsername();
+  }
+
+  public UUID getId() {
+    return this.user.getId();
   }
 }
