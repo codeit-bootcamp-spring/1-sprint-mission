@@ -1,7 +1,7 @@
 CREATE TABLE binary_contents
 (
     id           UUID PRIMARY KEY,
-    created_at   TIMESTAMP  NOT NULL,
+    created_at   TIMESTAMP    NOT NULL,
     file_name    VARCHAR(255) NOT NULL,
     size         BIGINT       NOT NULL,
     content_type VARCHAR(100) NOT NULL
@@ -10,11 +10,12 @@ CREATE TABLE binary_contents
 CREATE TABLE users
 (
     id         UUID PRIMARY KEY,
-    created_at TIMESTAMP  NOT NULL,
+    created_at TIMESTAMP    NOT NULL,
     updated_at TIMESTAMP,
     username   VARCHAR(50)  NOT NULL UNIQUE,
     email      VARCHAR(100) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
+    role       VARCHAR(50)  NOT NULL DEFAULT 'ROLE_USER',
     profile_id UUID,
     CONSTRAINT fk_user_profile FOREIGN KEY (profile_id) REFERENCES
         binary_contents (id) ON DELETE SET NULL
@@ -23,7 +24,7 @@ CREATE TABLE users
 CREATE TABLE channels
 (
     id          UUID PRIMARY KEY,
-    created_at  TIMESTAMP NOT NULL,
+    created_at  TIMESTAMP   NOT NULL,
     updated_at  TIMESTAMP,
     name        VARCHAR(100),
     description VARCHAR(500),
@@ -36,7 +37,7 @@ CREATE TABLE messages
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     content    TEXT,
-    channel_id UUID        NOT NULL,
+    channel_id UUID      NOT NULL,
     author_id  UUID,
     CONSTRAINT fk_message_channel FOREIGN KEY (channel_id) REFERENCES
         channels (id) ON DELETE CASCADE,
@@ -47,10 +48,10 @@ CREATE TABLE messages
 CREATE TABLE user_statuses
 (
     id             UUID PRIMARY KEY,
-    created_at     TIMESTAMP NOT NULL,
+    created_at     TIMESTAMP   NOT NULL,
     updated_at     TIMESTAMP,
     user_id        UUID UNIQUE NOT NULL,
-    last_active_at TIMESTAMP NOT NULL,
+    last_active_at TIMESTAMP   NOT NULL,
     CONSTRAINT fk_user_status_user FOREIGN KEY (user_id) REFERENCES
         users (id) ON DELETE CASCADE
 );
@@ -79,5 +80,3 @@ CREATE TABLE message_attachments
     CONSTRAINT fk_message_attachment_attachment FOREIGN KEY (attachment_id) REFERENCES
         binary_contents (id) ON DELETE CASCADE
 );
-
-

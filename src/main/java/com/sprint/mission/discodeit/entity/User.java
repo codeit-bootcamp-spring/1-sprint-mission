@@ -2,17 +2,20 @@ package com.sprint.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.security.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -22,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Entity
 @Table(name = "users")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity {
 
@@ -43,6 +48,9 @@ public class User extends BaseUpdatableEntity {
   @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
   private UserStatus status;
 
+  @Enumerated(EnumType.STRING)
+  private Role role;
+
   public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
@@ -50,6 +58,13 @@ public class User extends BaseUpdatableEntity {
 
     this.profile = profile;
     this.status = new UserStatus(this, Instant.now());
+    this.role = Role.ROLE_USER;
+  }
+
+  public static User createAdmin(String username, String email, String password) {
+    User user = new User(username, email, password, null);
+    user.role = Role.ROLE_ADMIN;
+    return user;
   }
 
   public void updateProfile(BinaryContent profile) {
@@ -73,6 +88,12 @@ public class User extends BaseUpdatableEntity {
   public void updatePassword(String newPassword, PasswordEncoder encoder) {
     if (!encoder.matches(newPassword, this.password)) {
       this.password = encoder.encode(password);
+    }
+  }
+
+  public void updateRole(Role newRole) {
+    if (!this.role.equals(newRole)) {
+      this.role = newRole;
     }
   }
 
