@@ -3,26 +3,27 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Getter
 @Entity
-@AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "binary_contents")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContent extends BaseEntity {
 
-  @Column(name = "file_name", nullable = false)
+  @Column(nullable = false)
   private String fileName;
-  @Column(name = "content_type", nullable = false)
-  private String contentType;
-  @Column(name = "size", nullable = false)
+  @Column(nullable = false)
   private Long size;
+  @Column(length = 100, nullable = false)
+  private String contentType;
+
+  public BinaryContent(String fileName, Long size, String contentType) {
+    this.fileName = fileName;
+    this.size = size;
+    this.contentType = contentType;
+  }
 }
