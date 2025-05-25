@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.AuthApiDocs;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +39,14 @@ public class AuthController implements AuthApiDocs {
 
         UUID userId = user.getUser().getId();
         UserResponse userResponse = userService.findById(userId);
+        return ResponseEntity.ok(userResponse);
+    }
+
+    @PutMapping("/role")
+    public ResponseEntity<UserResponse> updateUserRole(
+        @RequestBody UserRoleUpdateRequest request) {
+
+        UserResponse userResponse = authService.changeUserRole(request);
         return ResponseEntity.ok(userResponse);
     }
 }

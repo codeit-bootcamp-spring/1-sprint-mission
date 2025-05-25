@@ -22,6 +22,10 @@ logging:
     com.zaxxer.hikari.HikariConfig: DEBUG
 
 discodeit:
+  admin:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
+    email: ${ADMIN_EMAIL}
   storage:
     type: ${STORAGE_TYPE:local}
     local:

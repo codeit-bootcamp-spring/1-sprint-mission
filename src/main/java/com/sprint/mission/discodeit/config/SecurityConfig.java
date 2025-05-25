@@ -8,11 +8,15 @@ import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,23 +49,36 @@ public class SecurityConfig {
         csrfTokenRepository.setCookiePath("/");
 
         http
+
+            // logout
             .logout(logout -> logout
                 .logoutUrl("/api/auth/logout")
                 .addLogoutHandler(customLogoutHandler)
                 .logoutSuccessUrl("/")
             )
+
+            // CSRF
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository)
                 .ignoringRequestMatchers("/api/auth/logout")
             )
+
             .authenticationProvider(provider)
             .securityContext(
                 context -> context.securityContextRepository(securityContextRepository))
             .authorizeHttpRequests(auth -> auth
+
+                // 허용
                 .requestMatchers("/api/auth/csrf-token").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+
+                // 인증
                 .requestMatchers("/api/**").authenticated()
+
+                // anyRequest
                 .anyRequest().permitAll())
+
+            // 로그인
             .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -109,5 +126,19 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // 계층 권한 단순화
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.fromHierarchy("""
+            ROLE_ADMIN > ROLE_CHANNEL_MANAGER
+            ROLE_CHANNEL_MANAGER > ROLE_USER
+            """);
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 }

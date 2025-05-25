@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.dto.response;
 
-import lombok.Builder;
-
 import java.util.UUID;
+import lombok.Builder;
 
 @Builder
 public record UserResponse(
@@ -10,7 +9,8 @@ public record UserResponse(
     String username,
     String email,
     BinaryContentResponse profile,
-    boolean online
+    boolean online,
+    String role
 ) {
 
 //  public static UserResponse entityToDto(User user) {

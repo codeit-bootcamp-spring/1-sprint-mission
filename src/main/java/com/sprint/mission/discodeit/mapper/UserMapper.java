@@ -9,19 +9,20 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserMapper {
 
-  private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentMapper binaryContentMapper;
 
-  public UserResponse entityToDto(User user) {
-    if (user == null) {
-      return null;
+    public UserResponse entityToDto(User user) {
+        if (user == null) {
+            return null;
+        }
+        return UserResponse.builder()
+            .id(user.getId())
+            .username(user.getUsername())
+            .email(user.getEmail())
+            .profile(binaryContentMapper.entityToDto(user.getProfile()))
+            .online(user.getStatus().isOnline())
+            .role(user.getRole().name())
+            .build();
     }
-    return UserResponse.builder()
-        .id(user.getId())
-        .username(user.getUsername())
-        .email(user.getEmail())
-        .profile(binaryContentMapper.entityToDto(user.getProfile()))
-        .online(user.getStatus().isOnline())
-        .build();
-  }
 }
 
