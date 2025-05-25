@@ -21,6 +21,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.SecurityContextRepository;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -29,15 +30,16 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
   private final SecurityContextRepository securityContextRepository;
-  private final SessionRegistry sessionRegistry;
+  private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
 
   public CustomAuthenticationFilter(AuthenticationManager authenticationManager,
-      SecurityContextRepository securityContextRepository, UserMapper userMapper, SessionRegistry sessionRegistry) {
+      SecurityContextRepository securityContextRepository, UserMapper userMapper,
+      SessionAuthenticationStrategy sessionAuthenticationStrategy) {
     super(authenticationManager);
     this.userMapper = userMapper;
     this.authenticationManager = authenticationManager;
     this.securityContextRepository = securityContextRepository;
-    this.sessionRegistry = sessionRegistry;
+    this.sessionAuthenticationStrategy = sessionAuthenticationStrategy;
 
     setFilterProcessesUrl("/api/auth/login");
   }
@@ -70,7 +72,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     SecurityContextHolder.getContext().setAuthentication(authResult);
     securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, response);
-    sessionRegistry.registerNewSession(request.getSession().getId(), authResult.getPrincipal());
+
+    try {
+      sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
+    } catch (Exception e) {
+      logger.warn("Session authentication strategy failed", e);
+    }
 
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType("application/json");

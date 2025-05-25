@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomAuthenticationFilter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -51,6 +56,7 @@ public class SecurityConfig {
         .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            .sessionFixation().changeSessionId()
             .maximumSessions(1)
             .maxSessionsPreventsLogin(false)
             .sessionRegistry(sessionRegistry())
@@ -117,11 +123,12 @@ public class SecurityConfig {
   @Bean
   public CustomAuthenticationFilter customAuthFilter(AuthenticationManager authenticationManager,
       HttpSessionSecurityContextRepository securityContextRepository,
-      UserMapper userMapper, SessionRegistry sessionRegistry) {
-    return new CustomAuthenticationFilter(authenticationManager, securityContextRepository,
-        userMapper, sessionRegistry);
-  }
+      UserMapper userMapper, CompositeSessionAuthenticationStrategy sessionAuthenticationStrategy) {
 
+    return new CustomAuthenticationFilter(
+        authenticationManager, securityContextRepository, userMapper,
+        sessionAuthenticationStrategy);
+  }
   @Bean
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
@@ -138,5 +145,19 @@ public class SecurityConfig {
         "ROLE_ADMIN > ROLE_CHANNEL_MANAGER\n" +
             "ROLE_CHANNEL_MANAGER > ROLE_USER"
     );
+  }
+
+  @Bean
+  public CompositeSessionAuthenticationStrategy sessionAuthenticationStrategy() {
+    ConcurrentSessionControlAuthenticationStrategy concurrentStrategy =
+        new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry());
+    concurrentStrategy.setMaximumSessions(1);
+    concurrentStrategy.setExceptionIfMaximumExceeded(false);
+
+    return new CompositeSessionAuthenticationStrategy(Arrays.asList(
+        concurrentStrategy,
+        new SessionFixationProtectionStrategy(),
+        new RegisterSessionAuthenticationStrategy(sessionRegistry())
+    ));
   }
 }

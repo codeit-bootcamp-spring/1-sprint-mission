@@ -48,4 +48,19 @@ public class CustomUserDetails implements UserDetails {
   public boolean isEnabled() {
     return true;
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof CustomUserDetails) {
+      return this.user.getUsername().equals(((CustomUserDetails) obj).getUsername());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return this.user.getUsername().hashCode();
+  }
 }
+
+
