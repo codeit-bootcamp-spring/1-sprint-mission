@@ -73,4 +73,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
       + "WHERE m.channel.id = :channelId "
       + "ORDER BY m.createdAt DESC LIMIT 1")
   Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
+
+  boolean existsByIdAndAuthor_Id(UUID messageId, UUID currentUserId);
 }
