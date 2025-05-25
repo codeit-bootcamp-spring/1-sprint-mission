@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -120,6 +121,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
+  @PreAuthorize("@authz.isMessageOwner(#messageId, principal.user.id)")
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new MessageNotfoundException(
@@ -137,6 +139,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
+  @PreAuthorize("hasRole('ADMIN') or @authz.isMessageOwner(#messageId, principal.user.id)")
   public void delete(UUID messageId) {
     if (!messageRepository.existsById(messageId)) {
       throw new MessageNotfoundException(

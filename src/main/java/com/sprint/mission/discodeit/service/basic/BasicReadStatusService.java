@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
+  @PreAuthorize("#request.userId == principal.user.id")
   public ReadStatusDto create(ReadStatusCreateRequest request) {
     User user = userRepository.findById(request.userId())
         .orElseThrow(() -> new UserNotFoundException(
@@ -87,6 +89,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
+  @PreAuthorize("@authz.isReadStatusOwner(#readStatusId, principal.user.id)")
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> new ReadStatusNotFoundException(

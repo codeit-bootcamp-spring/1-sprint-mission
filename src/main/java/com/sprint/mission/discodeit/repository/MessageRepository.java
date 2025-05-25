@@ -16,7 +16,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     @Query("SELECT m FROM Message m "
         + "LEFT JOIN FETCH m.author a "
-//        + "JOIN FETCH a.status "
         + "LEFT JOIN FETCH a.profile "
         + "WHERE m.channel.id=:channelId AND m.createdAt < :createdAt")
     Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,
@@ -24,4 +23,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
         Pageable pageable);
 
     List<Message> findByChannelId(UUID channelId);
+
+    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END " +
+        "FROM Message m WHERE m.id = :messageId AND m.author.id = :userId")
+    boolean isAuthor(@Param("postId") UUID messageId, @Param("userId") UUID userId);
 }

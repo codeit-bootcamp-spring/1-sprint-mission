@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,6 +86,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
+  @PreAuthorize("hasRole('ADMIN') or #userId == principal.user.id")
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, MultipartFile file) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(
@@ -123,6 +125,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
+  @PreAuthorize("hasRole('ADMIN') or #userId == principal.user.id")
   public void delete(UUID userId) {
     if (!userRepository.existsById(userId)) {
       throw new UserNotFoundException(
