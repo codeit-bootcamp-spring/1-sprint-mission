@@ -69,7 +69,7 @@ public class ChannelController {
             .build();
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
         return ResponseEntity
             .status(HttpStatus.OK)

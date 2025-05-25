@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomAuthenticationFilter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
@@ -37,10 +39,15 @@ public class SecurityConfig {
     http
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-            .requestMatchers("/api/auth/csrf-token").permitAll()
-            .requestMatchers("/api/**").authenticated()
-            .anyRequest().permitAll())
+            .requestMatchers("/api/auth/login",
+                "/api/auth/csrf-token")
+            .permitAll()
+            .requestMatchers("/api/channels/public").hasRole("CHANNEL_MANAGER")
+            .requestMatchers(HttpMethod.PATCH, "/api/channels/**").hasRole("CHANNEL_MANAGER")
+            .requestMatchers(HttpMethod.DELETE, "/api/channels/**").hasRole("CHANNEL_MANAGER")
+            .requestMatchers("/api/auth/role").hasAnyRole("ADMIN")
+            .anyRequest().hasRole("USER")
+        )
         .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
@@ -70,6 +77,17 @@ public class SecurityConfig {
 //        );
         .csrf(AbstractHttpConfigurer::disable);
     return http.build();
+  }
+
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    return web -> web.ignoring()
+        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+        .requestMatchers("/",
+            "/static/**",
+            "/assets/**",
+            "/index.html",
+            "/favicon.ico");
   }
 
   @Bean
