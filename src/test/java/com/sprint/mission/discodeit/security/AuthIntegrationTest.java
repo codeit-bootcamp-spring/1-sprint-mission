@@ -26,20 +26,16 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class LoginIntegrationTest {
+public class AuthIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private UserStatusRepository userStatusRepository;
-
     @Autowired
     PasswordEncoder passwordEncoder;
 
@@ -83,6 +79,20 @@ public class LoginIntegrationTest {
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.message").value("로그인에 실패하였습니다."));
     }
+
+//    @Test
+//    @WithMockUser(roles = {"ADMIN"})
+//    void 관리자권한으로_권한변경_API_접근_성공() throws Exception {
+//        UserRoleUpdateRequest request = new UserRoleUpdateRequest(
+//            UUID.randomUUID(), Role.ROLE_ADMIN
+//        );
+//
+//        mockMvc.perform(put("/api/auth/role")
+//                .with(csrf())
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(request)))
+//            .andExpect(status().isOk());
+//    }
 
 
 }
