@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
+import com.sprint.mission.discodeit.security.CsrfCookieFilter;
 import com.sprint.mission.discodeit.security.DiscodeitLoginFilter;
 import com.sprint.mission.discodeit.security.DiscodeitLogoutFilter;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class SecurityConfig {
@@ -35,16 +37,17 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
             .requestMatchers("/api/**").authenticated()
             .anyRequest().permitAll())
-        .csrf(csrfConfig -> csrfConfig.disable()
-//            .csrfTokenRepository(cookieCsrfTokenRepository)
-//            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-//            .ignoringRequestMatchers("/api/auth/csrf-token")
+        .csrf(csrfConfig -> csrfConfig
+            .csrfTokenRepository(cookieCsrfTokenRepository)
+            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+            .ignoringRequestMatchers("/api/auth/csrf-token", "/api/auth/logout")
+            .ignoringRequestMatchers(new AntPathRequestMatcher("/api/users", HttpMethod.POST.name()))
         )
-//        .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+        .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
         .addFilterBefore(discodeitLoginFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterAfter(discodeitLogoutFilter, LogoutFilter.class)
         .formLogin(AbstractHttpConfigurer::disable)
-        .httpBasic(withDefaults())
+        .httpBasic(AbstractHttpConfigurer::disable)
         .build();
   }
 
