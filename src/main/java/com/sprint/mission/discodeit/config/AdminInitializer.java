@@ -21,7 +21,7 @@ public class AdminInitializer implements CommandLineRunner {
       User admin = new User(
           "admin",
           "admin@email.com",
-          "admin1234",
+          passwordEncoder.encode("admin1234"),
           null
       );
       admin.updateRole(Role.ROLE_ADMIN);

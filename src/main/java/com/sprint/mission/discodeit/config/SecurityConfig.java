@@ -37,8 +37,7 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http,
-      AuthenticationManager authManager, SecurityContextRepository contextRepository,
-      RoleChangeDetectionFilter roleChangeDetectionFilter)
+      AuthenticationManager authManager, SecurityContextRepository contextRepository)
       throws Exception {
 
     CustomAuthenticationFilter customFilter = new CustomAuthenticationFilter(authManager);
@@ -71,10 +70,11 @@ public class SecurityConfig {
     // 커스텀 필터 등록
     http
         .addFilterAt(customFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterAt(roleFilter, RoleChangeDetectionFilter.class);
+        .addFilterAfter(roleFilter, UsernamePasswordAuthenticationFilter.class);
 
     // 보안 설정
-    http.authorizeHttpRequests(auth -> auth
+    http
+        .authorizeHttpRequests(auth -> auth
             .requestMatchers(
                 "/api/auth/csrf-token",
                 "/api/auth/login",
