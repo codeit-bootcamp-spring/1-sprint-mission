@@ -9,7 +9,7 @@ spring:
       maxRequestSize: 30MB
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
