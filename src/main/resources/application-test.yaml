@@ -13,7 +13,7 @@ spring:
       mode: always # Spring Boot DB 테이블 만들기
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         highlight_sql: true # 텍스트에 컬러 입히기

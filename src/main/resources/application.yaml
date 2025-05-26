@@ -1,12 +1,18 @@
 server:
   port: 80
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: false
+        same-site: lax
 
 spring:
   application:
     name: discodeit
 
   jpa:
-    show-sql: true
+    show-sql: false
 
   servlet:
     multipart:
