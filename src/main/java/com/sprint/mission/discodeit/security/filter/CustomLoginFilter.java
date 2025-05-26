@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
@@ -22,6 +23,12 @@ public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
   public CustomLoginFilter(ObjectMapper mapper) {
     super(DEFAULT_ANT_PATH_REQUEST_MATCHER);
     this.mapper = mapper;
+  }
+
+  @Override
+  public void setSessionAuthenticationStrategy(
+      SessionAuthenticationStrategy sessionAuthenticationStrategy) {
+    super.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
   }
 
   @Override

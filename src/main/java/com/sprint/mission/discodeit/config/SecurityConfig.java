@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
 import com.sprint.mission.discodeit.security.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.handler.LoginSuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 
@@ -76,14 +82,44 @@ public class SecurityConfig {
   }
 
   @Bean
-  public CustomLoginFilter customLoginFilter(AuthenticationManager authenticationManager,
-      SecurityContextRepository securityContextRepository) {
+  public SessionAuthenticationStrategy sessionAuthenticationStrategy( // 인증 성공시 수행
+      SessionRegistry sessionRegistry) {
+
+    // 하단 HttpSecurity 의 sessionManagement 설정과 통일
+    // 동시 세션 제어 전략 설정
+    ConcurrentSessionControlAuthenticationStrategy concurrentSessionControlAuthenticationStrategy =
+        new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry);
+    concurrentSessionControlAuthenticationStrategy.setMaximumSessions(1);
+
+    // 세션 고정 보호 전략
+    SessionFixationProtectionStrategy sessionFixationProtectionStrategy =
+        new SessionFixationProtectionStrategy();
+
+    // 세션 레지스트리 등록
+    RegisterSessionAuthenticationStrategy registerSessionAuthenticationStrategy =
+        new RegisterSessionAuthenticationStrategy(sessionRegistry);
+
+    return new CompositeSessionAuthenticationStrategy(
+        Arrays.asList(
+            concurrentSessionControlAuthenticationStrategy,
+            sessionFixationProtectionStrategy,
+            registerSessionAuthenticationStrategy
+        )
+    );
+  }
+
+  @Bean
+  public CustomLoginFilter customLoginFilter(
+      AuthenticationManager authenticationManager,
+      SecurityContextRepository securityContextRepository,
+      SessionAuthenticationStrategy sessionAuthenticationStrategy) {
     CustomLoginFilter filter = new CustomLoginFilter(objectMapper);
     filter.setFilterProcessesUrl("/api/auth/login");
     filter.setAuthenticationManager(authenticationManager);
     filter.setAuthenticationSuccessHandler(loginSuccessHandler);
     filter.setAuthenticationFailureHandler(loginFailureHandler);
     filter.setSecurityContextRepository(securityContextRepository);
+    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
     return filter;
   }
 
@@ -113,8 +149,7 @@ public class SecurityConfig {
         .httpBasic(AbstractHttpConfigurer::disable)
         // 세션 관리 설정
         .sessionManagement(session -> session
-                .sessionFixation(SessionFixationConfigurer::changeSessionId
-                )
+                .sessionFixation(SessionFixationConfigurer::changeSessionId)
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
                 .expiredSessionStrategy(ev -> {
