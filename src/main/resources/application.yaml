@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   application: # 애플리케이션 기본 설정
     name: discodeit  # 애플리케이션 이름 설정
   servlet:
@@ -9,7 +9,7 @@ spring:
       max-request-size: 30MB # 요청당 최대 크기
   jpa: # JPA, Hibernate 설정
     hibernate:
-      ddl-auto: validate  # 데이터베이스 테이블과 엔티티 매핑 검증만 수행, 운영환경에서 일반적으로 validate 사용
+      ddl-auto: update  # 데이터베이스 테이블과 엔티티 매핑 검증만 수행, 운영환경에서 일반적으로 validate 사용
     properties:
       hibernate:
         format_sql: true  # sql 보기 좋게 포맷팅
@@ -24,6 +24,12 @@ logging:
 
 discodeit: # 파일 저장소 설정
   storage:
-    type: local # 파일 저장소 타입 local로 설정
+    type: ${STORAGE_TYPE:local} # 파일 저장소 타입 local로 설정
     local:
       root-path: .discodeit/storage # 로컬 저장소 경로
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
