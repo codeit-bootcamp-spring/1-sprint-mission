@@ -13,19 +13,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.SecurityContextRepository;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+  @Autowired
+  private RememberMeServices rememberMeServices;
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
@@ -79,6 +82,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
       logger.warn("Session authentication strategy failed", e);
     }
 
+    String remember = request.getParameter("remember-me");
+    if ("true".equals(remember)) {
+      rememberMeServices.loginSuccess(request, response, authResult);
+    }
+
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
@@ -103,6 +111,4 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     ErrorResponse errorResponse = ErrorResponse.from(e);
     objectMapper.writeValue(response.getWriter(), errorResponse);
   }
-
-
 }

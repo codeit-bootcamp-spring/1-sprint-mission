@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.security.CustomAuthenticationFilter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +22,15 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
@@ -41,7 +47,8 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain chain(HttpSecurity http,
-      CustomAuthenticationFilter customAuthenticationFilter) throws Exception {
+      CustomAuthenticationFilter customAuthenticationFilter,
+      PersistentTokenRepository tokenRepository) throws Exception {
 
     http
         .authorizeHttpRequests(auth -> auth
@@ -76,6 +83,12 @@ public class SecurityConfig {
             })
             .invalidateHttpSession(true)
             .clearAuthentication(true)
+        )
+        .rememberMe(r -> r
+            .rememberMeParameter("remember-me")
+            .tokenRepository(tokenRepository)
+            .tokenValiditySeconds(60 * 60 * 24 * 21)
+            .key("mySuperSecretKey123!")
         )
         .httpBasic(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
@@ -162,4 +175,22 @@ public class SecurityConfig {
         new RegisterSessionAuthenticationStrategy(sessionRegistry())
     ));
   }
+
+  @Bean
+  public PersistentTokenRepository tokenRepository(DataSource dataSource) {
+    JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
+    repository.setDataSource(dataSource);
+    return repository;
+  }
+
+  @Bean
+  public RememberMeServices rememberMeServices(UserDetailsService userDetailsService,
+      PersistentTokenRepository tokenRepository) {
+    PersistentTokenBasedRememberMeServices services =
+        new PersistentTokenBasedRememberMeServices("remember-me-key", userDetailsService, tokenRepository);
+    services.setTokenValiditySeconds(60 * 60 * 24 * 21);
+    services.setAlwaysRemember(false);
+    return services;
+  }
+
 }

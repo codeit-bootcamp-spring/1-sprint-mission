@@ -69,3 +69,10 @@ CREATE TABLE message_attachments
     CONSTRAINT fk_message_attachment_attachment FOREIGN KEY (attachment_id) REFERENCES
         binary_contents (id) ON DELETE CASCADE
 );
+
+CREATE TABLE persistent_logins (
+                                   username VARCHAR(64) NOT NULL,
+                                   series VARCHAR(64) PRIMARY KEY,
+                                   token VARCHAR(64) NOT NULL,
+                                   last_used TIMESTAMP NOT NULL
+);
