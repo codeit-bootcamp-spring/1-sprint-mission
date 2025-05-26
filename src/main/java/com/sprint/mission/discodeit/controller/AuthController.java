@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -28,10 +29,11 @@ public class AuthController implements AuthApi {
 
 
   @GetMapping("/csrf-token")
-  public CsrfToken csrfToken(CsrfToken token) {
+  public ResponseEntity<CsrfToken> csrfToken(CsrfToken csrfToken) {
     // Spring Security가 자동으로 CsrfToken 객체를 주입해 줌
-    return token;
+    return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
   }
+
 
   @GetMapping("/me")
   public ResponseEntity<UserDto> me(Authentication authentication) {

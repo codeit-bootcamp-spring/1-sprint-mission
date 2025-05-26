@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
+//import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.CustomLoginFilter;
 import com.sprint.mission.discodeit.security.CustomLogoutFilter;
 import com.sprint.mission.discodeit.security.CustomPersistentRememberMeServices;
@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -41,6 +42,8 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.session.SessionInformationExpiredStrategy;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -51,7 +54,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    private final CustomAuthenticationEntryPoint entryPoint;
+    //private final CustomAuthenticationEntryPoint entryPoint;
 
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
@@ -122,32 +125,24 @@ public class SecurityConfig {
             SessionRegistry sessionRegistry
     ) throws Exception {
         http
-                //.csrf(csrf -> csrf.disable())
                 //.cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/auth/logout"))
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // 회원가입만 허용
+                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
+                        .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"))).permitAll()
                         .requestMatchers(
-                                "/api/auth/login",
-                                "/api/auth/logout",
-                                "/api/auth/csrf-token", // csrf 토큰 발급 api
-                                "/api/users", // 회원가입 api 허용
-                                "/",
-                                "/index.html",
-                                "/favicon.ico",  // 파비콘
-                                "/assets/**", // JS/CSS 번들
-                                "/static/**", // 정적 리소스
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/actuator/**",
-                                "/login", // 추가
-                                "/login?**" // 추가 (expired=concurrent 포함)
+                                "/api/auth/login?**",
+                                "/api/auth/csrf-token" // csrf 토큰 발급 api
                         ).permitAll()
                         .anyRequest().hasRole("USER")
                 )
                 .formLogin(form -> form.disable())
-                .exceptionHandling(exception -> exception
+/*                .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(entryPoint)
-                )
+                )*/
                 .sessionManagement(session -> session
                         .sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId) //세션고정보호
                         .maximumSessions(1)
@@ -191,7 +186,7 @@ public class SecurityConfig {
         CustomPersistentRememberMeServices services =
                 new CustomPersistentRememberMeServices("remember-me-key", userDetailsService, tokenRepository);
         services.setTokenValiditySeconds(60 * 60 * 24 * 21); // 3주
-        services.setAlwaysRemember(true); // 매번 remember-me 적용
+        services.setAlwaysRemember(true); // 매번 remember-me 적용 // false 바꾸면 중복 생성 안됨
         return services;
     }
 

@@ -62,6 +62,11 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) throws IOException, ServletException {
+
+        if (this.sessionStrategy != null) {
+            this.sessionStrategy.onAuthentication(authResult, request, response);
+        }
+
         // 1. SecurityContext 생성 및 설정
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authResult);

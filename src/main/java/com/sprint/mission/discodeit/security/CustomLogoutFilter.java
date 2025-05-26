@@ -43,7 +43,7 @@ public class CustomLogoutFilter extends OncePerRequestFilter {
             response.addCookie(cookie);
 
             // DB 토큰 삭제
-            if (auth != null && auth.getName() != null) {
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
                 tokenRepository.removeUserTokens(auth.getName());
             }
 

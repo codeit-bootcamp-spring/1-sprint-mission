@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,3 +46,4 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     """);
     }
 }
+*/
