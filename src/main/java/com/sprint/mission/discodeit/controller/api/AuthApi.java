@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.data.CsrfTokenDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,4 +42,23 @@ public interface AuthApi {
         )
     })
     ResponseEntity<UserDto> getCurrentUser();
+
+    @Operation(summary = "사용자 권한 변경 (관리자 전용)")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", description = "권한 변경 성공",
+            content = @Content(schema = @Schema(implementation = UserDto.class))
+        ),
+        @ApiResponse(
+            responseCode = "403", description = "권한 없음",
+            content = @Content(examples = @ExampleObject(value = "Access Denied"))
+        ),
+        @ApiResponse(
+            responseCode = "404", description = "사용자를 찾을 수 없음",
+            content = @Content(examples = @ExampleObject(value = "User with id {userId} not found"))
+        )
+    })
+    ResponseEntity<UserDto> updateUserRole(
+        @Parameter(description = "권한 변경 요청") RoleUpdateRequest request
+    );
 } 
