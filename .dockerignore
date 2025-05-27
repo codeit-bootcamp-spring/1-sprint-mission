@@ -1,0 +1,21 @@
+# Gradle 캐시 및 빌드 결과 제외
+.gradle
+build
+
+# IDE 파일
+.idea
+*.iml
+
+# 시스템 파일
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# OS별 불필요한 파일
+Thumbs.db
+
+out
+*.iws
+*.ipr
