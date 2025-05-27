@@ -27,7 +27,6 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -49,7 +48,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -285,15 +283,8 @@ public class SecurityConfig {
   public SecurityFilterChain chain(HttpSecurity http)
       throws Exception {
 
+    //SSR 방식이었다면 아래 세션기반의 토큰 레포지토리를 사용하면되지만, Discodeit은 CSR방식을 사용
     CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-    PersistentTokenRepository rememberMeTokenRepository = persistentTokenRepository();
-
-    tokenRepository.setCookieName("CSRF-TOKEN");    // 쿠키 이름 변경
-    tokenRepository.setHeaderName("X-CSRF-TOKEN");  // 헤더 이름 변경
-
-    //SSR 방식이었다면 아래 세션기반의 토큰 레포지토리를 사용하면되지만, 요구사항에서 우리는 CSR방식을 사용하기로 했으므로 위처럼
-    //커스터마이징을 해주어야한다.
-    //CsrfTokenRepository httpSessionCsrfTokenRepository = new HttpSessionCsrfTokenRepository();
 
     http
         .authorizeHttpRequests(auth -> auth
@@ -323,8 +314,12 @@ public class SecurityConfig {
         //디스코드잇은 CSR 방식이기 때문에 formLogin은 사용하지 않는다.
         .formLogin(AbstractHttpConfigurer::disable)
 
+        //.addFilter() - Spring Security 필터 체인에 커스텀 필터 추가
         .addFilter(authenticationFilter(
             authenticationManager(http.getSharedObject(AuthenticationConfiguration.class))))
+        //authenticationFilter() - 커스텀 인증 필터 생성 메서드
+        //authenticationManager() - AuthenticationManager 객체 생성/반환
+        //http.getSharedObject(AuthenticationConfiguration.class) - Spring이 관리하는 인증 설정 객체 가져오기
 
         // 로그아웃 필터 구현
         .addFilterBefore(new CustomLogoutFilter(sessionRegistry(), persistentTokenRepository()),
@@ -350,6 +345,8 @@ public class SecurityConfig {
             .maxSessionsPreventsLogin(false)// 동일 계정으로 로그인 했을때, 이미 로그인 되어있는 계정을 로그아웃 시킬지
             .sessionRegistry(sessionRegistry())// 세션 이벤트 처리를 위해 필요
         )
+
+        // RememberMe 서비스를 빈으로 등록하면 더 세밀한 제어가 가능 (6.5.0 권장)
         .rememberMe(rememberMe -> rememberMe
             .rememberMeServices(rememberMeServices())
         );
