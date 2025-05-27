@@ -22,7 +22,11 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
       Pageable pageable);
 
 
-  Optional<Message> findFirstByChannelIdOrderByCreatedAtDesc(UUID channelId);
+  @Query("SELECT m.createdAt "
+      + "FROM Message m "
+      + "WHERE m.channel.id = :channelId "
+      + "ORDER BY m.createdAt DESC LIMIT 1")
+  Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
 
   void deleteAllByChannelId(UUID channelId);
 }

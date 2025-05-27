@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.binaryContent.FileNotFoundException;
-import com.sprint.mission.discodeit.service.basic.BinaryContentService;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
@@ -17,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
-@Slf4j
 @RequestMapping("/api/binaryContents")
 public class BinaryContentController implements BinaryContentApi {
 
@@ -29,7 +28,9 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping(path = "{binaryContentId}")
   public ResponseEntity<BinaryContentDto> find(
       @PathVariable("binaryContentId") UUID binaryContentId) {
+    log.info("바이너리 컨텐츠 조회 요청: id={}", binaryContentId);
     BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
+    log.debug("바이너리 컨텐츠 조회 응답: {}", binaryContent);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContent);
@@ -38,7 +39,9 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping
   public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+    log.info("바이너리 컨텐츠 목록 조회 요청: ids={}", binaryContentIds);
     List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    log.debug("바이너리 컨텐츠 목록 조회 응답: count={}", binaryContents.size());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContents);
@@ -47,24 +50,11 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping(path = "{binaryContentId}/download")
   public ResponseEntity<?> download(
       @PathVariable("binaryContentId") UUID binaryContentId) {
-    log.info("파일 다운로드 요청 수신 - binaryContentId: {}", binaryContentId);
-    try {
-      BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
-      ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
-
-      log.info("파일 다운로드 처리 완료 - binaryContentId: {}, fileName: {}",
-          binaryContentId, binaryContentDto.fileName());
-
-      return response;
-
-    } catch (FileNotFoundException e) {
-      log.warn("파일 다운로드 실패 - 파일을 찾을 수 없음 - binaryContentId: {}", binaryContentId, e);
-      throw e;
-
-    } catch (Exception e) {
-      log.error("파일 다운로드 실패 - binaryContentId: {}, 원인: {}",
-          binaryContentId, e.getMessage(), e);
-      throw e;
-    }
+    log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
+    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+    ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
+    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}",
+        response.getHeaders().getContentType(), response.getHeaders().getContentLength());
+    return response;
   }
 }

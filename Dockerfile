@@ -1,24 +1,40 @@
-#FROM amazoncorretto:17
-FROM gradle:8.6-jdk17 AS builder
+# 빌드 스테이지
+FROM amazoncorretto:17 AS builder
 
+# 작업 디렉토리 설정
 WORKDIR /app
 
+# Gradle Wrapper 파일 먼저 복사
+COPY ../0-sprint-mission-s9-base/gradle ./gradle
+COPY ../0-sprint-mission-s9-base/gradlew ./gradlew
+
+# Gradle 캐시를 위한 의존성 파일 복사
 COPY build.gradle settings.gradle ./
-RUN gradle dependencies || true
 
-COPY . .
-#RUN ./gradlew build -x test --no-daemon
-RUN gradle bootJar -x test --no-daemon
+# 의존성 다운로드
+RUN ./gradlew dependencies
 
-FROM amazoncorretto:17.0.8-alpine3.18 AS runner
+# 소스 코드 복사 및 빌드
+COPY ../0-sprint-mission-s9-base/src ./src
+RUN ./gradlew build -x test
+
+
+# 런타임 스테이지
+FROM amazoncorretto:17-alpine3.21
+
+# 작업 디렉토리 설정
 WORKDIR /app
-COPY --from=builder /app/build/libs/*.jar app.jar
 
-#ENV PROJECT_NAME=discodeit
-#ENV PROJECT_VERSION=1.2-M8
-ENV JVM_OPTS=""
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+# 프로젝트 정보를 ENV로 설정
+ENV PROJECT_NAME=discodeit \
+    PROJECT_VERSION=1.2-M8 \
+    JVM_OPTS=""
 
+# 빌드 스테이지에서 jar 파일만 복사
+COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
+
+# 80 포트 노출
 EXPOSE 80
 
-#CMD ["sh", "-c", "java $JVM_OPTS -jar build/libs/$PROJECT_NAME-$PROJECT_VERSION.jar"]
+# jar 파일 실행
+ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]

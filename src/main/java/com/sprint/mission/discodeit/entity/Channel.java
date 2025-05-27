@@ -18,13 +18,13 @@ public class Channel extends BaseUpdatableEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private Type type;
+  private ChannelType type;
   @Column(length = 100)
   private String name;
   @Column(length = 500)
   private String description;
 
-  public Channel(Type type, String name, String description) {
+  public Channel(ChannelType type, String name, String description) {
     this.type = type;
     this.name = name;
     this.description = description;
@@ -38,11 +38,4 @@ public class Channel extends BaseUpdatableEntity {
       this.description = newDescription;
     }
   }
-
-  public enum Type {
-    PUBLIC,
-    PRIVATE,
-  }
-
-
 }

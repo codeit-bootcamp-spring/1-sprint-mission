@@ -1,0 +1,212 @@
+25-05-20 10:00:22.045 [background-preinit] [32mINFO [0;39m o.h.validator.internal.util.Version  [ |  | ] - HV000001: Hibernate Validator 8.0.1.Final
+25-05-20 10:00:22.070 [main] [32mINFO [0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - Starting DiscodeitApplication using Java 17.0.14 with PID 62717 (/Users/shin-eunseob/codeit/1-sprint-mission/build/classes/java/main started by shin-eunseob in /Users/shin-eunseob/codeit/1-sprint-mission)
+25-05-20 10:00:22.070 [main] [32mDEBUG[0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-20 10:00:22.071 [main] [32mINFO [0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - The following 1 profile is active: "dev"
+25-05-20 10:00:22.202 [main] [33mWARN [0;39m o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext [ |  | ] - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [com.sprint.mission.discodeit.DiscodeitApplication]
+25-05-20 10:00:22.263 [main] [32mINFO [0;39m o.s.b.a.l.ConditionEvaluationReportLogger [ |  | ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-20 10:00:22.280 [main] [31mERROR[0;39m o.s.boot.SpringApplication           [ |  | ] - Application run failed
+org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [com.sprint.mission.discodeit.DiscodeitApplication]
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:185)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:418)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:791)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: org.springframework.context.annotation.ConflictingBeanDefinitionException: Annotation-specified bean name 's3BinaryContentStorage' for bean class [com.sprint.mission.discodeit.storage.s3.S3BinaryContentStorage] conflicts with existing, non-compatible bean definition of same name and class [com.sprint.mission.discodeit.storage.S3BinaryContentStorage]
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.checkCandidate(ClassPathBeanDefinitionScanner.java:361)
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.doScan(ClassPathBeanDefinitionScanner.java:288)
+	at org.springframework.context.annotation.ComponentScanAnnotationParser.parse(ComponentScanAnnotationParser.java:128)
+	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:332)
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:267)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:193)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:171)
+	... 13 common frames omitted
+25-05-20 10:02:12.507 [background-preinit] [32mINFO [0;39m o.h.validator.internal.util.Version  [ |  | ] - HV000001: Hibernate Validator 8.0.1.Final
+25-05-20 10:02:12.528 [main] [32mINFO [0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - Starting DiscodeitApplication using Java 17.0.14 with PID 62760 (/Users/shin-eunseob/codeit/1-sprint-mission/build/classes/java/main started by shin-eunseob in /Users/shin-eunseob/codeit/1-sprint-mission)
+25-05-20 10:02:12.528 [main] [32mDEBUG[0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-20 10:02:12.529 [main] [32mINFO [0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - The following 1 profile is active: "dev"
+25-05-20 10:02:12.672 [main] [33mWARN [0;39m o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext [ |  | ] - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [com.sprint.mission.discodeit.DiscodeitApplication]
+25-05-20 10:02:12.722 [main] [32mINFO [0;39m o.s.b.a.l.ConditionEvaluationReportLogger [ |  | ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-20 10:02:12.736 [main] [31mERROR[0;39m o.s.boot.SpringApplication           [ |  | ] - Application run failed
+org.springframework.beans.factory.BeanDefinitionStoreException: Failed to parse configuration class [com.sprint.mission.discodeit.DiscodeitApplication]
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:185)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:418)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:791)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: org.springframework.context.annotation.ConflictingBeanDefinitionException: Annotation-specified bean name 's3BinaryContentStorage' for bean class [com.sprint.mission.discodeit.storage.s3.S3BinaryContentStorage] conflicts with existing, non-compatible bean definition of same name and class [com.sprint.mission.discodeit.storage.S3BinaryContentStorage]
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.checkCandidate(ClassPathBeanDefinitionScanner.java:361)
+	at org.springframework.context.annotation.ClassPathBeanDefinitionScanner.doScan(ClassPathBeanDefinitionScanner.java:288)
+	at org.springframework.context.annotation.ComponentScanAnnotationParser.parse(ComponentScanAnnotationParser.java:128)
+	at org.springframework.context.annotation.ConfigurationClassParser.doProcessConfigurationClass(ConfigurationClassParser.java:332)
+	at org.springframework.context.annotation.ConfigurationClassParser.processConfigurationClass(ConfigurationClassParser.java:267)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:193)
+	at org.springframework.context.annotation.ConfigurationClassParser.parse(ConfigurationClassParser.java:171)
+	... 13 common frames omitted
+25-05-20 10:03:18.726 [background-preinit] [32mINFO [0;39m o.h.validator.internal.util.Version  [ |  | ] - HV000001: Hibernate Validator 8.0.1.Final
+25-05-20 10:03:18.747 [main] [32mINFO [0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - Starting DiscodeitApplication using Java 17.0.14 with PID 62791 (/Users/shin-eunseob/codeit/1-sprint-mission/build/classes/java/main started by shin-eunseob in /Users/shin-eunseob/codeit/1-sprint-mission)
+25-05-20 10:03:18.747 [main] [32mDEBUG[0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-20 10:03:18.748 [main] [32mINFO [0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - The following 1 profile is active: "dev"
+25-05-20 10:03:19.474 [main] [32mINFO [0;39m o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-20 10:03:19.510 [main] [32mINFO [0;39m o.s.d.r.c.RepositoryConfigurationDelegate [ |  | ] - Finished Spring Data repository scanning in 30 ms. Found 6 JPA repository interfaces.
+25-05-20 10:03:19.859 [main] [32mINFO [0;39m o.s.b.w.e.tomcat.TomcatWebServer     [ |  | ] - Tomcat initialized with port 8080 (http)
+25-05-20 10:03:19.864 [main] [32mINFO [0;39m o.a.coyote.http11.Http11NioProtocol  [ |  | ] - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-20 10:03:19.865 [main] [32mINFO [0;39m o.a.catalina.core.StandardService    [ |  | ] - Starting service [Tomcat]
+25-05-20 10:03:19.865 [main] [32mINFO [0;39m o.a.catalina.core.StandardEngine     [ |  | ] - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-20 10:03:19.891 [main] [32mINFO [0;39m o.a.c.c.C.[Tomcat].[localhost].[/]   [ |  | ] - Initializing Spring embedded WebApplicationContext
+25-05-20 10:03:19.891 [main] [32mINFO [0;39m o.s.b.w.s.c.ServletWebServerApplicationContext [ |  | ] - Root WebApplicationContext: initialization completed in 1127 ms
+25-05-20 10:03:19.995 [main] [32mINFO [0;39m com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Starting...
+25-05-20 10:03:20.044 [main] [32mINFO [0;39m com.zaxxer.hikari.pool.HikariPool    [ |  | ] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@54997f67
+25-05-20 10:03:20.045 [main] [32mINFO [0;39m com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Start completed.
+25-05-20 10:03:20.090 [main] [32mINFO [0;39m o.h.jpa.internal.util.LogHelper      [ |  | ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-20 10:03:20.121 [main] [32mINFO [0;39m org.hibernate.Version                [ |  | ] - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-20 10:03:20.138 [main] [32mINFO [0;39m o.h.c.i.RegionFactoryInitiator       [ |  | ] - HHH000026: Second-level cache disabled
+25-05-20 10:03:20.261 [main] [32mINFO [0;39m o.s.o.j.p.SpringPersistenceUnitInfo  [ |  | ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-20 10:03:20.325 [main] [32mINFO [0;39m o.hibernate.orm.connections.pooling  [ |  | ] - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.17
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-20 10:03:20.765 [main] [32mINFO [0;39m o.h.e.t.j.p.i.JtaPlatformInitiator   [ |  | ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-20 10:03:20.812 [main] [32mINFO [0;39m o.s.o.j.LocalContainerEntityManagerFactoryBean [ |  | ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-20 10:03:20.956 [main] [32mINFO [0;39m o.s.d.j.r.query.QueryEnhancerFactory [ |  | ] - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-20 10:03:21.305 [main] [33mWARN [0;39m o.s.b.a.s.s.UserDetailsServiceAutoConfiguration [ |  | ] - 
+
+Using generated security password: 525f99f9-d475-496e-bfb2-11de50fae79f
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+25-05-20 10:03:21.322 [main] [32mINFO [0;39m o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer [ |  | ] - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+25-05-20 10:03:21.357 [main] [32mINFO [0;39m o.s.b.a.w.s.WelcomePageHandlerMapping [ |  | ] - Adding welcome page: class path resource [static/index.html]
+25-05-20 10:03:21.502 [main] [32mINFO [0;39m o.s.b.a.e.web.EndpointLinksResolver  [ |  | ] - Exposing 4 endpoints beneath base path '/actuator'
+25-05-20 10:03:21.814 [main] [32mINFO [0;39m o.a.coyote.http11.Http11NioProtocol  [ |  | ] - Starting ProtocolHandler ["http-nio-8080"]
+25-05-20 10:03:21.824 [main] [32mINFO [0;39m o.s.b.w.e.tomcat.TomcatWebServer     [ |  | ] - Tomcat started on port 8080 (http) with context path '/'
+25-05-20 10:03:21.834 [main] [32mINFO [0;39m c.s.m.discodeit.DiscodeitApplication [ |  | ] - Started DiscodeitApplication in 3.302 seconds (process running for 3.612)
+25-05-20 10:03:21.957 [RMI TCP Connection(2)-127.0.0.1] [32mINFO [0;39m o.a.c.c.C.[Tomcat].[localhost].[/]   [ |  | ] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+25-05-20 10:03:21.957 [RMI TCP Connection(2)-127.0.0.1] [32mINFO [0;39m o.s.web.servlet.DispatcherServlet    [ |  | ] - Initializing Servlet 'dispatcherServlet'
+25-05-20 10:03:21.958 [RMI TCP Connection(2)-127.0.0.1] [32mINFO [0;39m o.s.web.servlet.DispatcherServlet    [ |  | ] - Completed initialization in 1 ms
+25-05-20 10:03:28.498 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Trying to match request against DefaultSecurityFilterChain defined as 'securityFilterChain' in [class path resource [com/sprint/mission/discodeit/config/SecurityConfig.class]] matching [any request] and having filters [DisableEncodeUrl, WebAsyncManagerIntegration, SecurityContextHolder, HeaderWriter, Csrf, RequestCacheAware, SecurityContextHolderAwareRequest, AnonymousAuthentication, ExceptionTranslation, Authorization] (1/1)
+25-05-20 10:03:28.499 [http-nio-8080-exec-1] [32mDEBUG[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Securing GET /
+25-05-20 10:03:28.502 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking DisableEncodeUrlFilter (1/10)
+25-05-20 10:03:28.504 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking WebAsyncManagerIntegrationFilter (2/10)
+25-05-20 10:03:28.505 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderFilter (3/10)
+25-05-20 10:03:28.505 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking HeaderWriterFilter (4/10)
+25-05-20 10:03:28.506 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking CsrfFilter (5/10)
+25-05-20 10:03:28.506 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking RequestCacheAwareFilter (6/10)
+25-05-20 10:03:28.506 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderAwareRequestFilter (7/10)
+25-05-20 10:03:28.507 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AnonymousAuthenticationFilter (8/10)
+25-05-20 10:03:28.507 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking ExceptionTranslationFilter (9/10)
+25-05-20 10:03:28.507 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AuthorizationFilter (10/10)
+25-05-20 10:03:28.530 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Trying to match request against DefaultSecurityFilterChain defined as 'securityFilterChain' in [class path resource [com/sprint/mission/discodeit/config/SecurityConfig.class]] matching [any request] and having filters [DisableEncodeUrl, WebAsyncManagerIntegration, SecurityContextHolder, HeaderWriter, Csrf, RequestCacheAware, SecurityContextHolderAwareRequest, AnonymousAuthentication, ExceptionTranslation, Authorization] (1/1)
+25-05-20 10:03:28.530 [http-nio-8080-exec-1] [32mDEBUG[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Securing GET /error
+25-05-20 10:03:28.530 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking DisableEncodeUrlFilter (1/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking WebAsyncManagerIntegrationFilter (2/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderFilter (3/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking HeaderWriterFilter (4/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking CsrfFilter (5/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking RequestCacheAwareFilter (6/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderAwareRequestFilter (7/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AnonymousAuthenticationFilter (8/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking ExceptionTranslationFilter (9/10)
+25-05-20 10:03:28.531 [http-nio-8080-exec-1] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AuthorizationFilter (10/10)
+25-05-20 10:03:29.495 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Trying to match request against DefaultSecurityFilterChain defined as 'securityFilterChain' in [class path resource [com/sprint/mission/discodeit/config/SecurityConfig.class]] matching [any request] and having filters [DisableEncodeUrl, WebAsyncManagerIntegration, SecurityContextHolder, HeaderWriter, Csrf, RequestCacheAware, SecurityContextHolderAwareRequest, AnonymousAuthentication, ExceptionTranslation, Authorization] (1/1)
+25-05-20 10:03:29.495 [http-nio-8080-exec-2] [32mDEBUG[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Securing GET /
+25-05-20 10:03:29.495 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking DisableEncodeUrlFilter (1/10)
+25-05-20 10:03:29.496 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking WebAsyncManagerIntegrationFilter (2/10)
+25-05-20 10:03:29.496 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderFilter (3/10)
+25-05-20 10:03:29.496 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking HeaderWriterFilter (4/10)
+25-05-20 10:03:29.496 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking CsrfFilter (5/10)
+25-05-20 10:03:29.497 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking RequestCacheAwareFilter (6/10)
+25-05-20 10:03:29.497 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderAwareRequestFilter (7/10)
+25-05-20 10:03:29.497 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AnonymousAuthenticationFilter (8/10)
+25-05-20 10:03:29.497 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking ExceptionTranslationFilter (9/10)
+25-05-20 10:03:29.497 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AuthorizationFilter (10/10)
+25-05-20 10:03:29.501 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Trying to match request against DefaultSecurityFilterChain defined as 'securityFilterChain' in [class path resource [com/sprint/mission/discodeit/config/SecurityConfig.class]] matching [any request] and having filters [DisableEncodeUrl, WebAsyncManagerIntegration, SecurityContextHolder, HeaderWriter, Csrf, RequestCacheAware, SecurityContextHolderAwareRequest, AnonymousAuthentication, ExceptionTranslation, Authorization] (1/1)
+25-05-20 10:03:29.501 [http-nio-8080-exec-2] [32mDEBUG[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Securing GET /error
+25-05-20 10:03:29.501 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking DisableEncodeUrlFilter (1/10)
+25-05-20 10:03:29.502 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking WebAsyncManagerIntegrationFilter (2/10)
+25-05-20 10:03:29.502 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderFilter (3/10)
+25-05-20 10:03:29.502 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking HeaderWriterFilter (4/10)
+25-05-20 10:03:29.502 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking CsrfFilter (5/10)
+25-05-20 10:03:29.502 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking RequestCacheAwareFilter (6/10)
+25-05-20 10:03:29.502 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderAwareRequestFilter (7/10)
+25-05-20 10:03:29.502 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AnonymousAuthenticationFilter (8/10)
+25-05-20 10:03:29.503 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking ExceptionTranslationFilter (9/10)
+25-05-20 10:03:29.503 [http-nio-8080-exec-2] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AuthorizationFilter (10/10)
+25-05-20 10:03:49.300 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Trying to match request against DefaultSecurityFilterChain defined as 'securityFilterChain' in [class path resource [com/sprint/mission/discodeit/config/SecurityConfig.class]] matching [any request] and having filters [DisableEncodeUrl, WebAsyncManagerIntegration, SecurityContextHolder, HeaderWriter, Csrf, RequestCacheAware, SecurityContextHolderAwareRequest, AnonymousAuthentication, ExceptionTranslation, Authorization] (1/1)
+25-05-20 10:03:49.301 [http-nio-8080-exec-3] [32mDEBUG[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Securing GET /login
+25-05-20 10:03:49.301 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking DisableEncodeUrlFilter (1/10)
+25-05-20 10:03:49.302 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking WebAsyncManagerIntegrationFilter (2/10)
+25-05-20 10:03:49.302 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderFilter (3/10)
+25-05-20 10:03:49.302 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking HeaderWriterFilter (4/10)
+25-05-20 10:03:49.302 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking CsrfFilter (5/10)
+25-05-20 10:03:49.302 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking RequestCacheAwareFilter (6/10)
+25-05-20 10:03:49.303 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderAwareRequestFilter (7/10)
+25-05-20 10:03:49.303 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AnonymousAuthenticationFilter (8/10)
+25-05-20 10:03:49.303 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking ExceptionTranslationFilter (9/10)
+25-05-20 10:03:49.304 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AuthorizationFilter (10/10)
+25-05-20 10:03:49.307 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Trying to match request against DefaultSecurityFilterChain defined as 'securityFilterChain' in [class path resource [com/sprint/mission/discodeit/config/SecurityConfig.class]] matching [any request] and having filters [DisableEncodeUrl, WebAsyncManagerIntegration, SecurityContextHolder, HeaderWriter, Csrf, RequestCacheAware, SecurityContextHolderAwareRequest, AnonymousAuthentication, ExceptionTranslation, Authorization] (1/1)
+25-05-20 10:03:49.307 [http-nio-8080-exec-3] [32mDEBUG[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Securing GET /error
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking DisableEncodeUrlFilter (1/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking WebAsyncManagerIntegrationFilter (2/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderFilter (3/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking HeaderWriterFilter (4/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking CsrfFilter (5/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking RequestCacheAwareFilter (6/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderAwareRequestFilter (7/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AnonymousAuthenticationFilter (8/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking ExceptionTranslationFilter (9/10)
+25-05-20 10:03:49.308 [http-nio-8080-exec-3] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AuthorizationFilter (10/10)
+25-05-20 10:03:54.090 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Trying to match request against DefaultSecurityFilterChain defined as 'securityFilterChain' in [class path resource [com/sprint/mission/discodeit/config/SecurityConfig.class]] matching [any request] and having filters [DisableEncodeUrl, WebAsyncManagerIntegration, SecurityContextHolder, HeaderWriter, Csrf, RequestCacheAware, SecurityContextHolderAwareRequest, AnonymousAuthentication, ExceptionTranslation, Authorization] (1/1)
+25-05-20 10:03:54.091 [http-nio-8080-exec-4] [32mDEBUG[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Securing GET /api/login
+25-05-20 10:03:54.091 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking DisableEncodeUrlFilter (1/10)
+25-05-20 10:03:54.092 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking WebAsyncManagerIntegrationFilter (2/10)
+25-05-20 10:03:54.093 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderFilter (3/10)
+25-05-20 10:03:54.094 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking HeaderWriterFilter (4/10)
+25-05-20 10:03:54.095 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking CsrfFilter (5/10)
+25-05-20 10:03:54.095 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking RequestCacheAwareFilter (6/10)
+25-05-20 10:03:54.096 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderAwareRequestFilter (7/10)
+25-05-20 10:03:54.096 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AnonymousAuthenticationFilter (8/10)
+25-05-20 10:03:54.096 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking ExceptionTranslationFilter (9/10)
+25-05-20 10:03:54.096 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AuthorizationFilter (10/10)
+25-05-20 10:03:54.099 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Trying to match request against DefaultSecurityFilterChain defined as 'securityFilterChain' in [class path resource [com/sprint/mission/discodeit/config/SecurityConfig.class]] matching [any request] and having filters [DisableEncodeUrl, WebAsyncManagerIntegration, SecurityContextHolder, HeaderWriter, Csrf, RequestCacheAware, SecurityContextHolderAwareRequest, AnonymousAuthentication, ExceptionTranslation, Authorization] (1/1)
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mDEBUG[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Securing GET /error
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking DisableEncodeUrlFilter (1/10)
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking WebAsyncManagerIntegrationFilter (2/10)
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderFilter (3/10)
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking HeaderWriterFilter (4/10)
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking CsrfFilter (5/10)
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking RequestCacheAwareFilter (6/10)
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking SecurityContextHolderAwareRequestFilter (7/10)
+25-05-20 10:03:54.100 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AnonymousAuthenticationFilter (8/10)
+25-05-20 10:03:54.101 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking ExceptionTranslationFilter (9/10)
+25-05-20 10:03:54.101 [http-nio-8080-exec-4] [32mTRACE[0;39m o.s.security.web.FilterChainProxy    [ |  | ] - Invoking AuthorizationFilter (10/10)
+25-05-20 10:03:58.428 [SpringApplicationShutdownHook] [32mINFO [0;39m o.s.b.w.e.tomcat.GracefulShutdown    [ |  | ] - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-20 10:03:58.430 [tomcat-shutdown] [32mINFO [0;39m o.s.b.w.e.tomcat.GracefulShutdown    [ |  | ] - Graceful shutdown complete
+25-05-20 10:03:58.437 [SpringApplicationShutdownHook] [32mINFO [0;39m o.s.o.j.LocalContainerEntityManagerFactoryBean [ |  | ] - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-20 10:03:58.439 [SpringApplicationShutdownHook] [32mINFO [0;39m com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Shutdown initiated...
+25-05-20 10:03:58.441 [SpringApplicationShutdownHook] [32mINFO [0;39m com.zaxxer.hikari.HikariDataSource   [ |  | ] - HikariPool-1 - Shutdown completed.

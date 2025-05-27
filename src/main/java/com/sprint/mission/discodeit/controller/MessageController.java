@@ -6,8 +6,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.exception.binaryContent.FileProcessingException;
-import com.sprint.mission.discodeit.service.basic.MessageService;
+import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
@@ -35,9 +34,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
-@Slf4j
 @RequestMapping("/api/messages")
 public class MessageController implements MessageApi {
 
@@ -48,77 +47,51 @@ public class MessageController implements MessageApi {
       @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    log.info("메시지 생성 요청 수신 - channelId: {}, authorId: {}, 첨부파일 수: {}",
-        messageCreateRequest.channelId(),
-        messageCreateRequest.authorId(),
-        attachments != null ? attachments.size() : 0);
-    try {
-      List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
-          .map(files -> files.stream()
-              .map(file -> {
-                try {
-                  return new BinaryContentCreateRequest(
-                      file.getOriginalFilename(),
-                      file.getContentType(),
-                      file.getBytes()
-                  );
-                } catch (IOException e) {
-                  log.error("첨부파일 처리 중 에러 발생 - fileName: {}, 원인: {}",
-                      file.getOriginalFilename(), e.getMessage(), e);
-                  throw new FileProcessingException(file.getName(), e);
-                }
-              })
-              .toList())
-          .orElse(new ArrayList<>());
-      MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
-      log.info("메시지 생성 성공 - messageId: {}, channelId: {}", createdMessage.id(),
-          createdMessage.channelId());
-      return ResponseEntity
-          .status(HttpStatus.CREATED)
-          .body(createdMessage);
-    } catch (Exception e) {
-      log.error("메시지 생성 실패 - channelId: {}, authorId: {}, 원인: {}",
-          messageCreateRequest.channelId(), messageCreateRequest.authorId(), e.getMessage(), e);
-      return ResponseEntity
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .build();
-    }
+    log.info("메시지 생성 요청: request={}, attachmentCount={}",
+        messageCreateRequest, attachments != null ? attachments.size() : 0);
+
+    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    log.debug("메시지 생성 응답: {}", createdMessage);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdMessage);
   }
 
   @PatchMapping(path = "{messageId}")
-  public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
+  public ResponseEntity<MessageDto> update(
+      @PathVariable("messageId") UUID messageId,
       @RequestBody @Valid MessageUpdateRequest request) {
-    log.info("메시지 업데이트 요청 수신 - messageId: {}", messageId);
-    try {
-      MessageDto updatedMessage = messageService.update(messageId, request);
-      log.info("메시지 업데이트 성공 - messageId: {}", messageId);
-      return ResponseEntity
-          .status(HttpStatus.OK)
-          .body(updatedMessage);
-    } catch (Exception e) {
-      log.error("메시지 업데이트 실패 - messageId: {}, 원인: {}", messageId, e.getMessage(), e);
-      return ResponseEntity
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .build();
-    }
-
+    log.info("메시지 수정 요청: id={}, request={}", messageId, request);
+    MessageDto updatedMessage = messageService.update(messageId, request);
+    log.debug("메시지 수정 응답: {}", updatedMessage);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedMessage);
   }
 
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
-    log.info("메시지 삭제 요청 수신 - messageId: {}", messageId);
-    try {
-      messageService.delete(messageId);
-      log.info("메시지 삭제 성공 - messageId: {}", messageId);
-      return ResponseEntity
-          .status(HttpStatus.NO_CONTENT)
-          .build();
-    } catch (Exception e) {
-      log.error("메시지 삭제 실패 - messageId: {}, 원인: {}", messageId, e.getMessage(), e);
-      return ResponseEntity
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .build();
-    }
+    log.info("메시지 삭제 요청: id={}", messageId);
+    messageService.delete(messageId);
+    log.debug("메시지 삭제 완료");
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
   @GetMapping
@@ -131,8 +104,11 @@ public class MessageController implements MessageApi {
           sort = "createdAt",
           direction = Direction.DESC
       ) Pageable pageable) {
+    log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}",
+        channelId, cursor, pageable);
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);
+    log.debug("채널별 메시지 목록 조회 응답: totalElements={}", messages.totalElements());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(messages);

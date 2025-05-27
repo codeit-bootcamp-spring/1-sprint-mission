@@ -1,20 +1,23 @@
 package com.sprint.mission.discodeit.exception.userStatus;
 
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import java.util.Map;
 import java.util.UUID;
 
 public class UserStatusNotFoundException extends UserStatusException {
 
-  public UserStatusNotFoundException(Map<String, Object> details) {
-    super(ErrorCode.USERSTATUS_NOT_FOUND, details);
+  public UserStatusNotFoundException() {
+    super(ErrorCode.USER_STATUS_NOT_FOUND);
   }
 
-  public static UserStatusNotFoundException byId(UUID id) {
-    return new UserStatusNotFoundException(Map.of("id", id));
+  public static UserStatusNotFoundException withId(UUID userStatusId) {
+    UserStatusNotFoundException exception = new UserStatusNotFoundException();
+    exception.addDetail("userStatusId", userStatusId);
+    return exception;
   }
 
-  public static UserStatusNotFoundException byUserId(UUID userId) {
-    return new UserStatusNotFoundException(Map.of("userId", userId));
+  public static UserStatusNotFoundException withUserId(UUID userId) {
+    UserStatusNotFoundException exception = new UserStatusNotFoundException();
+    exception.addDetail("userId", userId);
+    return exception;
   }
-}
+} 
