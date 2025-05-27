@@ -36,6 +36,8 @@ public class SecurityConfig {
                                                    CustomAuthenticationFilter customAuthenticationFilter) throws Exception {
         http
                 .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/api/auth/login")
+                        .ignoringRequestMatchers("/api/auth/logout")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -83,6 +85,9 @@ public class SecurityConfig {
         filter.setAuthenticationManager(authenticationManager);
         filter.setAuthenticationSuccessHandler(successHandler);
         filter.setAuthenticationFailureHandler(failureHandler);
+
+        filter.setFilterProcessesUrl("/api/auth/login");
+
         return filter;
     }
 
