@@ -8,7 +8,8 @@ CREATE TABLE users
     username   varchar(50) UNIQUE       NOT NULL,
     email      varchar(100) UNIQUE      NOT NULL,
     password   varchar(60)              NOT NULL,
-    profile_id uuid
+    profile_id uuid,
+    role       varchar(20)              NOT NULL DEFAULT 'ROLE_USER'
 );
 
 -- BinaryContent
@@ -19,7 +20,6 @@ CREATE TABLE binary_contents
     file_name    varchar(255)             NOT NULL,
     size         bigint                   NOT NULL,
     content_type varchar(100)             NOT NULL
---     ,bytes        bytea        NOT NULL
 );
 
 -- UserStatus
