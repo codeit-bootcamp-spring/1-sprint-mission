@@ -49,6 +49,14 @@ cloud:
     s3:
       bucket: ${AWS_S3_BUCKET}
 
+jwt:
+  issuer: discodeit-yudility
+  access-token:
+    validity-seconds: 900  # 15분
+  refresh-token:
+    validity-seconds: 2592000  # 30일
+  secret: ${JWT_SECRET:dev-secret-key-must-be-at-least-32-characters-long}
+
 logging:
   level:
     root: INFO
