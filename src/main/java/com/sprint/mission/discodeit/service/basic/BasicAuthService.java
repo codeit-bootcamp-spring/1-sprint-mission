@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,35 +18,36 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class BasicAuthService implements AuthService {
 
-  private final UserRepository userRepository;
-  private final UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-  @Transactional(readOnly = true)
-  @Override
-  public UserDto login(LoginRequest loginRequest) {
-    String username = loginRequest.username();
-    String password = loginRequest.password();
+    @Transactional(readOnly = true)
+    @Override
+    public UserDto login(LoginRequest loginRequest) {
+        String username = loginRequest.username();
+        String password = loginRequest.password();
 
-    log.info("Processing user login: username={}", username);
+        log.info("Processing user login: username={}", username);
 
-    try {
-      User user = userRepository.findByUsername(username)
-          .orElseThrow(() -> {
-            log.warn("Login failed: user not found - username={}", username);
-            return UserExceptions.notFound(username);
-          });
+        try {
+            User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.warn("Login failed: user not found - username={}", username);
+                    return UserExceptions.notFound(username);
+                });
 
-      if (!user.getPassword().equals(password)) {
-        log.warn("Login failed: wrong password - username={}", username);
-        throw UserExceptions.invalidPassword(username);
-      }
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                log.warn("Login failed: wrong password - username={}", username);
+                throw UserExceptions.invalidPassword(username);
+            }
 
-      log.info("Login successful: userId={}, username={}", user.getId(), username);
-      return userMapper.toDto(user);
-    } catch (Exception e) {
-      log.error("Error occurred during login process: username={}, error={}", username,
-          e.getMessage(), e);
-      throw e;
+            log.info("Login successful: userId={}, username={}", user.getId(), username);
+            return userMapper.toDto(user);
+        } catch (Exception e) {
+            log.error("Error occurred during login process: username={}, error={}", username,
+                e.getMessage(), e);
+            throw e;
+        }
     }
-  }
 }
