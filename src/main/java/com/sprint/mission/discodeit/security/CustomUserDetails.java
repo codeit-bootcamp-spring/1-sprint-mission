@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.entity.User;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
@@ -16,6 +17,7 @@ public class CustomUserDetails implements UserDetails {
     private final String email;
     private final String password;
     private final User user;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
@@ -23,12 +25,12 @@ public class CustomUserDetails implements UserDetails {
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.user = user;
+        this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 현재는 권한 관리를 하지 않으므로 빈 컬렉션 반환
-        return Collections.emptyList();
+        return authorities;
     }
 
     @Override
