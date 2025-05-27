@@ -39,6 +39,7 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Slf4j
 @EnableMethodSecurity
@@ -50,6 +51,16 @@ public class SecurityConfig {
   private final LoginFailureHandler loginFailureHandler;
   private final ObjectMapper objectMapper;
   private final UserDetailsService userDetailsService;
+
+
+  @Bean
+  public CookieCsrfTokenRepository cookieCsrfTokenRepository() {
+    CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse(); // httpOnly 설정 false
+    repository.setCookieName("XSRF-TOKEN"); // 프론트가 읽을 쿠키 이름
+    repository.setHeaderName("X-XSRF-TOKEN"); // 서버가 읽을 쿠키의 헤더 이름
+    repository.setCookiePath("/"); // csrf 쿠키 적용
+    return repository;
+  }
 
   @Bean
   public BCryptPasswordEncoder passwordEncoder() {
@@ -139,12 +150,20 @@ public class SecurityConfig {
       CustomLoginFilter customLoginFilter,
       SecurityContextRepository securityContextRepository,
       SessionRegistry sessionRegistry,
-      PersistentTokenRepository tokenRepository, CustomLogoutHandler customLogoutHandler)
+      PersistentTokenRepository tokenRepository,
+      CustomLogoutHandler customLogoutHandler,
+      CookieCsrfTokenRepository cookieCsrfTokenRepository)
       throws Exception {
 
     // formLogin 비활성화
     http.formLogin(AbstractHttpConfigurer::disable)
         // .csrf(AbstractHttpConfigurer::disable)
+        .csrf(csrf -> csrf
+            .csrfTokenRepository(cookieCsrfTokenRepository)
+            .ignoringRequestMatchers(
+                "/h2-console/**",
+                "/api/auth/logout")
+        )
         // HTTP Basic 인증 비활성화
         .httpBasic(AbstractHttpConfigurer::disable)
         // 세션 관리 설정
@@ -162,12 +181,6 @@ public class SecurityConfig {
         // SecurityContext 저장소 설정
         .securityContext(context -> context
             .securityContextRepository(securityContextRepository)
-        )
-        // CSRF 무시
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers(
-                "/h2-console/**",
-                "/api/auth/logout")
         )
         .headers(headers -> headers
             .frameOptions(
