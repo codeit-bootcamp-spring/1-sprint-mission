@@ -54,7 +54,7 @@ logging:
   level:
     org.hibernate.SQL: debug
     com.sprint.mission.discodeit: debug
-    org.springframework.security: trace
+#    org.springframework.security: trace
 
 decorator:
   datasource:
@@ -79,4 +79,9 @@ discodeit:
 
 file:
   dir: .discodeit/storage
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  accessTokenExpire: 900000
+  refreshTokenExpire: 604800000
 
