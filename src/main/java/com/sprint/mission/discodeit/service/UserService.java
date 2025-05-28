@@ -25,7 +25,7 @@ public interface UserService {
   UUID delete(UUID userId);
 
   UserUpdateResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
-      MultipartFile profile) throws IOException;
+      MultipartFile profile, String refreshToken) throws IOException;
 
   UserStatusUpdateResponse updateOnlineStatus(UUID userId, UserStatusUpdateRequest request);
 

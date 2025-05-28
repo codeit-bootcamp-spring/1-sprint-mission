@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.user.dto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserStatusUpdateResponse;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateResponse;
+import com.sprint.mission.discodeit.repository.JwtSessionRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,10 +17,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Tag(name = "User Controller")
 @RestController
 @RequiredArgsConstructor
@@ -38,6 +43,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
   private final UserService userService;
+  private final JwtService jwtService;
+  private final JwtSessionRepository jwtSessionRepository;
 
   /**
    * 유저 생성, 프사 선택
@@ -81,9 +88,10 @@ public class UserController {
   @PatchMapping("/{userId}")
   public UserUpdateResponse updateUser(@P("userId") @PathVariable("userId") UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      @CookieValue("refresh_token") String refreshToken) throws IOException {
 
-    return userService.update(userId, userUpdateRequest, profile);
+    return userService.update(userId, userUpdateRequest, profile, refreshToken);
   }
 
   @Operation(summary = "유저 온라인 상태 업데이트")
