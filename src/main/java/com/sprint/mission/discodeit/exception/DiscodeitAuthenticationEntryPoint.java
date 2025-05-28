@@ -7,7 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,16 +29,16 @@ public class DiscodeitAuthenticationEntryPoint implements AuthenticationEntryPoi
   public void commence(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException authException) throws IOException, ServletException {
 
+    String msg = Objects.toString(authException.getMessage(), "Unauthorized");
+    Map<String, Object> details = Collections.singletonMap(
+        HttpStatus.UNAUTHORIZED.toString(), msg
+    );
+
     ErrorResponse error = ErrorResponse.builder()
         .timestamp(Instant.now())
         .code(HttpStatus.UNAUTHORIZED.toString())
         .message(ErrorCode.UNAUTHORIZED.getMessage())
-        .details(
-            Map.of(
-                HttpStatus.UNAUTHORIZED.toString(),
-                authException.getMessage()
-            )
-        )
+        .details(details)
         .exceptionType(ErrorCode.UNAUTHORIZED.getCode())
         .status(HttpStatus.UNAUTHORIZED.value())
         .build();
@@ -46,7 +48,6 @@ public class DiscodeitAuthenticationEntryPoint implements AuthenticationEntryPoi
     response.setCharacterEncoding(StandardCharsets.UTF_8.name());
     objectMapper.writeValue(response.getWriter(), error);
 
-    Object o = objectMapper.readValue(request.getInputStream(), Object.class);
-    log.error("인증 실패: {}", o.toString());
+    log.error("인증 실패: {}", authException.toString());
   }
 }

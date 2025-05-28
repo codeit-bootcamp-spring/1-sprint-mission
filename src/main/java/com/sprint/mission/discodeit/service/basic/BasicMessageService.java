@@ -48,6 +48,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final PageResponseMapper<MessageDto> mapper = new PageResponseMapper<>();
+  private final MessageMapper messageMapper;
 
   /**
    * 메세지 만들기
@@ -74,7 +75,7 @@ public class BasicMessageService implements MessageService {
     uploadFiles(attachments, files);
 
     log.info("메세지 전송: {}", message.getId());
-    return MessageMapper.toDto(message);
+    return messageMapper.toDto(message);
   }
 
 
@@ -127,7 +128,7 @@ public class BasicMessageService implements MessageService {
     message.updateContent(request.newContent());
     log.info("메세지 수정: {}", message.getId());
 
-    return MessageMapper.toDto(message);
+    return messageMapper.toDto(message);
   }
 
   /**
@@ -158,7 +159,7 @@ public class BasicMessageService implements MessageService {
   private PageImpl<MessageDto> convertToMessageDto(Pageable pageable,
       Slice<Message> pagedMessages) {
     List<MessageDto> messageDtos = pagedMessages.stream()
-        .map(MessageMapper::toDto)
+        .map(messageMapper::toDto)
         .toList();
 
     return new PageImpl<>(messageDtos, pageable, 0);
@@ -224,7 +225,7 @@ public class BasicMessageService implements MessageService {
     }
 
     List<MessageDto> messageDtos = content.stream()
-        .map(MessageMapper::toDto)
+        .map(messageMapper::toDto)
         .toList();
 
     return PageResponse.<MessageDto>builder()

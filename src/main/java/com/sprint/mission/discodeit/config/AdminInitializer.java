@@ -28,7 +28,7 @@ public class AdminInitializer implements ApplicationRunner {
         .role(Role.ROLE_ADMIN)
         .email("admin@mail.com")
         .profile(null)
-        .password(passwordEncoder.encode("qwerqwer"))
+        .password(passwordEncoder.encode("qwerqwer1!"))
         .build();
 
     userRepository.save(admin);

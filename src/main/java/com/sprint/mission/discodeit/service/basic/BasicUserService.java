@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.role.Role;
@@ -11,13 +12,17 @@ import com.sprint.mission.discodeit.entity.user.dto.UserStatusUpdateResponse;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateResponse;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.jwt.JwtTokenNotFoundException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.entitymapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.status.UserSessionService;
 import com.sprint.mission.discodeit.service.util.BinaryContentUtils;
@@ -49,6 +54,8 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final UserSessionService userSessionService;
+  private final JwtSessionRepository jwtSessionRepository;
+  private final JwtService jwtService;
 
   @PersistenceContext
   EntityManager em;
@@ -160,7 +167,7 @@ public class BasicUserService implements UserService {
    */
   @Override
   public UserUpdateResponse update(UUID userId, UserUpdateRequest request,
-      MultipartFile profile) throws IOException {
+      MultipartFile profile, String refreshToken) throws IOException {
 
     User findUser = userRepository.findById(userId)
         .orElseThrow(() -> {
@@ -171,10 +178,43 @@ public class BasicUserService implements UserService {
         });
 
     changeUser(findUser, request, profile);
+    changeJwtAccessToken(userId, refreshToken, findUser);
 
     log.info("유저 수정: {}", userId);
     return new UserUpdateResponse(userId, findUser.getUsername(), findUser.getEmail(),
         BinaryContentMapper.toDto(findUser.getProfile()), true);
+  }
+
+  private void changeJwtAccessToken(UUID userId, String refreshToken, User findUser) {
+    // TODO: 유저 정보 변경하면 기존의 토큰 정보가 바뀌지 않아서 프로필 사진이 제대로 안나옴(로그아웃하고 다시 접속하면 됨)
+    JwtSession jwtSession = getJwtSession(refreshToken);
+    UserDto userDto = getUserDto(userId, findUser);
+    String accessToken = jwtService.createAccessToken(userDto);
+    jwtSession.setAccessToken(accessToken);
+
+    log.info("Jwt Access Token 변경 완료: {}", accessToken);
+  }
+
+  private JwtSession getJwtSession(String refreshToken) {
+    return jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(
+            () -> new JwtTokenNotFoundException(Instant.now(), ErrorCode.NOT_FOUND_JWT, Map.of(
+                ErrorCode.NOT_FOUND_JWT.getCode(),
+                ErrorCode.NOT_FOUND_JWT.getMessage()
+            )));
+  }
+
+  private UserDto getUserDto(UUID userId, User findUser) {
+    return UserDto.builder()
+        .id(userId)
+        .username(findUser.getUsername())
+        .email(findUser.getEmail())
+        .online(userSessionService.isOnline(findUser.getUsername())) // TODO: 토큰기반으로 변경후 수정
+        .profile(
+            new BinaryContentDto(findUser.getProfile().getId(), findUser.getProfile().getFileName(),
+                findUser.getProfile().getSize(), findUser.getProfile().getContentType()))
+        .Role(findUser.getRole())
+        .build();
   }
 
   /**

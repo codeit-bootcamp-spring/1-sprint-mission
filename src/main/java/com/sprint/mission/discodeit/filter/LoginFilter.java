@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.auth.LoginRequest;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.status.UserSessionService;
 import jakarta.servlet.FilterChain;
@@ -34,6 +36,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   private final UserRepository userRepository;
   private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
   private final UserSessionService userSessionService;
+  private final JwtSessionRepository jwtSessionRepository;
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request,
@@ -80,13 +83,26 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
 
   private UserDto getUserDto(User user) {
+
+    BinaryContent profile = user.getProfile();
+    BinaryContentDto binaryContentDto;
+    if (profile == null) {
+      binaryContentDto = null;
+    } else {
+      binaryContentDto = BinaryContentDto.builder()
+          .id(user.getId())
+          .fileName(profile.getFileName())
+          .size(profile.getSize())
+          .contentType(profile.getContentType())
+          .build();
+    }
+
     return UserDto.builder()
         .id(user.getId())
         .username(user.getUsername())
         .email(user.getEmail())
         .online(userSessionService.isOnline(user.getUsername())) // TODO: 세션으로 바꾼 후 수정해야함
-        .profile(new BinaryContentDto(user.getProfile().getId(), user.getProfile().getFileName(),
-            user.getProfile().getSize(), user.getProfile().getContentType()))
+        .profile(binaryContentDto)
         .Role(user.getRole())
         .build();
   }
