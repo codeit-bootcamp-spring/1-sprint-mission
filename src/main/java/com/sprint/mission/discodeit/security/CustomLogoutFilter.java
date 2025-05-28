@@ -1,11 +1,14 @@
-package com.sprint.mission.discodeit.filter;
+package com.sprint.mission.discodeit.security;
 
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ public class CustomLogoutFilter extends OncePerRequestFilter {
 
   private final SessionRegistry sessionRegistry;
   private final PersistentTokenRepository persistentTokenRepository;
+  private final JwtService jwtService;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request,
@@ -67,10 +71,19 @@ public class CustomLogoutFilter extends OncePerRequestFilter {
         session.invalidate();
       }
 
-      // 5. 쿠키 삭제 (JSESSIONID, Remember-Me, CSRF 토큰)
+      // 5. 토큰 무효화
+      Cookie refreshTokenCookie = Arrays.stream(request.getCookies())
+          .filter(cookie -> cookie.getName().equals("refresh-token"))
+          .findFirst()
+          .orElseThrow(() -> new ServletException("Cookie not found"));
+
+      jwtService.invalidateRefreshToken(refreshTokenCookie.getValue());
+
+      // 6. 쿠키 삭제 (JSESSIONID, Remember-Me, CSRF 토큰)
       deleteCookie(response, "JSESSIONID");
       deleteCookie(response, "remember-me"); // Remember-Me 쿠키 삭제
       deleteCookie(response, "CSRF-TOKEN");
+      deleteCookie(response, "refresh-token");
 
       response.setStatus(HttpServletResponse.SC_OK); //성공 반환
       response.setContentType("application/json");

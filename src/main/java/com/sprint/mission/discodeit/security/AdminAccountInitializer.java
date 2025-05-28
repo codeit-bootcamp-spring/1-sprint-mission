@@ -1,8 +1,7 @@
-package com.sprint.mission.discodeit.config;
+package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;

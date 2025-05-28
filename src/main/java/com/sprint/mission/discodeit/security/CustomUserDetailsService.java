@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.dto.CustomUserDetails;
 import com.sprint.mission.discodeit.entity.User;
@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
-//@Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 

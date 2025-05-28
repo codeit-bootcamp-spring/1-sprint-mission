@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.dto.CustomUserDetails;
 import java.util.Map;
