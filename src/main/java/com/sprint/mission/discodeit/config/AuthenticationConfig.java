@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.security.CustomRememberMeServices;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.handler.CustomAuthenticationFailureHandler;
 import com.sprint.mission.discodeit.security.handler.CustomAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +14,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 
@@ -32,6 +36,7 @@ public class AuthenticationConfig {
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
         AuthenticationManager authManager,
+        RememberMeServices rememberMeServices,
         CustomAuthenticationSuccessHandler successHandler,
         CustomAuthenticationFailureHandler failureHandler,
         SecurityContextRepository securityContextRepository
@@ -41,6 +46,7 @@ public class AuthenticationConfig {
         filter.setAuthenticationSuccessHandler(successHandler);
         filter.setAuthenticationFailureHandler(failureHandler);
         filter.setSecurityContextRepository(securityContextRepository);
+        filter.setRememberMeServices(rememberMeServices);
         return filter;
     }
 
@@ -61,8 +67,17 @@ public class AuthenticationConfig {
     }
 
     @Bean
-    PasswordEncoder encoder() {
+    public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public RememberMeServices rememberMeServices(
+        UserDetailsService userDetailsService,
+        PersistentTokenRepository tokenRepository,
+        @Value("${discodeit.security.remember-me.key}") String key
+    ) {
+        return new CustomRememberMeServices(key, userDetailsService, tokenRepository);
     }
 
 }

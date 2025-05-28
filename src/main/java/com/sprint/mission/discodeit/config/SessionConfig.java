@@ -13,4 +13,16 @@ public class SessionConfig {
         return new SessionRegistryImpl();
     }
 
+//    @Bean
+//    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http
+//            .sessionManagement(s -> s
+//                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+//                .sessionFixation(sf -> sf.migrateSession()) // 세션 고정보호
+//                .maximumSessions(1) // 동시 로그인 제한
+//                .maxSessionsPreventsLogin(false)
+//                .expiredUrl("/"));
+//
+//        return http.build();
+//    }
 }

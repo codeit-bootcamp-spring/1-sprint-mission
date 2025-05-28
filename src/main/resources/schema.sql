@@ -101,3 +101,14 @@ alter table message_attachments
 alter table message_attachments
     add constraint fk_message_attachments_attachment_id
         foreign key (attachment_id) references binary_contents (id) on delete cascade;
+
+-- token
+CREATE TABLE persistent_logins
+(
+    username  varchar(64)              not null,
+    series    varchar(64) primary key,
+    token     varchar(64)              not null,
+    last_used timestamp with time zone not null
+);
+
+drop table persistent_logins;

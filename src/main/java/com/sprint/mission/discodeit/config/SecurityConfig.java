@@ -3,19 +3,26 @@ package com.sprint.mission.discodeit.config;
 import com.sprint.mission.discodeit.security.CustomAuthenticationProvider;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
+import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Bean
@@ -24,10 +31,10 @@ public class SecurityConfig {
         CustomAuthenticationProvider authProvider, // DaoAuthenticationProvider provider,
         JsonUsernamePasswordAuthenticationFilter loginFilter,
         SecurityContextRepository securityContextRepository,
-        CustomLogoutHandler customLogoutHandler) throws Exception {
+        CustomLogoutHandler customLogoutHandler,
+        RememberMeServices rememberMeServices) throws Exception {
 
-        return http
-
+        http
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfTokenRepository())
                 .ignoringRequestMatchers("/api/auth/logout")
@@ -46,10 +53,20 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(this::configureAuthorization)
 
-            .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
+            .rememberMe(r -> r
+                .rememberMeServices(rememberMeServices)
+            )
 
-            .build();
+            .sessionManagement(s -> s
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionFixation(sf -> sf.migrateSession()) // 세션 고정보호
+                .maximumSessions(1) // 동시 로그인 제한
+                .maxSessionsPreventsLogin(false)
+                .expiredUrl("/"))
 
+            .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     // 인가 정책
@@ -82,6 +99,15 @@ public class SecurityConfig {
         repository.setCookieName("Csrf-Token");
         repository.setHeaderName("X-Csrf-Token");
         repository.setCookiePath("/");
+        return repository;
+    }
+
+    // 토큰 저장소 설정
+    @Bean
+    public PersistentTokenRepository tokenRepository(DataSource dataSource) {
+        JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
+        repository.setDataSource(dataSource);
+        repository.setCreateTableOnStartup(false);
         return repository;
     }
 
