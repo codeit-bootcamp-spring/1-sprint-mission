@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
@@ -242,17 +243,16 @@ public class BasicUserService implements UserService {
     log.info("사용자 권한 변경 시작: userId = {}, role = {}", roleUpdateRequest.getUserId(),
         roleUpdateRequest.getNewRole().toString());
 
-    if (roleUpdateRequest == null || roleUpdateRequest.getUserId() == null
-        || roleUpdateRequest.getNewRole() == null) {
+    if (roleUpdateRequest.getUserId() == null || roleUpdateRequest.getNewRole() == null) {
       throw new IllegalArgumentException("Empty Data");
     }
 
     User user = userRepository.findById(roleUpdateRequest.getUserId())
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    String previousRole = user.getRole();
+    Role previousRole = user.getRole();
 
-    user.setRole(roleUpdateRequest.getNewRole().toString());
+    user.setRole(roleUpdateRequest.getNewRole());
     userRepository.save(user);
     log.info("사용자 권한 변경 완료: userId = {}, role = {}", user.getId(), user.getRole());
 
