@@ -89,6 +89,18 @@ CREATE TABLE persistent_logins
     last_used TIMESTAMP   NOT NULL
 );
 
+CREATE TABLE jwt_sessions
+(
+    id            uuid PRIMARY KEY,
+    user_id       uuid      NOT NULL,
+    access_token  text      NOT NULL,
+    refresh_token text      NOT NULL,
+    expires_at    TIMESTAMP NOT NULL,
+    created_at    TIMESTAMP NOT NULL,
+    revoked       BOOLEAN   NOT NULL DEFAULT FALSE,
+    replaced_by   VARCHAR(255)
+);
+
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)

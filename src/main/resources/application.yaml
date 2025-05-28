@@ -75,3 +75,9 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: alpha
+
+app:
+  jwt:
+    secret: "mySecretKeyForJWTtokenGenerationAndValidation12345" # 나중에 환경변수로 변경
+    access-token-expiration: 900000
+    refresh-token-expiration: 604800000 # 나중에 30일로 변경
