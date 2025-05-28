@@ -7,18 +7,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Auth API", description = "인증 관리 API")
 public interface AuthControllerDocs {
 
-  @Operation(summary = "유저 로그인")
+  @Operation(summary = "csrf token 발급")
   @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "로그인 성공"),
-      @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않음"),
-      @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음")
+      @ApiResponse(responseCode = "200", description = "토큰 발급 성공"),
   })
-  @PostMapping("/login")
-  ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest userLoginRequest);
+  @GetMapping("/csrf-token")
+  ResponseEntity<CsrfToken> csrfToken(CsrfToken token);
 }

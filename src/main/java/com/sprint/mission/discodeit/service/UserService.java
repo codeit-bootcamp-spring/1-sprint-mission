@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,14 +38,16 @@ public class UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final UserMapper userMapper;
+  private final PasswordEncoder passwordEncoder;
 
   @Transactional
   public UserResponse createUser(UserCreateRequest userCreateRequest, MultipartFile profile) {
     log.debug("createUser() 호출");
     duplicationCheck(userCreateRequest.username(), userCreateRequest.email());
 
+    String encodedPassword = passwordEncoder.encode(userCreateRequest.password());
     User newUser = User.create(userCreateRequest.username(), userCreateRequest.email(),
-        userCreateRequest.password());
+        encodedPassword);
     BinaryContent content = createProfile(profile);
 
     newUser = userRepository.save(newUser);
@@ -86,7 +89,7 @@ public class UserService {
       user.updateName(newUsername);
     }
     if (newPassword != null) {
-      user.updatePassword(newPassword);
+      user.updatePassword(passwordEncoder.encode(newPassword));
     }
     if (profile != null) {
       user.getProfile().ifPresent(content -> binaryContentStorage.delete(content.getId()));

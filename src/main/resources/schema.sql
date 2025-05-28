@@ -13,6 +13,7 @@ create table users(
 	username varchar(50) not null unique,
 	email varchar(100) not null unique,
 	password varchar(60) not null,
+    role varchar(30) not null default 'ROLE_USER',
 	profile_id uuid references binary_contents(id) on delete set null
 );
 
