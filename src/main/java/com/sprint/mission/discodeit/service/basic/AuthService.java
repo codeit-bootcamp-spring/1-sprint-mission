@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
-import com.sprint.mission.discodeit.dto.user.UserLoginRequest;
+import com.sprint.mission.discodeit.dto.user.LoginRequest;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.security.UserUnauthorizedException;
@@ -23,7 +23,7 @@ import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,7 +37,7 @@ public class AuthService {
   private final UserDetailsService userDetailsService;
   //
   private final UserMapper userMapper;
-  private final BCryptPasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
   private final RoleRepository roleRepository;
   private final SessionRegistry sessionRegistry;
 

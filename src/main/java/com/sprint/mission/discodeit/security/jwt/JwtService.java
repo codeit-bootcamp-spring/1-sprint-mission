@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.security.jwt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -17,16 +16,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -96,7 +91,7 @@ public class JwtService {
   }
 
   // JwtTokenProvider 역할
-  public String generateToken(UserDto userDto, LocalDateTime issuedAtLdt,
+  private String generateToken(UserDto userDto, LocalDateTime issuedAtLdt,
       LocalDateTime expiresAtLdt, String tokenType) {
 
     Date issuedAtDate = Date.from(issuedAtLdt.atZone(ZoneId.systemDefault()).toInstant());

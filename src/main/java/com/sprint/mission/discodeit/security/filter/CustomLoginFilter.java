@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.dto.user.UserLoginRequest;
+import com.sprint.mission.discodeit.dto.user.LoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
@@ -45,8 +45,8 @@ public class CustomLoginFilter extends AbstractAuthenticationProcessingFilter {
               + "Expected application/json.");
     }
 
-    UserLoginRequest loginRequest = mapper.readValue(request.getInputStream(),
-        UserLoginRequest.class);
+    LoginRequest loginRequest = mapper.readValue(request.getInputStream(),
+        LoginRequest.class);
     String username = loginRequest.username();
     username = username != null ? username.trim() : "";
     String password = loginRequest.password();
