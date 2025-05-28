@@ -9,16 +9,16 @@ import java.util.UUID;
 
 public interface UserStatusService {
 
-  UserStatus createUserStatus(UUID userId);
+    UserStatus createUserStatus(UUID userId);
 
-  UserStatus findUserStatusById(UUID userStatusId);
+    UserStatus findUserStatusById(UUID userStatusId);
 
-  List<UserStatus> findAllUserStatuses();
+    List<UserStatus> findAllUserStatuses();
 
-  UserStatus updateUserStatusById(UpdateUserStatusByIdRequest updateUserStatusByIdRequest);
+    UserStatus updateUserStatusById(UpdateUserStatusByIdRequest updateUserStatusByIdRequest);
 
-  UserStatusDto updateUserStatusByUserId(UUID userId,
-      UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest);
+    UserStatusDto updateUserStatusByUserId(UUID userId,
+        UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest);
 
-  void deleteUserStatus(UUID userStatusId);
+    void deleteUserStatus(UUID userStatusId);
 }

@@ -15,31 +15,36 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UserValidator {
 
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-  public User validateUserExistsByUserId(UUID userId) {
-    return userRepository.findUserById(userId)
-        .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
-  }
-
-  public void validateDuplicateByName(String name) {
-    if (userRepository.findUserByName(name).isPresent()) {
-      throw new UserAlreadyExistException(Map.of("name", name));
+    public User validateUserExistsByUserId(UUID userId) {
+        return userRepository.findUserById(userId)
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
     }
 
-  }
-
-  public void validateDuplicateUserByEmail(String email) {
-    if (userRepository.findUserByEmail(email).isPresent()) {
-      throw new UserAlreadyExistException(Map.of("email", email));
+    public User validateUserExistsByUserName(String name) {
+        return userRepository.findUserByName(name)
+            .orElseThrow(() -> new UserNotFoundException(Map.of("name", name)));
     }
-  }
 
-  public User validateUserExistsByNameAndPassword(String name, String password) {
-    return userRepository.findUserByNameAndPassword(name, password)
-        .orElseThrow(() -> {
-          log.error("userNotFound");
-          return new UserNotFoundException(Map.of("name", name, "password", password));
-        });
-  }
+    public void validateDuplicateByName(String name) {
+        if (userRepository.findUserByName(name).isPresent()) {
+            throw new UserAlreadyExistException(Map.of("name", name));
+        }
+
+    }
+
+    public void validateDuplicateUserByEmail(String email) {
+        if (userRepository.findUserByEmail(email).isPresent()) {
+            throw new UserAlreadyExistException(Map.of("email", email));
+        }
+    }
+
+    public User validateUserExistsByNameAndPassword(String name, String password) {
+        return userRepository.findUserByNameAndPassword(name, password)
+            .orElseThrow(() -> {
+                log.error("userNotFound");
+                return new UserNotFoundException(Map.of("name", name, "password", password));
+            });
+    }
 }

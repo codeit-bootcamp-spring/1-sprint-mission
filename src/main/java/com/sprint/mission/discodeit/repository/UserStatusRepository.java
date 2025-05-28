@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface UserStatusRepository {
 
-  UserStatus saveUserStatus(UserStatus userStatus);
+    UserStatus saveUserStatus(UserStatus userStatus);
 
-  Optional<UserStatus> findUserStatusById(UUID userStatusId);
+    Optional<UserStatus> findUserStatusById(UUID userStatusId);
 
-  Optional<UserStatus> findUserStatusByUser(User user);
+    Optional<UserStatus> findUserStatusByUser(User user);
 
-  List<UserStatus> findAllUserStatuses();
+    List<UserStatus> findAllUserStatuses();
 
-  void removeUserStatus(UUID userStatusId);
+    void removeUserStatus(UUID userStatusId);
 }

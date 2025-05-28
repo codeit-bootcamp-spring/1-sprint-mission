@@ -16,6 +16,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,36 +36,43 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("api/messages")
 public class MessageController implements MessageApi {
 
-  private final MessageService messageService;
+    private final MessageService messageService;
 
-  @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public ResponseEntity<MessageDto> createMessage(
-      @RequestPart(value = "messageCreateRequest") CreateMessageRequest createMessageRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(messageService.createMessage(createMessageRequest, multipartFileList));
-  }
+    @PostMapping(value = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<MessageDto> createMessage(
+        @RequestPart(value = "messageCreateRequest") CreateMessageRequest createMessageRequest,
+        @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(
+                messageService.createMessage(createMessageRequest, multipartFileList));
+    }
 
-  @PatchMapping(value = "/{id}")
-  public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID id,
-      @RequestBody UpdateMessageRequest updateMessageRequest) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(messageService.updateMessage(id, updateMessageRequest));
-  }
+    @PreAuthorize("#id == authentication.principal.user.id")
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<MessageDto> updateMessage(
+        @PathVariable UUID id,
+        @RequestBody UpdateMessageRequest updateMessageRequest,
+        @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(messageService.updateMessage(id, updateMessageRequest, userDetails));
+    }
 
-  @DeleteMapping(value = "{id}")
-  public ResponseEntity<Void> deleteMessage(@PathVariable UUID id) {
-    messageService.deleteMessage(id);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-  }
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity<Void> deleteMessage(
+        @PathVariable UUID id,
+        @AuthenticationPrincipal UserDetails userDetails) {
+        messageService.deleteMessage(id, userDetails);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
-  @GetMapping(value = "")
-  public ResponseEntity<PageResponse<MessageDto>> findMessagesByChannel(
-      @RequestParam("channelId") UUID channelId,
-      @RequestParam(value = "cursor", required = false) Instant cursor,
-      @PageableDefault(size = 50, sort = {
-          "createdAt"}, direction = Direction.DESC) Pageable pageable) {
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(messageService.findAllMessagesByChannelId(channelId, cursor, pageable));
-  }
+    @GetMapping(value = "")
+    public ResponseEntity<PageResponse<MessageDto>> findMessagesByChannel(
+        @RequestParam("channelId") UUID channelId,
+        @RequestParam(value = "cursor", required = false) Instant cursor,
+        @PageableDefault(size = 50, sort = {
+            "createdAt"}, direction = Direction.DESC) Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(messageService.findAllMessagesByChannelId(channelId, cursor, pageable));
+    }
 }

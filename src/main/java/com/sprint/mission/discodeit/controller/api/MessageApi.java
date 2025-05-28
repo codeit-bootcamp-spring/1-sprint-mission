@@ -14,38 +14,41 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Message", description = "Message API")
 public interface MessageApi {
 
-  @Operation(summary = "Message 생성")
-  ResponseEntity<MessageDto> createMessage(
-      @Parameter(
-          description = "Message 생성 정보",
-          content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
-      ) CreateMessageRequest messageCreateRequest,
-      @Parameter(
-          description = "Message 첨부 파일들",
-          content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
-      ) List<MultipartFile> multipartFileList
-  );
+    @Operation(summary = "Message 생성")
+    ResponseEntity<MessageDto> createMessage(
+        @Parameter(
+            description = "Message 생성 정보",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
+        ) CreateMessageRequest messageCreateRequest,
+        @Parameter(
+            description = "Message 첨부 파일들",
+            content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+        ) List<MultipartFile> multipartFileList
+    );
 
-  @Operation(summary = "Message 내용 수정")
-  ResponseEntity<MessageDto> updateMessage(
-      @Parameter(description = "수정할 Message ID") UUID messageId,
-      @Parameter(description = "수정할 Message 내용") UpdateMessageRequest request
-  );
+    @Operation(summary = "Message 내용 수정")
+    ResponseEntity<MessageDto> updateMessage(
+        @Parameter(description = "수정할 Message ID") UUID messageId,
+        @Parameter(description = "수정할 Message 내용") UpdateMessageRequest request,
+        UserDetails userDetails
+    );
 
-  @Operation(summary = "Message 삭제")
-  ResponseEntity<Void> deleteMessage(
-      @Parameter(description = "삭제할 Message ID") UUID messageId
-  );
+    @Operation(summary = "Message 삭제")
+    ResponseEntity<Void> deleteMessage(
+        @Parameter(description = "삭제할 Message ID") UUID messageId,
+        UserDetails userDetails
+    );
 
-  @Operation(summary = "Channel의 Message 목록 조회")
-  ResponseEntity<PageResponse<MessageDto>> findMessagesByChannel(
-      @Parameter(description = "조회할 Channel ID") UUID channelId,
-      @Parameter(description = "페이징 커서 정보") Instant cursor,
-      @Parameter(description = "페이징 정보") Pageable pageable
-  );
+    @Operation(summary = "Channel의 Message 목록 조회")
+    ResponseEntity<PageResponse<MessageDto>> findMessagesByChannel(
+        @Parameter(description = "조회할 Channel ID") UUID channelId,
+        @Parameter(description = "페이징 커서 정보") Instant cursor,
+        @Parameter(description = "페이징 정보") Pageable pageable
+    );
 }

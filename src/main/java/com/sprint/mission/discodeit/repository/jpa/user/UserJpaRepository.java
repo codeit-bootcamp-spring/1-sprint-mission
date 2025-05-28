@@ -9,12 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface UserJpaRepository extends JpaRepository<User, UUID> {
 
-  Optional<User> findUserByName(String name);
+    Optional<User> findUserByName(String name);
 
-  Optional<User> findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 
-  Optional<User> findUserByNameAndPassword(String name, String password);
+    Optional<User> findUserByNameAndPassword(String name, String password);
 
-  @Query("select user from User user join fetch user.userStatus")
-  List<User> findAll();
+    @Query("select user from User user")
+    List<User> findAll();
+
+    boolean existsByName(String name);
 }

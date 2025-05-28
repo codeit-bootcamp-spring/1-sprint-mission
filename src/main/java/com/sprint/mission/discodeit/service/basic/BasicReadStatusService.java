@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.readStatus.request.UpdateReadStatusReque
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.execption.readStatus.NotReadStatusOwner;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -13,8 +14,10 @@ import com.sprint.mission.discodeit.validator.ChannelValidator;
 import com.sprint.mission.discodeit.validator.ReadStatusValidator;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,52 +25,58 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 
-  private final ReadStatusRepository readStatusRepository;
-  private final ReadStatusValidator readStatusValidator;
-  private final UserValidator userValidator;
-  private final ChannelValidator channelValidator;
-  private final ReadStatusMapper readStatusMapper;
+    private final ReadStatusRepository readStatusRepository;
+    private final ReadStatusValidator readStatusValidator;
+    private final UserValidator userValidator;
+    private final ChannelValidator channelValidator;
+    private final ReadStatusMapper readStatusMapper;
 
-  @Override
-  @Transactional
-  public ReadStatusDto createReadStatus(CreateReadStatusRequest createReadStatusRequest) {
-    User user = userValidator.validateUserExistsByUserId(createReadStatusRequest.userId());
-    Channel channel = channelValidator.validateChannelExistsByChannelId(
-        createReadStatusRequest.channelId());
+    @Override
+    @Transactional
+    public ReadStatusDto createReadStatus(CreateReadStatusRequest createReadStatusRequest) {
+        User user = userValidator.validateUserExistsByUserId(createReadStatusRequest.userId());
+        Channel channel = channelValidator.validateChannelExistsByChannelId(
+            createReadStatusRequest.channelId());
 
-    return readStatusMapper.toReadStatusDto(
-        readStatusRepository.saveReadStatus(
-            ReadStatus.of(user, channel, createReadStatusRequest.lastReadAt())));
-  }
+        return readStatusMapper.toReadStatusDto(
+            readStatusRepository.saveReadStatus(
+                ReadStatus.of(user, channel, createReadStatusRequest.lastReadAt())));
+    }
 
-  @Override
-  public ReadStatus findReadStatusById(UUID readStatusId) {
-    return readStatusValidator.validateReadStatusExistsById(readStatusId);
-  }
+    @Override
+    public ReadStatus findReadStatusById(UUID readStatusId) {
+        return readStatusValidator.validateReadStatusExistsById(readStatusId);
+    }
 
-  @Override
-  @Transactional(readOnly = true)
-  public List<ReadStatusDto> findAllReadStatusesByUserId(UUID userId) {
-    User user = userValidator.validateUserExistsByUserId(userId);
-    return readStatusRepository.findAllReadStatusByUser(user).stream()
-        .map(readStatus -> readStatusMapper.toReadStatusDto(readStatus))
-        .toList();
-  }
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReadStatusDto> findAllReadStatusesByUserId(UUID userId) {
+        User user = userValidator.validateUserExistsByUserId(userId);
+        return readStatusRepository.findAllReadStatusByUser(user).stream()
+            .map(readStatus -> readStatusMapper.toReadStatusDto(readStatus))
+            .toList();
+    }
 
-  @Override
-  @Transactional
-  public ReadStatusDto updateReadStatus(UUID readStatusId,
-      UpdateReadStatusRequest updateReadStatusRequest) {
-    ReadStatus readStatus = readStatusValidator.validateReadStatusExistsById(readStatusId);
-    readStatus.updateLastReadAt(updateReadStatusRequest.newLastReadAt());
+    @Override
+    @Transactional
+    public ReadStatusDto updateReadStatus(UUID readStatusId,
+        UpdateReadStatusRequest updateReadStatusRequest, UserDetails userDetails) {
+        ReadStatus readStatus = readStatusValidator.validateReadStatusExistsById(readStatusId);
 
-    return readStatusMapper.toReadStatusDto(readStatus);
-  }
+        if (!readStatus.getUser().getName().equals(userDetails.getUsername())) {
+            throw new NotReadStatusOwner(
+                Map.of("readStatusId", readStatus, "username", userDetails.getUsername()));
+        }
 
-  @Override
-  public void deleteReadStatus(UUID readStatusId) {
-    readStatusValidator.validateReadStatusExistsById(readStatusId);
+        readStatus.updateLastReadAt(updateReadStatusRequest.newLastReadAt());
 
-    readStatusRepository.removeReadStatus(readStatusId);
-  }
+        return readStatusMapper.toReadStatusDto(readStatus);
+    }
+
+    @Override
+    public void deleteReadStatus(UUID readStatusId) {
+        readStatusValidator.validateReadStatusExistsById(readStatusId);
+
+        readStatusRepository.removeReadStatus(readStatusId);
+    }
 }

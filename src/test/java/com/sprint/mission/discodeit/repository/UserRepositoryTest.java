@@ -26,250 +26,250 @@ import org.springframework.test.context.ActiveProfiles;
 @Import({UserRepositoryImpl.class, UserStatusRepositoryImpl.class, JpaAuditingConfiguration.class})
 public class UserRepositoryTest {
 
-  @Autowired
-  UserJpaRepository userJpaRepository;
+    @Autowired
+    UserJpaRepository userJpaRepository;
 
-  @Autowired
-  UserRepositoryImpl userRepository;
+    @Autowired
+    UserRepositoryImpl userRepository;
 
-  @Autowired
-  UserStatusRepositoryImpl userStatusRepository;
+    @Autowired
+    UserStatusRepositoryImpl userStatusRepository;
 
-  private UUID saveUser(int num) {
-    User user = User.of("name" + num, "email" + num,
-        "password" + num);
-    return userRepository.saveUser(user).getId();
-  }
-
-  @Nested
-  class SaveUserTest {
-
-    @Test
-    void 유저_저장_성공() {
-      // given
-      User user = User.of("name1", "email", "password1");
-
-      // when
-      User savedUser = userRepository.saveUser(user);
-
-      // then
-      assertNotNull(savedUser);
-      assertEquals("name1", savedUser.getName());
-      assertEquals("email", savedUser.getEmail());
-      assertEquals("password1", savedUser.getPassword());
-    }
-  }
-
-  @Nested
-  class FindUserByIdTest {
-
-    @Test
-    void 유저_아이디로_조회_성공() {
-      // given
-      int num = 1;
-      UUID userId = saveUser(num);
-
-      // when
-      Optional<User> userOptional = userRepository.findUserById(userId);
-
-      // then
-      assertTrue(userOptional.isPresent());
-
-      User user = userOptional.get();
-      assertEquals("name" + num, user.getName());
+    private UUID saveUser(int num) {
+        User user = User.of("name" + num, "email" + num,
+            "password" + num);
+        return userRepository.saveUser(user).getId();
     }
 
-    @Test
-    void 존재하지_않는_유저_아이디로_조회_() {
-      // given
-      UUID userId = UUID.randomUUID();
+    @Nested
+    class SaveUserTest {
 
-      // when
-      Optional<User> userOptional = userRepository.findUserById(userId);
+        @Test
+        void 유저_저장_성공() {
+            // given
+            User user = User.of("name1", "email", "password1");
 
-      // then
-      assertFalse(userOptional.isPresent());
-    }
-  }
+            // when
+            User savedUser = userRepository.saveUser(user);
 
-  @Nested
-  class FindAllUsersTest {
-
-    @Test
-    void 유저_목록_조회_성공() {
-      // given
-      int size = 10;
-      saveUsers(size);
-
-      // when
-      List<User> userList = userRepository.findAllUsers();
-
-      // then
-      assertEquals(size, userList.size());
+            // then
+            assertNotNull(savedUser);
+            assertEquals("name1", savedUser.getName());
+            assertEquals("email", savedUser.getEmail());
+            assertEquals("password1", savedUser.getPassword());
+        }
     }
 
-    private void saveUsers(int size) {
-      for (int i = 0; i < size; i++) { // userStatus와 fetch join이기 때문에 추가적으로 같이 저장
-        User user = User.of("name" + i, "email" + i,
-            "password" + i);
-        userStatusRepository.saveUserStatus(UserStatus.of(userRepository.saveUser(user)));
-      }
-    }
-  }
+    @Nested
+    class FindUserByIdTest {
 
-  @Nested
-  class RemoveUserTest {
+        @Test
+        void 유저_아이디로_조회_성공() {
+            // given
+            int num = 1;
+            UUID userId = saveUser(num);
 
-    @Test
-    void 유저_삭제_성공() {
-      // given
-      UUID userId = saveUser(0);
+            // when
+            Optional<User> userOptional = userRepository.findUserById(userId);
 
-      // when
-      userRepository.removeUser(userId);
+            // then
+            assertTrue(userOptional.isPresent());
 
-      // then
-      Optional<User> userOptional = userRepository.findUserById(userId);
-      assertTrue(userOptional.isEmpty());
-    }
+            User user = userOptional.get();
+            assertEquals("name" + num, user.getName());
+        }
 
-    @Test
-    void 존재하지_않는_유저_아이디로_삭제() {
-      // given
-      UUID userId = saveUser(0);
+        @Test
+        void 존재하지_않는_유저_아이디로_조회_() {
+            // given
+            UUID userId = UUID.randomUUID();
 
-      // when
-      userRepository.removeUser(UUID.randomUUID());
+            // when
+            Optional<User> userOptional = userRepository.findUserById(userId);
 
-      // then
-      Optional<User> userOptional = userRepository.findUserById(userId);
-      assertTrue(userOptional.isPresent());
-    }
-  }
-
-  @Nested
-  class ExistsUserTest {
-
-    @Test
-    void 유저_존재_여부_확인_성공() {
-      // given
-      UUID userId = saveUser(0);
-
-      // when
-      boolean isExist = userRepository.existsUser(userId);
-
-      // then
-      assertTrue(isExist);
+            // then
+            assertFalse(userOptional.isPresent());
+        }
     }
 
-    @Test
-    void 유저_존재_여부_확인_실패() {
-      // given
-      UUID userId = saveUser(0);
+    @Nested
+    class FindAllUsersTest {
 
-      // when
-      boolean isExist = userRepository.existsUser(UUID.randomUUID());
+        @Test
+        void 유저_목록_조회_성공() {
+            // given
+            int size = 10;
+            saveUsers(size);
 
-      // then
-      assertFalse(isExist);
-    }
-  }
+            // when
+            List<User> userList = userRepository.findAllUsers();
 
-  @Nested
-  class FindUserByNameTest {
+            // then
+            assertEquals(size, userList.size());
+        }
 
-    @Test
-    void Name으로_유저_조회_성공() {
-      // given
-      int num = 0;
-      saveUser(num);
-
-      // when
-      Optional<User> userOptional = userRepository.findUserByName("name" + num);
-
-      // then
-      assertTrue(userOptional.isPresent());
-
-      User user = userOptional.get();
-      assertEquals("name" + num, user.getName());
+        private void saveUsers(int size) {
+            for (int i = 0; i < size; i++) { // userStatus와 fetch join이기 때문에 추가적으로 같이 저장
+                User user = User.of("name" + i, "email" + i,
+                    "password" + i);
+                userStatusRepository.saveUserStatus(UserStatus.of(userRepository.saveUser(user)));
+            }
+        }
     }
 
-    @Test
-    void Name으로_유저_조회_실패() {
-      // given
-      int num = 0;
-      saveUser(num);
+    @Nested
+    class RemoveUserTest {
 
-      // when
-      Optional<User> userOptional = userRepository.findUserByName("name" + 1);
+        @Test
+        void 유저_삭제_성공() {
+            // given
+            UUID userId = saveUser(0);
 
-      // then
-      assertTrue(userOptional.isEmpty());
-    }
-  }
+            // when
+            userRepository.removeUser(userId);
 
-  @Nested
-  class FindUserByEmailTest {
+            // then
+            Optional<User> userOptional = userRepository.findUserById(userId);
+            assertTrue(userOptional.isEmpty());
+        }
 
-    @Test
-    void Email로_유저_조회_성공() {
-      // given
-      saveUser(0);
+        @Test
+        void 존재하지_않는_유저_아이디로_삭제() {
+            // given
+            UUID userId = saveUser(0);
 
-      // when
-      Optional<User> userOptional = userRepository.findUserByEmail("email" + 0);
+            // when
+            userRepository.removeUser(UUID.randomUUID());
 
-      // then
-      assertTrue(userOptional.isPresent());
-
-      User user = userOptional.get();
-      assertEquals("email" + 0, user.getEmail());
+            // then
+            Optional<User> userOptional = userRepository.findUserById(userId);
+            assertTrue(userOptional.isPresent());
+        }
     }
 
-    @Test
-    void Email로_유저_조회_실패() {
-      // given
-      saveUser(0);
+    @Nested
+    class ExistsUserTest {
 
-      // when
-      Optional<User> userOptional = userRepository.findUserByEmail("email" + 1);
+        @Test
+        void 유저_존재_여부_확인_성공() {
+            // given
+            UUID userId = saveUser(0);
 
-      // then
-      assertTrue(userOptional.isEmpty());
-    }
-  }
+            // when
+            boolean isExist = userRepository.existsUser(userId);
 
-  @Nested
-  class FindUserByNameAndPasswordTest {
+            // then
+            assertTrue(isExist);
+        }
 
-    @Test
-    void Name_Password로_유저_조회_성공() {
-      // given
-      saveUser(0);
+        @Test
+        void 유저_존재_여부_확인_실패() {
+            // given
+            UUID userId = saveUser(0);
 
-      // when
-      Optional<User> userOptional =
-          userRepository.findUserByNameAndPassword("name" + 0, "password" + 0);
+            // when
+            boolean isExist = userRepository.existsUser(UUID.randomUUID());
 
-      // then
-      assertTrue(userOptional.isPresent());
-
-      User user = userOptional.get();
-      assertEquals("name" + 0, user.getName());
-      assertEquals("password" + 0, user.getPassword());
+            // then
+            assertFalse(isExist);
+        }
     }
 
-    @Test
-    void Name_Password로_유저_조회_실패() {
-      // given
-      saveUser(0);
+    @Nested
+    class FindUserByNameTest {
 
-      // when
-      Optional<User> userOptional =
-          userRepository.findUserByNameAndPassword(null, "password" + 0);
+        @Test
+        void Name으로_유저_조회_성공() {
+            // given
+            int num = 0;
+            saveUser(num);
 
-      // then
-      assertTrue(userOptional.isEmpty());
+            // when
+            Optional<User> userOptional = userRepository.findUserByName("name" + num);
+
+            // then
+            assertTrue(userOptional.isPresent());
+
+            User user = userOptional.get();
+            assertEquals("name" + num, user.getName());
+        }
+
+        @Test
+        void Name으로_유저_조회_실패() {
+            // given
+            int num = 0;
+            saveUser(num);
+
+            // when
+            Optional<User> userOptional = userRepository.findUserByName("name" + 1);
+
+            // then
+            assertTrue(userOptional.isEmpty());
+        }
     }
-  }
+
+    @Nested
+    class FindUserByEmailTest {
+
+        @Test
+        void Email로_유저_조회_성공() {
+            // given
+            saveUser(0);
+
+            // when
+            Optional<User> userOptional = userRepository.findUserByEmail("email" + 0);
+
+            // then
+            assertTrue(userOptional.isPresent());
+
+            User user = userOptional.get();
+            assertEquals("email" + 0, user.getEmail());
+        }
+
+        @Test
+        void Email로_유저_조회_실패() {
+            // given
+            saveUser(0);
+
+            // when
+            Optional<User> userOptional = userRepository.findUserByEmail("email" + 1);
+
+            // then
+            assertTrue(userOptional.isEmpty());
+        }
+    }
+
+    @Nested
+    class FindUserByNameAndPasswordTest {
+
+        @Test
+        void Name_Password로_유저_조회_성공() {
+            // given
+            saveUser(0);
+
+            // when
+            Optional<User> userOptional =
+                userRepository.findUserByNameAndPassword("name" + 0, "password" + 0);
+
+            // then
+            assertTrue(userOptional.isPresent());
+
+            User user = userOptional.get();
+            assertEquals("name" + 0, user.getName());
+            assertEquals("password" + 0, user.getPassword());
+        }
+
+        @Test
+        void Name_Password로_유저_조회_실패() {
+            // given
+            saveUser(0);
+
+            // when
+            Optional<User> userOptional =
+                userRepository.findUserByNameAndPassword(null, "password" + 0);
+
+            // then
+            assertTrue(userOptional.isEmpty());
+        }
+    }
 }

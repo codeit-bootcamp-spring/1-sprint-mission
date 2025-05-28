@@ -7,20 +7,22 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-  User saveUser(User user);
+    User saveUser(User user);
 
-  Optional<User> findUserById(UUID userId);
+    Optional<User> findUserById(UUID userId);
 
-  List<User> findAllUsers();
+    List<User> findAllUsers();
 
-  void removeUser(UUID userId);
+    void removeUser(UUID userId);
 
-  boolean existsUser(UUID userId);
+    boolean existsUser(UUID userId);
 
-  Optional<User> findUserByName(String name);
+    boolean existsUser(String username);
 
-  Optional<User> findUserByEmail(String email);
+    Optional<User> findUserByName(String name);
 
-  Optional<User> findUserByNameAndPassword(String name, String password);
+    Optional<User> findUserByEmail(String email);
+
+    Optional<User> findUserByNameAndPassword(String name, String password);
 
 }

@@ -13,30 +13,30 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class UserStatusRepositoryImpl implements UserStatusRepository {
 
-  private final UserStatusJpaRepository userStatusRepository;
+    private final UserStatusJpaRepository userStatusRepository;
 
-  @Override
-  public UserStatus saveUserStatus(UserStatus userStatus) {
-    return userStatusRepository.save(userStatus);
-  }
+    @Override
+    public UserStatus saveUserStatus(UserStatus userStatus) {
+        return userStatusRepository.save(userStatus);
+    }
 
-  @Override
-  public Optional<UserStatus> findUserStatusById(UUID userStatusId) {
-    return userStatusRepository.findById(userStatusId);
-  }
+    @Override
+    public Optional<UserStatus> findUserStatusById(UUID userStatusId) {
+        return userStatusRepository.findById(userStatusId);
+    }
 
-  @Override
-  public Optional<UserStatus> findUserStatusByUser(User user) {
-    return userStatusRepository.findUserStatusByUser(user);
-  }
+    @Override
+    public Optional<UserStatus> findUserStatusByUser(User user) {
+        return userStatusRepository.findUserStatusByUser(user);
+    }
 
-  @Override
-  public List<UserStatus> findAllUserStatuses() {
-    return userStatusRepository.findAll();
-  }
+    @Override
+    public List<UserStatus> findAllUserStatuses() {
+        return userStatusRepository.findAll();
+    }
 
-  @Override
-  public void removeUserStatus(UUID userStatusId) {
-    userStatusRepository.deleteById(userStatusId);
-  }
+    @Override
+    public void removeUserStatus(UUID userStatusId) {
+        userStatusRepository.deleteById(userStatusId);
+    }
 }

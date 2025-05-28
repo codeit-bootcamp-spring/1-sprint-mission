@@ -12,45 +12,50 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
 
-  private final UserJpaRepository userRepository;
+    private final UserJpaRepository userRepository;
 
-  @Override
-  public User saveUser(User user) {
-    return userRepository.save(user);
-  }
+    @Override
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
 
-  @Override
-  public Optional<User> findUserById(UUID userId) {
-    return userRepository.findById(userId);
-  }
+    @Override
+    public Optional<User> findUserById(UUID userId) {
+        return userRepository.findById(userId);
+    }
 
-  @Override
-  public List<User> findAllUsers() {
-    return userRepository.findAll();
-  }
+    @Override
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
 
-  @Override
-  public void removeUser(UUID userId) {
-    userRepository.deleteById(userId);
-  }
+    @Override
+    public void removeUser(UUID userId) {
+        userRepository.deleteById(userId);
+    }
 
-  @Override
-  public boolean existsUser(UUID userId) {
-    return userRepository.existsById(userId);
-  }
+    @Override
+    public boolean existsUser(UUID userId) {
+        return userRepository.existsById(userId);
+    }
 
-  @Override
-  public Optional<User> findUserByName(String name) {
-    return userRepository.findUserByName(name);
-  }
+    @Override
+    public boolean existsUser(String username) {
+        return userRepository.existsByName(username);
+    }
 
-  @Override
-  public Optional<User> findUserByEmail(String email) {
-    return userRepository.findUserByEmail(email);
-  }
+    @Override
+    public Optional<User> findUserByName(String name) {
+        return userRepository.findUserByName(name);
+    }
 
-  @Override
-  public Optional<User> findUserByNameAndPassword(String name, String password) {
-    return userRepository.findUserByNameAndPassword(name, password);
-  }
+    @Override
+    public Optional<User> findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findUserByNameAndPassword(String name, String password) {
+        return userRepository.findUserByNameAndPassword(name, password);
+    }
 }

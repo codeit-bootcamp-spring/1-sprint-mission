@@ -24,4 +24,6 @@ spring:
 
 logging:
   level:
-    root: debug
+    root: info
+    org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: TRACE

@@ -7,8 +7,8 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserStatusMapper {
-  
-  @Mapping(target = "lastActiveAt", source = "loginAt")
-  @Mapping(target = "userId", expression = "java(userStatus.getUser().getId())")
-  UserStatusDto toUserStatusDto(UserStatus userStatus);
+
+    @Mapping(target = "lastActiveAt", source = "loginAt")
+    @Mapping(target = "userId", expression = "java(userStatus.getUser().getId())")
+    UserStatusDto toUserStatusDto(UserStatus userStatus);
 }

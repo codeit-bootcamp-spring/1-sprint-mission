@@ -21,59 +21,60 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-  private final UserStatusRepository userStatusRepository;
-  private final UserStatusValidator userStatusValidator;
-  private final UserValidator userValidator;
-  private final UserStatusMapper userStatusMapper;
+    private final UserStatusRepository userStatusRepository;
+    private final UserStatusValidator userStatusValidator;
+    private final UserValidator userValidator;
+    private final UserStatusMapper userStatusMapper;
 
-  @Override
-  @Transactional
-  public UserStatus createUserStatus(UUID userId) {
-    User user = userValidator.validateUserExistsByUserId(userId);
+    @Override
+    @Transactional
+    public UserStatus createUserStatus(UUID userId) {
+        User user = userValidator.validateUserExistsByUserId(userId);
 
-    userStatusValidator.validateDuplicateByUser(user);
+        userStatusValidator.validateDuplicateByUser(user);
 
-    return userStatusRepository.saveUserStatus(UserStatus.of(user));
-  }
+        return userStatusRepository.saveUserStatus(UserStatus.of(user));
+    }
 
-  @Override
-  public UserStatus findUserStatusById(UUID userStatusId) {
-    return userStatusValidator.validateUserStatusExistsById(userStatusId);
-  }
+    @Override
+    public UserStatus findUserStatusById(UUID userStatusId) {
+        return userStatusValidator.validateUserStatusExistsById(userStatusId);
+    }
 
-  @Override
-  public List<UserStatus> findAllUserStatuses() {
-    return userStatusRepository.findAllUserStatuses();
-  }
+    @Override
+    public List<UserStatus> findAllUserStatuses() {
+        return userStatusRepository.findAllUserStatuses();
+    }
 
-  @Override
-  @Transactional
-  public UserStatus updateUserStatusById(UpdateUserStatusByIdRequest updateUserStatusByIdRequest) {
-    UserStatus userStatus =
-        userStatusValidator.validateUserStatusExistsById(
-            updateUserStatusByIdRequest.userStatusId());
+    @Override
+    @Transactional
+    public UserStatus updateUserStatusById(
+        UpdateUserStatusByIdRequest updateUserStatusByIdRequest) {
+        UserStatus userStatus =
+            userStatusValidator.validateUserStatusExistsById(
+                updateUserStatusByIdRequest.userStatusId());
 
-    userStatus.updateUserStatusInfo(Instant.now());
+        userStatus.updateUserStatusInfo(Instant.now());
 
-    return userStatus;
-  }
+        return userStatus;
+    }
 
-  @Override
-  @Transactional
-  public UserStatusDto updateUserStatusByUserId(UUID userid,
-      UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
-    User user = userValidator.validateUserExistsByUserId(userid);
-    UserStatus userStatus = userStatusValidator.validateUserStatusExistsByUser(user);
+    @Override
+    @Transactional
+    public UserStatusDto updateUserStatusByUserId(UUID userid,
+        UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
+        User user = userValidator.validateUserExistsByUserId(userid);
+        UserStatus userStatus = userStatusValidator.validateUserStatusExistsByUser(user);
 
-    userStatus.updateUserStatusInfo(updateUserStatusByUserIdRequest.newLastActiveAt());
+        userStatus.updateUserStatusInfo(updateUserStatusByUserIdRequest.newLastActiveAt());
 
-    return userStatusMapper.toUserStatusDto(userStatus);
-  }
+        return userStatusMapper.toUserStatusDto(userStatus);
+    }
 
-  @Override
-  public void deleteUserStatus(UUID userStatusId) {
-    userStatusValidator.validateUserStatusExistsById(userStatusId);
+    @Override
+    public void deleteUserStatus(UUID userStatusId) {
+        userStatusValidator.validateUserStatusExistsById(userStatusId);
 
-    userStatusRepository.removeUserStatus(userStatusId);
-  }
+        userStatusRepository.removeUserStatus(userStatusId);
+    }
 }

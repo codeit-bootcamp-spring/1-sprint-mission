@@ -14,21 +14,22 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserStatusValidator {
 
-  private final UserStatusRepository userStatusRepository;
+    private final UserStatusRepository userStatusRepository;
 
-  public UserStatus validateUserStatusExistsById(UUID userStatusId) {
-    return userStatusRepository.findUserStatusById(userStatusId)
-        .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userStatusId", userStatusId)));
-  }
-
-  public UserStatus validateUserStatusExistsByUser(User user) {
-    return userStatusRepository.findUserStatusByUser(user)
-        .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", user.getId())));
-  }
-
-  public void validateDuplicateByUser(User user) {
-    if (userStatusRepository.findUserStatusByUser(user).isPresent()) {
-      throw new UserStatusAlreadyExistException(Map.of("userId", user.getId()));
+    public UserStatus validateUserStatusExistsById(UUID userStatusId) {
+        return userStatusRepository.findUserStatusById(userStatusId)
+            .orElseThrow(
+                () -> new UserStatusNotFoundException(Map.of("userStatusId", userStatusId)));
     }
-  }
+
+    public UserStatus validateUserStatusExistsByUser(User user) {
+        return userStatusRepository.findUserStatusByUser(user)
+            .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", user.getId())));
+    }
+
+    public void validateDuplicateByUser(User user) {
+        if (userStatusRepository.findUserStatusByUser(user).isPresent()) {
+            throw new UserStatusAlreadyExistException(Map.of("userId", user.getId()));
+        }
+    }
 }

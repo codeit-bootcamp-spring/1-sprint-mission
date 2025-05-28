@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserStatusJpaRepository extends JpaRepository<UserStatus, UUID> {
 
-  Optional<UserStatus> findUserStatusByUser(User user);
+    Optional<UserStatus> findUserStatusByUser(User user);
 }

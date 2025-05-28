@@ -8,17 +8,19 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
 
-  MessageDto createMessage(CreateMessageRequest createMessageRequest,
-      List<MultipartFile> multipartFileList);
+    MessageDto createMessage(CreateMessageRequest createMessageRequest,
+        List<MultipartFile> multipartFileList);
 
-  PageResponse<MessageDto> findAllMessagesByChannelId(UUID channelId, Instant cursor,
-      Pageable pageable);
+    PageResponse<MessageDto> findAllMessagesByChannelId(UUID channelId, Instant cursor,
+        Pageable pageable);
 
-  MessageDto updateMessage(UUID messageId, UpdateMessageRequest updateMessageRequest);
+    MessageDto updateMessage(UUID messageId, UpdateMessageRequest updateMessageRequest,
+        UserDetails userDetails);
 
-  void deleteMessage(UUID messageId);
+    void deleteMessage(UUID messageId, UserDetails userDetails);
 }

@@ -6,17 +6,18 @@ import com.sprint.mission.discodeit.dto.readStatus.request.UpdateReadStatusReque
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface ReadStatusService {
 
-  ReadStatusDto createReadStatus(CreateReadStatusRequest createReadStatusRequest);
+    ReadStatusDto createReadStatus(CreateReadStatusRequest createReadStatusRequest);
 
-  ReadStatus findReadStatusById(UUID readStatusId);
+    ReadStatus findReadStatusById(UUID readStatusId);
 
-  List<ReadStatusDto> findAllReadStatusesByUserId(UUID userId);
+    List<ReadStatusDto> findAllReadStatusesByUserId(UUID userId);
 
-  ReadStatusDto updateReadStatus(UUID readStatusId,
-      UpdateReadStatusRequest updateReadStatusRequest);
+    ReadStatusDto updateReadStatus(UUID readStatusId,
+        UpdateReadStatusRequest updateReadStatusRequest, UserDetails userDetails);
 
-  void deleteReadStatus(UUID readStatusId);
+    void deleteReadStatus(UUID readStatusId);
 }
