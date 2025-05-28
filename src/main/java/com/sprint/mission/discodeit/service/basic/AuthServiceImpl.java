@@ -26,6 +26,6 @@ public class AuthServiceImpl implements AuthService {
             && user.getPassword().equals(dto
             .getPassword())).findFirst()
         .orElseThrow(() -> new LoginFailedException(dto.getUsername()));
-    return userMapper.toDto(loginUser);
+    return userMapper.toDto(loginUser, true);
   }
 }

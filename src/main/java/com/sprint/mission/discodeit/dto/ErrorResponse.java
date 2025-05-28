@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.dto;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,6 +44,17 @@ public class ErrorResponse {
         exceptionClass.getSimpleName(),
         errorCode.getHttpStatus().value()
     );
+  }
+
+  public static ErrorResponse from(Exception exception, int status) {
+    return ErrorResponse.builder()
+            .timestamp(Instant.now())
+            .code(exception.getClass().getSimpleName())
+            .message(exception.getMessage())
+            .details(new HashMap<>())
+            .exceptionType(exception.getClass().getSimpleName())
+            .status(status)
+            .build();
   }
 
 }

@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import java.util.UUID;
+
+import com.sprint.mission.discodeit.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,4 +20,5 @@ public class UserDto {
   private String email;
   private BinaryContentDto profile;
   private boolean isOnline;
+  private Role role;
 }

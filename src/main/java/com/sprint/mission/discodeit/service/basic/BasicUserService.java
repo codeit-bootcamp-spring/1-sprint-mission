@@ -5,19 +5,24 @@ import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 
 import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -34,7 +39,8 @@ public class BasicUserService implements UserService {
 
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
-
+  private final PasswordEncoder passwordEncoder;
+  private final SessionRegistry sessionRegistry;
 
   @Override
   @Transactional
@@ -50,15 +56,16 @@ public class BasicUserService implements UserService {
 
     BinaryContent nullableProfile = saveBinaryFile(optionalProfileCreateRequest);
 
-    User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword(), nullableProfile);
+    String encodePwd = passwordEncoder.encode(dto.getPassword());
+
+    User user = new User(dto.getUsername(), dto.getEmail(), encodePwd, nullableProfile, Role.USER);
 
     //cascade persist
-    user.addUserStatus(new UserStatus(Instant.now()));
     User saveUser = userRepository.save(user);
 
     log.info("사용자 생성 완료 id: {}", saveUser.getId());
 
-    return userMapper.toDto(saveUser);
+    return userMapper.toDto(saveUser, isUserOnline(saveUser));
   }
 
   @Override
@@ -66,14 +73,14 @@ public class BasicUserService implements UserService {
   public UserDto find(UUID id) {
     User findUser = userRepository.findById(id)
         .orElseThrow(() -> new UserNotFoundException(id));
-    return userMapper.toDto(findUser);
+    return userMapper.toDto(findUser, isUserOnline(findUser));
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<UserDto> findAll() {
     return userRepository.findAll().stream()
-        .map(userMapper::toDto)
+        .map(user -> userMapper.toDto(user, isUserOnline(user)))
         .toList();
   }
 
@@ -98,7 +105,7 @@ public class BasicUserService implements UserService {
 
     log.info("사용자 수정 완료 id: {}", findUser.getId());
 
-    return userMapper.toDto(findUser);
+    return userMapper.toDto(findUser, isUserOnline(findUser));
   }
 
   @Override
@@ -130,4 +137,32 @@ public class BasicUserService implements UserService {
         .orElse(null);
   }
 
+  @Transactional
+  public UserDto updateRole(UUID userId, Role newRole) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+    user.updateRole(newRole);
+
+
+    //세션에서 지우기
+    sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> ((CustomUserDetails) principal).getUser().getId().equals(userId))
+            .findFirst()
+            .ifPresent(principal -> {
+                      List<SessionInformation> activeSessions =
+                              sessionRegistry.getAllSessions(principal, false);
+                      log.debug("Active sessions: {}", activeSessions.size());
+                      activeSessions.forEach(SessionInformation::expireNow); //세션 찾아서 만료처리
+                    }
+            );
+
+    return userMapper.toDto(user, isUserOnline(user));
+  }
+
+  public boolean isUserOnline(User user) {
+    return sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> principal instanceof CustomUserDetails)
+            .map(principal -> ((CustomUserDetails) principal).getUser())
+            .anyMatch(u -> u.getId().equals(user.getId()));
+  }
 }

@@ -25,9 +25,21 @@ public class ChannelMapper {
   private final ReadStatusRepository readStatusRepository;
   private final UserMapper userMapper;
 
-  public ChannelDto toDto(Channel channel) {
+  public ChannelDto toDto(Channel channel, List<UserDto> participants, Instant lastMessageAt) {
+    return new ChannelDto(
+            channel.getId(),
+            channel.getChannelType(),
+            channel.getName(),
+            channel.getDescription(),
+            participants,
+            lastMessageAt
+    );
+  }
+
+/*  public ChannelDto toDto(Channel channel) {
 
     List<UserDto> participants = new ArrayList<>();
+
     if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
       participants = readStatusRepository.findAllByChannel(channel)
           .stream()
@@ -50,5 +62,5 @@ public class ChannelMapper {
         participants,
         lastMessageAt
     );
-  }
+  }*/
 }

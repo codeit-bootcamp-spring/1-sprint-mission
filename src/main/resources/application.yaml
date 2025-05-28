@@ -71,3 +71,9 @@ info:
   multipart:
     max-file-size: ${spring.servlet.multipart.maxFileSize}
     max-request-size: ${spring.servlet.multipart.maxRequestSize}
+
+
+security:
+  remember-me:
+    key: my-secret-key
+    token-validity-seconds: 1814400
