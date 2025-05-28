@@ -12,16 +12,14 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserUpdateRequestDto {
 
-  @NotBlank
-  @Size(min = 2, max = 20)
-  private String newUsername;
-  @NotBlank
-  @Email
-  private String newEmail;
-  //  @NotBlank
-//  @Pattern(
-//      regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,}$",
-//      message = "비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다."
-//  )
-  private String newPassword;
+    @Size(min = 2, max = 20)
+    private String newUsername;
+    @Email
+    private String newEmail;
+    @Size(min = 8)
+    @Pattern(
+            regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+=-]).{8,}$",
+            message = "비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다."
+    )
+    private String newPassword;
 }

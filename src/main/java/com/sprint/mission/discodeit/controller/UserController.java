@@ -4,15 +4,14 @@ import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.Interface.UserService;
-import com.sprint.mission.discodeit.service.Interface.UserStatusService;
+import com.sprint.mission.discodeit.service.basic.UserSessionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,52 +23,50 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserController implements UserApi {
 
-  private final UserService userService;
-  private final UserStatusService userStatusService;
+    private final UserService userService;
+    private final UserSessionService userSessionService;
 
-  @Override
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UserDto> createUser(
-      @Valid @RequestPart("userCreateRequest") UserCreateRequestDto userCreateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+    @Override
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDto> createUser(
+            @Valid @RequestPart("userCreateRequest") UserCreateRequestDto userCreateRequest,
+            @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
-    UserDto createdUser = userService.createUser(userCreateRequest, profile);
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-  }
+        UserDto createdUser = userService.createUser(userCreateRequest, profile);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
 
-  @Override
-  @GetMapping
-  public ResponseEntity<List<UserDto>> findAll() {
-    List<UserDto> userDto = userService.getAllUsers();
-    return ResponseEntity.ok(userDto);
-  }
+    @Override
+    @GetMapping
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> userDto = userService.getAllUsers();
+        return ResponseEntity.ok(userDto);
+    }
 
-  @Override
-  @PatchMapping(value = "/{userId}", consumes = {
-      MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UserDto> updateUser(
-      @PathVariable("userId") UUID userId,
-      @Valid @RequestPart("userUpdateRequest") UserUpdateRequestDto userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
-  ) {
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.user.id")
+    @PatchMapping(value = "/{userId}", consumes = {
+            MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDto> updateUser(
+            @PathVariable("userId") UUID userId,
+            @Valid @RequestPart("userUpdateRequest") UserUpdateRequestDto userUpdateRequest,
+            @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) {
 
-    UserDto updatedUser = userService.updateUser(userId, userUpdateRequest, profile);
-    return ResponseEntity.ok(updatedUser);
-  }
+        UserDto updatedUser = userService.updateUser(userId, userUpdateRequest, profile);
+        return ResponseEntity.ok(updatedUser);
+    }
 
-  @Override
-  @DeleteMapping("/{userId}")
-  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
-    userService.deleteUser(userId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-  }
+    @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.user.id")
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
-  @Override
-  @PatchMapping(value = "/{userId}/userStatus", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-      @RequestBody
-      UserStatusUpdateRequest request) {
-    UserStatus userStatus = userStatusService.updateByUserId(userId, request);
-    return ResponseEntity.ok(userStatus);
-  }
+    @PatchMapping(value = "/{userId}/userStatus", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> updateUserStatusByUserId(@PathVariable("userId") UUID userId) {
+        return ResponseEntity.ok(userSessionService.isUserLoggedIn(userId));
+    }
 }

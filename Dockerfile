@@ -1,12 +1,14 @@
 # 빌드 이미지
-FROM gradle:8.10-jdk17-alpine AS builder
+FROM amazoncorretto:17-alpine AS builder
 
 # 작업 디렉토리 설정
 WORKDIR /app
 
 # 필요한 거 먼저 복사
-COPY build.gradle settings.gradle gradlew /app/
 COPY gradle /app/gradle
+COPY gradlew /app/
+COPY settings.gradle /app/
+COPY build.gradle /app/
 
 # 의존성 미리 다운(캐시)
 RUN chmod +x gradlew && ./gradlew dependencies --no-daemon
@@ -25,7 +27,7 @@ WORKDIR /app
 
 # 환경변수 설정
 ENV PROJECT_NAME=discodeit
-ENV PROJECT_VERSION=1.2-M8
+ENV PROJECT_VERSION=2.0-M9
 ENV SPRING_PROFILE=prod
 ENV JVM_OPTS=""
 
@@ -36,4 +38,4 @@ COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar /app/
 EXPOSE 80
 
 # jar 파일 실행 (환경변수 활용)
-CMD ["sh", "-c", "java $JVM_OPTS -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE -jar /app/app.jar"]
+CMD exec java $JVM_OPTS -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE -jar /app/app.jar
