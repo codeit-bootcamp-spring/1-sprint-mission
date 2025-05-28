@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:devDB;MODE=PostgreSQL # PostgreSQL 호환 모드 추가
+    username: devUser
+    password: devPass
+    driver-class-name: org.h2.Driver  # 명시적으로 드라이버 클래스 지정
+  h2:
+    console:
+      enabled: true # H2 콘솔 활성화
+      path: /h2-console
+  sql:
+    init:
+      mode: always # Spring Boot DB 테이블 만들기
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        highlight_sql: true # 텍스트에 컬러 입히기
+        format_sql: true # sql 포맷을 깔끔하게
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: TRACE # 요청마다 통과하는 필터 목록 확인하기
+    org.hibernate.SQL: DEBUG # Hibernate SQL 쿼리 로그만 DEBUG 활성화, Logger 로 출력
+    org.hibernate.orm.jdbc.bind: TRACE # 바인딩된 파라미터 표시 로그
+server:
+  port: 8080

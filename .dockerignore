@@ -1,0 +1,15 @@
+### Gradle ###
+.gradle/
+build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.iws
+
+### OS 자동 생성 파일 ###
+.DS_Store
+Thumbs.db
+
+### 로그 ###
+*.log
