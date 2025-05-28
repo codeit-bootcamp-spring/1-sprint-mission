@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.Role;
 import java.util.UUID;
+
 import lombok.Builder;
 
 @Builder
@@ -17,7 +19,7 @@ public record UserDto(
     //사용자 프로필 사진
     BinaryContentDto profile,
     //사용자 역할
-    String role
+    Role role
 ) {
 
 }

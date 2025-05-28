@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.security;
 
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class AdminAccountInitializer implements CommandLineRunner {
       adminUser.setUsername("admin");
       adminUser.setEmail("admin@discodeit.com");
       adminUser.setPassword(passwordEncoder.encode(adminPassword));
-      adminUser.setRole("ROLE_ADMIN");
+      adminUser.setRole(Role.ADMIN);
 
       userRepository.save(adminUser);
 
