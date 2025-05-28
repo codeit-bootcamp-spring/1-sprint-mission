@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 public class MessageRequest {
 
@@ -25,6 +25,7 @@ public class MessageRequest {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class Update {
 
         @NotBlank(message = "수정할 메시지 내용은 비어 있을 수 없습니다.")

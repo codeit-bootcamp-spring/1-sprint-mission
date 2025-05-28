@@ -24,6 +24,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -85,6 +86,7 @@ public class BasicUserService implements UserService {
         return userMapper.entityToDto(findByIdOrThrow(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     @Override
     @Transactional
     public UserResponse update(UUID id, UserRequest.Update request,
@@ -117,6 +119,7 @@ public class BasicUserService implements UserService {
         return userMapper.entityToDto(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     @Override
     public void deleteById(UUID id) {
         findByIdOrThrow(id);

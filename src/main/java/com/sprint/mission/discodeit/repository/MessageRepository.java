@@ -23,4 +23,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
         Pageable pageable);
 
     Optional<Message> findFirstByChannelIdOrderByCreatedAtDesc(UUID channelId);
+
+    @Query("SELECT count(m) > 0 FROM Message m WHERE m.id = :id AND m.author.id = :authorId")
+    boolean existsByIdAndAuthorId(@Param("id") UUID id, @Param("authorId") UUID authorId);
 }

@@ -23,19 +23,17 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -109,6 +107,7 @@ public class BasicMassageService implements MessageService {
         return messageMapper.entityToDto(findByIdOrThrow(id));
     }
 
+    @PreAuthorize("hasPermission(#id, 'Message', 'UPDATE')")
     @Override
     @Transactional
     public MessageResponse update(UUID id, MessageRequest.Update request) {
@@ -120,6 +119,7 @@ public class BasicMassageService implements MessageService {
         return messageMapper.entityToDto(message);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasPermission(#id, 'Message', 'DELETE')")
     @Override
     public void deleteById(UUID id) {
         findByIdOrThrow(id);

@@ -2,12 +2,17 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.CustomAuthenticationProvider;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.evaluator.CustomPermissionEvaluator;
 import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
@@ -25,13 +30,16 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomPermissionEvaluator customPermissionEvaluator;
 
     @Bean
     SecurityFilterChain chain(
         HttpSecurity http,
-        CustomAuthenticationProvider authProvider, // DaoAuthenticationProvider provider,
+        CustomAuthenticationProvider authProvider, // DaoAuthenticationProvider
         JsonUsernamePasswordAuthenticationFilter loginFilter,
         SecurityContextRepository securityContextRepository,
         CustomLogoutHandler customLogoutHandler,
@@ -120,4 +128,12 @@ public class SecurityConfig {
         return new SessionRegistryImpl();
     }
 
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+        RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setPermissionEvaluator(customPermissionEvaluator);
+        handler.setRoleHierarchy(roleHierarchy);
+        return handler;
+    }
 }
