@@ -1,27 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.CascadeType;
+import com.sprint.mission.discodeit.security.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Base64;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "users")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity {
 
@@ -39,19 +41,22 @@ public class User extends BaseUpdatableEntity {
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
-  @JsonManagedReference
-  @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
-  private UserStatus status;
+  @Enumerated(EnumType.STRING)
+  private Role role;
 
   public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
-    String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-    this.password = Base64.getEncoder()
-        .encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
+    this.password = password;
 
     this.profile = profile;
-    this.status = new UserStatus(this, Instant.now());
+    this.role = Role.ROLE_USER;
+  }
+
+  public static User createAdmin(String username, String email, String password) {
+    User user = new User(username, email, password, null);
+    user.role = Role.ROLE_ADMIN;
+    return user;
   }
 
   public void updateProfile(BinaryContent profile) {
@@ -72,21 +77,20 @@ public class User extends BaseUpdatableEntity {
     }
   }
 
-  public void updatePassword(String newPassword) {
-    String decodedPassword = new String(Base64.getDecoder().decode(this.password),
-        StandardCharsets.UTF_8);
-    if (BCrypt.checkpw(newPassword, decodedPassword)) {
-      return;
+  public void updatePassword(String newPassword, PasswordEncoder encoder) {
+    if (!encoder.matches(newPassword, this.password)) {
+      this.password = encoder.encode(password);
     }
-    String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-    this.password = Base64.getEncoder()
-        .encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
   }
 
-  public boolean isSamePassword(String password) {
-    String decodedPassword = new String(Base64.getDecoder().decode(this.password),
-        StandardCharsets.UTF_8);
-    return BCrypt.checkpw(password, decodedPassword);
+  public void updateRole(Role newRole) {
+    if (!this.role.equals(newRole)) {
+      this.role = newRole;
+    }
+  }
+
+  public boolean isSamePassword(String password, PasswordEncoder encoder) {
+    return encoder.matches(password, this.password);
   }
 
   public void validateDuplicateName(String name) {

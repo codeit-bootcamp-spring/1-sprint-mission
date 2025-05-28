@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +46,9 @@ class BasicUserServiceTest {
 
   @Mock
   private BinaryContentRepository binaryContentRepository;
+
+  @Mock
+  private PasswordEncoder passwordEncoder;
 
   @InjectMocks
   private BasicUserService userService;
