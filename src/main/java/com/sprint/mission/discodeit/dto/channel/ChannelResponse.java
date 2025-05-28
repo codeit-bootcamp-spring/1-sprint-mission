@@ -1,0 +1,11 @@
+package com.sprint.mission.discodeit.dto.channel;
+
+import com.sprint.mission.discodeit.dto.user.UserResponse;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+public record ChannelResponse(UUID channelId, String channelName, Boolean isPrivate,
+                              Instant lastMessageTime, List<UserResponse> userList) {
+
+}

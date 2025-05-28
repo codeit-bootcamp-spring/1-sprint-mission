@@ -1,0 +1,125 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.binarycontetnt.CreateBinaryContentRequest;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.error.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.persistence.EntityNotFoundException;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class BasicUserService implements UserService {
+
+  private final UserRepository userRepository;
+  private final BinaryContentRepository binaryContentRepository;
+  private final UserStatusRepository userStatusRepository;
+  private final BinaryContentStorage binaryContentStorage;
+
+  @Override
+  @Transactional
+  public UserResponse createUser(CreateUserRequest request,
+      Optional<CreateBinaryContentRequest> optionalRequest) {
+    if (userRepository.existsUserByUsername(request.username()) || userRepository.existsUserByEmail(
+        request.email())) {
+      throw new IllegalArgumentException("이미 사용 중인 username 또는 email입니다.");
+    }
+
+    User user = new User(request.username(), request.password(), request.email());
+    optionalRequest.map(this::saveBinaryContent).ifPresent(user::setProfileImage);
+
+    UserStatus userStatus = new UserStatus(Instant.now());
+    user.setUserStatus(userStatus);
+    userStatus.setUser(user);
+    log.info("USER_CREATED - {} | - | 이름: {}, 이메일: {}", user.getId(), user.getUsername(),
+        user.getEmail());
+    return UserMapper.INSTANCE.userToUserResponse(userRepository.save(user));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<UserResponse> findAllUsers() {
+    return userRepository.findWithStatusAndProfile().stream()
+        .map(UserMapper.INSTANCE::userToUserResponse).toList();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Optional<UserResponse> findUserById(UUID userId) {
+    User user = getUserById(userId);
+    return Optional.ofNullable(UserMapper.INSTANCE.userToUserResponse(user));
+  }
+
+  @Override
+  @Transactional
+  public Optional<UserResponse> updateUser(UUID userId, UpdateUserRequest request,
+      Optional<CreateBinaryContentRequest> optionalRequest) {
+    return userRepository.findById(userId).map(user -> {
+      if (request.username() != null) {
+        user.setUsername(request.username());
+      }
+      optionalRequest.map(this::saveBinaryContent).ifPresent(user::setProfileImage);
+      userRepository.save(user);
+
+      log.info("USER_UPDATED - {} | 변경된 이메일: {}", user.getId(), user.getEmail());
+      return UserMapper.INSTANCE.userToUserResponse(user);
+    });
+  }
+
+  @Override
+  @Transactional
+  public void deleteUser(UUID userId) {
+    userRepository.findById(userId).ifPresent(user -> {
+      if (user.getProfileImage() != null) {
+        binaryContentRepository.deleteById(user.getProfileImage().getId());
+      }
+      if (user.getUserStatus() != null) {
+        userStatusRepository.deleteById(user.getUserStatus().getId());
+      }
+      userRepository.deleteById(user.getId());
+      log.warn("USER_DELETED - {}", user.getId());
+    });
+  }
+
+  @Override
+  @Transactional
+  public User getUserById(UUID uuid) {
+    if (uuid == null) {
+      throw new IllegalArgumentException("Need to specify a valid user id");
+    }
+    return userRepository.findById(uuid)
+        .orElseThrow(UserNotFoundException::new);
+  }
+
+  private BinaryContent saveBinaryContent(CreateBinaryContentRequest profileRequest) {
+    String fileName = profileRequest.fileName();
+    String contentType = profileRequest.contentType();
+    byte[] bytes = profileRequest.bytes();
+    BinaryContent binaryContent = new BinaryContent(fileName, contentType);
+    try {
+      UUID fileUUID = binaryContentStorage.put(binaryContent.getId(), bytes);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return binaryContentRepository.save(binaryContent);
+  }
+}

@@ -1,0 +1,126 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class BasicChannelService implements ChannelService {
+
+  private final ChannelRepository channelRepository;
+  private final UserService userService;
+
+  @Override
+  @Transactional
+  public ChannelResponse createChannel(CreateChannelRequest request) {
+    User user = userService.getUserById(request.userId());
+    Channel channel = getOrCreateChannel(request.channelName());
+
+    channel.addUserToChannel(user);
+    log.info("CHANNEL_CREATED - {} | 채널명: {}", channel.getId(), channel.getChannelName());
+
+    return ChannelMapper.INSTANCE.toChannelResponse(channel);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<ChannelResponse> getChannelsResponse() {
+    return channelRepository.findAll().stream().map(ChannelMapper.INSTANCE::toChannelResponse)
+        .toList();
+  }
+
+
+  @Override
+  @Transactional(readOnly = true)
+  public ChannelResponse getChannelResponse(UUID uuid) {
+    Channel channel = channelRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
+    return ChannelMapper.INSTANCE.toChannelResponse(channel);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Channel getChannel(UUID uuid) {
+    return channelRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
+  }
+
+  @Override
+  @Transactional
+  public ChannelResponse addMessageToChannel(UUID channelUUID, Message message) {
+    Channel channel = channelRepository.findById(channelUUID)
+        .orElseThrow(EntityNotFoundException::new);
+    channel.addMessageToChannel(message);
+    channelRepository.save(channel);
+    return ChannelMapper.INSTANCE.toChannelResponse(channel);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<Message> getMessagesFromChannel(UUID uuid) {
+    return channelRepository.findById(uuid).orElseThrow(
+        () -> new EntityNotFoundException("No channel found for uuid: " + uuid)
+    ).getMessages();
+  }
+
+  @Override
+  @Transactional
+  public ChannelResponse updateChannel(UUID uuid, UpdateChannelRequest request) {
+    Channel channel = channelRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
+    channel.updateChannelName(request.newName());
+    channelRepository.save(channel);
+    log.info("CHANNEL_UPDATED - {} | 변경된 이름: {}", channel.getId(), channel.getChannelName());
+    return ChannelMapper.INSTANCE.toChannelResponse(channel);
+  }
+
+  @Override
+  @Transactional
+  public void deleteChannel(UUID uuid) {
+    try {
+      channelRepository.deleteById(uuid);
+      log.warn("CHANNEL_DELETED - {} ", uuid);
+    } catch (EmptyResultDataAccessException ignored) {
+    }
+  }
+
+  @Override
+  @Transactional
+  public ChannelResponse createPrivateChannel(CreatePrivateChannelRequest request) {
+    Channel channel = new Channel(true);
+
+    List<User> users = request.userIds().stream().map(userService::getUserById).toList();
+
+    users.forEach(channel::addUserToChannel);
+    log.info("CHANNEL_CREATED - {} | 채널명: {}", channel.getId(), channel.getChannelName());
+
+    return ChannelMapper.INSTANCE.toChannelResponse(channelRepository.save(channel));
+  }
+
+  @Override
+  public List<ChannelResponse> getChannelsByUserId(UUID userId) {
+    return ChannelMapper.INSTANCE.toChannelResponseList(
+        channelRepository.findAllByUsers_Id(userId));
+  }
+
+  private Channel getOrCreateChannel(String channelName) {
+    return Optional.ofNullable(channelRepository.findByChannelName(channelName))
+        .orElseGet(() -> channelRepository.save(new Channel(channelName, false)));
+  }
+}

@@ -1,0 +1,44 @@
+package com.sprint.mission.discodeit.entity;
+
+import static com.sprint.mission.discodeit.entity.Status.CONNECTED;
+import static com.sprint.mission.discodeit.entity.Status.DISCONNECTED;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
+import java.time.Duration;
+import java.time.Instant;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Entity
+@NoArgsConstructor
+public class UserStatus extends BaseUpdateEntity {
+
+  private Instant lastActiveAt;
+
+  @Setter
+  @OneToOne(mappedBy = "userStatus")
+  private User user;
+
+  public UserStatus(Instant instant) {
+    this.createdAt = instant;
+    this.updatedAt = createdAt;
+    this.lastActiveAt = updatedAt;
+  }
+
+  public void updateLastActiveAt(Instant instant) {
+    this.lastActiveAt = instant;
+  }
+
+  public Status getStatus() {
+    Instant now = Instant.now();
+    if (Duration.between(lastActiveAt, now).getSeconds() <= 300) {
+      return CONNECTED;
+    } else {
+      return DISCONNECTED;
+    }
+  }
+
+}
