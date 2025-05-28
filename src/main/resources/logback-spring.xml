@@ -1,0 +1,30 @@
+<configuration>
+
+  <!-- 콘솔로 출력 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %highlight(%-5level) %logger{36} - %msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일로 출력 (RollingFileAppender) -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--    <file>${LOG_PATH}/${LOG_FILE}.log</file>-->
+    <!-- log 기록 타입 인코딩  -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 날짜별 파일 분할 -->
+      <fileNamePattern>${LOG_PATH}/${LOG_FILE}.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY}</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+
+</configuration>

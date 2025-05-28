@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: discodeit
+    version: 2.0-M9
+  boot:
+    version: 3.4.0
+  profiles:
+    active: ${PROFILES_ACTIVE:dev}
+  #  config:
+  #    import: optional:file:.env[.properties] # docker test 용, Spring Boot 3.1 이상에서만 작동
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 25MB
+    session:
+      timeout: 30m
+
+logging:
+  level:
+    root: info
+    com.zaxxer.hikari.HikariConfig: DEBUG
+
+discodeit:
+  admin:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
+    email: ${ADMIN_EMAIL}
+  storage:
+    type: ${STORAGE_TYPE:local}
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:./binaryContents}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+
+# swagger
+springdoc:
+  api-docs:
+    path: /api-docs     # OpenAPI 명세서의 엔드포인트 설정 (default: /v3/api-docs)
+  default-consumes-media-type: application/json   # 기본 요청 Content-Type
+  default-produces-media-type: application/json   # 기본 응답 Content-Type
+  swagger-ui:
+    operations-sorter: alpha    # API 메서드 알파벳 순 정렬
+    tags-sorter: alpha          # API 태그 알파벳 순 정렬
+    path: /swagger-ui
+    display-request-duration: true
+    doc-expansion: none
+    filter: true
+    show-extensions: true

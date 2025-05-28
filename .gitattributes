@@ -1,0 +1,11 @@
+# Gradle Wrapper
+gradlew text eol=lf
+gradle/wrapper/* text eol=lf
+
+# 쉘 스크립트 & 도커 관련 파일
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.env text eol=lf
+
+# 설정
+*.yml text eol=lf
