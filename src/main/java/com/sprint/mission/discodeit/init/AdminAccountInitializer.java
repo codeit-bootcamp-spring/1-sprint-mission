@@ -32,7 +32,7 @@ public class AdminAccountInitializer implements CommandLineRunner {
                 "admin@abc.com",
                 passwordEncoder.encode("admin123"),
                 null,
-                Role.ROLE_ADMIN
+                Role.ADMIN
                 );
         userRepository.save(admin);
         log.info("admin 관리자 생성 완료");

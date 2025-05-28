@@ -20,6 +20,7 @@ import java.time.Instant;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class BasicUserService implements UserService {
 
     String encodePwd = passwordEncoder.encode(dto.getPassword());
 
-    User user = new User(dto.getUsername(), dto.getEmail(), encodePwd, nullableProfile, Role.ROLE_USER);
+    User user = new User(dto.getUsername(), dto.getEmail(), encodePwd, nullableProfile, Role.USER);
 
     //cascade persist
     User saveUser = userRepository.save(user);
@@ -141,6 +142,20 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
     user.updateRole(newRole);
+
+
+    //세션에서 지우기
+    sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> ((CustomUserDetails) principal).getUser().getId().equals(userId))
+            .findFirst()
+            .ifPresent(principal -> {
+                      List<SessionInformation> activeSessions =
+                              sessionRegistry.getAllSessions(principal, false);
+                      log.debug("Active sessions: {}", activeSessions.size());
+                      activeSessions.forEach(SessionInformation::expireNow); //세션 찾아서 만료처리
+                    }
+            );
+
     return userMapper.toDto(user, isUserOnline(user));
   }
 

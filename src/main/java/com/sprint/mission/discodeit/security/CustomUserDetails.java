@@ -33,11 +33,14 @@ public class CustomUserDetails implements UserDetails {
     }
 */
 
+/*    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+    }*/
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 권한 정보가 없다면 빈 컬렉션 반환
-        //return Collections.emptyList();
-        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_".concat(user.getRole().name())));
     }
 
     @Override

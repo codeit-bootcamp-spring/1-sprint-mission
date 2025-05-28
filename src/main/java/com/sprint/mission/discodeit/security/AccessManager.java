@@ -28,7 +28,7 @@ public class AccessManager {
 
         // 관리자 권한이면 허용
         return authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(auth -> auth.getAuthority().equals("ADMIN"));
     }
 
     public boolean isMessageAuthor(UUID messageId, Authentication authentication) {
@@ -48,7 +48,7 @@ public class AccessManager {
                 .map(message ->
                         message.getAuthor().getId().equals(currentUserId) ||
                                 authentication.getAuthorities().stream()
-                                        .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))
+                                        .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))
                 )
                 .orElse(false);
     }
