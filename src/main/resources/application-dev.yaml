@@ -1,24 +1,26 @@
+server:
+  port: 8080
+
 spring:
-  application:
-    name: discodeit-dev
-  server:
-    port: 8081
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/discodeit_dev
-    username: progres
+    url: jdbc:postgresql://localhost:5432/dev
+    username: postgres
     password: tmdcks1234
   jpa:
-    hibernate:
-      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
 
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: .discodeit/dev-storage
 logging:
   level:
-    root: info
+    com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true

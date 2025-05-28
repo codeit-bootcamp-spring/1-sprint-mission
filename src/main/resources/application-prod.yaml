@@ -1,24 +1,25 @@
-spring:
-  application:
-    name: discodeit-prod
-  server:
-    port: 8080
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://prod-db-host:5432/discodeit_prod
-    username: progres
-    password: tmdcks1234
-  jpa:
-    hibernate:
-      ddl-auto: validate
+server:
+  port: 80
 
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: /var/discodeit/storage
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: false
+
 logging:
   level:
-    root: info
+    com.sprint.mission.discodeit: info
     org.hibernate.SQL: info
-    org.hibernate.orm.jdbc.bind: trace
+
+management:
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: false

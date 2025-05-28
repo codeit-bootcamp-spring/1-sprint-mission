@@ -1,18 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sprint.mission.discodeit.eenum.Role;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -26,10 +22,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
 public class User extends BaseUpdatableEntity {
-  @Setter
-  @Id
-  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
-  private UUID id;
+
   @Column(length = 50, nullable = false, unique = true)
   private String username;
   @Column(length = 100, nullable = false, unique = true)
@@ -44,16 +37,12 @@ public class User extends BaseUpdatableEntity {
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus status;
 
-  public User(UUID id,String username, String email, String password, BinaryContent profile) {
-    this.id=(id);
-    this.username = username;
-    this.email = email;
-    this.password = password;
-    this.profile = profile;
-  }
+  @Setter
+  @Column(name = "role", nullable = false)
+  @Enumerated(EnumType.STRING)
+  private Role role;
 
   public User(String username, String email, String password, BinaryContent profile) {
-    this.id=UUID.randomUUID();
     this.username = username;
     this.email = email;
     this.password = password;
@@ -75,5 +64,4 @@ public class User extends BaseUpdatableEntity {
       this.profile = newProfile;
     }
   }
-
 }

@@ -10,9 +10,6 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.Channel.ChannelNotFoundExeption;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
-import com.sprint.mission.discodeit.exception.User.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -62,7 +59,7 @@ public class MessageServiceTest {
 
 	@Test
 	void createMessage_Success() {
-		MessageCreateRequest request = new MessageCreateRequest("hhhh",channelId, authorId);
+		MessageCreateRequest request = new MessageCreateRequest("Hello World",channelId, authorId);
 		when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
 		when(userRepository.findById(authorId)).thenReturn(Optional.of(author));
 		when(messageRepository.save(any(Message.class))).thenReturn(message);
@@ -71,7 +68,7 @@ public class MessageServiceTest {
 		MessageDto result = messageService.create(request, List.of());
 
 		assertNotNull(result);
-		assertEquals("hhhh", result.content());
+		assertEquals("Hello World", result.content());
 		verify(messageRepository).save(any(Message.class));
 	}
 
@@ -83,7 +80,7 @@ public class MessageServiceTest {
 		MessageDto result = messageService.find(messageId);
 
 		assertNotNull(result);
-		assertEquals("hhhh", result.content());
+		assertEquals("Hello World", result.content());
 		verify(messageRepository).findById(messageId);
 	}
 

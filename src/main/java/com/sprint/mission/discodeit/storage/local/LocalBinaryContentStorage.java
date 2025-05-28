@@ -10,8 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -20,13 +18,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-@Service
+@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
+@Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final Path root;
-
 
   public LocalBinaryContentStorage(
       @Value("${discodeit.storage.local.root-path}") Path root
@@ -36,7 +33,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @PostConstruct
   public void init() {
-
     if (!Files.exists(root)) {
       try {
         Files.createDirectories(root);
