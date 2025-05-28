@@ -3,10 +3,13 @@ package com.sprint.mission.discodeit.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.exception.DiscodeitAccessDeniedHandler;
 import com.sprint.mission.discodeit.exception.DiscodeitAuthenticationEntryPoint;
+import com.sprint.mission.discodeit.filter.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.filter.JwtLoginFilter;
 import com.sprint.mission.discodeit.filter.LoginFilter;
-import com.sprint.mission.discodeit.filter.LogoutFilter;
 import com.sprint.mission.discodeit.redis.RedisRememberMeTokenRepository;
+import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.status.UserSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +30,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -51,6 +53,7 @@ public class SecurityConfig {
   private final FindByIndexNameSessionRepository<? extends Session> findByIndexNameSessionRepository;
   private final UserSessionService userSessionService;
   private final ApplicationEventPublisher eventPublisher;
+  private final JwtService jwtService;
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -60,14 +63,25 @@ public class SecurityConfig {
     handler.setCsrfRequestAttributeName("_csrf");
 
     return http
-        .addFilterBefore(
-            loginFilter(securityContextRepository(), rememberMeServices()),
-            UsernamePasswordAuthenticationFilter.class
-        )
-        .addFilterBefore(
-            new LogoutFilter(redisRememberMeTokenRepository, rememberMeServices()),
-            BasicAuthenticationFilter.class
-        )
+//        .addFilterBefore(
+//            loginFilter(securityContextRepository(), rememberMeServices()),
+//            UsernamePasswordAuthenticationFilter.class
+//        )
+//        .addFilterBefore(
+//            new LogoutFilter(redisRememberMeTokenRepository, rememberMeServices()),
+//            BasicAuthenticationFilter.class
+//        )
+        .addFilterAfter(
+            new JwtLoginFilter(userRepository, new ProviderManager(daoAuthenticationProvider()),
+                jwtService,
+                objectMapper,
+                userSessionService),
+            UsernamePasswordAuthenticationFilter.class)
+        .addFilterAfter(new JwtAuthenticationFilter(jwtService),
+            UsernamePasswordAuthenticationFilter.class)
+//        .sessionManagement(session -> session
+//            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//        )
         .rememberMe(rememberMe ->
             rememberMe
                 .rememberMeCookieName("remember-me")
@@ -82,12 +96,14 @@ public class SecurityConfig {
                 .csrfTokenRepository(cookieCsrfTokenRepository)
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/api/users", "POST"))
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/api/auth/login", "POST"))
+                .ignoringRequestMatchers(new AntPathRequestMatcher("/api/auth/logout", "POST"))
         )
         .authorizeHttpRequests(request ->
             request
                 .requestMatchers(
                     "/",
                     "/index.html",
+                    "/favicon.ico",
                     "/static/**",
                     "/error",
                     "/swagger-ui/**",
@@ -96,9 +112,11 @@ public class SecurityConfig {
                     "/assets/**",
                     "/static/index.html",
                     "/static/favicon.ico").permitAll()
-                .requestMatchers("/api/auth/csrf-token", "/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me")
+                .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/binaryContents/**").permitAll()
                 .anyRequest().hasRole("USER")
         )
@@ -119,14 +137,15 @@ public class SecurityConfig {
   @Bean
   LoginFilter loginFilter(
       SecurityContextRepository contextRepository,
-      PersistentTokenBasedRememberMeServices rememberMeServices) {
+      PersistentTokenBasedRememberMeServices rememberMeServices,
+      JwtSessionRepository jwtSessionRepository) {
 
     ProviderManager providerManager = new ProviderManager(daoAuthenticationProvider());
     providerManager.setAuthenticationEventPublisher(
         new DefaultAuthenticationEventPublisher(eventPublisher));
 
     LoginFilter loginFilter = new LoginFilter(objectMapper, userRepository,
-        findByIndexNameSessionRepository, userSessionService);
+        findByIndexNameSessionRepository, userSessionService, jwtSessionRepository);
     loginFilter.setRememberMeServices(rememberMeServices);
     loginFilter.setAuthenticationManager(providerManager);
     loginFilter.setFilterProcessesUrl(AUTH_PATH);
@@ -153,8 +172,8 @@ public class SecurityConfig {
 
     CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
 
-    cookieCsrfTokenRepository.setCookieName("CSRF-TOKEN");
-    cookieCsrfTokenRepository.setHeaderName("X-CSRF-TOKEN");
+    cookieCsrfTokenRepository.setCookieName("XSRF-TOKEN");
+    cookieCsrfTokenRepository.setHeaderName("X-XSRF-TOKEN");
 
     return cookieCsrfTokenRepository;
   }
