@@ -18,7 +18,7 @@ CREATE TABLE users
     email        varchar(100) unique not null,
     password     varchar(200)        not null,
     phone_num    varchar(20)         not null,
-    user_type    varchar(10)         not null default 'COMMON',
+    role    varchar(20)         not null default 'USER',
     phone_region varchar(10)         not null default 'KR',
     is_active    boolean             not null default true,
     introduce    text,

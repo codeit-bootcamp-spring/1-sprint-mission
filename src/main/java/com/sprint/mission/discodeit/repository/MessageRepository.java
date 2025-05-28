@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
+import java.time.Instant;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,17 +10,21 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
-import java.util.UUID;
-
 @Repository
 public interface MessageRepository extends JpaRepository<Message, UUID> {
-    @Query("select max(m.createdAt) from Message m where m.channel.id = :channelId")
-    Instant findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
 
-    @Query("select m from Message m where m.channel.id = :channelId order by m.createdAt desc")
-    Slice<Message> findMessagesFirstPage(@Param("channelId") UUID channelId, Pageable pageable);
+  @Query("select max(m.createdAt) from Message m where m.channel.id = :channelId")
+  Instant findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
 
-    @Query("select m from Message m where m.channel.id = :channelId and m.id < :cursor order by m.createdAt desc")
-    Slice<Message> findMessagesNextPage(@Param("channelId") UUID channelId, @Param("cursor") UUID cursor, Pageable pageable);
+  @Query("select m from Message m where m.channel.id = :channelId order by m.createdAt desc")
+  Slice<Message> findMessagesFirstPage(@Param("channelId") UUID channelId, Pageable pageable);
+
+  @Query("select m from Message m where m.channel.id = :channelId and m.id < :cursor order by m.createdAt desc")
+  Slice<Message> findMessagesNextPage(@Param("channelId") UUID channelId,
+      @Param("cursor") UUID cursor, Pageable pageable);
+
+  @Query("select count(m) > 0 from Message m where m.id = :messageId and m.author.id = :userId")
+  boolean existsMessageByIdAndAuthorId(@Param("messageId") UUID messageId,
+      @Param("userId") UUID userId);
+
 }

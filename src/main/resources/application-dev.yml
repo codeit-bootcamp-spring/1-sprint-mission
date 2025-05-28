@@ -19,13 +19,14 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         use_sql_comments: true
         highlight_sql: true
-        generate_statistics: true
+        generate_statistics: false
         cache:
           use_second_level_cache: false
       open-in-view: false
+
     transaction:
       default-timeout: 30
 
@@ -70,6 +71,11 @@ logging:
       springframework:
         core:
           env: debug
+        security: trace
+      #          web:
+      #            csrf: debug
+      #            FilterChainProxy: debug
+      #            session: debug
       hibernate:
         sql: debug
         type:
@@ -100,3 +106,5 @@ server:
       charset: utf-8
       enabled: true
       force: true
+    session:
+      timeout: 30m

@@ -12,7 +12,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -23,7 +23,7 @@ spring:
   # sql initialize를 사용하지 않을 것
   sql:
     init:
-      mode: never
+      mode: embedded
 
 discodeit:
   storage:
@@ -37,6 +37,12 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+    admin:
+      username: ${ADMIN_USERNAME}
+      password: ${ADMIN_PASSWORD}
+      email: ${ADMIN_EMAIL}
+    cookie:
+      persistent-key: ${PERSISTENT_COOKIE_KEY}
 
 # 테스트용이기에 DEBUG로 확인
 logging:

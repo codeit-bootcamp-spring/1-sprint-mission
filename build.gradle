@@ -27,7 +27,7 @@ ext {
 }
 
 group = 'com.sprint.mission'
-version = '1.2-M8'
+version = 'v2.0-M9'
 
 java {
     toolchain {
@@ -56,6 +56,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // spring security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'

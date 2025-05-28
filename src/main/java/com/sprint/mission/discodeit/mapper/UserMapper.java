@@ -10,28 +10,32 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UserMapper {
-    private final BinaryContentMapper binaryContentMapper;
 
-    public UserResponseDto toResponseDto(User user) {
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .nickname(user.getNickname())
-                .email(user.getEmail())
-                .profile(user.getProfile() == null ? null : binaryContentMapper.toResponseDto(user.getProfile()))
-                .online(user.getUserStatus().isOnline())
-                .build();
-    }
+  private final BinaryContentMapper binaryContentMapper;
 
-    public User toEntity(UserSignupRequestDto userSignupRequestDto) {
-        return new User(
-                userSignupRequestDto.username(),
-                userSignupRequestDto.nickname(),
-                userSignupRequestDto.email(),
-                userSignupRequestDto.password(),
-                new Phone(userSignupRequestDto.phone(), userSignupRequestDto.regionCode()),
-                userSignupRequestDto.userType(),
-                userSignupRequestDto.introduce(),
-                null
-        );
-    }
+  public UserResponseDto toResponseDto(User user, boolean isOnline) {
+    return UserResponseDto.builder()
+        .id(user.getId())
+        .username(user.getUsername())
+        .nickname(user.getNickname())
+        .email(user.getEmail())
+        .role(user.getRole())
+        .profile(
+            user.getProfile() == null ? null : binaryContentMapper.toResponseDto(user.getProfile()))
+        .online(isOnline)
+        .build();
+  }
+
+  public User toEntity(UserSignupRequestDto userSignupRequestDto, String hashedPassword) {
+    return new User(
+        userSignupRequestDto.username(),
+        userSignupRequestDto.nickname(),
+        userSignupRequestDto.email(),
+        hashedPassword,
+        new Phone(userSignupRequestDto.phone(), userSignupRequestDto.regionCode()),
+        userSignupRequestDto.role(),
+        userSignupRequestDto.introduce(),
+        null
+    );
+  }
 }
