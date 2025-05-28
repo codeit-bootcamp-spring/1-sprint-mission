@@ -92,11 +92,11 @@ public class SecurityConfig {
         )
         .httpBasic(AbstractHttpConfigurer::disable)
         .formLogin(AbstractHttpConfigurer::disable)
-//        .csrf(csrf -> csrf
-//              .ignoringRequestMatchers("/api/auth/logout")
-//            .csrfTokenRepository(csrfTokenRepository())
-//        );
-        .csrf(AbstractHttpConfigurer::disable);
+        .csrf(csrf -> csrf
+              .ignoringRequestMatchers("/api/auth/logout")
+            .csrfTokenRepository(csrfTokenRepository())
+        );
+//        .csrf(AbstractHttpConfigurer::disable);
     return http.build();
   }
 
@@ -114,8 +114,8 @@ public class SecurityConfig {
   @Bean
   public CsrfTokenRepository csrfTokenRepository() {
     CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-    repo.setCookieName("CSRF-TOKEN");
-    repo.setHeaderName("X-CSRF-TOKEN");
+    repo.setCookieName("XSRF-TOKEN");
+    repo.setHeaderName("X-XSRF-TOKEN");
     return repo;
   }
 
