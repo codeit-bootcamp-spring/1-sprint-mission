@@ -102,6 +102,11 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     UUID currentUserId = userDetails.getUserDto().id();
 
     return switch (permission.toUpperCase()) {
+      case "CREATE" -> {
+        // CREATE의 경우 targetId는 userId (생성하려는 ReadStatus의 userId)
+        UUID userId = UUID.fromString(targetId.toString());
+        yield userId.equals(currentUserId); // 본인의 ReadStatus만 생성 가능
+      }
       case "UPDATE" -> {
         // UPDATE의 경우 targetId는 readStatusId
         UUID readStatusId = UUID.fromString(targetId.toString());

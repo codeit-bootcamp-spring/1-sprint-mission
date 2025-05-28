@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.security.filter;
 
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.FilterChain;
@@ -19,12 +19,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 // 로그아웃 필터 구현
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends OncePerRequestFilter {
 
