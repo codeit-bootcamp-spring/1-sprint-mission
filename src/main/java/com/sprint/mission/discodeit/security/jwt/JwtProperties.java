@@ -21,7 +21,7 @@ public class JwtProperties {
 
   @NotBlank
   @Size(min = 32, message = "JWT secret must be at least 32 characters")
-  private String secret; // 토큰 서명 비밀 키, 필수값, 32자 이상
+  private String secret = "dev-secret-key-must-be-at-least-32-characters-long"; // 토큰 서명 비밀 키, 필수값, 32자 이상
 
   @Valid
   private AccessTokenConfig accessToken = new AccessTokenConfig();

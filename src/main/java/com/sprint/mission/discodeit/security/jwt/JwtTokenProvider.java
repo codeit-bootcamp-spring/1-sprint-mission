@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
@@ -34,6 +36,8 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
   private final JwtProperties jwtProperties;
+  private final DiscodeitUserDetailsService userDetailsService; // ← 추가
+
   private final Clock clock = Clock.systemUTC(); // 현재 시각 제공 객체 > 테스트 시 모킹 가능
 
   @PostConstruct
@@ -111,10 +115,12 @@ public class JwtTokenProvider {
   public Authentication getAuthentication(String token) {
     Claims claims = getClaims(token);
 
-    Collection<SimpleGrantedAuthority> authorities = getAuthorities(claims);
-    User principal = new User(claims.getSubject(), "", authorities);
+    String username = claims.getSubject();
 
-    return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    DiscodeitUserDetails principal = (DiscodeitUserDetails) userDetailsService.loadUserByUsername(
+        username);
+
+    return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
   }
 
   /**
