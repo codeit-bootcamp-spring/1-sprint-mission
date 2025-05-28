@@ -9,7 +9,7 @@ public record UserResponse(
     String username,
     String email,
     BinaryContentResponse profile,
-    boolean online,
+    Boolean online,
     String role
 ) {
 

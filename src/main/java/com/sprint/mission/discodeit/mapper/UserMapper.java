@@ -12,6 +12,10 @@ public class UserMapper {
     private final BinaryContentMapper binaryContentMapper;
 
     public UserResponse entityToDto(User user) {
+        return entityToDto(user, null);
+    }
+
+    public UserResponse entityToDto(User user, Boolean isOnline) {
         if (user == null) {
             return null;
         }
@@ -20,7 +24,7 @@ public class UserMapper {
             .username(user.getUsername())
             .email(user.getEmail())
             .profile(binaryContentMapper.entityToDto(user.getProfile()))
-            .online(user.getStatus().isOnline())
+            .online(isOnline)
             .role(user.getRole().name())
             .build();
     }

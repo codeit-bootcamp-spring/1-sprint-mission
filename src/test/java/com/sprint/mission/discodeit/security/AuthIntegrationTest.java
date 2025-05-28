@@ -13,9 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter.LoginRequest;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
@@ -46,8 +44,6 @@ public class AuthIntegrationTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserStatusRepository userStatusRepository;
-    @Autowired
     PasswordEncoder passwordEncoder;
 
     private final String username = "test";
@@ -63,8 +59,6 @@ public class AuthIntegrationTest {
             null);
 
         user = userRepository.saveAndFlush(user);
-        UserStatus userStatus = userStatusRepository.save(UserStatus.createUserStatus(user));
-        user.updateStatus(userStatus);
     }
 
     @Test

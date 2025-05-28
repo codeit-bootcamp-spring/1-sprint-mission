@@ -41,10 +41,6 @@ public enum ErrorCode {
     READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 수신 상태 정보가 존재하지 않습니다."),
     READ_IS_ALREADY_EXIST(HttpStatus.CONFLICT, "수신 상태 정보가 이미 존재합니다."),
 
-    // USER_STATUS
-    USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자 상태가 존재하지 않습니다."),
-    USER_STATUS_IS_ALREADY_EXIST(HttpStatus.CONFLICT, "사용자 상태가 이미 존재합니다."),
-
     // S3
     S3_PRESIGND_URL_CREATE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3 URL 생성에 실패하였습니다."),
     S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드에 실패하였습니다."),

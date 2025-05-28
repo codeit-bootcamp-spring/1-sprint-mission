@@ -11,7 +11,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.SessionFixationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -57,9 +60,10 @@ public class SecurityConfig {
                 .rememberMeServices(rememberMeServices)
             )
 
+            // TODO : 세션을 활용한 사용자 활동 확인 - 프론트에서 어떻게 받는지 알기
             .sessionManagement(s -> s
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .sessionFixation(sf -> sf.migrateSession()) // 세션 고정보호
+                .sessionFixation(SessionFixationConfigurer::migrateSession) // 세션 고정보호
                 .maximumSessions(1) // 동시 로그인 제한
                 .maxSessionsPreventsLogin(false)
                 .expiredUrl("/"))
@@ -109,6 +113,11 @@ public class SecurityConfig {
         repository.setDataSource(dataSource);
         repository.setCreateTableOnStartup(false);
         return repository;
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 
 }
