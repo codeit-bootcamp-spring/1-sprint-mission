@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.exception.Channel;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
-import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -9,7 +8,7 @@ import java.util.Map;
  */
 public class ChannelNotFoundException extends ChannelException {
 
-  public ChannelNotFoundException(Instant timestamp, Map<String, Object> details) {
-    super(timestamp, ErrorCode.CHANNEL_NOT_FOUND, details);
-  }
+    public ChannelNotFoundException(Map<String, Object> details) {
+        super(ErrorCode.CHANNEL_NOT_FOUND, details);
+    }
 }

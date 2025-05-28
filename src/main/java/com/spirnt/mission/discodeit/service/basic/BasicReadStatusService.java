@@ -29,77 +29,77 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class BasicReadStatusService implements ReadStatusService {
 
-  private final ReadStatusMapper readStatusMapper;
-  private final ReadStatusRepository readStatusRepository;
-  private final UserRepository userRepository;
-  private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
+    private final ReadStatusRepository readStatusRepository;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
 
-  @Override
-  public ReadStatusDto create(ReadStatusCreateRequest readStatusCreateRequest) {
-    UUID userId = readStatusCreateRequest.userId();
-    UUID channelId = readStatusCreateRequest.channelId();
-    Instant lastReadAt = readStatusCreateRequest.lastReadAt();
+    @Override
+    public ReadStatusDto create(ReadStatusCreateRequest readStatusCreateRequest) {
+        UUID userId = readStatusCreateRequest.userId();
+        UUID channelId = readStatusCreateRequest.channelId();
+        Instant lastReadAt = readStatusCreateRequest.lastReadAt();
 
-    // User와 Channel 존재하지 않으면 예외 발생
-    Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> {
-          log.warn("[Creating ReadStatus Failed: Channel with id {} not found]", channelId);
-          return new ChannelNotFoundException(Instant.now(), Map.of("channelId", channelId));
-        });
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.warn("[Creating ReadStatus Failed: User with id {} not found]", userId);
-          return new UserNotFoundException(Instant.now(), Map.of("userId", userId));
-        });
+        // User와 Channel 존재하지 않으면 예외 발생
+        Channel channel = channelRepository.findById(channelId)
+            .orElseThrow(() -> {
+                log.warn("[Creating ReadStatus Failed: Channel with id {} not found]", channelId);
+                return new ChannelNotFoundException(Map.of("channelId", channelId));
+            });
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> {
+                log.warn("[Creating ReadStatus Failed: User with id {} not found]", userId);
+                return new UserNotFoundException(Map.of("userId", userId));
+            });
 
-    //이미 해당 채널-유저를 가진 ReadStatus가 있으면 예외 발생
-    if (readStatusRepository.existsByUserIdAndChannelId(userId,
-        channelId)) {
-      log.warn(
-          "[Creating ReadStatus Failed: ReadStatus with userId {} and channelId {} already exists]",
-          userId, channelId);
-      throw new ReadStatusAlreadyExistException(Instant.now(),
-          Map.of("userID", userId, "channelId", channelId));
+        //이미 해당 채널-유저를 가진 ReadStatus가 있으면 예외 발생
+        if (readStatusRepository.existsByUserIdAndChannelId(userId,
+            channelId)) {
+            log.warn(
+                "[Creating ReadStatus Failed: ReadStatus with userId {} and channelId {} already exists]",
+                userId, channelId);
+            throw new ReadStatusAlreadyExistException(
+                Map.of("userID", userId, "channelId", channelId));
 
+        }
+        ReadStatus readStatus = readStatusRepository.save(
+            new ReadStatus(user, channel, lastReadAt));
+        return readStatusMapper.toDto(readStatus);
     }
-    ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel, lastReadAt));
-    return readStatusMapper.toDto(readStatus);
-  }
 
-  @Override
-  public ReadStatusDto find(UUID readStatusId) {
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(
-            () -> new ReadStatusNotFoundException(Instant.now(),
-                Map.of("readStatusId", readStatusId)));
-    return readStatusMapper.toDto(readStatus);
-  }
+    @Override
+    public ReadStatusDto find(UUID readStatusId) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+            .orElseThrow(
+                () -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId)));
+        return readStatusMapper.toDto(readStatus);
+    }
 
 
-  @Override
-  public List<ReadStatusDto> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId).stream()
-        .map(readStatusMapper::toDto)
-        .collect(Collectors.toList());
-  }
+    @Override
+    public List<ReadStatusDto> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(userId).stream()
+            .map(readStatusMapper::toDto)
+            .collect(Collectors.toList());
+    }
 
-  @Override
-  public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> {
-          log.warn("[Updaing ReadStatud Failed: ReadStatus with id {} not found]",
-              readStatusId);
-          return new ReadStatusNotFoundException(Instant.now(),
-              Map.of("readStatusId", readStatusId));
-        });
-    return readStatusMapper.toDto(readStatus);
-  }
+    @Override
+    public ReadStatusDto update(UUID readStatusId,
+        ReadStatusUpdateRequest readStatusUpdateRequest) {
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+            .orElseThrow(() -> {
+                log.warn("[Updaing ReadStatud Failed: ReadStatus with id {} not found]",
+                    readStatusId);
+                return new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId));
+            });
+        return readStatusMapper.toDto(readStatus);
+    }
 
-  @Override
-  public void delete(UUID id) {
-    readStatusRepository.deleteById(id);
-  }
+    @Override
+    public void delete(UUID id) {
+        readStatusRepository.deleteById(id);
+    }
 }
 
 

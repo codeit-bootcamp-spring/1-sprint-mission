@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.exception.User;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
-import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -9,7 +8,7 @@ import java.util.Map;
  */
 public class UserAlreadyExistException extends UserException {
 
-  public UserAlreadyExistException(Instant timestamp, Map<String, Object> details) {
-    super(timestamp, ErrorCode.DUPLICATE_USER, details);
-  }
+    public UserAlreadyExistException(Map<String, Object> details) {
+        super(ErrorCode.DUPLICATE_USER, details);
+    }
 }

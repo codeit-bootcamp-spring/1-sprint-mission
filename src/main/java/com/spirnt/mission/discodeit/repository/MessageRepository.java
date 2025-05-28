@@ -15,20 +15,20 @@ import org.springframework.stereotype.Repository;
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
 
-  // 최신 메시지 size만큼 조회 (첫 페이지)
-  @Query(
-      "SELECT m from Message m LEFT JOIN FETCH m.author LEFT JOIN FETCH m.author.status LEFT JOIN FETCH m.author.profile JOIN FETCH m.channel LEFT JOIN FETCH m.attachments "
-          + "WHERE m.channel.id = :channelId")
-  Slice<Message> findByChannelId(@Param("channelId") UUID channelId, Pageable pageable);
+    // 최신 메시지 size만큼 조회 (첫 페이지)
+    @Query(
+        "SELECT m from Message m LEFT JOIN FETCH m.author LEFT JOIN FETCH m.author.profile JOIN FETCH m.channel LEFT JOIN FETCH m.attachments "
+            + "WHERE m.channel.id = :channelId")
+    Slice<Message> findByChannelId(@Param("channelId") UUID channelId, Pageable pageable);
 
-  // 커서 기반 메시지 size만큼 조회 (createdAt < cursor)
-  @Query(
-      "SELECT m from Message m LEFT JOIN FETCH m.author LEFT JOIN FETCH m.author.status LEFT JOIN FETCH m.author.profile JOIN FETCH m.channel LEFT JOIN FETCH m.attachments "
-          + "WHERE m.channel.id = :channelId "
-          + "AND (m.createdAt < :cursor)")
-  Slice<Message> findByChannelIdAndCreatedAtLessThan(@Param("channelId") UUID channelId,
-      @Param("cursor") Instant cursor,
-      Pageable pageable);
+    // 커서 기반 메시지 size만큼 조회 (createdAt < cursor)
+    @Query(
+        "SELECT m from Message m LEFT JOIN FETCH m.author LEFT JOIN FETCH m.author.profile JOIN FETCH m.channel LEFT JOIN FETCH m.attachments "
+            + "WHERE m.channel.id = :channelId "
+            + "AND (m.createdAt < :cursor)")
+    Slice<Message> findByChannelIdAndCreatedAtLessThan(@Param("channelId") UUID channelId,
+        @Param("cursor") Instant cursor,
+        Pageable pageable);
 
-  List<Message> findAllByChannelId(UUID channelId);
+    List<Message> findAllByChannelId(UUID channelId);
 }

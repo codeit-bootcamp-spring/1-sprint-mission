@@ -8,6 +8,8 @@ import jakarta.persistence.Table;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "channels")
@@ -18,6 +20,7 @@ public class Channel extends BaseUpdatableEntity {
   String name;
   String description;
   @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   ChannelType type;
 
   public Channel(String name, String description, ChannelType type) {

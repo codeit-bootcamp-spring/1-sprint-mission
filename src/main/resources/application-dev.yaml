@@ -1,36 +1,40 @@
 server:
-  port: 8090
+  port: 8080
 spring:
   application:
     name: discodeit
   datasource:
-    url: jdbc:h2:mem:discodeit_dev
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
-    database-platform: org.hibernate.dialect.H2Dialect
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
+#  boot:
+#    admin:
+#      client:
+#        url: http://localhost:9090
 logging:
   level:
-    root: debug
+    root: info
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+    org.springframework.security: trace
 info:
   datasource:
     url: ${spring.datasource.url}
     driver-class-name: ${spring.datasource.driver-class-name}
     jpa:
       ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+
+discodeit:
+  storage:
+    type: local
+
+management:
+  info:
+    env:
+      enabled: true

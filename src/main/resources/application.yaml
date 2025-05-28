@@ -2,7 +2,7 @@ spring:
   application:
     name: discodeit
   profiles:
-    default: prod
+    default: dev
   servlet:
     multipart:
       enabled: true
@@ -13,12 +13,18 @@ spring:
       client:
         instance:
           name: discodeit
-discodeit:
-  storage:
-    type: local
+  config:
+    import: optional:file:.env[.properties]
+
+server:
+  servlet:
+    session:
+      timeout: 30m  # 사용자가 30분 동안 아무 요청하지 않으면 세션 만료
+
 logging:
   level:
     root: info
+
 management:
   endpoints:
     web:
@@ -27,9 +33,7 @@ management:
   endpoint:
     health:
       show-details: "ALWAYS"
-  info:
-    env:
-      enabled: true
+
 info:
   app:
     name: Discodeit
@@ -45,3 +49,16 @@ info:
   multipart:
     max-file-size: ${spring.servlet.multipart.max-file-size}
     max-request-size: ${spring.servlet.multipart.max-request-size}
+
+discodeit:
+  storage:
+    type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:./localStorage}
+  s3:
+    access-key: ${AWS_S3_ACCESS_KEY}
+    secret-key: ${AWS_S3_SECRET_KEY}
+    region: ${AWS_S3_REGION}
+    bucket: ${AWS_S3_BUCKET}
+    presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+

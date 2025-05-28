@@ -1,7 +1,6 @@
 package com.spirnt.mission.discodeit.exception.User;
 
 import com.spirnt.mission.discodeit.exception.ErrorCode;
-import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -10,7 +9,7 @@ import java.util.Map;
 public class UserNotFoundException extends UserException {
 
 
-  public UserNotFoundException(Instant timestamp, Map<String, Object> details) {
-    super(timestamp, ErrorCode.USER_NOT_FOUND, details);
-  }
+    public UserNotFoundException(Map<String, Object> details) {
+        super(ErrorCode.USER_NOT_FOUND, details);
+    }
 }

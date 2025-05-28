@@ -12,13 +12,13 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
 
-  @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile JOIN FETCH u.status")
-  List<User> findAllFetchJoin();
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.profile")
+    List<User> findAllFetchJoin();
 
 
-  boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
 
-  boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
-  Optional<User> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 }

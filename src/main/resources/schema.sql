@@ -6,6 +6,12 @@ CREATE TABLE binary_contents(
   content_type VARCHAR(100) NOT NULL
 );
 
+CREATE TYPE role AS ENUM (
+  'ROLE_ADMIN',
+  'ROLE_CHANNEL_MANAGER',
+  'ROLE_USER'
+);
+
 CREATE TABLE users (
   id UUID PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -14,6 +20,7 @@ CREATE TABLE users (
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(60) NOT NULL,
   profile_id UUID,
+  role role NOT NULL,
   FOREIGN KEY (profile_id) REFERENCES binary_contents(id)
 	  ON DELETE SET NULL
 );
@@ -38,15 +45,6 @@ CREATE TABLE messages (
   author_id UUID,
   FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE,
   FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
-);
-
-CREATE TABLE user_statuses (
-  id UUID PRIMARY KEY,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE,
-  user_id UUID UNIQUE NOT NULL,
-  last_active_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE read_statuses (
