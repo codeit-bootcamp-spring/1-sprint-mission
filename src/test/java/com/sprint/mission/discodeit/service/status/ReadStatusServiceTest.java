@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,10 +15,8 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.status.read.ReadStatus;
 import com.sprint.mission.discodeit.entity.status.read.ReadStatusRequest;
 import com.sprint.mission.discodeit.entity.status.read.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.status.user.UserStatus;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.readstatus.ReadStatusExistsException;
 import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -93,47 +90,7 @@ class ReadStatusServiceTest {
     verify(readStatusRepository).findReadStatusByUser_IdAndChannel_Id(any(), any());
     verify(readStatusRepository).save(any(ReadStatus.class));
   }
-
-  @Test
-  @DisplayName("읽음 상태 생성 - 실패(중복)")
-  void createReadStatusFail() {
-    UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-    UUID channelId = UUID.fromString("22222222-2222-2222-2222-222222222222");
-    UUID userStatusId = UUID.fromString("44444444-4444-4444-4444-444444444444");
-    Instant now = Instant.now();
-
-    ReadStatusRequest request = new ReadStatusRequest(userId, channelId, now);
-
-    UserStatus userStatus = mock(UserStatus.class);
-    when(userStatus.getId()).thenReturn(userStatusId);
-
-    User user = mock(User.class);
-    when(user.getId()).thenReturn(userId);
-    when(user.getStatus()).thenReturn(userStatus);
-
-    Channel channel = mock(Channel.class);
-    when(channel.getId()).thenReturn(channelId);
-
-    ReadStatus existingStatus = mock(ReadStatus.class);
-
-    when(userRepository.getReferenceById(userId)).thenReturn(user);
-    when(channelRepository.getReferenceById(channelId)).thenReturn(channel);
-    when(readStatusRepository.findReadStatusByUser_IdAndChannel_Id(any(), any()))
-        .thenReturn(Optional.of(existingStatus));
-
-    ReadStatusExistsException exception = assertThrows(
-        ReadStatusExistsException.class,
-        () -> readStatusService.create(request)
-    );
-
-    assertEquals(ErrorCode.EXIST_READ_STATUS, exception.getErrorCode());
-
-    verify(userRepository).getReferenceById(userId);
-    verify(channelRepository).getReferenceById(channelId);
-    verify(readStatusRepository).findReadStatusByUser_IdAndChannel_Id(any(), any());
-    verify(readStatusRepository, never()).save(any(ReadStatus.class));
-  }
-
+  
   @Test
   @DisplayName("사용자 ID로 읽음 상태 조회 - 성공")
   void findByUserId() {

@@ -6,11 +6,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.entity.auth.RequestLogin;
+import com.sprint.mission.discodeit.entity.auth.LoginRequest;
 import com.sprint.mission.discodeit.entity.auth.ResponseLogin;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserAuthException;
-import com.sprint.mission.discodeit.service.auth.UserAuthService;
+import com.sprint.mission.discodeit.service.auth.UserLoginRequest;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
@@ -30,7 +30,7 @@ class UserAuthControllerTest {
   private MockMvc mockMvc;
 
   @MockitoBean
-  private UserAuthService userAuthService;
+  private UserLoginRequest userAuthService;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -38,7 +38,7 @@ class UserAuthControllerTest {
   @Test
   @DisplayName("POST /api/auth/login - 로그인 성공")
   void login() throws Exception {
-    RequestLogin request = new RequestLogin("user", "password");
+    LoginRequest request = new LoginRequest("user", "password");
     String requestJson = objectMapper.writeValueAsString(request);
 
     UUID userId = UUID.randomUUID();
@@ -60,7 +60,7 @@ class UserAuthControllerTest {
   @Test
   @DisplayName("POST /api/auth/login - 로그인 실패")
   void loginFail() throws Exception {
-    RequestLogin request = new RequestLogin("user", "password");
+    LoginRequest request = new LoginRequest("user", "password");
     String requestJson = objectMapper.writeValueAsString(request);
 
     UUID userId = UUID.randomUUID();

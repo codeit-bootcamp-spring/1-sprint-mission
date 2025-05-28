@@ -4,6 +4,7 @@ package com.sprint.mission.discodeit.controller;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,12 +12,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.TestConfig;
 import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.channel.create.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.create.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.update.ChannelModifyRequest;
+import com.sprint.mission.discodeit.entity.role.Role;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.time.Instant;
 import java.util.List;
@@ -25,12 +28,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 @WebMvcTest(ChannelController.class)
+@Import(TestConfig.class)
 class ChannelControllerTest {
 
   @Autowired
@@ -74,9 +79,9 @@ class ChannelControllerTest {
     UUID user3Id = UUID.randomUUID();
     List<UUID> ids = List.of(user1Id, user2Id, user3Id);
     List<UserDto> userDtos = List.of(
-        new UserDto(user1Id, "user1", "user1@mail.com", null, true),
-        new UserDto(user2Id, "user2", "user2@mail.com", null, true),
-        new UserDto(user3Id, "user3", "user3@mail.com", null, true)
+        new UserDto(user1Id, "user1", "user1@mail.com", null, true, Role.ROLE_USER),
+        new UserDto(user2Id, "user2", "user2@mail.com", null, true, Role.ROLE_USER),
+        new UserDto(user3Id, "user3", "user3@mail.com", null, true, Role.ROLE_USER)
     );
     PrivateChannelCreateRequest request = new PrivateChannelCreateRequest(ids);
     String requestJson = objectMapper.writeValueAsString(request);
@@ -98,6 +103,7 @@ class ChannelControllerTest {
   }
 
   @Test
+  @WithMockUser(username = "admin", roles = {"ADMIN"})
   @DisplayName("DELETE /api/channels/{channelId} - 채널 삭제")
   void deleteChannel() throws Exception {
     UUID channelId = UUID.randomUUID();
@@ -106,7 +112,9 @@ class ChannelControllerTest {
 
     mockMvc
         .perform(delete("/api/channels/{channelId}", channelId)
-            .contentType(MediaType.APPLICATION_JSON))
+            .contentType(MediaType.APPLICATION_JSON)
+            .with(csrf())
+        )
         .andExpect(status().isNoContent());
   }
 
@@ -129,7 +137,8 @@ class ChannelControllerTest {
     mockMvc
         .perform(patch("/api/channels/{channelId}", channelId)
             .contentType(MediaType.APPLICATION_JSON)
-            .content(requestJson))
+            .content(requestJson)
+        )
         .andExpect(status().isOk())
         .andExpect(content().json(objectMapper.writeValueAsString(channelDto)));
   }

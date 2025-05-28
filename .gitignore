@@ -9,11 +9,11 @@ build/
 *.log
 .env
 discodeit.env
+discodeit.env.dev
 .DS_Store
 **/.DS_Store
 
 !/.discodeit/
-!/discodeit.env
 
 ### STS ###
 .apt_generated
@@ -46,4 +46,3 @@ out/
 ### VS Code ###
 .vscode/
 !/.discodeit/
-!/discodeit.env

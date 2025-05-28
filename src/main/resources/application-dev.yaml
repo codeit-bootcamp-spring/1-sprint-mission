@@ -1,5 +1,10 @@
 server:
-  port: 7070
+  port: 8080
+  servlet:
+    session:
+      timeout: 15m
+      cookie:
+        max-age: 900
 
 spring:
   application:
@@ -13,15 +18,18 @@ spring:
       max-file-size: 100MB
       max-request-size: 500MB
       enabled: true
+  output:
+    ansi:
+      enabled: always
   datasource:
-    url: jdbc:h2:mem:testdb
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         highlight_sql: true
@@ -29,10 +37,24 @@ spring:
         generate_statistics: true;
         use_sql_comments: true;
     open-in-view: false
+  session:
+    store-type: redis
+    redis:
+      flush-mode: on-save
+      namespace: spring:session
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: qwerqwer
+
 logging:
+  pattern:
+    console: ${LOGPATTERN_CONSOLE:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %msg%n}
   level:
     org.hibernate.SQL: debug
     com.sprint.mission.discodeit: debug
+#    org.springframework.security: trace
 
 decorator:
   datasource:
@@ -49,12 +71,17 @@ discodeit:
     local:
       root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
     s3:
-      access-key: ${AWS_ACCESS_KEY_ID}
-      secret-key: ${AWS_SECRET_ACCESS_KEY}
-      region: ${AWS_REGION}
-      bucket: ${AWS_S3_BUCKET}
+      access-key: ${AWS_ACCESS_KEY_ID:}
+      secret-key: ${AWS_SECRET_ACCESS_KEY:}
+      region: ${AWS_REGION:}
+      bucket: ${AWS_S3_BUCKET:}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
 file:
   dir: .discodeit/storage
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  accessTokenExpire: 900000
+  refreshTokenExpire: 604800000
 

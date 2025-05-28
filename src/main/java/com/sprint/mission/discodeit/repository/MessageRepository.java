@@ -15,11 +15,14 @@ public interface MessageRepository extends JpaRepository<Message, UUID>, Message
 
   @Override
   @NonNull
-  @EntityGraph(attributePaths = {"channel", "author", "author.profile", "attachments",
-      "author.status"})
+  @EntityGraph(attributePaths = {"channel", "author", "author.profile", "attachments"})
   Optional<Message> findById(@NonNull UUID uuid);
 
   @EntityGraph(attributePaths = {"attachments"})
   @Override
   void deleteById(@NonNull UUID messageId);
+
+  void deleteAllByauthor_id(UUID authorId);
+
+  boolean existsByidAndAuthor_Id(UUID id, UUID authorId);
 }

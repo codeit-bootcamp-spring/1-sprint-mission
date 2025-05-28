@@ -5,36 +5,55 @@ plugins {
     id 'jacoco'
 }
 
-test {
-    finalizedBy jacocoTestReport
+group = 'com.sprint.mission'
+version = '2.2-M10'
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(17) }
 }
 
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = true
-        html.required = true
-    }
-    
-    dependsOn test
+repositories {
+    mavenCentral()
 }
 
 ext {
-    springBootAdminVersion = "3.4.5"
+    querydslVersion = '5.1.0'
+    mapstructVersion = '1.5.3.Final'
 }
 
-group = 'com.sprint.mission'
-version = '1.2-M8'
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api:2.1.1"
 
-jar {
-    archiveBaseName.set("discodeit")
-    archiveVersion.set("1.2-M8")
-}
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.session:spring-session-data-redis'
+    implementation 'io.lettuce:lettuce-core'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    implementation platform("software.amazon.awssdk:bom:2.31.14")
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:s3-transfer-manager'
+    implementation 'software.amazon.awssdk:auth'       // AwsBasicCredentials
+    implementation 'software.amazon.awssdk:regions'    // Region
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 configurations {
@@ -43,77 +62,61 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-}
+//sourceSets {
+//    main {
+//        java {
+//            srcDirs += "$buildDir/generated/sources/querydsl"
+//        }
+//    }
+//}
+//
+//def querydslDir = "$buildDir/generated/sources/querydsl"
+//
+//task generateQuerydsl(type: JavaCompile) {
+//    description = 'Generate Querydsl Q-classes'
+//    group = 'build'
+//
+//    doFirst { file(querydslDir).mkdirs() }
+//
+//    source = sourceSets.main.allJava
+//    classpath = sourceSets.main.compileClasspath
+//    destinationDirectory = file(querydslDir)
+//    options.annotationProcessorPath = configurations.annotationProcessor
+//
+//    // 👇  -proc:only 를 빼고, processor 하나만 지정
+//    options.compilerArgs = [
+//            '-processor', 'com.querydsl.apt.jpa.JPAAnnotationProcessor'
+//    ]
+//}
+//
+//compileJava {
+//    dependsOn generateQuerydsl
+//    source += fileTree(querydslDir)
+//}
+//
+//classes {
+//    dependsOn generateQuerydsl
+//}
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
-    runtimeOnly 'org.postgresql:postgresql'
-    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
-
-    //Swagger
-    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.7.0'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    runtimeOnly 'com.h2database:h2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // MapStruct
-    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-    annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
-
-    // queryDSL
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
-    // aws s3
-    implementation("software.amazon.awssdk:s3:2.31.14")
-    implementation("software.amazon.awssdk:protocol-core:2.31.14")
-    implementation("software.amazon.awssdk:s3-transfer-manager:2.31.14")
-    implementation("software.amazon.awssdk.crt:aws-crt:0.34.1")
-
-    implementation 'io.github.cdimascio:dotenv-java:3.0.0'
-}
-
-tasks.withType(JavaCompile) {
-    options.annotationProcessorPath = configurations.annotationProcessor
-    options.compilerArgs = ['-Amapstruct.defaultComponentModel=spring',
-                            '-Amapstruct.suppressGeneratorTimestamp=true',
-                            '-Amapstruct.suppressGeneratorVersionInfoComment=true']
-}
-
-// 생성 소스 디렉토리를 명시적으로 지정
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/java']
-        }
-    }
-}
-
-tasks.named('test') {
+test {
     useJUnitPlatform()
 }
 
-// 생성 소스가 저장되는 디렉토리를 clean 태스크에 포함
+jacocoTestReport {
+    dependsOn test
+    reports { xml.required = true; html.required = true }
+}
+
+// --------------------------------------------------
+// 6) Clean 태스크에서 생성된 파일들 정리
+// --------------------------------------------------
 clean {
-    delete "build", "src/main/generated"
+//    delete querydslDir
+    delete 'build'
 }
 
 dependencyManagement {
     imports {
-        mavenBom "de.codecentric:spring-boot-admin-dependencies:$springBootAdminVersion"
+        mavenBom "de.codecentric:spring-boot-admin-dependencies:3.4.5"
     }
 }

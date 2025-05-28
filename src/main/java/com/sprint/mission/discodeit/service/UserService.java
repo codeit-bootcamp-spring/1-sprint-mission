@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateResponse;
 import com.sprint.mission.discodeit.entity.user.dto.UserStatusUpdateRequest;
@@ -17,12 +18,14 @@ public interface UserService {
 
   UserCreateResponse findById(UUID userId);
 
+  UserDto findByUsername(String username);
+
   List<UserCreateResponse> findAll();
 
   UUID delete(UUID userId);
 
   UserUpdateResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
-      MultipartFile profile) throws IOException;
+      MultipartFile profile, String refreshToken) throws IOException;
 
   UserStatusUpdateResponse updateOnlineStatus(UUID userId, UserStatusUpdateRequest request);
 

@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.role.Role;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateResponse;
@@ -9,15 +12,20 @@ import com.sprint.mission.discodeit.entity.user.dto.UserStatusUpdateResponse;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateResponse;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.jwt.JwtTokenNotFoundException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.entitymapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.repository.JwtSessionRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.status.UserStateService;
+import com.sprint.mission.discodeit.service.status.UserSessionService;
 import com.sprint.mission.discodeit.service.util.BinaryContentUtils;
-import com.sprint.mission.discodeit.service.util.UserStatusContextUtils;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -28,6 +36,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +49,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStateService userStateService;
+  private final ReadStatusRepository readStatusRepository;
+  private final MessageRepository messageRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final PasswordEncoder passwordEncoder;
+  private final UserSessionService userSessionService;
+  private final JwtSessionRepository jwtSessionRepository;
+  private final JwtService jwtService;
 
   @PersistenceContext
   EntityManager em;
@@ -54,20 +68,11 @@ public class BasicUserService implements UserService {
       throws IOException {
     User findUser = userRepository.findUserByUsername(request.getUsername());
     User findEmail = userRepository.findUserByEmail(request.getEmail());
-    if (findUser != null) {
-      log.error("중복 이름 '{}' 저장 시도", request.getUsername());
-      throw new DuplicateUsernameException(Instant.now(), ErrorCode.EXIST_USER,
-          Map.of(request.getUsername(), ErrorCode.EXIST_USER.getMessage()));
-    } else if (findEmail != null) {
-      log.error("중복 이메일 '{}' 저장 시도", request.getEmail());
-      throw new DuplicateEmailException(Instant.now(), ErrorCode.EXIST_USER,
-          Map.of(request.getUsername(), ErrorCode.EXIST_USER.getMessage()));
-    }
+    checkDuplicated(request, findUser, findEmail);
 
     BinaryContent profile = BinaryContentUtils.getProfile(file);
     User savedMember = saveUser(request, profile);
 
-    UserStatusContextUtils.saveUserStatus(savedMember, userStateService);
     BinaryContentUtils.saveProfileImg(file, savedMember, binaryContentStorage);
 
     return new UserCreateResponse(
@@ -77,6 +82,18 @@ public class BasicUserService implements UserService {
         savedMember.getProfile() != null ? BinaryContentMapper.toDto(savedMember.getProfile())
             : null,
         true);
+  }
+
+  private void checkDuplicated(UserCreateRequest request, User findUser, User findEmail) {
+    if (findUser != null) {
+      log.error("중복 이름 '{}' 저장 시도", request.getUsername());
+      throw new DuplicateUsernameException(Instant.now(), ErrorCode.EXIST_USER,
+          Map.of(request.getUsername(), ErrorCode.EXIST_USER.getMessage()));
+    } else if (findEmail != null) {
+      log.error("중복 이메일 '{}' 저장 시도", request.getEmail());
+      throw new DuplicateEmailException(Instant.now(), ErrorCode.EXIST_USER,
+          Map.of(request.getUsername(), ErrorCode.EXIST_USER.getMessage()));
+    }
   }
 
   /**
@@ -94,6 +111,23 @@ public class BasicUserService implements UserService {
   }
 
   /**
+   * @methodName : findByUsername
+   * @date : 2025. 5. 19. 13:44
+   * @author : wongil
+   * @Description: username으로 찾기
+   **/
+  @Override
+  public UserDto findByUsername(String username) {
+    User user = userRepository.findUserByUsername(username);
+
+    return UserDto.builder()
+        .username(user.getUsername())
+        .id(user.getId())
+        .email(user.getEmail())
+        .build();
+  }
+
+  /**
    * 모든 유저 찾기
    */
   @Override
@@ -103,7 +137,8 @@ public class BasicUserService implements UserService {
 
     return users.stream()
         .map(user -> new UserCreateResponse(user.getId(), user.getUsername(), user.getEmail(),
-            BinaryContentMapper.toDto(user.getProfile()), user.isThereHere()))
+            BinaryContentMapper.toDto(user.getProfile()),
+            userSessionService.isOnline(user.getUsername()))) // TODO: 세션으로 구현후 바꾸기
         .toList();
   }
 
@@ -117,6 +152,10 @@ public class BasicUserService implements UserService {
           Map.of(userId.toString(), ErrorCode.USER_NOT_FOUND.getMessage())
       );
     }
+
+    readStatusRepository.deleteAllByuser_id(userId);
+    messageRepository.deleteAllByauthor_id(userId);
+
     userRepository.deleteById(userId);
 
     log.info("유저 삭제: {}", userId);
@@ -128,7 +167,7 @@ public class BasicUserService implements UserService {
    */
   @Override
   public UserUpdateResponse update(UUID userId, UserUpdateRequest request,
-      MultipartFile profile) throws IOException {
+      MultipartFile profile, String refreshToken) throws IOException {
 
     User findUser = userRepository.findById(userId)
         .orElseThrow(() -> {
@@ -139,10 +178,43 @@ public class BasicUserService implements UserService {
         });
 
     changeUser(findUser, request, profile);
+    changeJwtAccessToken(userId, refreshToken, findUser);
 
     log.info("유저 수정: {}", userId);
     return new UserUpdateResponse(userId, findUser.getUsername(), findUser.getEmail(),
         BinaryContentMapper.toDto(findUser.getProfile()), true);
+  }
+
+  private void changeJwtAccessToken(UUID userId, String refreshToken, User findUser) {
+    // TODO: 유저 정보 변경하면 기존의 토큰 정보가 바뀌지 않아서 프로필 사진이 제대로 안나옴(로그아웃하고 다시 접속하면 됨)
+    JwtSession jwtSession = getJwtSession(refreshToken);
+    UserDto userDto = getUserDto(userId, findUser);
+    String accessToken = jwtService.createAccessToken(userDto);
+    jwtSession.setAccessToken(accessToken);
+
+    log.info("Jwt Access Token 변경 완료: {}", accessToken);
+  }
+
+  private JwtSession getJwtSession(String refreshToken) {
+    return jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(
+            () -> new JwtTokenNotFoundException(Instant.now(), ErrorCode.NOT_FOUND_JWT, Map.of(
+                ErrorCode.NOT_FOUND_JWT.getCode(),
+                ErrorCode.NOT_FOUND_JWT.getMessage()
+            )));
+  }
+
+  private UserDto getUserDto(UUID userId, User findUser) {
+    return UserDto.builder()
+        .id(userId)
+        .username(findUser.getUsername())
+        .email(findUser.getEmail())
+        .online(userSessionService.isOnline(findUser.getUsername())) // TODO: 토큰기반으로 변경후 수정
+        .profile(
+            new BinaryContentDto(findUser.getProfile().getId(), findUser.getProfile().getFileName(),
+                findUser.getProfile().getSize(), findUser.getProfile().getContentType()))
+        .Role(findUser.getRole())
+        .build();
   }
 
   /**
@@ -155,7 +227,7 @@ public class BasicUserService implements UserService {
         .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
             Map.of(userId.toString(), ErrorCode.USER_NOT_FOUND.getMessage())));
 
-    findUser.getStatus().setLastActiveAt(request.newLastActiveAt());
+//    findUser.getStatus().setLastActiveAt(request.newLastActiveAt());
 
     return new UserStatusUpdateResponse(userId, findUser.getId(), request.newLastActiveAt());
   }
@@ -196,11 +268,15 @@ public class BasicUserService implements UserService {
    * 유저 저장 메서드
    */
   private User saveUser(UserCreateRequest request, BinaryContent bin) {
+
+    String encodedPassword = passwordEncoder.encode(request.getPassword());
+
     User user = User.builder()
         .username(request.getUsername())
         .email(request.getEmail())
-        .password(request.getPassword())
+        .password(encodedPassword)
         .profile(bin)
+        .role(Role.ROLE_USER)
         .build();
 
     log.info("유저 저장: {}", user.getUsername());

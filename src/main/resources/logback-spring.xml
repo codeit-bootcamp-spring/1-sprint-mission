@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+  <!-- Spring Boot 기본 컬러 변환 규칙 로드 -->
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
   <!-- .logs 로그 파일 -->
   <property name="LOG_DIR" value="${user.dir}/.logs"/>
 
-  <!-- 출력 포맷 -->
+  <!-- 컬러 출력 활성화된 콘솔 앱렌더 -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
+    <!-- Jansi 로 윈도우 등에서도 ANSI 컬러 지원 -->
+    <withJansi>true</withJansi>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <pattern>
-        <![CDATA[%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n]]></pattern>
+        <![CDATA[
+        %clr(%d{yy-MM-dd HH:mm:ss.SSS}){faint}
+        %clr([%thread]){faint}
+        %highlight(%-5level)
+        %clr(%logger{36}){cyan}
+        [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n
+        ]]>
+      </pattern>
     </encoder>
   </appender>
 
-  <!-- 파일 출력 설정 -->
+  <!-- 파일 출력 설정 (컬러 제거, 기존 패턴 유지) -->
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOG_DIR}/application.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- 일자별 롤링 -->
-      <fileNamePattern>${LOG_DIR}application.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>${LOG_DIR}/application.%d{yyyy-MM-dd}.log</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
-    <encoder>
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <pattern>
-        <![CDATA[%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n]]></pattern>
+        <![CDATA[%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n]]>
+      </pattern>
     </encoder>
   </appender>
 
@@ -31,18 +44,17 @@
       <appender-ref ref="FILE"/>
     </root>
     <logger name="com.sprint.mission.discodeit" level="INFO"/>
-    <!--    <logger name="org.hibernate.SQL" level="DEBUG"/>-->
   </springProfile>
 
   <springProfile name="dev">
-    <root level="INFO">
+    <root level="TRACE">
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
     </root>
-    <logger name="com.sprint.mission.discodeit" level="DEBUG"/>
-    <!--    <logger name="org.hibernate.SQL" level="DEBUG"/>-->
+    <logger name="com.sprint.mission.discodeit" level="TRACE"/>
   </springProfile>
 
+  <!-- 기본 로깅 레벨 설정 -->
   <root level="INFO">
     <appender-ref ref="CONSOLE"/>
     <appender-ref ref="FILE"/>

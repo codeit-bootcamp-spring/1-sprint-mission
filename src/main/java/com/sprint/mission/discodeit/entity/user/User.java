@@ -2,15 +2,15 @@ package com.sprint.mission.discodeit.entity.user;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
-import com.sprint.mission.discodeit.entity.status.user.UserStatus;
+import com.sprint.mission.discodeit.entity.role.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.Duration;
-import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +33,8 @@ public class User extends BaseUpdatableEntity {
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private UserStatus status;
+  @Enumerated(EnumType.STRING)
+  private Role role;
 
   public void changeUserInfo(String username, String email, String password) {
     this.username = username;
@@ -42,20 +42,14 @@ public class User extends BaseUpdatableEntity {
     this.password = password;
   }
 
-  public void changeUserStatus(UserStatus userStatus) {
-    this.status = userStatus;
-    this.status.initUser(this);
+  public void changeRole(Role role) {
+    if (role != null) {
+      this.role = role;
+    }
   }
 
   public void changeProfile(BinaryContent profile) {
     this.profile = profile;
-  }
-
-  public boolean isThereHere() {
-    Instant now = Instant.now();
-    Duration between = Duration.between(status.getLastActiveAt(), now);
-
-    return !(between.toMinutes() >= 5);
   }
 
 }

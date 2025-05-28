@@ -11,10 +11,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.TestConfig;
 import com.sprint.mission.discodeit.dto.response.MessageDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.message.MessageContentUpdateRequest;
 import com.sprint.mission.discodeit.entity.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.security.AuthorizationChecker;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.UUID;
@@ -22,12 +25,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 
+@Import(TestConfig.class)
 @WebMvcTest(MessageController.class)
 class MessageControllerTest {
 
@@ -36,6 +41,9 @@ class MessageControllerTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @MockitoBean
+  private AuthorizationChecker authorizationChecker;
 
   @MockitoBean
   private MessageService messageService;
@@ -53,7 +61,7 @@ class MessageControllerTest {
         Instant.now(),
         "content",
         channelId,
-        new UserDto(authorId, "user", "user@mail.com", null, true),
+        new UserDto(authorId, "user", "user@mail.com", null, true, Role.ROLE_USER),
         null
     );
     when(messageService.create(any(MessageCreateRequest.class), isNull()))
@@ -100,7 +108,7 @@ class MessageControllerTest {
         Instant.now(),
         "content",
         channelId,
-        new UserDto(authorId, "user", "user@mail.com", null, true),
+        new UserDto(authorId, "user", "user@mail.com", null, true, Role.ROLE_USER),
         null
     );
     when(messageService.update(any(UUID.class), any(MessageContentUpdateRequest.class)))

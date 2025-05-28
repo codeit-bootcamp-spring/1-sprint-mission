@@ -89,7 +89,7 @@ public class ReadStatusService {
 
     if (findReadStatus.isPresent()) {
       throw new ReadStatusExistsException(Instant.now(), ErrorCode.EXIST_READ_STATUS,
-          Map.of(user.getStatus().getId().toString(), ErrorCode.EXIST_READ_STATUS.getMessage())
+          Map.of(ErrorCode.EXIST_READ_STATUS.getCode(), ErrorCode.EXIST_READ_STATUS.getMessage())
       );
     }
   }

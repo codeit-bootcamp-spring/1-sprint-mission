@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.TestConfig;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateResponse;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateRequest;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockPart;
@@ -34,6 +36,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 
+@Import(TestConfig.class)
 @WebMvcTest(UserController.class)
 class UserControllerTest {
 

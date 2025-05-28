@@ -40,6 +40,7 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelMapper mapper;
+  private final UserMapper userMapper;
 
   /**
    * 공개채널 생성
@@ -149,7 +150,7 @@ public class BasicChannelService implements ChannelService {
   private List<UserDto> getUsers(List<ReadStatus> readStatusList) {
 
     return readStatusList.stream()
-        .map(read -> UserMapper.toDto(read.getUser()))
+        .map(read -> userMapper.toDto(read.getUser()))
         .toList();
   }
 

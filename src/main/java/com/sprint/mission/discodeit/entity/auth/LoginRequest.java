@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.entity.auth;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record RequestLogin(
+public record LoginRequest(
 
     @NotBlank
     String username,

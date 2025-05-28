@@ -5,12 +5,19 @@ import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.service.status.UserSessionService;
 import java.time.Instant;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class UserMapper {
 
-  public static UserDto toDto(User user) {
+  private final UserSessionService userSessionService;
+
+  public UserDto toDto(User user) {
     if (user == null) {
       throw new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
           Map.of(ErrorCode.USER_NOT_FOUND.getCode(), ErrorCode.USER_NOT_FOUND.getMessage())
@@ -19,6 +26,9 @@ public class UserMapper {
 
     BinaryContentDto binaryContentDto = BinaryContentMapper.toDto(user.getProfile());
 
-    return new UserDto(user.getId(), user.getUsername(), user.getEmail(), binaryContentDto, true);
+    return new UserDto(user.getId(), user.getUsername(), user.getEmail(), binaryContentDto,
+        userSessionService.isOnline(user.getUsername()),
+        user.getRole());
   }
+
 }

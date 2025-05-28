@@ -9,10 +9,16 @@ import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class MessageMapper {
 
-  public static MessageDto toDto(Message message) {
+  private final UserMapper userMapper;
+
+  public MessageDto toDto(Message message) {
     if (message == null) {
       throw new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND,
           Map.of(ErrorCode.MESSAGE_NOT_FOUND.getCode(), ErrorCode.MESSAGE_NOT_FOUND.getMessage())
@@ -23,7 +29,7 @@ public class MessageMapper {
         .map(BinaryContentMapper::toDto)
         .toList();
 
-    UserDto author = UserMapper.toDto(message.getAuthor());
+    UserDto author = userMapper.toDto(message.getAuthor());
 
     return new MessageDto(
         message.getId(),
