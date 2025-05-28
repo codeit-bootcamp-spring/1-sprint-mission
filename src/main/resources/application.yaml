@@ -18,6 +18,13 @@ spring:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+  jwt:
+    issuer: discodeit-yudility
+    access-token:
+      validity-seconds: 900  # 15분
+    refresh-token:
+      validity-seconds: 2592000  # 30일
+    secret: ${JWT_SECRET:dev-secret-key-must-be-at-least-32-characters-long}
 
 springdoc:
   api-docs:
@@ -49,13 +56,7 @@ cloud:
     s3:
       bucket: ${AWS_S3_BUCKET}
 
-jwt:
-  issuer: discodeit-yudility
-  access-token:
-    validity-seconds: 900  # 15분
-  refresh-token:
-    validity-seconds: 2592000  # 30일
-  secret: ${JWT_SECRET:dev-secret-key-must-be-at-least-32-characters-long}
+
 
 logging:
   level:
