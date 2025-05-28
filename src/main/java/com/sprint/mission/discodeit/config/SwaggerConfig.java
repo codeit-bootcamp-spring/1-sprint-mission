@@ -16,7 +16,7 @@ public class SwaggerConfig {
         .info(new Info()
             .title("Discodeit API 문서")
             .description("Discodeit 프로젝트의 Swagger API 문서입니다.")
-            .version("1.2")
+            .version("2.0")
         )
         .servers(List.of(
             new Server().url("http://localhost:8080").description("로컬 서버")
