@@ -8,14 +8,26 @@ import lombok.Getter;
 @Getter
 public class DiscodeitException extends RuntimeException {
 
-  private final ErrorCode errorCode;
-  private final Instant timestamp;
-  private final Map<String, Object> details = new HashMap<>();
+  private ErrorCode errorCode;
+  private Instant timestamp;
+  private Map<String, Object> details;
 
 
   public DiscodeitException(ErrorCode errorCode) {
     super(errorCode.getMessage());
-    this.errorCode = errorCode;
     this.timestamp = Instant.now();
+    this.errorCode = errorCode;
+    this.details = new HashMap<>();
+  }
+
+  public DiscodeitException(ErrorCode errorCode, Throwable cause) {
+    super(errorCode.getMessage(), cause);
+    this.timestamp = Instant.now();
+    this.errorCode = errorCode;
+    this.details = new HashMap<>();
+  }
+
+  public void addDetail(String key, Object value) {
+    this.details.put(key, value);
   }
 }

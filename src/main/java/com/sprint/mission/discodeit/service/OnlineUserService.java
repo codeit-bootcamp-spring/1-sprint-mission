@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.CustomUserDetails;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,7 @@ public class OnlineUserService {
 
     // 해당 사용자의 Principal 찾기
     for (Object principal : allPrincipals) {
-      if (principal instanceof CustomUserDetails) {
-        CustomUserDetails userDetails = (CustomUserDetails) principal;
+      if (principal instanceof DiscodeitUserDetails userDetails) {
         if (user.getUsername().equals(userDetails.getUsername())) {
           // 해당 사용자의 활성 세션이 있는지 확인
           List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);

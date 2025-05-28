@@ -1,15 +1,16 @@
 package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.CustomPermissionEvaluator;
-import com.sprint.mission.discodeit.dto.CustomUserDetails;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.filter.CustomAuthenticationFilter;
-import com.sprint.mission.discodeit.filter.CustomLogoutFilter;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.security.CustomPermissionEvaluator;
+import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
+import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.filter.JwtAuthFilter;
 
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import com.sprint.mission.discodeit.security.SecurityMatchers;
+import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,7 +100,19 @@ public class SecurityConfig {
   }
 
   @Bean
-  public PersistentTokenBasedRememberMeServices rememberMeServices() {
+  public PersistentTokenBasedRememberMeServices rememberMeServices(
+      @Value("${security.remember-me.key}") String key,
+      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+      DataSource dataSource,
+      UserDetailsService userDetailsService
+  ) {
+
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(dataSource);
+    tokenRepository.setCreateTableOnStartup(false);
+    // 최초 구동 시 true로 설정하면 테이블 자동 생성
+    // 테이블 생성 후 false로 변경하는게 안전
+
     PersistentTokenBasedRememberMeServices rememberMeServices =
         new PersistentTokenBasedRememberMeServices("discodeitSecretKey123",
             userDetailsService(), persistentTokenRepository());
@@ -109,7 +122,6 @@ public class SecurityConfig {
 
     return rememberMeServices;
   }
-
 
   @Bean
   public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
@@ -160,9 +172,14 @@ public class SecurityConfig {
 
   @Bean
   public RoleHierarchy roleHierarchy() {
-    return RoleHierarchyImpl.fromHierarchy("""
-        ROLE_ADMIN > ROLE_CHANNEL_MANAGER > ROLE_USER
-        """);
+    return RoleHierarchyImpl.withDefaultRolePrefix()
+        .role(Role.ADMIN.name())
+        .implies(Role.USER.name(), Role.CHANNEL_MANAGER.name())
+
+        .role(Role.CHANNEL_MANAGER.name())
+        .implies(Role.USER.name())
+
+        .build();
   }
 
   @Bean
@@ -209,82 +226,19 @@ public class SecurityConfig {
 
   //역할: HTTP 요청에서 사용자명과 비밀번호를 추출하여 인증 처리
   @Bean
-  public UsernamePasswordAuthenticationFilter authenticationFilter(
-      AuthenticationManager authenticationManager) throws Exception {
-
-    //UsernamePasswordAuthenticationFilter 주요 기능:
-    // - 요청에서 사용자명/비밀번호 파라미터 추출 --> 하지만 우리는 form로그인이 아니기 때문에 직접 Json에서 추출해야함
-    // - UsernamePasswordAuthenticationToken 생성
-    // - AuthenticationManager에 인증 위임
-    // - 인증 성공/실패 핸들러 호출
-    // - 성공 시 SecurityContext에 인증 정보 저장
-
-    CustomAuthenticationFilter filter = new CustomAuthenticationFilter();
-    filter.setAuthenticationManager(authenticationManager);
-    filter.setFilterProcessesUrl("/api/auth/login");
-
-    // SessionAuthenticationStrategy 설정 추가
-    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
-
-    // Remember-Me 서비스 설정
-    filter.setRememberMeServices(rememberMeServices());
-
-    filter.setAuthenticationSuccessHandler((request, response, authentication) -> {
-      // 성공 처리 로직
-
-      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-      User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
-          () -> new UsernameNotFoundException("사용자를 찾을 수 없습니다.")
-      );
-
-      // SecurityContext에 명시적으로 Authentication 저장
-      SecurityContext context = SecurityContextHolder.createEmptyContext();
-      context.setAuthentication(authentication);
-      SecurityContextHolder.setContext(context);
-
-      // 세션에 SecurityContext 저장
-      HttpSession session = request.getSession(true);
-      session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-          context);
-
-      // Remember-Me 토큰 생성 및 저장
-      rememberMeServices().loginSuccess(request, response, authentication);
-      log.info("Remember-Me 토큰 생성 시도");
-
-      response.setContentType("application/json");
-      response.setCharacterEncoding("UTF-8");
-
-      //순환참조 피하기위해 UserDto 구조에 맞게 Map으로 응답 데이터 구성
-      Map<String, Object> responseData = new HashMap<>();
-      responseData.put("id", user.getId());
-      responseData.put("username", user.getUsername());
-      responseData.put("email", user.getEmail());
-      responseData.put("online", true); // 로그인 직후이므로 true
-      responseData.put("profile", user.getProfile() != null ?
-          Map.of("id", user.getProfile().getId()) : null); // BinaryContentDto 간단히 처리
-      responseData.put("role", user.getRole());
-
-      response.getWriter()
-          .write(new ObjectMapper().writeValueAsString(responseData));
-    });
-    filter.setAuthenticationFailureHandler((request, response, exception) -> {
-      // Remember-Me 실패 처리
-      rememberMeServices().loginFail(request, response);
-
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.setContentType("application/json");
-      response.getWriter().write("{\"status\":\"failure\"}");
-    });
-    return filter;
+  public String debugFilterChain(SecurityFilterChain chain) {
+    log.debug("Debug Filter Chain...");
+    int filterSize = chain.getFilters().size();
+    IntStream.range(0, filterSize)
+        .forEach(idx -> {
+          log.debug("[{}/{}] {}", idx + 1, filterSize, chain.getFilters().get(idx));
+        });
+    return "debugFilterChain";
   }
 
   @Bean
   public SecurityFilterChain chain(HttpSecurity http)
       throws Exception {
-
-    //SSR 방식이었다면 아래 세션기반의 토큰 레포지토리를 사용하면되지만, Discodeit은 CSR방식을 사용
-    CookieCsrfTokenRepository tokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
 
     http
         .authorizeHttpRequests(auth -> auth

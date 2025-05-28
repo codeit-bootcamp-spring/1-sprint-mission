@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.security;
 
-import com.sprint.mission.discodeit.dto.CustomUserDetails;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
@@ -63,8 +62,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
   }
 
   private boolean checkUserPermission(Authentication authentication, User user, String permission) {
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    UUID currentUserId = userDetails.getUserId();
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
+    UUID currentUserId = userDetails.getUserDto().id();
 
     return switch (permission.toUpperCase()) {
       case "UPDATE", "DELETE" -> {
@@ -81,8 +80,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
   private boolean checkUserPermissionById(Authentication authentication, Serializable targetId,
       String permission) {
     UUID userId = UUID.fromString(targetId.toString());
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    UUID currentUserId = userDetails.getUserId();
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
+    UUID currentUserId = userDetails.getUserDto().id();
 
     return switch (permission.toUpperCase()) {
       case "UPDATE", "DELETE" -> {
@@ -99,8 +98,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
   private boolean checkReadStatusPermissionById(Authentication authentication,
       Serializable targetId, String permission) {
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    UUID currentUserId = userDetails.getUserId();
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
+    UUID currentUserId = userDetails.getUserDto().id();
 
     return switch (permission.toUpperCase()) {
       case "UPDATE" -> {
@@ -121,8 +120,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
   //readStatus 권한 확인
   private boolean checkReadStatusPermission(Authentication authentication, ReadStatus readStatus,
       String permission) {
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    UUID currentUserId = userDetails.getUserId();
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
+    UUID currentUserId = userDetails.getUserDto().id();
 
     return switch (permission.toUpperCase()) {
       case "CREATE", "UPDATE" -> // 생성, 수정은 본인만 가능
@@ -134,7 +133,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
   //Message 객체가 있을때 사용하는 메서드
   private boolean checkMessagePermission(Authentication authentication, Message message,
       String permission) {
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
     String currentUsername = userDetails.getUsername();
 
     return switch (permission.toUpperCase()) {
@@ -155,8 +154,8 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
   private boolean checkMessagePermissionById(Authentication authentication, Serializable targetId,
       String permission) {
     UUID messageId = UUID.fromString(targetId.toString());
-    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    UUID currentUserId = userDetails.getUserId();
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
+    UUID currentUserId = userDetails.getUserDto().id();
 
     return switch (permission.toUpperCase()) {
       case "READ" -> messageRepository.existsById(messageId); // 메시지가 존재하면 읽기 가능

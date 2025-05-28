@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.event;
 
-import com.sprint.mission.discodeit.dto.CustomUserDetails;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +17,7 @@ import org.springframework.stereotype.Component;
 public class AuthEventListener {
 
   private final SessionRegistry sessionRegistry;
-
-  private final UserRepository userRepository;
+  private final JwtService jwtService;
 
   @EventListener
   @Async
@@ -35,8 +34,7 @@ public class AuthEventListener {
     // SessionRegistry가 "사용자 검색" 기능까지 가지면 책임이 너무 많아지기 때문에, 구현되어있지 않음.
     // 따라서 모든 principal을 순회하면서 찾아야한다. --> 대용량 서비스에서는 Redis를 사용하는 이유.
     for (Object principal : allPrincipals) {
-      if (principal instanceof CustomUserDetails) {
-        CustomUserDetails userDetails = (CustomUserDetails) principal;
+      if (principal instanceof DiscodeitUserDetails userDetails) {
 
         if (username.equals(userDetails.getUsername())) {
           log.info("대상 사용자 발견: username = {}", username);
@@ -52,6 +50,10 @@ public class AuthEventListener {
         }
       }
     }
+    jwtService.invalidateRefreshToken(username);
+    //강제 로그아웃 하더라도 해당 유저가 새로고침하지 않는다면,
+    // 엑세스 토큰의 유효기간 동안은 이전의 권한으로 여전히 API 요청을 할 수 있습니다.
+    // 이 버그에 대해서는 심화 요구사항을 수행하면서 해결합니다.
   }
 
 }

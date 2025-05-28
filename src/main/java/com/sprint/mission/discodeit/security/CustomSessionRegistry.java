@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.security;
 
-import com.sprint.mission.discodeit.dto.CustomUserDetails;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,8 +15,7 @@ public class CustomSessionRegistry extends SessionRegistryImpl {
   public void registerNewSession(String sessionId, Object principal) {
     super.registerNewSession(sessionId, principal);
 
-    if (principal instanceof CustomUserDetails) {
-      CustomUserDetails userDetails = (CustomUserDetails) principal;
+    if (principal instanceof DiscodeitUserDetails userDetails) {
       usernameToPrincipal.put(userDetails.getUsername(), principal);
     }
   }
