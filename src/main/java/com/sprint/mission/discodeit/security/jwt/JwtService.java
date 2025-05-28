@@ -236,7 +236,7 @@ public class JwtService {
   /**
    * Claims 객체에서 userDto 클레임 파싱하여 UserDto 객체로 변환
    **/
-  private Optional<UserDto> getUserDtoFromToken(String token) {
+  public Optional<UserDto> getUserDtoFromToken(String token) {
     if (token == null || token.trim().isEmpty()) {
       return Optional.empty();
     }

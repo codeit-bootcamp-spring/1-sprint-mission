@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.security.filter.CustomLoginFilter;
 import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
 import com.sprint.mission.discodeit.security.handler.LoginFailureHandler;
 import com.sprint.mission.discodeit.security.handler.LoginSuccessHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -94,7 +95,7 @@ public class SecurityConfig {
 
   @Bean
   public JwtAuthenticationFilter jwtAuthenticationFilter() { // 다음 단계에서 필터 구현
-    return new JwtAuthenticationFilter(jwtService);
+    return new JwtAuthenticationFilter(jwtService, userDetailsService);
   }
 
 //  @Bean
@@ -141,7 +142,9 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain chain(
-      HttpSecurity http, CookieCsrfTokenRepository cookieCsrfTokenRepository)
+      HttpSecurity http,
+      CookieCsrfTokenRepository cookieCsrfTokenRepository,
+      JwtAuthenticationFilter jwtAuthenticationFilter)
       throws Exception {
 
     // formLogin 비활성화
@@ -181,6 +184,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").hasRole("USER")
                 .anyRequest().authenticated()
         )
+        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         // X-Frame-Options 를 SAMEORIGIN 설정 (H2 콘솔 프레임 허용)
         .headers(headers -> headers
             .frameOptions(
