@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sprint.mission.discodeit.config.JpaConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,9 +74,6 @@ public class UserRepositoryTest {
 
     assertThat(foundUser.getProfile()).isNotNull();
     assertThat(foundUser.getProfile().getFileName()).isEqualTo(user.getUsername() + ".png");
-
-    assertThat(foundUser.getStatus()).isNotNull();
-    assertThat(foundUser.getStatus().getUser().getUsername()).isEqualTo(user.getUsername());
   }
 
   @Test
@@ -108,7 +105,6 @@ public class UserRepositoryTest {
     assertThat(users).hasSize(2);
     users.forEach(u -> {
       assertThat(u.getProfile()).isNotNull();
-      assertThat(u.getStatus()).isNotNull();
     });
   }
 
@@ -137,8 +133,6 @@ public class UserRepositoryTest {
     assertThat(users).containsExactlyInAnyOrder(u1);
     users.forEach(u -> {
       assertThat(u.getProfile()).isNotNull();
-      assertThat(u.getStatus()).isNotNull();
-      assertThat(u.getStatus().getUser()).isEqualTo(u1);
     });
   }
 
@@ -153,7 +147,7 @@ public class UserRepositoryTest {
 
     assertThat(found).isPresent();
     assertThat(found.get().getProfile().getFileName()).isEqualTo("frank.png");
-    assertThat(found.get().getStatus().getUser().getUsername()).isEqualTo("frank");
+
   }
 
   @Test
@@ -166,12 +160,9 @@ public class UserRepositoryTest {
   private User persistUser(String username) {
     BinaryContent profile = new BinaryContent(username + ".png", 1024L, "image/png");
     User user = new User(username, username + "@test.com", "pw", profile, null);
-    UserStatus status = UserStatus.create(user);
-    user.updateStatus(status);
 
     em.persist(profile);
     em.persist(user);
-    em.persist(status);
 
     return user;
   }

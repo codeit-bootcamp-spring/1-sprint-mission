@@ -29,7 +29,7 @@ public enum ErrorCode {
 
   READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ-STATUS-001", "Could Not Find ReadStatus."),
 
-  USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-STATUS-001", "Could Not Find UserStatus.");
+  ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "AUTH-001", "Not Authorized To Perform This Action.");
 
 
   private final HttpStatus status;

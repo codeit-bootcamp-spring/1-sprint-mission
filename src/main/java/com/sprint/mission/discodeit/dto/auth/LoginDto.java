@@ -6,7 +6,8 @@ public record LoginDto(
     @NotBlank(message = "Empty username not allowed")
     String username,
     @NotBlank(message = "Empty password not allowed")
-    String password
+    String password,
+    Boolean rememberMe
 ) {
 
 }

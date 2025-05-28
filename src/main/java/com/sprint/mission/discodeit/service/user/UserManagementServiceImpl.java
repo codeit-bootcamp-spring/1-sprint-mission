@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.user;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.file.FileException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
@@ -29,7 +28,6 @@ public class UserManagementServiceImpl implements UserManagementService {
   @Override
   @Transactional
   public User createUser(User user, MultipartFile profile) {
-    setStatusToUser(user);
     if (profile != null && !profile.isEmpty()) {
       withProfile(user, profile);
     }
@@ -73,11 +71,6 @@ public class UserManagementServiceImpl implements UserManagementService {
     if (user.getProfile() != null) {
       binaryContentService.delete(String.valueOf(user.getProfile().getId()));
     }
-  }
-
-  private void setStatusToUser(User user) {
-    UserStatus status = UserStatus.create(user);
-    user.updateStatus(status);
   }
 
 

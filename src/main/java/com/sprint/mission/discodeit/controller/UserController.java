@@ -13,6 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -73,10 +76,11 @@ public class UserController implements UserApiDocs {
   public ResponseEntity<UserResponseDto> updateUser(
       @PathVariable String id,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
-      @Valid @RequestPart(value = "userUpdateRequest") UserUpdateDto updateDto
+      @Valid @RequestPart(value = "userUpdateRequest") UserUpdateDto updateDto,
+      @AuthenticationPrincipal UserDetails userDetails
   ) {
 
-    UserResponseDto user = userFacade.updateUser(id, profile, updateDto);
+    UserResponseDto user = userFacade.updateUser(id, profile, updateDto, userDetails);
     return ResponseEntity.ok(user);
   }
 

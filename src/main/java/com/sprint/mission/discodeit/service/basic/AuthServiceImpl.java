@@ -1,21 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
 
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.user.UserException;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.auth.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.util.PasswordEncryptor;
-import java.time.Instant;
-import java.util.Map;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -23,32 +17,44 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-  private final UserRepository userRepository;
-  private final UserMapper userMapper;
+  private final SessionRegistry sessionRegistry;
 
   @Override
-  @Transactional
-  public UserResponseDto login(String username, String password) {
+  public void forceLogout(UUID userId) {
+    List<Object> principals = sessionRegistry.getAllPrincipals();
 
-    User targetUser = userRepository.findByUsernameWithProfileAndStatus(username)
-        .orElseThrow(() -> {
-              log.debug("[LOGIN FAILED] : [USER WITH USERNAME {} NOT FOUND]", username);
-              return new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("username", username));
-            }
-
-        );
-
-    if (!PasswordEncryptor.checkPassword(password, targetUser.getPassword())) {
-      log.debug("[LOGIN FAILED] : [PASSWORD DOES NOT MATCH FOR USER: {}]", username);
-      throw new UserException(ErrorCode.PASSWORD_MATCH_ERROR, Map.of("username", username));
+    for (Object principal : principals) {
+      if (principal instanceof DiscodeitUserDetails userDetails && userDetails.getUser().getId()
+          .equals(userId)) {
+        List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);
+        for (SessionInformation session : sessions) {
+          session.expireNow();
+        }
+      }
     }
+  }
 
-    targetUser.getStatus().updateLastOnline(Instant.now());
-    userRepository.save(targetUser);
-
-    log.debug("[LOGIN SUCCESS] [USERNAME : {}]", username);
-
-    return userMapper.toDto(targetUser);
+  @Override
+  public void printSessions() {
+    List<Object> principals = sessionRegistry.getAllPrincipals();
+    System.out.println("PRINTING SESSIONS: \n");
+    for (Object principal : principals) {
+      if (principal instanceof DiscodeitUserDetails userDetails) {
+        List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);
+        boolean hasActiveSession = sessions.stream().anyMatch(s -> !s.isExpired());
+        if (hasActiveSession) {
+          System.out.println("User ID: " + userDetails.getUser().getId());
+          System.out.println("Username: " + userDetails.getUsername());
+          System.out.println("Active Sessions:");
+          for (SessionInformation session : sessions) {
+            System.out.println(" - Session ID: " + session.getSessionId());
+            System.out.println("   Last Request: " + session.getLastRequest());
+            System.out.println("   Expired: " + session.isExpired());
+          }
+        }
+      }
+    }
+    System.out.println("FINISHED PRINTING SESSIONS: \n");
 
   }
 }

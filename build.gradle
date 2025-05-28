@@ -80,6 +80,9 @@ dependencies {
     testImplementation 'org.testcontainers:localstack:1.20.6'
     testImplementation 'org.testcontainers:junit-jupiter:1.20.6'
 
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+
 }
 
 tasks.named('test') {

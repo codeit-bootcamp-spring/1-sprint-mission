@@ -19,15 +19,15 @@ CREATE TABLE users
 );
 
 
+-- CREATE TABLE user_statuses
+-- (
+--     id             UUID PRIMARY KEY,
+--     created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+--     updated_at     TIMESTAMP WITH TIME ZONE,
+--     user_id        UUID                     NOT NULL UNIQUE REFERENCES users (id) ON DELETE CASCADE,
+--     last_active_at TIMESTAMP WITH TIME ZONE NOT NULL
+-- );
 
-CREATE TABLE user_statuses
-(
-    id             UUID PRIMARY KEY,
-    created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at     TIMESTAMP WITH TIME ZONE,
-    user_id        UUID                     NOT NULL UNIQUE REFERENCES users (id) ON DELETE CASCADE,
-    last_active_at TIMESTAMP WITH TIME ZONE NOT NULL
-);
 
 CREATE TABLE channels
 (
@@ -67,3 +67,17 @@ CREATE TABLE message_attachments
     PRIMARY KEY (message_id, attachment_id)
 );
 
+<<<<<<< HEAD
+
+ALTER TABLE users
+    ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER';
+
+CREATE TABLE persistent_logins
+(
+    username  varchar(64) not null,
+    series    varchar(64) primary key,
+    token     varchar(64) not null,
+    last_used timestamp   not null
+)
+=======
+>>>>>>> upstream/part3-허지웅

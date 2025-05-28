@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+
+import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
+
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
@@ -62,12 +65,6 @@ public class BasicUserService implements UserService {
 
     List<UUID> userUuids = parseStringToUuid(userIds);
 
-    // TODO : 상세 exception message 작성
-//    if (userUuids.isEmpty()) {
-//      log.warn("[ATTEMPT TO CREATE PRIVATE CHANNEL WITH NO USER]");
-//      throw new DiscodeitException(ErrorCode.DEFAULT_ERROR_MESSAGE);
-//    }
-
     return userRepository.findAllByIdIn(userUuids);
   }
 
@@ -112,4 +109,17 @@ public class BasicUserService implements UserService {
     return userUuids;
 
   }
+
+
+  @Override
+  @Transactional
+  public User updateUserRole(RoleUpdateRequest request) {
+    User user = userRepository.findById(request.userId())
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+    user.updateUserRole(request.newRole());
+
+    return user;
+  }
+
 }

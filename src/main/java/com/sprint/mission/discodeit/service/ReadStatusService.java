@@ -6,9 +6,13 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface ReadStatusService {
-  ReadStatus create(CreateReadStatusDto dto);
+
+  ReadStatus create(CreateReadStatusDto dto, UserDetails details);
+
+
   ReadStatus find(String id);
 
   List<ReadStatus> findAllByUserId(String userId);
@@ -17,6 +21,7 @@ public interface ReadStatusService {
 
   List<ReadStatus> findAllByChannelId(String channelId);
 
-  ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id);
+  ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id, UserDetails details);
+
 
 }

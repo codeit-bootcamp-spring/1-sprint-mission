@@ -16,6 +16,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,22 +65,24 @@ public class MessageController {
 
   //  @Override
   @PatchMapping("/messages/{messageId}")
-
   public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId,
-      @Valid @RequestBody MessageUpdateDto messageDto) {
+      @Valid @RequestBody MessageUpdateDto messageDto,
+      @AuthenticationPrincipal UserDetails userDetails) {
 
     log.debug("[MESSAGE UPDATE REQUEST] : [ID : {}]", messageId);
 
-    MessageResponseDto message = messageFacade.updateMessage(messageId, messageDto);
+    MessageResponseDto message = messageFacade.updateMessage(messageId, messageDto, userDetails);
+
     return ResponseEntity.ok(message);
   }
 
   //  @Override
   @DeleteMapping("/messages/{messageId}")
-  public ResponseEntity<Void> deleteMessage(@PathVariable String messageId) {
+  public ResponseEntity<Void> deleteMessage(@PathVariable String messageId,
+      @AuthenticationPrincipal UserDetails details) {
 
     log.debug("[DELETE MESSAGE REQUEST] : [ID : {}]", messageId);
-    messageFacade.deleteMessage(messageId);
+    messageFacade.deleteMessage(messageId, details);
     log.debug("[DELETED MESSAGE] : [ID : {}]", messageId);
     return ResponseEntity.noContent().build();
   }

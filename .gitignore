@@ -42,7 +42,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-
 .env
 *.jar
 
@@ -54,4 +53,7 @@ discodeit.env.encrypted
 
 /logs/**
 
+/.env
+
+/src/test/resources/.env
 

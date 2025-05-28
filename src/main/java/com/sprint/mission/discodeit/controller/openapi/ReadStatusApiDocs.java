@@ -11,9 +11,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
 
 @Tag(name = "ReadStatus API", description = "Message 읽음 상태 작업")
 public interface ReadStatusApiDocs {
@@ -38,7 +41,9 @@ public interface ReadStatusApiDocs {
           )
       )
   })
-  ResponseEntity<ReadStatusResponseDto> createReadStatus(@Parameter(required = true, description = "ReadStatus 생성 정보") CreateReadStatusDto dto);
+  ResponseEntity<ReadStatusResponseDto> createReadStatus(
+      @Parameter(required = true, description = "ReadStatus 생성 정보") CreateReadStatusDto dto,
+      @AuthenticationPrincipal UserDetails details);
 
 
   @Operation(summary = "ReadStatus 업데이트")
@@ -55,7 +60,8 @@ public interface ReadStatusApiDocs {
   })
   ResponseEntity<ReadStatusResponseDto> updateReadStatus(
       @Parameter(required = true, description = "업데이트 ReadStatus UUID") String id,
-      @Parameter(required = true, description = "업데이트 정보") UpdateReadStatusDto dto);
+      @Parameter(required = true, description = "업데이트 정보") UpdateReadStatusDto dto,
+      @AuthenticationPrincipal UserDetails details);
 
 
   @Operation(summary = "User의 ReadStatus 목록")

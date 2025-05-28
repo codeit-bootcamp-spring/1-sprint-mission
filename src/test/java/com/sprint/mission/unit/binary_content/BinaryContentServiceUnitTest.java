@@ -98,7 +98,7 @@ public class BinaryContentServiceUnitTest {
         .willReturn(Optional.ofNullable(content));
     given(mapper.toDto(any()))
         .willReturn(mock(BinaryContentDto.class));
-    
+
     assertThatThrownBy(() -> binaryContentService.download(id.toString()))
         .isInstanceOf(FileException.class)
         .hasMessageContaining(ErrorCode.FILE_ERROR.getMessage());

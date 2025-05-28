@@ -14,6 +14,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -86,7 +90,9 @@ public interface UserApiDocs {
 
       @Parameter(description = "User UUID", required = true) String id,
       @Parameter(description = "User 프로필 이미지") MultipartFile profile,
-      @Parameter(description = "User 업데이트 정보 (JSON)") UserUpdateDto updateDto
+      @Parameter(description = "User 업데이트 정보 (JSON)") UserUpdateDto updateDto,
+      @AuthenticationPrincipal UserDetails userDetails
+
   );
 
   @Operation(summary = "User 삭제")

@@ -8,14 +8,23 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+
+import com.sprint.mission.discodeit.service.basic.PermissionService;
+
 import com.sprint.mission.discodeit.service.message.MessageManagementService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +37,9 @@ public class MessageFacadeImpl implements MessageFacade {
 
   private final MessageManagementService messageManagementService;
   private final MessageMapper messageMapper;
+
+  private final PermissionService permissionService;
+
 
   @Override
   @Transactional
@@ -71,14 +83,22 @@ public class MessageFacadeImpl implements MessageFacade {
 
   @Override
   @Transactional
-  public MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto) {
+  public MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto,
+      UserDetails userDetails) {
+
+    if (!permissionService.checkIsAuthor(userDetails, UUID.fromString(messageId))) {
+      throw new DiscodeitException(ErrorCode.ACCESS_DENIED);
+    }
+
     Message message = messageManagementService.updateMessage(messageId, messageDto.newContent());
     return messageMapper.toResponseDto(message);
   }
 
   @Override
   @Transactional
-  public void deleteMessage(String messageId) {
+  public void deleteMessage(String messageId,
+      UserDetails userDetails) {
+    permissionService.checkIsAdminOrAuthor(UUID.fromString(messageId), userDetails);
     messageManagementService.deleteMessage(messageId);
   }
 

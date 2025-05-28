@@ -9,7 +9,8 @@ spring:
 
 logging:
   level:
-    p6spy: DEBUG
-    root: DEBUG
+    p6spy: info
+    root: info
+
 server:
   port: 8080

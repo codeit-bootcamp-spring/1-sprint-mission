@@ -13,6 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,10 +39,9 @@ public class ReadStatusController implements ReadStatusApiDocs {
   @Override
   @PostMapping("/readStatuses")
   public ResponseEntity<ReadStatusResponseDto> createReadStatus(
-      @Valid @RequestBody CreateReadStatusDto dto) {
+      @Valid @RequestBody CreateReadStatusDto dto, @AuthenticationPrincipal UserDetails details) {
     ReadStatusResponseDto status = readStatusMapper.toReadStatusResponseDto(
-        readStatusService.create(dto));
-
+        readStatusService.create(dto, details));
     return ResponseEntity.status(HttpStatus.CREATED).body(status);
 
   }
@@ -46,8 +49,8 @@ public class ReadStatusController implements ReadStatusApiDocs {
   @Override
   @PatchMapping("/readStatuses/{id}")
   public ResponseEntity<ReadStatusResponseDto> updateReadStatus(@PathVariable String id,
-      @RequestBody UpdateReadStatusDto dto) {
-    ReadStatus status = readStatusService.updateById(dto, id);
+      @RequestBody UpdateReadStatusDto dto, @AuthenticationPrincipal UserDetails details) {
+    ReadStatus status = readStatusService.updateById(dto, id, details);
     return ResponseEntity.ok(readStatusMapper.toReadStatusResponseDto(status));
   }
 

@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.controller;
 
 
 import static org.mockito.BDDMockito.given;
+
+import static org.mockito.Mockito.mock;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -13,8 +16,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.security.auth.DiscodeitUserDetails;
+
 import com.sprint.mission.discodeit.service.facade.user.UserFacade;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -25,6 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+
+import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
@@ -48,7 +57,7 @@ public class UserControllerTest {
     String userId = UUID.randomUUID().toString();
     UserResponseDto mockResponse = new UserResponseDto(
         UUID.fromString(userId),
-        "testuser", "test@example.com", null, true);
+        "testuser", "test@example.com", null, true, UserRole.ROLE_USER);
 
     when(userFacade.findUserById(userId)).thenReturn(mockResponse);
 
@@ -89,7 +98,7 @@ public class UserControllerTest {
 
     String userId = UUID.randomUUID().toString();
     UserResponseDto dto = new UserResponseDto(UUID.fromString(userId), createUserRequest.username(),
-        createUserRequest.email(), null, true);
+        createUserRequest.email(), null, true, UserRole.ROLE_USER);
     given(userFacade.createUser(createUserRequest, profile)).willReturn(dto);
 
     mockMvc.perform(multipart("/api/users").file(userCreatePart).file(profile).contentType(
@@ -123,10 +132,10 @@ public class UserControllerTest {
   @DisplayName("GET /api/users - 성공(목록 조회)")
   void getUsers_success() throws Exception {
     UserResponseDto response1 = new UserResponseDto(
-        UUID.randomUUID(), "u1", "u1@gmail.com", null, true
+        UUID.randomUUID(), "u1", "u1@gmail.com", null, true, UserRole.ROLE_USER
     );
     UserResponseDto response2 = new UserResponseDto(
-        UUID.randomUUID(), "u2", "u2@gmail.com", null, true
+        UUID.randomUUID(), "u2", "u2@gmail.com", null, true, UserRole.ROLE_USER
     );
     List<UserResponseDto> users = List.of(response1, response2);
     when(userFacade.findAllUsers()).thenReturn(users);
@@ -158,10 +167,13 @@ public class UserControllerTest {
         updateDto.newUsername(),
         updateDto.newEmail(),
         null,
-        true
+        true,
+        UserRole.ROLE_USER
     );
 
-    given(userFacade.updateUser(userId, newProfile, updateDto))
+    UserDetails details = mock(DiscodeitUserDetails.class);
+
+    given(userFacade.updateUser(userId, newProfile, updateDto, details))
         .willReturn(response);
 
     MockMultipartHttpServletRequestBuilder builder = multipart("/api/users/" + userId);
