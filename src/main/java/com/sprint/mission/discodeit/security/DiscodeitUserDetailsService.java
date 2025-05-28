@@ -1,29 +1,31 @@
 package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DiscodeitUserDetailsService implements UserDetailsService {
 
   private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     log.debug("DiscodeitUserDetailsService 호출");
     User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new UserNotFoundException(Map.of("username", username)));
+        .orElseThrow(() -> new UsernameNotFoundException("username not matched: " + username));
 
-    return new DiscodeitUserDetails(user);
+    return new DiscodeitUserDetails(userMapper.toDto(user), user.getPassword());
   }
 }

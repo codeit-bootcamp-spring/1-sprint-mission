@@ -16,7 +16,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Table(name = "users")
@@ -34,17 +33,12 @@ public class User extends BaseUpdatableEntity {
   private String password;
 
   @Column(nullable = false)
-  @ColumnDefault("ROLE_USER")
+  @ColumnDefault("USER")
   @Enumerated(EnumType.STRING)
   private Role role;
 
-  public enum Role implements GrantedAuthority {
-    ROLE_ADMIN, ROLE_CHANNEL_MANAGER, ROLE_USER;
-
-    @Override
-    public String getAuthority() {
-      return this.name();
-    }
+  public enum Role {
+    ADMIN, CHANNEL_MANAGER, USER;
   }
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -59,7 +53,7 @@ public class User extends BaseUpdatableEntity {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.role = Role.ROLE_USER;
+    this.role = Role.USER;
   }
 
   public static User create(String username, String email, String password) {

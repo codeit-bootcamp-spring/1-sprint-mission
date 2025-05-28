@@ -8,14 +8,19 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -24,9 +29,31 @@ public class AuthService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final SessionRegistry sessionRegistry;
+  private final PasswordEncoder passwordEncoder;
 
-  public UserResponse toUserResponse(DiscodeitUserDetails principal) {
-    return userMapper.toDto(principal.getUser());
+  @Value("${discodeit.admin.username}")
+  private String adminUsername;
+  @Value("${discodeit.admin.email}")
+  private String adminEmail;
+  @Value("${discodeit.admin.password}")
+  private String adminPassword;
+
+  @PostConstruct
+  @Transactional
+  public UserResponse initAdmin() {
+    if (userRepository.existsByEmail(adminEmail) || userRepository.existsByUsername(adminUsername)) {
+      log.warn("이미 어드민이 존재합니다.");
+      return null;
+    }
+
+    String encodedPassword = passwordEncoder.encode(adminPassword);
+    User admin = User.create(adminUsername, adminEmail, encodedPassword);
+    admin.updateRole(Role.ADMIN);
+    userRepository.save(admin);
+
+    UserResponse adminDto = userMapper.toDto(admin);
+    log.info("어드민이 초기화되었습니다. {}", adminDto);
+    return adminDto;
   }
 
   @Transactional
@@ -41,10 +68,13 @@ public class AuthService {
     }
 
     sessionRegistry.getAllPrincipals().stream()
-        .filter(p -> p instanceof DiscodeitUserDetails userDetails &&
-            userDetails.getId().equals(userId))
-        .flatMap(p -> sessionRegistry.getAllSessions(p, false).stream())
-        .forEach(SessionInformation::expireNow);
+        .filter(principal -> ((DiscodeitUserDetails) principal).getUser().id().equals(userId))
+        .findFirst()
+        .ifPresent(principal -> {
+              sessionRegistry.getAllSessions(principal, false)
+                  .forEach(SessionInformation::expireNow);
+            }
+        );
 
     return userMapper.toDto(user);
   }

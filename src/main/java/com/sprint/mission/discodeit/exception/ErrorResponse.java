@@ -12,16 +12,25 @@ public record ErrorResponse(
     int status
 ) {
 
-  public static ErrorResponse of(
-      ErrorCode errorCode, Map<String, Object> details, String exceptionType
-  ) {
+  public static ErrorResponse fromException(Exception e, int status) {
     return new ErrorResponse(
         Instant.now(),
-        errorCode.name(),
-        errorCode.getMessage(),
-        details,
-        exceptionType,
-        errorCode.getStatus()
+        e.getClass().getSimpleName(),
+        e.getMessage(),
+        Map.of(),
+        e.getClass().getSimpleName(),
+        status
+    );
+  }
+
+  public static ErrorResponse fromDiscodeitException(DiscodeitException e) {
+    return new ErrorResponse(
+        e.getTimestamp(),
+        e.getErrorCode().name(),
+        e.getErrorCode().getMessage(),
+        e.getDetails(),
+        e.getClass().getSimpleName(),
+        e.getErrorCode().getStatus()
     );
   }
 }

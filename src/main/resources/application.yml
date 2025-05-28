@@ -14,6 +14,10 @@ spring:
       max-request-size: 30MB
 
 discodeit:
+  admin:
+    username: ${DISCODEIT_ADMIN_USERNAME}
+    email: ${DISCODEIT_ADMIN_EMAIL}
+    password: ${DISCODEIT_ADMIN_PASSWORD}
   storage:
     type: ${STORAGE_TYPE:local} # local | s3
     local:

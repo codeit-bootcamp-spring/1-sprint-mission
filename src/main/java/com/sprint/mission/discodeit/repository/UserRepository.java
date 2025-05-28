@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
   @Query("SELECT u FROM User u "
-      + "JOIN FETCH u.status "
+      + "left JOIN FETCH u.status "
       + "LEFT JOIN FETCH u.profile "
       + "WHERE u.id = :id")
   Optional<User> findByIdWithProfileAndStatus(@Param("id") UUID id);
@@ -22,7 +22,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   List<User> findAllWithProfileAndStatus();
 
   @Query("SELECT u FROM User u "
-      + "JOIN FETCH u.status "
+      + "LEFT JOIN FETCH u.status "
       + "LEFT JOIN FETCH u.profile "
       + "WHERE u.username = :username")
   Optional<User> findByUsername(@Param("username") String username);
