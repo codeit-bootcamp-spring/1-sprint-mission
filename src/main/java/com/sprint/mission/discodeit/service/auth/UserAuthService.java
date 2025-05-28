@@ -119,7 +119,7 @@ public class UserAuthService implements com.sprint.mission.discodeit.service.aut
             if (cookie.getName().equals("refresh_token")) {
               String value = cookie.getValue();
 
-              jwtService.invalidToken(value);
+              jwtService.invalidRefreshToken(value);
 
               Cookie kookie = new Cookie("refresh_token", null);
               kookie.setMaxAge(0);

@@ -25,4 +25,6 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, Long> {
   boolean existsByAccessToken(String accessToken);
 
   Optional<JwtSession> findFirstByUser_Id(UUID userId);
+
+  void deleteAllByAccessToken(String accessToken);
 }

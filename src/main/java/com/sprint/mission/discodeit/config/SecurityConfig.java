@@ -54,6 +54,7 @@ public class SecurityConfig {
   private final UserSessionService userSessionService;
   private final ApplicationEventPublisher eventPublisher;
   private final JwtService jwtService;
+  private final JwtSessionRepository jwtSessionRepository;
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -74,10 +75,11 @@ public class SecurityConfig {
         .addFilterAfter(
             new JwtLoginFilter(userRepository, new ProviderManager(daoAuthenticationProvider()),
                 jwtService,
+                jwtSessionRepository,
                 objectMapper,
                 userSessionService),
             UsernamePasswordAuthenticationFilter.class)
-        .addFilterAfter(new JwtAuthenticationFilter(jwtService),
+        .addFilterAfter(new JwtAuthenticationFilter(jwtService, jwtSessionRepository),
             UsernamePasswordAuthenticationFilter.class)
 //        .sessionManagement(session -> session
 //            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

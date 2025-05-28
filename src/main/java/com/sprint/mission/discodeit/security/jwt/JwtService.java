@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.exception.jwt.JwtTokenNotFoundException;
 import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -27,12 +28,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Getter
+@Transactional
 public class JwtService {
 
   private final JwtSessionRepository jwtSessionRepository;
@@ -125,6 +129,11 @@ public class JwtService {
           .parseSignedClaims(token);
 
       return true;
+    } catch (ExpiredJwtException e) {
+      log.info("토큰 만료:{}", token);
+      invalidAccessToken(token);
+      SecurityContextHolder.clearContext();
+      return false;
     } catch (Exception e) {
       log.warn("토큰 검증 실패: {}", token);
       throw new JwtInvalidationException(Instant.now(), ErrorCode.JWT_INVALID, Map.of(
@@ -141,6 +150,7 @@ public class JwtService {
    * @Description: refresh 토큰을 이용해서 jwt token 재발급
    **/
   public JwtSession reIssue(String token) {
+    log.info("access token 재발급 시도");
     checkToken(token);
 
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
@@ -183,12 +193,33 @@ public class JwtService {
    * @author : wongil
    * @Description: 토큰 무효화
    **/
-  public void invalidToken(String token) {
+  public void invalidRefreshToken(String token) {
     if (token != null) {
       jwtBlacklist.put(token, getExpire(token));
       log.info("토큰 블랙 리스트 추가 완료:{}", token);
 
       jwtSessionRepository.deleteAllByRefreshToken(token);
+      log.info("토큰 무효: {}", token);
+    }
+  }
+
+  public void invalidAccessToken(String token) {
+    if (token != null) {
+
+      LocalDateTime expire;
+      try {
+        expire = getExpire(token);
+      } catch (ExpiredJwtException e) {
+        expire = e.getClaims().getExpiration()
+            .toInstant()
+            .atZone(ZoneId.of("Asia/Seoul"))
+            .toLocalDateTime();
+      }
+
+      jwtBlacklist.put(token, expire);
+      log.info("토큰 블랙 리스트 추가 완료:{}", token);
+
+      jwtSessionRepository.deleteAllByAccessToken(token);
       log.info("토큰 무효: {}", token);
     }
   }

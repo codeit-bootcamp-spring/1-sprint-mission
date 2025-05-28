@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,12 +31,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtLoginFilter extends OncePerRequestFilter {
 
   private final UserRepository userRepository;
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
+  private final JwtSessionRepository jwtSessionRepository;
   private final ObjectMapper objectMapper;
   private final UserSessionService userSessionService;
 
@@ -53,6 +57,9 @@ public class JwtLoginFilter extends OncePerRequestFilter {
     DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authenticate.getPrincipal();
 
     UserDto dto = getUserDto(userDetails);
+    if (jwtSessionRepository.existsByUser_Id(dto.id())) {
+      jwtService.invalidTokenByUserId(dto.id());
+    }
 
     String accessToken = jwtService.generateAccessToken(dto);
     String refreshToken = jwtService.generateRefreshToken(dto);
@@ -67,6 +74,7 @@ public class JwtLoginFilter extends OncePerRequestFilter {
     cookie.setMaxAge((int) jwtService.getRefreshTokenExpiration() / 1000);
     response.addCookie(cookie);
 
+    log.info("로그인 성공:{}", dto.id());
   }
 
   public UserDto getUserDto(DiscodeitUserDetails userDetails) {

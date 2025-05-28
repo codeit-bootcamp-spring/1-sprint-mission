@@ -8,6 +8,7 @@ import lombok.Getter;
 public class DiscodeitException extends RuntimeException {
 
   public DiscodeitException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
+    super(errorCode.getMessage());
     this.timestamp = timestamp;
     this.errorCode = errorCode;
     this.details = details;

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.filter;
 
+import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtHeader;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.FilterChain;
@@ -8,16 +9,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
+  private final JwtSessionRepository jwtSessionRepository;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -27,13 +31,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     if (header != null && header.startsWith(JwtHeader.JWT_BEARER)) {
 
       String token = header.substring(7);
+
       if (jwtService.validate(token)) {
         Authentication authentication = jwtService.createAuthentication(token);
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info("인증 성공");
+      } else {
+        log.error("인증 실패");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
       }
-    } else {
-      response.setStatus(HttpStatus.UNAUTHORIZED.value());
     }
 
     filterChain.doFilter(request, response);
@@ -47,11 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       return true;
     }
 
-    if (path.startsWith("/api/auth/login") ||
-        path.startsWith("/api/auth/csrf-token") ||
-        path.startsWith("/api/auth/me") ||
-        path.startsWith("/api/auth/logout")
-    ) {
+    if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/csrf-token")
+        || path.startsWith("/api/auth/me") || path.startsWith("/api/auth/logout")) {
       return true;
     }
     return false;
