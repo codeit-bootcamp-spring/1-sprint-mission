@@ -134,4 +134,30 @@ public class AuthController {
           .body("인증 처리 중 오류가 발생했습니다: " + e.getMessage());
     }
   }
+
+  @PostMapping(value = "/logout")
+  public ResponseEntity<Void> logout(
+      @CookieValue(name = "refresh_token", required = false) String refreshTokenFromCookie,
+      HttpServletResponse response) {
+    if (refreshTokenFromCookie == null || refreshTokenFromCookie.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    try {
+      // 토큰 무효화
+      jwtService.revokeToken(refreshTokenFromCookie);
+      //쿠키 삭제
+      ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
+          .httpOnly(true)
+          .secure(true)
+          .sameSite("Strict")
+          .path("/api/auth/")
+          .maxAge(0) // 만료
+          .build();
+      response.addHeader("Set-Cookie", deleteCookie.toString());
+      return ResponseEntity.ok().build();
+    } catch (Exception e) {
+      log.warn("로그아웃 처리 중 오류 발생: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
 }

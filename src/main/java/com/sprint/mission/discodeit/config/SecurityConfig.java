@@ -188,15 +188,15 @@ public class SecurityConfig {
         // X-Frame-Options 를 SAMEORIGIN 설정 (H2 콘솔 프레임 허용)
         .headers(headers -> headers
             .frameOptions(
-                FrameOptionsConfig::sameOrigin))
-        // 로그아웃
-        .logout(logout -> logout
-            .logoutUrl("/api/auth/logout")
-            .invalidateHttpSession(true) // 세션 무효화 처리
-            .clearAuthentication(true) // securityContext 초기화
-            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-            .deleteCookies("remember-me-cookie", "JSESSIONID")
-        );
+                FrameOptionsConfig::sameOrigin));
+    // 로그아웃
+//        .logout(logout -> logout
+//            .logoutUrl("/api/auth/logout")
+//            .invalidateHttpSession(true) // 세션 무효화 처리
+//            .clearAuthentication(true) // securityContext 초기화
+//            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+//            .deleteCookies("remember-me-cookie", "JSESSIONID")
+//        );
 
 //    http
 //        .rememberMe(r -> r

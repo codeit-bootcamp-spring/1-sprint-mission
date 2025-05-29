@@ -285,14 +285,24 @@ public class JwtService {
   }
 
   /**
-   * Refresh Token 무효화
+   * Token 무효화
    **/
   public void revokeToken(UUID tokenId) {
     jwtSessionRepository.findById(tokenId)
         .ifPresent(token -> {
           token.updatedRevoked(true);
           jwtSessionRepository.save(token);
-          log.info("RefreshToken 무효화 성공: tokenId={}, user={}", tokenId, token.getId());
+          log.debug("Token 무효화 성공: tokenId={}, user={}", tokenId, token.getId());
+        });
+  }
+
+  public void revokeToken(String RefreshToken) {
+    jwtSessionRepository.findByRefreshToken(RefreshToken)
+        .ifPresent(token -> {
+          token.updatedRevoked(true);
+          jwtSessionRepository.save(token);
+          log.info("Token 무효화 성공");
+          log.debug("Token 무효화 성공: RefreshToken={}, user={}", RefreshToken, token.getId());
         });
   }
 }
