@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.security.MissingRefreshTokenException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -157,6 +159,41 @@ public class AuthController {
       return ResponseEntity.ok().build();
     } catch (Exception e) {
       log.warn("로그아웃 처리 중 오류 발생: {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @PostMapping(value = "/refresh")
+  public ResponseEntity<String> reissueToken(
+      @CookieValue(name = "refresh_token", required = false)
+      String refreshTokenFromCookie,
+      HttpServletResponse response) {
+    try {
+      Optional<JwtTokenDto> tokenDtoOptional = jwtService.reissueTokenWithRotation(
+          refreshTokenFromCookie);
+
+      if (tokenDtoOptional.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body("토큰 재발급에 실패했습니다.");
+      }
+
+      JwtTokenDto tokenDto = tokenDtoOptional.get();
+      // Refresh Token 쿠키에 저장
+      int maxAge = (int) ChronoUnit.SECONDS.between(LocalDateTime.now(),
+          // jwtService 에서 가져오거나 yml에서 값가져오는 걸로 변경할 수 있을듯
+          jwtSessionRepository.findByRefreshToken(tokenDto.refreshToken()).get()
+              .getRefreshTokenExpiresAt());
+      ResponseCookie cookie = ResponseCookie.from("refresh_token", tokenDto.refreshToken())
+          .httpOnly(true)
+          .secure(true)
+          .sameSite("Strict")
+          .path("/api/auth/")
+          .maxAge(maxAge)
+          .build();
+      response.addHeader("Set-Cookie", cookie.toString());
+      return ResponseEntity.ok(tokenDto.accessToken());
+    } catch (Exception e) {
+      log.error("토큰 재발급 중 오류 발생: {}", e.getMessage(), e);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }

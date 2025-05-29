@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.security.InvalidRefreshTokenException;
+import com.sprint.mission.discodeit.exception.security.JwtSessionNotFoundException;
+import com.sprint.mission.discodeit.exception.security.MissingRefreshTokenException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -17,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
@@ -165,21 +169,28 @@ public class JwtService {
    **/
   @Transactional
   public Optional<JwtTokenDto> reissueTokenWithRotation(String oldRefreshToken) {
+    // 토큰 유효성 검사 401
     if (oldRefreshToken == null || oldRefreshToken.trim().isEmpty()) {
-      log.info("RefreshToken | token is null? : {}, token is empty? : {}", oldRefreshToken == null,
+      log.warn("RefreshToken | token is null? : {}, token is empty? : {}", oldRefreshToken == null,
           oldRefreshToken.trim().isEmpty());
-      return Optional.empty();
+      throw new MissingRefreshTokenException(Map.of("oldRefreshToken", oldRefreshToken));
     }
+    if (!validateToken(oldRefreshToken)) {
+      log.warn("리프레시 토큰이 유효하지 않습니다.");
+      throw new InvalidRefreshTokenException(
+          Map.of("oldRefreshToken", oldRefreshToken)); // TODO 나중에 리팩토링하면서 토큰 반환 다 지우기
+    }
+
     // DB에서 oldRefreshToken를 가진 JwtSession 조회
     Optional<JwtSession> optionalJwtSession = jwtSessionRepository.findByRefreshToken(
         oldRefreshToken);
     if (optionalJwtSession.isEmpty()) {
       log.warn("RefreshToken을 DB에서 찾을 수 없습니다.");
-      return Optional.empty();
+      throw new JwtSessionNotFoundException(Map.of("oldRefreshToken", oldRefreshToken));
     }
     JwtSession oldSession = optionalJwtSession.get();
 
-    // 유효성 검사
+    // 세션 유효성 검사
     if (oldSession.isRevoked()) {
       log.warn("이미 취소된 토큰입니다.(id : {}) is Revoked? {}", oldSession.getId(), oldSession.isRevoked());
       return Optional.empty();
