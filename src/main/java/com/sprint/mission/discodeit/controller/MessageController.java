@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageApi;
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
@@ -8,7 +9,10 @@ import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.Interface.MessageService;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,11 +38,21 @@ public class MessageController implements MessageApi {
             @Valid @RequestPart("messageCreateRequest") CreateMessageRequestDto messageCreateRequest,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-        List<BinaryContentDto> attachmentRequests = attachments != null
-                ? attachments.stream()
-                .map(this::saveAttachment)
-                .collect(Collectors.toList())
-                : List.of();
+        List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
+                .map(files -> files.stream()
+                        .map(file -> {
+                            try {
+                                return new BinaryContentCreateRequest(
+                                        file.getOriginalFilename(),
+                                        file.getContentType(),
+                                        file.getBytes()
+                                );
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .toList())
+                .orElse(new ArrayList<>());
 
         MessageDto createdMessage = messageService.createMessage(messageCreateRequest,
                 attachmentRequests);

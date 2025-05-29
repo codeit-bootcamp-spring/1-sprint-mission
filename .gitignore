@@ -18,7 +18,10 @@ out/
 !**/src/test/**/out/
 application-prod.yaml
 .env
-*.logs
+*.log
+**/*.log
+logs/
+**/logs/
 ### Eclipse ###
 .apt_generated
 .classpath

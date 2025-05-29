@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.auth.SecurityUtil;
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.security.SecurityUtil;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
@@ -63,7 +64,7 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageDto createMessage(CreateMessageRequestDto request,
-            List<BinaryContentDto> binaryRequests) {
+            List<BinaryContentCreateRequest> binaryRequests) {
         log.info("메시지 생성 요청: channelId={}, authorId={}, 첨부파일 수={}, 내용={}",
                 request.getChannelId(), request.getAuthorId(), binaryRequests.size(),
                 request.getContent());
@@ -84,9 +85,9 @@ public class BasicMessageService implements MessageService {
                 .map(binaryRequest -> {
                     BinaryContent savedContent = binaryContentService.saveBinaryContent(
                             binaryRequest);
-                    binaryContentStorage.put(savedContent.getId(), binaryRequest.getBytes());
+                    binaryContentStorage.put(savedContent.getId(), binaryRequest.bytes());
                     log.debug("첨부파일 저장 완료: id={}, name={}", savedContent.getId(),
-                            binaryRequest.getFileName());
+                            binaryRequest.fileName());
                     return savedContent.getId();
                 })
                 .toList();

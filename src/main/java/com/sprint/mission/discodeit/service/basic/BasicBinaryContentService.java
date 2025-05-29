@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.file.FileNotFoundException;
@@ -27,58 +28,47 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-  private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentMapper binaryContentMapper;
 
-  @Override
-  @Transactional
-  public BinaryContent saveBinaryContent(BinaryContentDto dto) {
-    if (dto == null) {
-      log.warn("파일 저장 실패: DTO가 null입니다.");
-      throw new InvalidFileDataException();
+    @Override
+    @Transactional
+    public BinaryContent saveBinaryContent(BinaryContentCreateRequest dto) {
+        if (dto == null) {
+            log.warn("파일 저장 실패: DTO가 null입니다.");
+            throw new InvalidFileDataException();
+        }
+
+        BinaryContent binaryContent = new BinaryContent(
+                dto.fileName(),
+                dto.bytes().length,
+                dto.contentType()
+        );
+
+        BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+        log.info("파일 저장 완료: id={}, fileName={}, size={}bytes", savedContent.getId(),
+                savedContent.getFileName(), savedContent.getSize());
+        return savedContent;
     }
 
-    if (dto.getBytes() == null) {
-      log.warn("파일 저장 실패: 파일 바이트가 null입니다. fileName={}", dto.getFileName());
-      throw new InvalidFileDataException();
+
+    @Override
+    public BinaryContentDto find(UUID id) {
+        BinaryContentDto dto = binaryContentRepository.findById(id)
+                .map(binaryContentMapper::toDto)
+                .orElseThrow(FileNotFoundException::new);
+        return dto;
     }
 
-    Optional<BinaryContent> existing = binaryContentRepository.findById(dto.getId());
-    if (existing.isPresent()) {
-      log.info("이미 존재하는 파일 요청: id={}, fileName={}", dto.getId(), dto.getFileName());
-      return existing.get();
+    @Override
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> ids) {
+        return binaryContentRepository.findAllByIdIn(ids).stream().map(binaryContentMapper::toDto)
+                .toList();
     }
 
-    BinaryContent binaryContent = new BinaryContent(
-        dto.getFileName(),
-        dto.getBytes().length,
-        dto.getContentType()
-    );
-
-    BinaryContent savedContent = binaryContentRepository.save(binaryContent);
-    log.info("파일 저장 완료: id={}, fileName={}, size={}bytes", savedContent.getId(),
-        savedContent.getFileName(), savedContent.getSize());
-    return savedContent;
-  }
-
-
-  @Override
-  public BinaryContentDto find(UUID id) {
-    BinaryContentDto dto = binaryContentRepository.findById(id)
-        .map(binaryContentMapper::toDto)
-        .orElseThrow(FileNotFoundException::new);
-    return dto;
-  }
-
-  @Override
-  public List<BinaryContentDto> findAllByIdIn(List<UUID> ids) {
-    return binaryContentRepository.findAllByIdIn(ids).stream().map(binaryContentMapper::toDto)
-        .toList();
-  }
-
-  @Override
-  public void delete(UUID id) {
-    binaryContentRepository.findById(id).orElseThrow(FileNotFoundException::new);
-    binaryContentRepository.deleteById(id);
-  }
+    @Override
+    public void delete(UUID id) {
+        binaryContentRepository.findById(id).orElseThrow(FileNotFoundException::new);
+        binaryContentRepository.deleteById(id);
+    }
 }

@@ -24,10 +24,7 @@ logging:
   level:
     root: info
     org.hibernate.sql: DEBUG
-    org.springframework.security.web.csrf: TRACE
-    org.springframework.security.web.session: debug
-    org.springframework.security.session: debug
-    org.springframework.security.core.session: debug
+    org.springframework.security: debug
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.web: DEBUG
     org.springframework.web.servlet: DEBUG

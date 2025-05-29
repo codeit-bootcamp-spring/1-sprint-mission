@@ -4,14 +4,18 @@ import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.Interface.UserService;
-import com.sprint.mission.discodeit.service.basic.UserSessionService;
+import com.sprint.mission.discodeit.security.UserSessionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,7 +48,7 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.user.id")
+    @PreAuthorize("hasRole('ADMIN') or principal.user.id==#userId")
     @PatchMapping(value = "/{userId}", consumes = {
             MediaType.MULTIPART_FORM_DATA_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> updateUser(
@@ -58,7 +62,7 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == principal.user.id")
+    @PreAuthorize("hasRole('ADMIN') or principal.user.id==#userId")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);

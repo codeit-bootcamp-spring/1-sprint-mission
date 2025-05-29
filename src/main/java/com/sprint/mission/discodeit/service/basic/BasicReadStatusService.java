@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.auth.SecurityUtil;
+import com.sprint.mission.discodeit.security.SecurityUtil;
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service

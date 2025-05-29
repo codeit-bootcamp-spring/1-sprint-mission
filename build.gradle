@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.0-M9'
+version = '2.2-M10'
 
 java {
     toolchain {
@@ -32,6 +32,12 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.2'
     implementation 'software.amazon.awssdk:s3:2.31.7'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT 라이브러리
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

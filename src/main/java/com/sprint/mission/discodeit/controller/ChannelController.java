@@ -24,7 +24,7 @@ public class ChannelController implements ChannelApi {
     private final ChannelService channelService;
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @PostMapping("/public")
     public ResponseEntity<ChannelDto> createChannel(
             @Valid @RequestBody PublicChannelCreateRequestDto request) {
@@ -41,7 +41,7 @@ public class ChannelController implements ChannelApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId,
             @Valid @RequestBody ChannelUpdateRequestDto request) {
@@ -49,7 +49,7 @@ public class ChannelController implements ChannelApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @DeleteMapping("/{channelId}")
     public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
         channelService.deleteChannel(channelId);

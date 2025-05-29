@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.auth;
+package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -22,7 +22,15 @@ public class AdminInitializer implements ApplicationRunner {
             user.setUsername("admin");
             user.setEmail("admin@example.com");
             user.setPassword(passwordEncoder.encode("admin1234!@"));
-            user.setRole(Role.ROLE_ADMIN);
+            user.setRole(Role.ADMIN);
+            userRepository.save(user);
+        }
+        if (userRepository.findByEmail("user@example.com").isEmpty()) {
+            User user = new User();
+            user.setUsername("우디");
+            user.setEmail("user@example.com");
+            user.setPassword(passwordEncoder.encode("123qwe!@"));
+            user.setRole(Role.CHANNEL_MANAGER);
             userRepository.save(user);
         }
     }
