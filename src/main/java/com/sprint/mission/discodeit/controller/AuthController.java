@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenDto;
 import com.sprint.mission.discodeit.service.basic.AuthService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +21,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
@@ -30,6 +32,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,10 +59,29 @@ public class AuthController {
     return ResponseEntity.ok(token);
   }
 
+/*
   @GetMapping(value = "/me")
   public ResponseEntity<UserDto> me() {
     return ResponseEntity.ok(authService.getUserBySession());
   }
+*/
+
+  @GetMapping(value = "/me")
+  public ResponseEntity<String> me(
+      @CookieValue(name = "refresh_token", required = false) String refreshTokenFromCookie) { // HttpServletRequest 대신 Spring mvc @CookieValue
+    if (refreshTokenFromCookie == null || refreshTokenFromCookie.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body("Refresh Token Cookie 가 존재하지 않거나 없습니다.");
+    }
+    try {
+      String accessToken = jwtService.getAccessTokenByRefreshToken(refreshTokenFromCookie);
+      return ResponseEntity.ok(accessToken);
+    } catch (JwtException e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body("유효하지 않은 토큰입니다.");
+    }
+  }
+
 
   @PutMapping(value = "/role")
   public ResponseEntity<UserDto> updateRole(@RequestBody RoleUpdateRequest request) {
@@ -92,7 +114,7 @@ public class AuthController {
       int maxAge = (int) ChronoUnit.SECONDS.between(LocalDateTime.now(),
           // jwtService 에서 가져오거나 yml에서 값가져오는 걸로 변경할 수 있을듯
           jwtSessionRepository.findByRefreshToken(refreshToken).get().getRefreshTokenExpiresAt());
-      ResponseCookie cookie = ResponseCookie.from("refreshToken",
+      ResponseCookie cookie = ResponseCookie.from("refresh_token",
               refreshToken) // 이거 그대로... 저장해도 되는걸까요
           .httpOnly(true)
           .secure(true)

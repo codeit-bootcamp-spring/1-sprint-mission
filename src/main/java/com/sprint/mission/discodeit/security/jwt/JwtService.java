@@ -120,6 +120,18 @@ public class JwtService {
         .compact();
   }
 
+
+  /**
+   * Refresh Token 으로 Access Token 찾기
+   **/
+  public String getAccessTokenByRefreshToken(String refreshToken) {
+    JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(
+            () -> new JwtException("유효하지 않은 refreshToken으로 accessToken을 찾을 수 없습니다."));
+    return jwtSession.getAccessToken();
+  }
+
+
   /**
    * 토큰의 유효성 검증
    **/
