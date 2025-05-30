@@ -5,8 +5,8 @@ import jakarta.validation.constraints.PastOrPresent;
 import java.time.Instant;
 
 public record UserStatusUpdateRequest(
-    @NotNull(message = "최근 활동기간은 필수입니다.")
-    @PastOrPresent(message = "최근 활동 시간은 과거 또는 현재 시각이어야 합니다.")
+    @NotNull(message = "마지막 활동 시간은 필수입니다")
+    @PastOrPresent(message = "마지막 활동 시간은 현재 또는 과거 시간이어야 합니다")
     Instant newLastActiveAt
 ) {
 

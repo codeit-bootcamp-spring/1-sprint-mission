@@ -1,24 +1,11 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
 
-@Component
-public class BinaryContentMapper {
+@Mapper(componentModel = "spring")
+public interface BinaryContentMapper {
 
-  public BinaryContentDto toDto(BinaryContent entity) {
-    if (entity == null) {
-      return null;
-    }
-
-    return new BinaryContentDto(
-        entity.getId(),
-        entity.getCreatedAt(),
-        entity.getFileName(),
-        entity.getSize(),
-        entity.getContentType()
-    );
-  }
+  BinaryContentDto toDto(BinaryContent binaryContent);
 }

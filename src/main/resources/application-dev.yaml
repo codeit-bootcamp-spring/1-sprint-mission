@@ -1,44 +1,36 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: false
     properties:
       hibernate:
         format_sql: true
+  security:
+    user:
+      name: user
 
-
-discodeit:
-  storage:
-    type: ${STORAGE_TYPE:s3}
-    local:
-      root-path: /Users/kbh/storage
-
-cloud:
-  aws:
-    s3:
-      bucket: ${AWS_S3_BUCKET}
-    credentials:
-      access-key: ${AWS_S3_ACCESS_KEY}
-      secret-key: ${AWS_S3_SECRET_KEY}
-    region:
-      static: ${AWS_S3_REGION}
-
+app:
+  admin:
+    username: admin
+    password: admin1234
+    email: admin@example.com
 
 logging:
   level:
-    root: info
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
     com.sprint.mission.discodeit: debug
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+    org.springframework.security: trace
 
+management:
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
