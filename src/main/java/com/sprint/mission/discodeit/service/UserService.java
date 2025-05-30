@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserEmailDuplicateException;
@@ -14,14 +13,18 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,11 +37,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
+  private final SessionRegistry sessionRegistry;
 
   @Transactional
   public UserResponse createUser(UserCreateRequest userCreateRequest, MultipartFile profile) {
@@ -53,19 +56,24 @@ public class UserService {
     newUser = userRepository.save(newUser);
     newUser.updateProfile(content);
     log.info("User 생성. id: {}", newUser.getId());
-    UserStatus userStatus = userStatusRepository.save(UserStatus.create(newUser));
-    log.info("UserStatus 생성. id: {}", userStatus.getId());
 
     return userMapper.toDto(newUser);
   }
 
   public List<UserResponse> readAll() {
     log.debug("readAll() 호출");
-    return userRepository.findAllWithProfileAndStatus().stream()
-        .map(userMapper::toDto)
+    Set<UUID> onlineUserIds = sessionRegistry.getAllPrincipals().stream()
+        .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
+        .filter(principal -> principal instanceof DiscodeitUserDetails)
+        .map(principal -> ((DiscodeitUserDetails) principal).getUser().id())
+        .collect(Collectors.toSet());
+
+    return userRepository.findAllWithProfile().stream()
+        .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
         .toList();
   }
 
+  @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
   @Transactional
   public UserResponse updateUser(UUID userId, UserUpdateRequest userUpdateRequest,
       MultipartFile profile) {
@@ -73,7 +81,7 @@ public class UserService {
     String newEmail = userUpdateRequest.newEmail();
     String newUsername = userUpdateRequest.newUsername();
     String newPassword = userUpdateRequest.newPassword();
-    User user = userRepository.findByIdWithProfileAndStatus(userId)
+    User user = userRepository.findByIdWithProfile(userId)
         .orElseThrow(() -> new UserNotFoundException(Map.of("id", userId)));
 
     if (newEmail != null) {
@@ -102,10 +110,11 @@ public class UserService {
     return userMapper.toDto(user);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
   @Transactional
   public void deleteUser(UUID userId) {
     log.debug("deleteUser() 호출");
-    userRepository.findByIdWithProfileAndStatus(userId)
+    userRepository.findByIdWithProfile(userId)
         .ifPresent(user -> {
           user.getProfile().ifPresent(content -> binaryContentStorage.delete(content.getId()));
           log.info("user 삭제. id: {}", user.getId());

@@ -45,9 +45,6 @@ public class User extends BaseUpdatableEntity {
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private UserStatus status;
-
   @Builder(access = AccessLevel.PRIVATE)
   private User(String username, String email, String password) {
     this.username = username;
@@ -62,10 +59,6 @@ public class User extends BaseUpdatableEntity {
         .email(email)
         .password(password)
         .build();
-  }
-
-  protected void setUserStatus(UserStatus status) {
-    this.status = status;
   }
 
   public void updateEmail(String email) {

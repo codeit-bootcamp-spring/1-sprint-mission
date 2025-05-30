@@ -14,6 +14,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -56,6 +57,7 @@ public class AuthService {
     return adminDto;
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @Transactional
   public UserResponse updateUserRole(RoleUpdateRequest roleUpdateRequest) {
     UUID userId = roleUpdateRequest.userId();
@@ -68,7 +70,7 @@ public class AuthService {
     }
 
     sessionRegistry.getAllPrincipals().stream()
-        .filter(principal -> ((DiscodeitUserDetails) principal).getUser().id().equals(userId))
+        .filter(principal -> ((DiscodeitUserDetails) principal).getUsername().equals(user.getUsername()))
         .findFirst()
         .ifPresent(principal -> {
               sessionRegistry.getAllSessions(principal, false)

@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
@@ -25,7 +24,6 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.UserMapperImpl;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.Optional;
@@ -45,8 +43,6 @@ class UserServiceTest {
 
   @Mock
   UserRepository userRepository;
-  @Mock
-  UserStatusRepository userStatusRepository;
   @Mock
   BinaryContentRepository binaryContentRepository;
   @Mock
@@ -72,14 +68,10 @@ class UserServiceTest {
   void createUser() {
     //given
     User user = User.create(username, email, password);
-    UserStatus userStatus = UserStatus.create(user);
     UUID userId = UUID.randomUUID();
-    UUID userStatusId = UUID.randomUUID();
     ReflectionTestUtils.setField(user, "id", userId);
-    ReflectionTestUtils.setField(userStatus, "id", userStatusId);
 
     given(userRepository.save(any(User.class))).willReturn(user);
-    given(userStatusRepository.save(any(UserStatus.class))).willReturn(userStatus);
     given(userRepository.existsByEmail(any())).willReturn(false);
     given(userRepository.existsByUsername(any())).willReturn(false);
 
@@ -95,7 +87,6 @@ class UserServiceTest {
     verify(binaryContentRepository, never()).save(any(BinaryContent.class));
     verify(binaryContentStorage, never()).put(any(UUID.class), any(byte[].class));
     verify(userRepository).save(any(User.class));
-    verify(userStatusRepository).save(any(UserStatus.class));
   }
 
   @Test
@@ -103,11 +94,8 @@ class UserServiceTest {
   void createUserWithProfile() throws IOException {
     //given
     User user = User.create(username, email, password);
-    UserStatus userStatus = UserStatus.create(user);
     UUID userId = UUID.randomUUID();
-    UUID userStatusId = UUID.randomUUID();
     ReflectionTestUtils.setField(user, "id", userId);
-    ReflectionTestUtils.setField(userStatus, "id", userStatusId);
 
     given(profile.isEmpty()).willReturn(false);
     given(profile.getSize()).willReturn(1024L);
@@ -120,7 +108,6 @@ class UserServiceTest {
     given(binaryContentRepository.save(any(BinaryContent.class))).willReturn(content);
     given(binaryContentStorage.put(any(UUID.class), any(byte[].class))).willReturn(content.getId());
     given(userRepository.save(any(User.class))).willReturn(user);
-    given(userStatusRepository.save(any(UserStatus.class))).willReturn(userStatus);
     given(userRepository.existsByEmail(any())).willReturn(false);
     given(userRepository.existsByUsername(any())).willReturn(false);
 
@@ -137,7 +124,6 @@ class UserServiceTest {
     verify(binaryContentRepository).save(any(BinaryContent.class));
     verify(binaryContentStorage).put(any(UUID.class), any(byte[].class));
     verify(userRepository).save(any(User.class));
-    verify(userStatusRepository).save(any(UserStatus.class));
   }
 
   @Test
@@ -188,7 +174,7 @@ class UserServiceTest {
 
     User user = User.create(username, email, password);
     ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
-    given(userRepository.findByIdWithProfileAndStatus(user.getId())).willReturn(Optional.of(user));
+    given(userRepository.findByIdWithProfile(user.getId())).willReturn(Optional.of(user));
     given(userRepository.existsByEmail(newEmail)).willReturn(false);
     given(userRepository.existsByUsername(newUsername)).willReturn(false);
 
@@ -214,7 +200,7 @@ class UserServiceTest {
 
     User user = User.create(username, email, password);
     ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
-    given(userRepository.findByIdWithProfileAndStatus(user.getId())).willReturn(Optional.of(user));
+    given(userRepository.findByIdWithProfile(user.getId())).willReturn(Optional.of(user));
 
     given(profile.isEmpty()).willReturn(false);
     given(profile.getSize()).willReturn(1024L);
@@ -252,7 +238,7 @@ class UserServiceTest {
 
     User user = User.create(username, email, password);
     ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
-    given(userRepository.findByIdWithProfileAndStatus(user.getId())).willReturn(Optional.of(user));
+    given(userRepository.findByIdWithProfile(user.getId())).willReturn(Optional.of(user));
     given(userRepository.existsByEmail(newEmail)).willReturn(true);
 
     assertThatThrownBy(() -> userService.updateUser(user.getId(), userUpdateRequest, null))
@@ -269,7 +255,7 @@ class UserServiceTest {
 
     User user = User.create(username, email, password);
     ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
-    given(userRepository.findByIdWithProfileAndStatus(user.getId())).willReturn(Optional.of(user));
+    given(userRepository.findByIdWithProfile(user.getId())).willReturn(Optional.of(user));
     given(userRepository.existsByUsername(newUsername)).willReturn(true);
 
     assertThatThrownBy(() -> userService.updateUser(user.getId(), userUpdateRequest, null))
@@ -280,7 +266,7 @@ class UserServiceTest {
   @DisplayName("user 삭제 - user가 없는 경우")
   void deleteUser() {
     UUID userId = UUID.randomUUID();
-    given(userRepository.findByIdWithProfileAndStatus(any(UUID.class))).willReturn(
+    given(userRepository.findByIdWithProfile(any(UUID.class))).willReturn(
         Optional.empty());
 
     //when
@@ -297,7 +283,7 @@ class UserServiceTest {
     UUID userId = UUID.randomUUID();
     User user = User.create(username, email, password);
     ReflectionTestUtils.setField(user, "id", userId);
-    given(userRepository.findByIdWithProfileAndStatus(userId)).willReturn(Optional.of(user));
+    given(userRepository.findByIdWithProfile(userId)).willReturn(Optional.of(user));
 
     //when
     userService.deleteUser(userId);

@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.Type;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +44,6 @@ class MessageRepositoryTest {
   void setUp() {
     content = BinaryContent.create(1024L, "attachment", "jpg");
     user = User.create("username", "email", "password");
-    UserStatus userStatus = UserStatus.create(user);
     user.updateProfile(content);
     channel = Channel.create(Type.PUBLIC, "public", "public channel");
 

@@ -2,49 +2,56 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.User.Role;
-import com.sprint.mission.discodeit.security.CsrfCookieFilter;
+import com.sprint.mission.discodeit.security.CustomAccessDeniedHandler;
+import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.DiscodeitLoginFilter;
-import com.sprint.mission.discodeit.security.DiscodeitLogoutFilter;
-import com.sprint.mission.discodeit.security.LoginFailureHandler;
-import com.sprint.mission.discodeit.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
+import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.session.ConcurrentSessionFilter;
 
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+  private final DataSource dataSource;
+  private final ObjectMapper objectMapper;
+
+  @Value("${security.remember-me.key}")
+  private String key;
+  @Value("${security.remember-me.token-validity-seconds}")
+  private int tokenValiditySeconds;
+
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, ObjectMapper objectMapper,
-      DiscodeitLoginFilter discodeitLoginFilter, DiscodeitLogoutFilter discodeitLogoutFilter) throws Exception {
+  public SecurityFilterChain securityFilterChain(
+      HttpSecurity httpSecurity,
+      RememberMeServices rememberMeServices
+  ) throws Exception {
     return httpSecurity
         .authorizeHttpRequests(requests -> requests
             .requestMatchers(
@@ -52,10 +59,6 @@ public class SecurityConfig {
                 SecurityMatchers.GET_CSRF_TOKEN,
                 SecurityMatchers.SIGN_UP
             ).permitAll()
-            .requestMatchers(HttpMethod.PUT, "/api/auth/role").hasRole(Role.ADMIN.name())
-            .requestMatchers(HttpMethod.POST, "/api/channels/public").hasRole(Role.CHANNEL_MANAGER.name())
-            .requestMatchers(HttpMethod.PATCH, "/api/channels/*").hasRole(Role.CHANNEL_MANAGER.name())
-            .requestMatchers(HttpMethod.DELETE, "/api/channels/*").hasRole(Role.CHANNEL_MANAGER.name())
             .anyRequest().hasRole(Role.USER.name())
         )
         .csrf(csrfConfig -> csrfConfig
@@ -64,29 +67,33 @@ public class SecurityConfig {
             .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
         )
         .sessionManagement(sessionConfig -> sessionConfig
+            .sessionFixation().migrateSession()
             .maximumSessions(1)
             .maxSessionsPreventsLogin(false)
+            .sessionRegistry(sessionRegistry())
+            .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
         )
-        .securityContext(context -> context.securityContextRepository(securityContextRepository()))
-        .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-        .addFilterAt(discodeitLoginFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterAt(discodeitLogoutFilter, LogoutFilter.class)
-        .addFilter(new ConcurrentSessionFilter(sessionRegistry(), new CustomSessionInformationExpiredStrategy(objectMapper)))
+        .rememberMe(rememberMe -> rememberMe
+            .rememberMeServices(rememberMeServices)
+        )
+        .with(new DiscodeitLoginFilter.Configurer(objectMapper), Customizer.withDefaults())
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper))
+            .accessDeniedHandler(new CustomAccessDeniedHandler(objectMapper))
+        )
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
-        .logout(AbstractHttpConfigurer::disable)
+        .logout(logout -> logout
+            .logoutRequestMatcher(SecurityMatchers.LOGOUT)
+            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+            .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry()))
+        )
         .build();
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
     return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-  }
-
-  @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-      throws Exception {
-    return config.getAuthenticationManager();
   }
 
   @Bean
@@ -107,11 +114,6 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SecurityContextRepository securityContextRepository() {
-    return new HttpSessionSecurityContextRepository();
-  }
-
-  @Bean
   public CsrfTokenRepository csrfTokenRepository() {
     CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
     cookieCsrfTokenRepository.setCookieName("CSRF-TOKEN");
@@ -120,32 +122,21 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-    return new RegisterSessionAuthenticationStrategy(sessionRegistry());
+  public PersistentTokenRepository persistentTokenRepository() {
+    JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
+    repo.setDataSource(dataSource);
+    return repo;
   }
 
   @Bean
-  public DiscodeitLoginFilter discodeitLoginFilter(ObjectMapper objectMapper, AuthenticationManager authenticationManager) {
-    DiscodeitLoginFilter filter = new DiscodeitLoginFilter(objectMapper);
+  public PersistentTokenBasedRememberMeServices rememberMeServices(
+      UserDetailsService userDetailsService,
+      PersistentTokenRepository persistentTokenRepository
+  ) {
+    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
+        key, userDetailsService, persistentTokenRepository);
+    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
 
-    filter.setRequiresAuthenticationRequestMatcher(SecurityMatchers.LOGIN);
-    filter.setAuthenticationManager(authenticationManager);
-    filter.setSecurityContextRepository(securityContextRepository());
-    filter.setAuthenticationSuccessHandler(new LoginSuccessHandler(objectMapper));
-    filter.setAuthenticationFailureHandler(new LoginFailureHandler(objectMapper));
-    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy());
-
-    return filter;
-  }
-
-  @Bean
-  public DiscodeitLogoutFilter discodeitLogoutFilter() {
-    DiscodeitLogoutFilter filter = new DiscodeitLogoutFilter(
-        new HttpStatusReturningLogoutSuccessHandler(),
-        new SecurityContextLogoutHandler()
-    );
-    filter.setLogoutRequestMatcher(SecurityMatchers.LOGOUT);
-
-    return filter;
+    return rememberMeServices;
   }
 }

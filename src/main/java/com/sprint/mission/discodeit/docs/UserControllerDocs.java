@@ -55,17 +55,6 @@ public interface UserControllerDocs {
       @RequestPart(required = false) MultipartFile profile
   );
 
-  @Operation(summary = "온라인 상태 변경")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "유저 수정 성공"),
-      @ApiResponse(responseCode = "404", description = "유저의 상태를 찾을 수 없음")
-  })
-  @PatchMapping("/{id}/userStatus")
-  ResponseEntity<UserStatusResponse> updateUserOnline(
-      @PathVariable UUID id,
-      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest
-  );
-
   @Operation(summary = "유저 삭제")
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "유저 삭제 성공"),

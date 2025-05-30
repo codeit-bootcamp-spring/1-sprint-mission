@@ -16,12 +16,12 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.dto.response.UserStatusResponse;
+import com.sprint.mission.discodeit.entity.User.Role;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.exception.user.UserNameDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +48,6 @@ class UserControllerTest {
 
   @MockitoBean
   UserService userService;
-  @MockitoBean
-  UserStatusService userStatusService;
 
   @Test
   @DisplayName("createUserWithProfile")
@@ -65,7 +63,7 @@ class UserControllerTest {
         profile.getSize(), profile.getName(), profile.getContentType());
 
     UserResponse userResponse = new UserResponse(UUID.randomUUID(), request.username(),
-        request.email(), binaryContentResponse, false);
+        request.email(), binaryContentResponse, false, Role.USER);
 
     given(userService.createUser(any(), any())).willReturn(userResponse);
 
@@ -87,7 +85,7 @@ class UserControllerTest {
         "application/json", objectMapper.writeValueAsBytes(request));
 
     UserResponse userResponse = new UserResponse(UUID.randomUUID(), request.username(),
-        request.email(), null, false);
+        request.email(), null, false, Role.USER);
 
     given(userService.createUser(any(), any())).willReturn(userResponse);
 
@@ -108,7 +106,7 @@ class UserControllerTest {
         "application/json", objectMapper.writeValueAsBytes(request));
 
     UserResponse userResponse = new UserResponse(UUID.randomUUID(), request.username(),
-        request.email(), null, false);
+        request.email(), null, false, Role.USER);
 
     given(userService.createUser(any(), any())).willThrow(new UserNameDuplicateException(Map.of()));
 
@@ -124,9 +122,9 @@ class UserControllerTest {
   void getUsers() throws Exception {
 
     UserResponse userResponse1 = new UserResponse(UUID.randomUUID(), "username1",
-        "email1@email.com", null, false);
+        "email1@email.com", null, false, Role.USER);
     UserResponse userResponse2 = new UserResponse(UUID.randomUUID(), "username2",
-        "email2@email.com", null, false);
+        "email2@email.com", null, false, Role.USER);
 
     given(userService.readAll()).willReturn(List.of(userResponse1, userResponse2));
 
@@ -151,7 +149,7 @@ class UserControllerTest {
         profile.getSize(), profile.getName(), profile.getContentType());
 
     UserResponse userResponse = new UserResponse(UUID.randomUUID(), request.newUsername(),
-        request.newEmail(), binaryContentResponse, false);
+        request.newEmail(), binaryContentResponse, false, Role.USER);
 
     given(userService.updateUser(any(), any(), any())).willReturn(userResponse);
 
@@ -177,7 +175,7 @@ class UserControllerTest {
         "application/json", objectMapper.writeValueAsBytes(request));
 
     UserResponse userResponse = new UserResponse(UUID.randomUUID(), request.newUsername(),
-        request.newEmail(), null, false);
+        request.newEmail(), null, false, Role.USER);
 
     given(userService.updateUser(any(), any(), any())).willThrow(
         new UserNotFoundException(Map.of()));
@@ -205,8 +203,6 @@ class UserControllerTest {
         userStatusUpdateRequest.newLastActiveAt()
     );
 
-    given(userStatusService.update(any(), any())).willReturn(userStatusResponse);
-
     mockMvc.perform(patch("/api/users/" + userId + "/userStatus")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(userStatusUpdateRequest))
@@ -228,8 +224,6 @@ class UserControllerTest {
         userId,
         userStatusUpdateRequest.newLastActiveAt()
     );
-
-    given(userStatusService.update(any(), any())).willThrow(new UserNotFoundException(Map.of()));
 
     mockMvc.perform(patch("/api/users/" + userId + "/userStatus")
             .contentType(MediaType.APPLICATION_JSON)

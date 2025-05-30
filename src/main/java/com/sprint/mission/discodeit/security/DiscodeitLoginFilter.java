@@ -7,11 +7,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,5 +39,27 @@ public class DiscodeitLoginFilter extends UsernamePasswordAuthenticationFilter {
     UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
         userLoginRequest.username(), userLoginRequest.password());
     return this.getAuthenticationManager().authenticate(token);
+  }
+
+  public static class Configurer extends
+      AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, DiscodeitLoginFilter> {
+
+    private final ObjectMapper objectMapper;
+
+    public Configurer(ObjectMapper objectMapper) {
+      super(new DiscodeitLoginFilter(objectMapper), SecurityMatchers.LOGIN_URL);
+      this.objectMapper = objectMapper;
+    }
+
+    @Override
+    protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
+      return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.POST.name());
+    }
+
+    @Override
+    public void init(HttpSecurity http) throws Exception {
+      successHandler(new LoginSuccessHandler(objectMapper));
+      failureHandler(new LoginFailureHandler(objectMapper));
+    }
   }
 }

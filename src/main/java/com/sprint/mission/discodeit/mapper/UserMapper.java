@@ -16,10 +16,15 @@ public abstract class UserMapper {
   protected BinaryContentMapper binaryContentMapper;
 
   @Mapping(source = "profile", target = "profile")
-  @Mapping(source = "status.online", target = "online")
+  @Mapping(target = "online", ignore = true)
   public abstract UserResponse toDto(User user);
+
+  @Mapping(source = "user.profile", target = "profile")
+  @Mapping(target = "online", expression = "java(online)")
+  public abstract UserResponse toDto(User user, boolean online);
 
   protected BinaryContentResponse map(Optional<BinaryContent> optionalProfile) {
     return optionalProfile.map(binaryContentMapper::toDto).orElse(null);
   }
+
 }

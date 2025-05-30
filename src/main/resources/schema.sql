@@ -60,3 +60,11 @@ create table message_attachments(
 	attachment_id uuid references binary_contents(id) on delete cascade,
     primary key (message_id, attachment_id)
 );
+
+create table persistent_logins
+(
+    username  varchar(64) not null,
+    series    varchar(64) primary key,
+    token     varchar(64) not null,
+    last_used timestamp   not null
+);

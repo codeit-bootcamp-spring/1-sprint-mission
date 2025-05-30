@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,7 @@ public class ReadStatusService {
   private final ChannelRepository channelRepository;
   private final ReadStatusMapper readStatusMapper;
 
+  @PreAuthorize("principal.user.id == #dto.userId()")
   @Transactional
   public ReadStatusResponse create(ReadStatusCreateRequest dto) {
     UUID userId = dto.userId();
@@ -64,6 +67,7 @@ public class ReadStatusService {
     }
   }
 
+  @PostAuthorize("principal.user.id == returnObject.userId()")
   @Transactional
   public ReadStatusResponse update(UUID id, Instant newLastReadAt) {
     ReadStatus readStatus = findById(id);

@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -93,6 +94,12 @@ public class MessageService {
     return messageMapper.toDto(message);
   }
 
+  public MessageResponse find(UUID id) {
+    return messageRepository.findById(id)
+        .map(messageMapper::toDto)
+        .orElseThrow(() -> new MessageNotFoundException(Map.of("id", id)));
+  }
+
   public PageResponse<MessageResponse> readAllByChannelId(
       UUID channelId, Instant cursor, Pageable pageable
   ) {
@@ -109,6 +116,7 @@ public class MessageService {
     return pageResponseMapper.fromMessageResponse(slice);
   }
 
+  @PreAuthorize("principal.user.id == @messageService.find(#messageId).author.id")
   @Transactional
   public MessageResponse updateMessage(UUID messageId, String content) {
     log.debug("updateMessage() 호출");
@@ -121,6 +129,7 @@ public class MessageService {
     return messageMapper.toDto(message);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or principal.user.id == @messageService.find(#messageId).author.id")
   @Transactional
   public void deleteMessage(UUID messageId) {
     messageRepository.findByIdWithAttachments(messageId)
