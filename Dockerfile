@@ -17,11 +17,14 @@ RUN ./gradlew build -x test --no-daemon
 EXPOSE 80
 
 # 7. 프로젝트 정보를 환경 변수로 설정하세요.
-ENV PROJECT_NAME=1-sprint-mission \
-    PROJECT_VERSION=0.0.1-SNAPSHOT \
-    JVM_OPTS=""
+ENV PROJECT_NAME=discodeit
+ENV PROJECT_VERSION=1.2-M8
 
-# 8. 애플리케이션 실행 명령어를 설정하세요. (환경 변수 활용)
-#ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
-ENTRYPOINT sh -c 'java $JVM_OPTS -jar build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar'
+# JVM 옵션을 ENV로 설정
+#ENV JVM_OPTS=$JVM_OPTS
+
+# 빌드된 jar 파일 실행
+#ENTRYPOINT sh -c "exec java $JVM_OPTS -jar build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar"
+
+ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
 
