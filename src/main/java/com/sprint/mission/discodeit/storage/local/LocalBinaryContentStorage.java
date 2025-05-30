@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.storage.local;
 
-import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -43,7 +43,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
   }
 
-  @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.exists(filePath)) {
@@ -57,7 +56,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     return binaryContentId;
   }
 
-  @Override
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.notExists(filePath)) {
