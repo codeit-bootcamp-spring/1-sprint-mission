@@ -22,7 +22,6 @@ application-prod.yaml
 **/*.log
 logs/
 **/logs/
-/.discodeit
 ### Eclipse ###
 .apt_generated
 .classpath
