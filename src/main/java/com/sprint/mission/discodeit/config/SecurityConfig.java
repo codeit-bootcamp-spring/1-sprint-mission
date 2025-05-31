@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.User.Role;
+import com.sprint.mission.discodeit.security.CsrfCookieFilter;
 import com.sprint.mission.discodeit.security.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
-import com.sprint.mission.discodeit.security.DiscodeitLoginFilter;
+import com.sprint.mission.discodeit.security.DiscodeitLoginFilter.Configurer;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
 import javax.sql.DataSource;
@@ -31,6 +32,7 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
@@ -66,6 +68,7 @@ public class SecurityConfig {
             .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
         )
+        .addFilterBefore(new CsrfCookieFilter(), CsrfFilter.class)
         .sessionManagement(sessionConfig -> sessionConfig
             .sessionFixation().migrateSession()
             .maximumSessions(1)
@@ -76,7 +79,7 @@ public class SecurityConfig {
         .rememberMe(rememberMe -> rememberMe
             .rememberMeServices(rememberMeServices)
         )
-        .with(new DiscodeitLoginFilter.Configurer(objectMapper), Customizer.withDefaults())
+        .with(new Configurer(objectMapper), Customizer.withDefaults())
         .exceptionHandling(ex -> ex
             .authenticationEntryPoint(new CustomAuthenticationEntryPoint(objectMapper))
             .accessDeniedHandler(new CustomAccessDeniedHandler(objectMapper))
@@ -115,10 +118,7 @@ public class SecurityConfig {
 
   @Bean
   public CsrfTokenRepository csrfTokenRepository() {
-    CookieCsrfTokenRepository cookieCsrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-    cookieCsrfTokenRepository.setCookieName("CSRF-TOKEN");
-    cookieCsrfTokenRepository.setHeaderName("X-CSRF-TOKEN");
-    return cookieCsrfTokenRepository;
+    return CookieCsrfTokenRepository.withHttpOnlyFalse();
   }
 
   @Bean
