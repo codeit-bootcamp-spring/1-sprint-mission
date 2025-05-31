@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
@@ -44,7 +44,7 @@ public class UserService {
   private final SessionRegistry sessionRegistry;
 
   @Transactional
-  public UserResponse createUser(UserCreateRequest userCreateRequest, MultipartFile profile) {
+  public UserDto createUser(UserCreateRequest userCreateRequest, MultipartFile profile) {
     log.debug("createUser() 호출");
     duplicationCheck(userCreateRequest.username(), userCreateRequest.email());
 
@@ -60,7 +60,7 @@ public class UserService {
     return userMapper.toDto(newUser);
   }
 
-  public List<UserResponse> readAll() {
+  public List<UserDto> readAll() {
     log.debug("readAll() 호출");
     Set<UUID> onlineUserIds = sessionRegistry.getAllPrincipals().stream()
         .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
@@ -75,7 +75,7 @@ public class UserService {
 
   @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
   @Transactional
-  public UserResponse updateUser(UUID userId, UserUpdateRequest userUpdateRequest,
+  public UserDto updateUser(UUID userId, UserUpdateRequest userUpdateRequest,
       MultipartFile profile) {
     log.debug("updateUser() 호출");
     String newEmail = userUpdateRequest.newEmail();

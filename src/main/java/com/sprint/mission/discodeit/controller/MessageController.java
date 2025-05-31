@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.docs.MessageControllerDocs;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
@@ -37,19 +37,19 @@ public class MessageController implements MessageControllerDocs {
 
   @PostMapping
   @Override
-  public ResponseEntity<MessageResponse> createMessage(
+  public ResponseEntity<MessageDto> createMessage(
       @RequestPart @Valid MessageCreateRequest messageCreateRequest,
       @RequestPart(required = false) List<MultipartFile> attachments
   ) {
     log.debug("POST /api/messages");
-    MessageResponse messageResponse = messageService.createMessage(messageCreateRequest,
+    MessageDto messageDto = messageService.createMessage(messageCreateRequest,
         attachments);
-    return ResponseEntity.status(HttpStatus.CREATED).body(messageResponse);
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
   }
 
   @GetMapping
   @Override
-  public ResponseEntity<PageResponse<MessageResponse>> getMessages(
+  public ResponseEntity<PageResponse<MessageDto>> getMessages(
       @RequestParam UUID channelId,
       @RequestParam(required = false) Instant cursor,
       Pageable pageable
@@ -61,14 +61,14 @@ public class MessageController implements MessageControllerDocs {
 
   @PatchMapping("/{id}")
   @Override
-  public ResponseEntity<MessageResponse> updateMessage(
+  public ResponseEntity<MessageDto> updateMessage(
       @PathVariable UUID id,
       @RequestBody @Valid MessageUpdateRequest messageUpdateRequest
   ) {
     log.debug("PATCH /api/messages/{}", id);
-    MessageResponse messageResponse = messageService.updateMessage(id,
+    MessageDto messageDto = messageService.updateMessage(id,
         messageUpdateRequest.newContent());
-    return ResponseEntity.ok(messageResponse);
+    return ResponseEntity.ok(messageDto);
   }
 
   @DeleteMapping("/{id}")

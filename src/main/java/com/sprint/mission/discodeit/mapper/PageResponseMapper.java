@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import java.time.Instant;
 import java.util.List;
@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PageResponseMapper {
 
-  public PageResponse<MessageResponse> fromMessageResponse(Slice<MessageResponse> slice) {
-    List<MessageResponse> content = slice.getContent();
+  public PageResponse<MessageDto> fromMessageResponse(Slice<MessageDto> slice) {
+    List<MessageDto> content = slice.getContent();
     Instant nextCursor;
     if (content.isEmpty()) {
       nextCursor = Instant.now();

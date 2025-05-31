@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record ReadStatusResponse(
+public record ReadStatusDto(
     UUID id,
     UUID userId,
     UUID channelId,

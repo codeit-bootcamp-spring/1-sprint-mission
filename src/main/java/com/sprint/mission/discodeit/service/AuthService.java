@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.User.Role;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -41,7 +41,7 @@ public class AuthService {
 
   @PostConstruct
   @Transactional
-  public UserResponse initAdmin() {
+  public UserDto initAdmin() {
     if (userRepository.existsByEmail(adminEmail) || userRepository.existsByUsername(adminUsername)) {
       log.warn("이미 어드민이 존재합니다.");
       return null;
@@ -52,14 +52,14 @@ public class AuthService {
     admin.updateRole(Role.ADMIN);
     userRepository.save(admin);
 
-    UserResponse adminDto = userMapper.toDto(admin);
+    UserDto adminDto = userMapper.toDto(admin);
     log.info("어드민이 초기화되었습니다. {}", adminDto);
     return adminDto;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @Transactional
-  public UserResponse updateUserRole(RoleUpdateRequest roleUpdateRequest) {
+  public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
     UUID userId = roleUpdateRequest.userId();
     Role newRole = roleUpdateRequest.newRole();
     User user = userRepository.findById(roleUpdateRequest.userId())

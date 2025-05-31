@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.Type;
 import com.sprint.mission.discodeit.entity.Message;
@@ -40,7 +40,7 @@ public class ChannelService {
   private final ChannelMapper channelMapper;
 
   @Transactional
-  public ChannelResponse createPrivateChannel(List<UUID> userIds) {
+  public ChannelDto createPrivateChannel(List<UUID> userIds) {
     log.debug("createPrivateChannel() 호출");
     Channel channel = channelRepository.save(Channel.create(Channel.Type.PRIVATE, null, null));
     log.info("Private Channel 생성. id: {}", channel.getId());
@@ -54,7 +54,7 @@ public class ChannelService {
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
-  public ChannelResponse createPublicChannel(PublicChannelRequest publicChannelRequest) {
+  public ChannelDto createPublicChannel(PublicChannelRequest publicChannelRequest) {
     log.debug("createPublicChannel() 호출");
     Channel channel = channelRepository
         .save(Channel.create(Type.PUBLIC, publicChannelRequest.name(),
@@ -63,7 +63,7 @@ public class ChannelService {
     return channelMapper.toDto(channel);
   }
 
-  public List<ChannelResponse> readAllByUserId(UUID userId) {
+  public List<ChannelDto> readAllByUserId(UUID userId) {
     log.debug("readAllByUserId() 호출");
     if (!userRepository.existsById(userId)) {
       throw new UserNotFoundException(Map.of("id", userId));
@@ -83,7 +83,7 @@ public class ChannelService {
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
-  public ChannelResponse updateChannel(UUID channelId, PublicChannelUpdateRequest updateRequest) {
+  public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest updateRequest) {
     log.debug("updateChannel() 호출");
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ChannelNotFoundException(Map.of("id", channelId)));

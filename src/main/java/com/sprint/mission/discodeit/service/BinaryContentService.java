@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
@@ -54,7 +54,7 @@ public class BinaryContentService {
         .toList();
   }
 
-  public BinaryContentResponse find(UUID id) {
+  public BinaryContentDto find(UUID id) {
     BinaryContent content = binaryContentRepository.findById(id)
         .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("id", id)));
     return binaryContentMapper.toDto(content);

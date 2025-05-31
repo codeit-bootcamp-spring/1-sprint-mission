@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.docs;
 
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,7 +27,7 @@ public interface ReadStatusControllerDocs {
       @ApiResponse(responseCode = "404", description = "채널 혹은 유저를 찾을 수 없음")
   })
   @PostMapping
-  ResponseEntity<ReadStatusResponse> create(
+  ResponseEntity<ReadStatusDto> create(
       @RequestBody ReadStatusCreateRequest readStatusCreateRequest
   );
 
@@ -36,7 +36,7 @@ public interface ReadStatusControllerDocs {
       @ApiResponse(responseCode = "200", description = "readStatus 조회 성공")
   })
   @GetMapping
-  ResponseEntity<List<ReadStatusResponse>> find(
+  ResponseEntity<List<ReadStatusDto>> find(
       @RequestParam UUID userId
   );
 
@@ -46,7 +46,7 @@ public interface ReadStatusControllerDocs {
       @ApiResponse(responseCode = "404", description = "readStatus를 찾을 수 없음")
   })
   @PatchMapping("/{id}")
-  ResponseEntity<ReadStatusResponse> update(
+  ResponseEntity<ReadStatusDto> update(
       @PathVariable UUID id,
       @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest
   );

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.storage;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.exception.binarycontent.file.DirectoryCreateException;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileDeleteException;
@@ -65,7 +65,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  public ResponseEntity<Resource> download(BinaryContentResponse response) {
+  public ResponseEntity<Resource> download(BinaryContentDto response) {
     Path path = resolvePath(response.id());
     try {
       UrlResource resource = new UrlResource("file:" + path);

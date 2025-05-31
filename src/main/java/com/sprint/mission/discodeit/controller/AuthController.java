@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.docs.AuthControllerDocs;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,13 +30,13 @@ public class AuthController implements AuthControllerDocs {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal DiscodeitUserDetails principal) {
+  public ResponseEntity<UserDto> getUser(@AuthenticationPrincipal DiscodeitUserDetails principal) {
     return ResponseEntity.ok(principal.getUser());
   }
 
   @PutMapping("/role")
-  public ResponseEntity<UserResponse> updateUserRole(@RequestBody RoleUpdateRequest roleUpdateRequest, HttpServletRequest request, HttpServletResponse response) {
-    UserResponse userResponse = authService.updateUserRole(roleUpdateRequest);
-    return ResponseEntity.ok(userResponse);
+  public ResponseEntity<UserDto> updateUserRole(@RequestBody RoleUpdateRequest roleUpdateRequest, HttpServletRequest request, HttpServletResponse response) {
+    UserDto userDto = authService.updateUserRole(roleUpdateRequest);
+    return ResponseEntity.ok(userDto);
   }
 }

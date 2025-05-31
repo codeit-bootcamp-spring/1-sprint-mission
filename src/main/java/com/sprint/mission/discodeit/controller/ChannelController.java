@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.docs.ChannelControllerDocs;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -33,40 +33,40 @@ public class ChannelController implements ChannelControllerDocs {
 
   @PostMapping("/public")
   @Override
-  public ResponseEntity<ChannelResponse> createPublicChannel(
+  public ResponseEntity<ChannelDto> createPublicChannel(
       @RequestBody @Valid PublicChannelRequest publicChannelRequest
   ) {
     log.debug("POST /api/channels/public");
-    ChannelResponse publicChannel = channelService.createPublicChannel(publicChannelRequest);
+    ChannelDto publicChannel = channelService.createPublicChannel(publicChannelRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(publicChannel);
   }
 
   @PostMapping("/private")
   @Override
-  public ResponseEntity<ChannelResponse> createPrivateChannel(
+  public ResponseEntity<ChannelDto> createPrivateChannel(
       @RequestBody @Valid PrivateChannelRequest privateChannelRequest
   ) {
     log.debug("POST /api/channels/private");
-    ChannelResponse privateChannel = channelService.
+    ChannelDto privateChannel = channelService.
         createPrivateChannel(privateChannelRequest.participantIds());
     return ResponseEntity.status(HttpStatus.CREATED).body(privateChannel);
   }
 
   @GetMapping
   @Override
-  public ResponseEntity<List<ChannelResponse>> getChannels(@RequestParam UUID userId) {
+  public ResponseEntity<List<ChannelDto>> getChannels(@RequestParam UUID userId) {
     log.debug("GET /api/channels");
     return ResponseEntity.ok(channelService.readAllByUserId(userId));
   }
 
   @PatchMapping("/{id}")
   @Override
-  public ResponseEntity<ChannelResponse> updatePublicChannel(
+  public ResponseEntity<ChannelDto> updatePublicChannel(
       @PathVariable UUID id,
       @RequestBody @Valid PublicChannelUpdateRequest updateRequest
   ) {
     log.debug("PATCH /api/channels/{}", id);
-    ChannelResponse channel = channelService.updateChannel(id, updateRequest);
+    ChannelDto channel = channelService.updateChannel(id, updateRequest);
     return ResponseEntity.ok().body(channel);
   }
 

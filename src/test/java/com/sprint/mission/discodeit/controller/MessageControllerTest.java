@@ -12,10 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
-import com.sprint.mission.discodeit.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
@@ -68,23 +68,23 @@ class MessageControllerTest {
         "imege/jpeg",
         "file".getBytes()
     );
-    BinaryContentResponse binaryContentResponse = new BinaryContentResponse(
+    BinaryContentDto binaryContentDto = new BinaryContentDto(
         UUID.randomUUID(),
         attachment.getSize(),
         attachment.getName(),
         attachment.getContentType()
     );
-    MessageResponse messageResponse = new MessageResponse(
+    MessageDto messageDto = new MessageDto(
         messageId,
         Instant.now(),
         Instant.now(),
         content,
-        new UserResponse(authorId, null, null, null, false),
+        new UserDto(authorId, null, null, null, false),
         channelId,
-        List.of(binaryContentResponse)
+        List.of(binaryContentDto)
     );
 
-    given(messageService.createMessage(any(), any())).willReturn(messageResponse);
+    given(messageService.createMessage(any(), any())).willReturn(messageDto);
 
     mockMvc.perform(multipart("/api/messages")
             .file(messageCreateRequest)
@@ -113,17 +113,17 @@ class MessageControllerTest {
         "application/json",
         objectMapper.writeValueAsBytes(request)
     );
-    MessageResponse messageResponse = new MessageResponse(
+    MessageDto messageDto = new MessageDto(
         messageId,
         Instant.now(),
         Instant.now(),
         content,
-        new UserResponse(authorId, null, null, null, false),
+        new UserDto(authorId, null, null, null, false),
         channelId,
         List.of()
     );
 
-    given(messageService.createMessage(any(), any())).willReturn(messageResponse);
+    given(messageService.createMessage(any(), any())).willReturn(messageDto);
 
     mockMvc.perform(multipart("/api/messages")
             .file(messageCreateRequest)
@@ -138,17 +138,17 @@ class MessageControllerTest {
   void getMessages() throws Exception {
     UUID channelId = UUID.randomUUID();
     Instant cursor = Instant.now();
-    MessageResponse messageResponse = new MessageResponse(
+    MessageDto messageDto = new MessageDto(
         UUID.randomUUID(),
         cursor.minusSeconds(10),
         cursor.minusSeconds(10),
         "message",
-        new UserResponse(UUID.randomUUID(), null, null, null, false),
+        new UserDto(UUID.randomUUID(), null, null, null, false),
         channelId,
         List.of()
     );
-    PageResponse<MessageResponse> pageResponse = new PageResponse<>(
-        List.of(messageResponse),
+    PageResponse<MessageDto> pageResponse = new PageResponse<>(
+        List.of(messageDto),
         cursor,
         10,
         false,
@@ -175,16 +175,16 @@ class MessageControllerTest {
   void updateMessage() throws Exception {
     UUID messageId = UUID.randomUUID();
     MessageUpdateRequest request = new MessageUpdateRequest("newMessage");
-    MessageResponse messageResponse = new MessageResponse(
+    MessageDto messageDto = new MessageDto(
         messageId,
         Instant.now(),
         Instant.now(),
         "newMessage",
-        new UserResponse(UUID.randomUUID(), null, null, null, false),
+        new UserDto(UUID.randomUUID(), null, null, null, false),
         UUID.randomUUID(),
         List.of()
     );
-    given(messageService.updateMessage(any(), any())).willReturn(messageResponse);
+    given(messageService.updateMessage(any(), any())).willReturn(messageDto);
 
     mockMvc.perform(patch("/api/messages/" + messageId)
             .contentType(MediaType.APPLICATION_JSON)

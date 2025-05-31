@@ -7,7 +7,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 import com.sprint.mission.discodeit.config.S3StorageProperties;
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -93,7 +93,7 @@ class S3BinaryContentStorageTest {
   @Test
   @DisplayName("download")
   void download() throws MalformedURLException, URISyntaxException {
-    BinaryContentResponse binaryContentResponse = new BinaryContentResponse(
+    BinaryContentDto binaryContentDto = new BinaryContentDto(
         UUID.randomUUID(),
         1024L,
         "test.jpg",
@@ -104,7 +104,7 @@ class S3BinaryContentStorageTest {
     given(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).willReturn(presignedGetObjectRequest);
     given(presignedGetObjectRequest.url()).willReturn(url);
 
-    ResponseEntity<Resource> responseEntity = storage.download(binaryContentResponse);
+    ResponseEntity<Resource> responseEntity = storage.download(binaryContentDto);
 
     then(s3Presigner).should().presignGetObject(any(GetObjectPresignRequest.class));
     assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.FOUND);

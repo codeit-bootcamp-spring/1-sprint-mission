@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -51,7 +51,7 @@ public class MessageService {
   private final PageResponseMapper pageResponseMapper;
 
   @Transactional
-  public MessageResponse createMessage(MessageCreateRequest messageCreateRequest,
+  public MessageDto createMessage(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments) {
     log.debug("createMessage() 호출");
     UUID authorId = messageCreateRequest.authorId();
@@ -94,17 +94,17 @@ public class MessageService {
     return messageMapper.toDto(message);
   }
 
-  public MessageResponse find(UUID id) {
+  public MessageDto find(UUID id) {
     return messageRepository.findById(id)
         .map(messageMapper::toDto)
         .orElseThrow(() -> new MessageNotFoundException(Map.of("id", id)));
   }
 
-  public PageResponse<MessageResponse> readAllByChannelId(
+  public PageResponse<MessageDto> readAllByChannelId(
       UUID channelId, Instant cursor, Pageable pageable
   ) {
     log.debug("readAllByChannelId() 호출");
-    Slice<MessageResponse> slice;
+    Slice<MessageDto> slice;
     if (cursor == null) {
       slice = messageRepository.findPageByChannelId(channelId, pageable)
           .map(messageMapper::toDto);
@@ -118,7 +118,7 @@ public class MessageService {
 
   @PreAuthorize("principal.user.id == @messageService.find(#messageId).author.id")
   @Transactional
-  public MessageResponse updateMessage(UUID messageId, String content) {
+  public MessageDto updateMessage(UUID messageId, String content) {
     log.debug("updateMessage() 호출");
     Message message = messageRepository.findById(messageId)
         .orElseThrow(() -> new MessageNotFoundException(Map.of("id", messageId)));

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.docs.UserControllerDocs;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -32,32 +32,32 @@ public class UserController implements UserControllerDocs {
 
   @PostMapping
   @Override
-  public ResponseEntity<UserResponse> createUser(
+  public ResponseEntity<UserDto> createUser(
       @RequestPart @Valid UserCreateRequest userCreateRequest,
       @RequestPart(required = false) MultipartFile profile
   ) {
     log.debug("POST /api/users");
-    UserResponse userResponse = userService.createUser(userCreateRequest, profile);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
+    UserDto userDto = userService.createUser(userCreateRequest, profile);
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @GetMapping
   @Override
-  public ResponseEntity<List<UserResponse>> getUsers() {
+  public ResponseEntity<List<UserDto>> getUsers() {
     log.debug("GET /api/users");
     return ResponseEntity.ok(userService.readAll());
   }
 
   @PatchMapping("/{id}")
   @Override
-  public ResponseEntity<UserResponse> updateUser(
+  public ResponseEntity<UserDto> updateUser(
       @PathVariable UUID id,
       @RequestPart @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile
   ) {
     log.debug("PATCH /api/users/{}", id);
-    UserResponse userResponse = userService.updateUser(id, userUpdateRequest, profile);
-    return ResponseEntity.ok().body(userResponse);
+    UserDto userDto = userService.updateUser(id, userUpdateRequest, profile);
+    return ResponseEntity.ok().body(userDto);
   }
 
   @DeleteMapping("/{id}")

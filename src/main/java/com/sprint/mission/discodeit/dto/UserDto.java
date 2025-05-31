@@ -1,13 +1,13 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.User.Role;
 import java.util.UUID;
 
-public record UserResponse(
+public record UserDto(
     UUID id,
     String username,
     String email,
-    BinaryContentResponse profile,
+    BinaryContentDto profile,
     boolean online,
     Role role
 ) {

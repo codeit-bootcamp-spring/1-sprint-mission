@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -76,7 +76,7 @@ class UserServiceTest {
     given(userRepository.existsByUsername(any())).willReturn(false);
 
     //when
-    UserResponse response = userService.createUser(userCreateRequest, null);
+    UserDto response = userService.createUser(userCreateRequest, null);
 
     //then
     assertThat(response.id()).isEqualTo(userId);
@@ -112,7 +112,7 @@ class UserServiceTest {
     given(userRepository.existsByUsername(any())).willReturn(false);
 
     //when
-    UserResponse response = userService.createUser(userCreateRequest, profile);
+    UserDto response = userService.createUser(userCreateRequest, profile);
 
     //then
     assertThat(response.id()).isEqualTo(userId);
@@ -179,13 +179,13 @@ class UserServiceTest {
     given(userRepository.existsByUsername(newUsername)).willReturn(false);
 
     //when
-    UserResponse userResponse = userService.updateUser(user.getId(), userUpdateRequest, null);
+    UserDto userDto = userService.updateUser(user.getId(), userUpdateRequest, null);
 
     //then
-    assertThat(userResponse.id()).isEqualTo(user.getId());
-    assertThat(userResponse.profile()).isNull();
-    assertThat(userResponse.username()).isEqualTo(newUsername);
-    assertThat(userResponse.email()).isEqualTo(newEmail);
+    assertThat(userDto.id()).isEqualTo(user.getId());
+    assertThat(userDto.profile()).isNull();
+    assertThat(userDto.username()).isEqualTo(newUsername);
+    assertThat(userDto.email()).isEqualTo(newEmail);
 
     verify(binaryContentStorage, never()).delete(any(UUID.class));
   }
@@ -215,17 +215,17 @@ class UserServiceTest {
     given(userRepository.existsByUsername(newUsername)).willReturn(false);
 
     //when
-    UserResponse userResponse = userService.updateUser(user.getId(), userUpdateRequest, profile);
+    UserDto userDto = userService.updateUser(user.getId(), userUpdateRequest, profile);
 
     //then
-    assertThat(userResponse.id()).isEqualTo(user.getId());
-    assertThat(userResponse.username()).isEqualTo(newUsername);
-    assertThat(userResponse.email()).isEqualTo(newEmail);
-    assertThat(userResponse.profile()).isNotNull();
-    assertThat(userResponse.profile().id()).isEqualTo(content.getId());
-    assertThat(userResponse.profile().size()).isEqualTo(content.getSize());
-    assertThat(userResponse.profile().fileName()).isEqualTo(content.getFileName());
-    assertThat(userResponse.profile().contentType()).isEqualTo(content.getContentType());
+    assertThat(userDto.id()).isEqualTo(user.getId());
+    assertThat(userDto.username()).isEqualTo(newUsername);
+    assertThat(userDto.email()).isEqualTo(newEmail);
+    assertThat(userDto.profile()).isNotNull();
+    assertThat(userDto.profile().id()).isEqualTo(content.getId());
+    assertThat(userDto.profile().size()).isEqualTo(content.getSize());
+    assertThat(userDto.profile().fileName()).isEqualTo(content.getFileName());
+    assertThat(userDto.profile().contentType()).isEqualTo(content.getContentType());
   }
 
   @Test

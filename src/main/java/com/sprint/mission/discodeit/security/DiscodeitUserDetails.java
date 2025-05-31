@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.security;
 
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.UserDto;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -13,10 +13,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 public class DiscodeitUserDetails implements UserDetails {
 
-  private final UserResponse user;
+  private final UserDto user;
   private final String password;
 
-  public DiscodeitUserDetails(UserResponse user, String password) {
+  public DiscodeitUserDetails(UserDto user, String password) {
     this.user = user;
     this.password = password;
   }

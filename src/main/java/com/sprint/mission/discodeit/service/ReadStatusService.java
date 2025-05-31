@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -36,7 +36,7 @@ public class ReadStatusService {
 
   @PreAuthorize("principal.user.id == #dto.userId()")
   @Transactional
-  public ReadStatusResponse create(ReadStatusCreateRequest dto) {
+  public ReadStatusDto create(ReadStatusCreateRequest dto) {
     UUID userId = dto.userId();
     UUID channelId = dto.channelId();
 
@@ -57,7 +57,7 @@ public class ReadStatusService {
         .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("id", id)));
   }
 
-  public List<ReadStatusResponse> findAllByUserId(UUID userId) {
+  public List<ReadStatusDto> findAllByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
       return Collections.emptyList();
     } else {
@@ -69,7 +69,7 @@ public class ReadStatusService {
 
   @PostAuthorize("principal.user.id == returnObject.userId()")
   @Transactional
-  public ReadStatusResponse update(UUID id, Instant newLastReadAt) {
+  public ReadStatusDto update(UUID id, Instant newLastReadAt) {
     ReadStatus readStatus = findById(id);
     readStatus.updateLastReadAt(newLastReadAt);
     readStatusRepository.save(readStatus);
