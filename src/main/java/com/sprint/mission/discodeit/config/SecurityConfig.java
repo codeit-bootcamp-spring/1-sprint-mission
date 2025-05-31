@@ -197,10 +197,6 @@ public class SecurityConfig {
       User user = userRepository.findByUsername(username)
           .orElseThrow(() -> UserNotFoundException.withUsername(username));
 
-      // 디버깅용 로그 (나중에 제거)
-      System.out.println("Loading user: " + username);
-      System.out.println("User roles: " + user.getRoles());
-
       return new UserDetailsAdapter(user);
     };
   }

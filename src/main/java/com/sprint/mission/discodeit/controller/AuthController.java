@@ -6,10 +6,15 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.UserDetailsAdapter;
+import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -29,6 +35,7 @@ public class AuthController {
 
   private final UserMapper userMapper;
   private final UserRepository userRepository;
+  private final UserService userService;
 
   @GetMapping("/login")
   public ResponseEntity<UserDto> login(@AuthenticationPrincipal User user) {
@@ -45,7 +52,19 @@ public class AuthController {
     // SecurityContext 무효화
     SecurityContextHolder.clearContext();
 
+    // CSRF 토큰 제거
+    
     return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("me")
+  public ResponseEntity<UserDto> me(@AuthenticationPrincipal UserDetailsAdapter userDetails) {
+    log.info("내 정보 조회 요청");
+    UUID userId = userDetails.getUser().getId();
+    UserDto userDto = userService.find(userId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(userDto);
   }
 
   @PutMapping("/role")
