@@ -29,5 +29,8 @@ public class JwtSession extends BaseUpdatableEntity {
     this.refreshToken = refreshToken;
   }
 
-
+  public void update(String newAccessToken, String newRefreshToken) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+  }
 }
