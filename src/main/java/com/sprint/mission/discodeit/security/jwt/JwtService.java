@@ -48,10 +48,15 @@ public class JwtService {
   @Value("${app.jwt.refresh-token-expiration}")
   private long refreshTokenExpiration;
 
+  private SecretKey signingKey;
+
   // 서명키
   private SecretKey getSigningKey() {
-    byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
-    return Keys.hmacShaKeyFor(keyBytes);
+    if (this.signingKey == null) {
+      byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+      this.signingKey = Keys.hmacShaKeyFor(keyBytes);
+    }
+    return signingKey;
   }
 
   /**
