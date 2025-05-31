@@ -163,26 +163,26 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         // URL 별 접근 권한 설정
         .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/",
-                    "/index.html",
-                    "/assets/**",
-                    "/favicon.ico",
-                    "/h2-console/**",
-                    "/api/auth/login",
-//                "/api/auth/csrf-token",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/actuator/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                .requestMatchers("/api/auth/role").hasRole("ADMIN")
-                .requestMatchers("/api/channels/public").hasRole("CHANNEL_MANAGER")
-                .requestMatchers(HttpMethod.PATCH, "/api/channels/{channelId}")
-                .hasRole("CHANNEL_MANAGER")
-                .requestMatchers(HttpMethod.DELETE, "/api/channels/{channelId}")
-                .hasRole("CHANNEL_MANAGER")
-                .requestMatchers("/api/**").hasRole("USER")
-                .anyRequest().authenticated()
+            .requestMatchers(
+                "/",
+                "/index.html",
+                "/assets/**",
+                "/favicon.ico",
+                "/h2-console/**",
+                "/api/auth/login",
+                "/api/auth/csrf-token",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/actuator/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+            .requestMatchers("/api/auth/role").hasRole("ADMIN")
+            .requestMatchers("/api/channels/public").hasRole("CHANNEL_MANAGER")
+            .requestMatchers(HttpMethod.PATCH, "/api/channels/{channelId}")
+            .hasRole("CHANNEL_MANAGER")
+            .requestMatchers(HttpMethod.DELETE, "/api/channels/{channelId}")
+            .hasRole("CHANNEL_MANAGER")
+            .requestMatchers("/api/**").hasRole("USER")
+            .anyRequest().authenticated()
         )
         .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         // X-Frame-Options 를 SAMEORIGIN 설정 (H2 콘솔 프레임 허용)
