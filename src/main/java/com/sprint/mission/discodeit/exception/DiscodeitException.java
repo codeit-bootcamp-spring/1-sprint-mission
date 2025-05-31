@@ -8,7 +8,6 @@ import java.util.Map;
 
 @Getter
 public class DiscodeitException extends RuntimeException {
-
     private final Instant timestamp;
     private final ErrorCode errorCode;
     private final Map<String, Object> details;
@@ -30,4 +29,4 @@ public class DiscodeitException extends RuntimeException {
     public void addDetail(String key, Object value) {
         this.details.put(key, value);
     }
-}
+} 

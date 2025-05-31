@@ -43,29 +43,29 @@ class AuthApiIntegrationTest {
         // Given
         // 테스트 사용자 생성
         UserCreateRequest userRequest = new UserCreateRequest(
-                "loginuser",
-                "login@example.com",
-                "Password1!"
+            "loginuser",
+            "login@example.com",
+            "Password1!"
         );
-
+        
         userService.create(userRequest, Optional.empty());
-
+        
         // 로그인 요청
         LoginRequest loginRequest = new LoginRequest(
-                "loginuser",
-                "Password1!"
+            "loginuser",
+            "Password1!"
         );
-
+        
         String requestBody = objectMapper.writeValueAsString(loginRequest);
 
         // When & Then
         mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.username", is("loginuser")))
-                .andExpect(jsonPath("$.email", is("login@example.com")));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", notNullValue()))
+            .andExpect(jsonPath("$.username", is("loginuser")))
+            .andExpect(jsonPath("$.email", is("login@example.com")));
     }
 
     @Test
@@ -73,17 +73,17 @@ class AuthApiIntegrationTest {
     void login_Failure_UserNotFound() throws Exception {
         // Given
         LoginRequest loginRequest = new LoginRequest(
-                "nonexistentuser",
-                "Password1!"
+            "nonexistentuser",
+            "Password1!"
         );
-
+        
         String requestBody = objectMapper.writeValueAsString(loginRequest);
 
         // When & Then
         mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isNotFound());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -92,26 +92,26 @@ class AuthApiIntegrationTest {
         // Given
         // 테스트 사용자 생성
         UserCreateRequest userRequest = new UserCreateRequest(
-                "loginuser2",
-                "login2@example.com",
-                "Password1!"
+            "loginuser2",
+            "login2@example.com",
+            "Password1!"
         );
-
+        
         userService.create(userRequest, Optional.empty());
-
+        
         // 잘못된 비밀번호로 로그인 시도
         LoginRequest loginRequest = new LoginRequest(
-                "loginuser2",
-                "WrongPassword1!"
+            "loginuser2",
+            "WrongPassword1!"
         );
-
+        
         String requestBody = objectMapper.writeValueAsString(loginRequest);
 
         // When & Then
         mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isUnauthorized());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -119,16 +119,16 @@ class AuthApiIntegrationTest {
     void login_Failure_InvalidRequest() throws Exception {
         // Given
         LoginRequest invalidRequest = new LoginRequest(
-                "", // 사용자 이름 비어있음 (NotBlank 위반)
-                ""  // 비밀번호 비어있음 (NotBlank 위반)
+            "", // 사용자 이름 비어있음 (NotBlank 위반)
+            ""  // 비밀번호 비어있음 (NotBlank 위반)
         );
-
+        
         String requestBody = objectMapper.writeValueAsString(invalidRequest);
 
         // When & Then
         mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isBadRequest());
     }
-}
+} 

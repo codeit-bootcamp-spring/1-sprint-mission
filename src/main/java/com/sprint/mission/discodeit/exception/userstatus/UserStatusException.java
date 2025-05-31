@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.exception.userStatus;
+package com.sprint.mission.discodeit.exception.userstatus;
 
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -8,5 +8,7 @@ public class UserStatusException extends DiscodeitException {
         super(errorCode);
     }
 
-    public UserStatusException(ErrorCode errorCode, Throwable cause) {super(errorCode, cause);}
-}
+    public UserStatusException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode, cause);
+    }
+} 

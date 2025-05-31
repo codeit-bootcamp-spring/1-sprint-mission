@@ -16,16 +16,12 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+  private UUID id;
 
-    @CreatedDate
-    @Column(columnDefinition = "timestamp with time zone", updatable = false, nullable = false)
-    private Instant createdAt;
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
+  @CreatedDate
+  @Column(columnDefinition = "timestamp with time zone", updatable = false, nullable = false)
+  private Instant createdAt;
 }

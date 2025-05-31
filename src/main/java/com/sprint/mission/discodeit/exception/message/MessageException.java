@@ -8,5 +8,7 @@ public class MessageException extends DiscodeitException {
         super(errorCode);
     }
 
-    public MessageException(ErrorCode errorCode, Throwable cause) {super(errorCode, cause);}
-}
+    public MessageException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode, cause);
+    }
+} 

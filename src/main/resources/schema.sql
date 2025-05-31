@@ -124,3 +124,6 @@ ALTER TABLE read_statuses
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
             ON DELETE CASCADE;
+
+INSERT INTO users (email, password)
+VALUES ('woody@naver.com', '$2a$12$Vrl.8VGQvTCyBf/slcXWhuTF14ribtu3TfCp0ijpGtuYqdu06KNXS');
