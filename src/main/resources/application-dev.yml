@@ -26,4 +26,12 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: /Users/byeonheejae/Desktop/Study/codeit/path/1-sprint-mission 
+      root-path: /Users/byeonheejae/Desktop/Study/codeit/path/1-sprint-mission
+
+
+jwt:
+  secret: ${JWT_SECRET:defaultSecretKeyForDevelopmentEnvironmentOnlyPleaseChangeInProduction}
+  access-token:
+    expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600}  # 1 hour in seconds
+  refresh-token:
+    expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800}  # 7 days in seconds

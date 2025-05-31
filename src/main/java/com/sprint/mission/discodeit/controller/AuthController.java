@@ -7,10 +7,15 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.UserDetailsAdapter;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtService.JwtTokens;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,35 +41,85 @@ public class AuthController {
   private final UserMapper userMapper;
   private final UserRepository userRepository;
   private final UserService userService;
+  private final JwtService jwtService;
 
-  @GetMapping("/login")
-  public ResponseEntity<UserDto> login(@AuthenticationPrincipal User user) {
-    return ResponseEntity.ok(userMapper.toDto(user));
-  }
 
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-    // 세션 무효화
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      session.invalidate();
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      Optional<Cookie> refreshTokenCookie = Arrays.stream(cookies)
+          .filter(cookie -> "refresh_token".equals(cookie.getName()))
+          .findFirst();
+
+      refreshTokenCookie.ifPresent(cookie -> {
+        jwtService.invalidateToken(cookie.getValue());
+
+        Cookie clearCookie = new Cookie("refresh_token", "");
+        clearCookie.setMaxAge(0);
+        clearCookie.setPath("/");
+        response.addCookie(clearCookie);
+      });
     }
+
     // SecurityContext 무효화
     SecurityContextHolder.clearContext();
 
-    // CSRF 토큰 제거
-    
     return ResponseEntity.ok().build();
   }
 
-  @GetMapping("me")
-  public ResponseEntity<UserDto> me(@AuthenticationPrincipal UserDetailsAdapter userDetails) {
+  @GetMapping("/me")
+  public ResponseEntity<String> me(HttpServletRequest request) {
     log.info("내 정보 조회 요청");
-    UUID userId = userDetails.getUser().getId();
-    UserDto userDto = userService.find(userId);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(userDto);
+
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      Optional<Cookie> refreshTokenCookie = Arrays.stream(cookies)
+          .filter(cookie -> "refresh_token".equals(cookie.getName()))
+          .findFirst();
+
+      if (refreshTokenCookie.isPresent()) {
+        String refreshToken = refreshTokenCookie.get().getValue();
+        Optional<String> accessTokenOpt = jwtService.getAccessTokenByRefreshToken(refreshToken);
+
+        if (accessTokenOpt.isPresent()) {
+          return ResponseEntity.ok("\"" + accessTokenOpt.get() + "\"");
+        }
+      }
+    }
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<String> refreshToken(HttpServletRequest request,
+      HttpServletResponse response) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      Optional<Cookie> refreshTokenCookie = Arrays.stream(cookies)
+          .filter(cookie -> "refresh_token".equals(cookie.getName()))
+          .findFirst();
+
+      if (refreshTokenCookie.isPresent()) {
+        String refreshToken = refreshTokenCookie.get().getValue();
+        Optional<JwtTokens> tokensOpt = jwtService.refreshToken(refreshToken);
+
+        if (tokensOpt.isPresent()) {
+          JwtTokens tokens = tokensOpt.get();
+
+          Cookie newRefreshTokenCookie = new Cookie("refresh_token", tokens.refreshToken());
+          newRefreshTokenCookie.setHttpOnly(false);
+          newRefreshTokenCookie.setSecure(request.isSecure());
+          newRefreshTokenCookie.setPath("/");
+          newRefreshTokenCookie.setMaxAge(604800);
+          response.addCookie(newRefreshTokenCookie);
+
+          return ResponseEntity.ok("\"" + tokens.accessToken() + "\"");
+        }
+      }
+    }
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
   }
 
   @PutMapping("/role")
@@ -78,11 +133,9 @@ public class AuthController {
     user.getRoles().add(request.newRole());
     userRepository.save(user);
 
-    // 세션 무효화
-    HttpSession session = httpRequest.getSession(false);
-    if (session != null) {
-      session.invalidate();
-    }
+    jwtService.invalidateAllUserSessions(user.getId());
+
+    // SecurityContext 무효화
     SecurityContextHolder.clearContext();
 
     return ResponseEntity.ok(userMapper.toDto(user));

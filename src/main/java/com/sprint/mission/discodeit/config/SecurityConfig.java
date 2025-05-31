@@ -1,19 +1,19 @@
 package com.sprint.mission.discodeit.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.UserDetailsAdapter;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import javax.sql.DataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -32,26 +32,26 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
+@Slf4j
 @Configuration
 public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http, UserMapper userMapper,
-      PersistentTokenRepository persistentTokenRepository, UserDetailsService userDetailsService
-      , AuthenticationConfiguration configuration)
+      AuthenticationConfiguration configuration, JwtAuthenticationFilter jwtAuthenticationFilter,
+      com.sprint.mission.discodeit.security.jwt.JwtService jwtService)
       throws Exception {
     JsonUsernamePasswordAuthenticationFilter loginFilter =
         new JsonUsernamePasswordAuthenticationFilter(authenticationManager(configuration));
-    loginFilter.setAuthenticationSuccessHandler(successHandler(userMapper));
+    loginFilter.setAuthenticationSuccessHandler(successHandler(userMapper, jwtService));
     loginFilter.setAuthenticationFailureHandler(failureHandler());
 
     http
         .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/api/auth/logout")
+            .ignoringRequestMatchers("/api/auth/logout", "/api/auth/login", "/api/auth/refresh")
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
         )
@@ -71,40 +71,20 @@ public class SecurityConfig {
                 "api/users/{userId}/userStatus", "/api/messages/**").permitAll()
 
             // 인증 불필요
-            .requestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/login").permitAll()
+            .requestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/login",
+                "/api/auth/refresh").permitAll()
 
             // 로그아웃
             .requestMatchers("/api/auth/logout").authenticated()
 
+            // Remember Me
+            .requestMatchers("/api/auth/me").permitAll()
+
             .anyRequest().hasRole("USER")
         )
-        .securityContext(securityContext -> securityContext
-            .securityContextRepository(new HttpSessionSecurityContextRepository())
-        )
-        .rememberMe(rememberMe -> rememberMe
-            .tokenRepository(persistentTokenRepository)
-            .tokenValiditySeconds(60 * 60 * 24 * 21)
-            .userDetailsService(userDetailsService)
-        )
-        .logout(logout -> logout
-            .logoutUrl("/api/auth/logout")
-            .deleteCookies("JSESSIONID", "remember-me")
-            .addLogoutHandler((request, response, authentication) -> {
-              if (authentication != null) {
-                persistentTokenRepository.removeUserTokens(authentication.getName());
-              }
-            })
-        )
-        .sessionManagement(session -> session
-            .maximumSessions(1)
-            .maxSessionsPreventsLogin(false)
-            .expiredSessionStrategy(event -> {
-              HttpServletResponse response = event.getResponse();
-              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-              response.setContentType("application/json");
-              response.getWriter().write("{\"error\": \"다른 기기에서 로그인되어 세션이 종료되었습니다.\"}");
-            })
-        )
+        .sessionManagement(session -> session.disable())
+        .logout(logout -> logout.disable())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
@@ -130,17 +110,28 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationSuccessHandler successHandler(UserMapper userMapper) {
+  public AuthenticationSuccessHandler successHandler(UserMapper userMapper,
+      com.sprint.mission.discodeit.security.jwt.JwtService jwtService) {
     return (request, response, authentication) -> {
       UserDetailsAdapter adapter = (UserDetailsAdapter) authentication.getPrincipal();
       User user = adapter.getUser();
       UserDto userDto = userMapper.toDto(user);
 
-      // 여기서 authentication.getAuthorities() 값을 확인합니다.
-      System.out.println("로그인 성공! 유저 권한: " + authentication.getAuthorities());
+      log.info("로그인 성공, 유저 권한: " + authentication.getAuthorities());
+
+      com.sprint.mission.discodeit.security.jwt.JwtService.JwtTokens tokens = jwtService.generateTokens(
+          userDto);
+
+      jakarta.servlet.http.Cookie refreshTokenCookie = new jakarta.servlet.http.Cookie(
+          "refresh_token", tokens.refreshToken());
+      refreshTokenCookie.setHttpOnly(false);
+      refreshTokenCookie.setSecure(request.isSecure());
+      refreshTokenCookie.setPath("/");
+      refreshTokenCookie.setMaxAge(604800);
+      response.addCookie(refreshTokenCookie);
 
       response.setContentType("application/json");
-      new ObjectMapper().writeValue(response.getWriter(), userDto);
+      response.getWriter().write("\"" + tokens.accessToken() + "\"");
     };
   }
 
