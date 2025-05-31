@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomLogoutHandler implements LogoutHandler {
 
-  private final PersistentTokenRepository persistentTokenRepository;
+//  private final PersistentTokenRepository persistentTokenRepository;
 
   @Override
   public void logout(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) {
-    if (authentication != null && authentication.getName() != null) {
+/*    if (authentication != null && authentication.getName() != null) {
       persistentTokenRepository.removeUserTokens(authentication.getName());
       log.info("user('{}')의 remember-me 토큰 삭제", authentication.getName());
-    }
+    }*/
   }
 }

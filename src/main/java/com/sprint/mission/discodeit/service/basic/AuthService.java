@@ -91,7 +91,7 @@ public class AuthService {
 
     // JwtSession 로 강제 로그아웃 처리 ---------------------------------------------------------------
     UUID userId = updatedUser.getId();
-    List<JwtSession> userSessions = jwtSessionRepository.findAllbyUserIdAndRevokedFalse(userId);
+    List<JwtSession> userSessions = jwtSessionRepository.findAllByUserIdAndRevokedFalse(userId);
 
     if (userSessions.isEmpty()) {
       log.info("사용자 ID {}의 활성 JwtSession 이 없습니다.", userId);
