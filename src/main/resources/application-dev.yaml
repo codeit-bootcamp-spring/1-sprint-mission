@@ -28,6 +28,7 @@ logging:
     root: info
     com.sprint.mission.discodeit: debug
     org.springframework.security: TRACE
+    com.example.jwt: DEBUG
 
 discodeit:
   storage:
