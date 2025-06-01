@@ -22,8 +22,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.SessionFixationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -51,23 +51,14 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain chain(
         HttpSecurity http,
-//        CustomAuthenticationProvider authProvider, // DaoAuthenticationProvider
         SecurityContextRepository securityContextRepository,
         CustomLogoutHandler customLogoutHandler,
         RememberMeServices rememberMeServices) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable())  // JWT 사용시 CSRF 불필요
+            .csrf(AbstractHttpConfigurer::disable)  // JWT 사용시 CSRF 불필요
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안함
-
-//            .logout(logout -> logout
-//                .logoutUrl("/api/auth/logout")
-//                .addLogoutHandler(customLogoutHandler)
-//                .logoutSuccessUrl("/")
-//            )
-
-//            .authenticationProvider(authProvider)
 
             .securityContext(
                 context -> context.securityContextRepository(securityContextRepository))
@@ -78,18 +69,10 @@ public class SecurityConfig {
                 .rememberMeServices(rememberMeServices)
             )
 
-            .sessionManagement(s -> s
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .sessionFixation(SessionFixationConfigurer::migrateSession) // 세션 고정보호
-                .maximumSessions(1) // 동시 로그인 제한
-                .maxSessionsPreventsLogin(false)
-                .expiredUrl("/"))
-
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint(customAuthenticationEntryPoint()))
 
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-//            .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

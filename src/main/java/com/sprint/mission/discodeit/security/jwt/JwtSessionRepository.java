@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.security.jwt;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -28,5 +29,11 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
         "WHERE js.accessTokenExpiresAt > CURRENT_TIMESTAMP " +
         "AND js.revoked = false")
     Set<UUID> findUserIdsWithActiveAccessTokens();
+
+    @Query("SELECT js FROM JwtSession js " +
+        "WHERE js.userId = :userId " +
+        "AND js.accessTokenExpiresAt > CURRENT_TIMESTAMP " +
+        "AND js.revoked = false")
+    List<JwtSession> findActiveSessionsByUserId(@Param("userId") UUID userId);
 
 }

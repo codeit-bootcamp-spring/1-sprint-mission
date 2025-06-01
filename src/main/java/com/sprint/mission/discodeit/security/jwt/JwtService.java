@@ -64,6 +64,14 @@ public class JwtService {
 
     @Transactional
     public void saveJwtSession(UserResponse userResponse, String accessToken, String refreshToken) {
+
+        // 동시 로그인 제한
+        List<JwtSession> activeSessions = jwtSessionRepository.findActiveSessionsByUserId(
+            userResponse.id());
+        if (!activeSessions.isEmpty()) {
+            activeSessions.forEach(JwtSession::revoke);
+        }
+
         Date accessTokenExpiration = getExpiration(accessToken);
         Date refreshTokenExpiration = getExpiration(refreshToken);
 
