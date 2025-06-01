@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -22,5 +23,10 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
         + "SET js.revoked = true "
         + "WHERE js.userId = :userId AND js.revoked = false")
     void revokeAllSessionsByUserId(@Param("userId") UUID userId);
+
+    @Query("SELECT DISTINCT js.userId FROM JwtSession js " +
+        "WHERE js.accessTokenExpiresAt > CURRENT_TIMESTAMP " +
+        "AND js.revoked = false")
+    Set<UUID> findUserIdsWithActiveAccessTokens();
 
 }

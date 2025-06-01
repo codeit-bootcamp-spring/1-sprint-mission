@@ -11,7 +11,7 @@ import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +39,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
-    private final SessionRegistry sessionRegistry;
+    private final JwtSessionRepository jwtSessionRepository;
 
     @Override
     @Transactional
@@ -68,11 +67,7 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserResponse> findAll() {
 
-        Set<UUID> onlineUserIds = sessionRegistry.getAllPrincipals().stream()
-            .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
-            .filter(principal -> principal instanceof CustomUserDetails)
-            .map(principal -> ((CustomUserDetails) principal).getUserResponse().id())
-            .collect(Collectors.toSet());
+        Set<UUID> onlineUserIds = jwtSessionRepository.findUserIdsWithActiveAccessTokens();
 
         List<UserResponse> userResponses = userRepository.findAll().stream()
             .map(user -> userMapper.entityToDto(user, onlineUserIds.contains(user.getId())))
