@@ -197,6 +197,10 @@ public class JwtService {
         return newAccessToken;
     }
 
+    public void revokeAllUserSessions(UUID userId) {
+        jwtSessionRepository.revokeAllSessionsByUserId(userId);
+    }
+
     /**
      * 내부 유틸 메서드
      */

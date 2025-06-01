@@ -122,12 +122,13 @@ public class AuthController implements AuthApiDocs {
         return ResponseEntity.ok(newAccessToken);
     }
 
-
     @PutMapping("/role")
     public ResponseEntity<UserResponse> updateUserRole(
         @RequestBody UserRoleUpdateRequest request) {
 
         UserResponse userResponse = authService.changeUserRole(request);
+        jwtService.revokeAllUserSessions(request.getUserId());
+
         return ResponseEntity.ok(userResponse);
     }
 
