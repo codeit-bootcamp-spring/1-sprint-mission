@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -145,11 +146,11 @@ public class JwtService {
             getClaims(token);
             return true;
         } catch (ExpiredJwtException e) {
-            log.warn("토큰이 만료되었습니다: {}", e.getMessage());
-            return false;
+            log.info("토큰이 만료되었습니다: {}", e.getMessage());
+            throw new BadCredentialsException("유효하지 않은 토큰입니다");
         } catch (JwtException e) {
-            log.warn("유효하지 않은 토큰입니다: {}", e.getMessage());
-            return false;
+            log.info("유효하지 않은 토큰입니다: {}", e.getMessage());
+            throw new BadCredentialsException("유효하지 않은 토큰입니다");
         }
     }
 
@@ -160,6 +161,19 @@ public class JwtService {
         User principal = new User(claims.getSubject(), "", authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+    }
+
+    public JwtSession findJwtSessionByRefreshToken(String refreshToken) {
+        // 없는 경우
+        JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
+            .orElseThrow(() -> new BadCredentialsException("로그인이 필요합니다."));
+
+        // 만료된 경우
+        if (!jwtSession.isRefreshTokenValid()) {
+            throw new BadCredentialsException("토큰이 만료되었습니다.");
+        }
+
+        return jwtSession;
     }
 
     /**

@@ -38,11 +38,11 @@ public class JwtSession extends BaseUpdatableEntity {
     @Column(nullable = false)
     private int refreshCount;
 
-    public boolean refreshTokenIsValid() {
+    public boolean isRefreshTokenValid() {
         return refreshTokenExpiresAt.isAfter(Instant.now());
     }
 
-    public boolean accessTokenIsValid() {
+    public boolean isAccessTokenValid() {
         return accessTokenExpiresAt.isAfter(Instant.now());
     }
 

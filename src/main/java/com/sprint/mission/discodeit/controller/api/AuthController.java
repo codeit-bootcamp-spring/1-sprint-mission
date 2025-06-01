@@ -4,24 +4,24 @@ import com.sprint.mission.discodeit.controller.docs.AuthApiDocs;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtProperties;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -62,13 +62,9 @@ public class AuthController implements AuthApiDocs {
 
         jwtService.saveJwtSession(userResponse, accessToken, refreshToken);
 
-        Cookie cookie = new Cookie("refresh_token", refreshToken);
-        cookie.setPath("/");
-        cookie.setMaxAge((int) jwtProperties.getRefreshToken().getValiditySeconds());
-        response.addCookie(cookie);
+        addRefreshTokenCookie(response, refreshToken);
 
         return ResponseEntity.ok(accessToken);
-
     }
 
 
@@ -79,12 +75,18 @@ public class AuthController implements AuthApiDocs {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getUserWithSession(
-        @AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<String> getCurrentUser(
+        @CookieValue(value = "refresh_token", required = false) String cookieRefreshToken
+    ) {
+        if (cookieRefreshToken == null || cookieRefreshToken.isEmpty()) {
+            throw new BadCredentialsException("인증 정보가 없습니다");
+        }
 
-        UUID userId = user.getUserResponse().id();
-        UserResponse userResponse = userService.findById(userId);
-        return ResponseEntity.ok(userResponse);
+        jwtService.validateToken(cookieRefreshToken);
+
+        JwtSession jwtSession = jwtService.findJwtSessionByRefreshToken(cookieRefreshToken);
+
+        return ResponseEntity.ok(jwtSession.getAccessToken());
     }
 
     @PutMapping("/role")
@@ -93,5 +95,13 @@ public class AuthController implements AuthApiDocs {
 
         UserResponse userResponse = authService.changeUserRole(request);
         return ResponseEntity.ok(userResponse);
+    }
+
+    private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie("refresh_token", refreshToken);
+        cookie.setPath("/");
+        cookie.setMaxAge((int) jwtProperties.getRefreshToken().getValiditySeconds());
+
+        response.addCookie(cookie);
     }
 }

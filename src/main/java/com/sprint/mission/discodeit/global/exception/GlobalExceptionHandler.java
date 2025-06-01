@@ -46,7 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             .status(ErrorCode.AUTH_UNAUTHORIZED.getHttpStatus().value())
             .exceptionType(ex.getClass().getSimpleName())
             .code(ErrorCode.AUTH_UNAUTHORIZED.name())
-            .message("토큰이 유효하지 않습니다. 다시 로그인 해 주세요.")
+            .message("토큰이 유효하지 않습니다. 다시 로그인 해주세요.")
             .build();
 
         return handleExceptionInternal(errorResponse);
