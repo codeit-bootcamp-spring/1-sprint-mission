@@ -23,10 +23,10 @@ public class JwtSession extends BaseUpdatableEntity {
     @Column(nullable = false)
     private UUID userId;
 
-    @Column(length = 500)
+    @Column(nullable = false, length = 500)
     private String accessToken;
 
-    @Column(length = 500)
+    @Column(nullable = false, length = 500)
     private String refreshToken;
 
     @Column(nullable = false)
@@ -38,12 +38,19 @@ public class JwtSession extends BaseUpdatableEntity {
     @Column(nullable = false)
     private int refreshCount;
 
+    @Column(columnDefinition = "boolean default false")
+    private boolean revoked;
+
     public boolean isRefreshTokenValid() {
-        return refreshTokenExpiresAt.isAfter(Instant.now());
+        return !revoked && refreshTokenExpiresAt.isAfter(Instant.now());
     }
 
     public boolean isAccessTokenValid() {
         return accessTokenExpiresAt.isAfter(Instant.now());
+    }
+
+    public void revoke() {
+        this.revoked = true;
     }
 
 }

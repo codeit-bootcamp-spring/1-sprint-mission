@@ -145,9 +145,11 @@ public class JwtService {
         try {
             getClaims(token);
             return true;
+
         } catch (ExpiredJwtException e) {
             log.info("토큰이 만료되었습니다: {}", e.getMessage());
             throw new BadCredentialsException("유효하지 않은 토큰입니다");
+
         } catch (JwtException e) {
             log.info("유효하지 않은 토큰입니다: {}", e.getMessage());
             throw new BadCredentialsException("유효하지 않은 토큰입니다");
@@ -165,15 +167,20 @@ public class JwtService {
 
     public JwtSession findJwtSessionByRefreshToken(String refreshToken) {
         // 없는 경우
-        JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
-            .orElseThrow(() -> new BadCredentialsException("로그인이 필요합니다."));
+        JwtSession jwtSession = findByRefreshTokenOrThrow(refreshToken);
 
         // 만료된 경우
         if (!jwtSession.isRefreshTokenValid()) {
             throw new BadCredentialsException("토큰이 만료되었습니다.");
         }
-
         return jwtSession;
+    }
+
+    public void revokeRefreshToken(String refreshToken) {
+        JwtSession jwtSession = findByRefreshTokenOrThrow(refreshToken);
+        jwtSession.revoke();
+        jwtSessionRepository.save(jwtSession);
+        log.info("사용자 ID {} 의 리프레시 토큰 무효화", jwtSession.getUserId());
     }
 
     /**
@@ -226,6 +233,11 @@ public class JwtService {
             .map(Object::toString)
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
+    }
+
+    private JwtSession findByRefreshTokenOrThrow(String refreshToken) {
+        return jwtSessionRepository.findByRefreshToken(refreshToken)
+            .orElseThrow(() -> new BadCredentialsException("유효하지 않은 토큰입니다."));
     }
 
     public enum TokenType {

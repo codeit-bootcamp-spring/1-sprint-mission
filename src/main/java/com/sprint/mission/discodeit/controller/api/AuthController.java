@@ -67,6 +67,22 @@ public class AuthController implements AuthApiDocs {
         return ResponseEntity.ok(accessToken);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+        @CookieValue(value = "refresh_token", required = false) String cookieRefreshToken,
+        HttpServletResponse response
+    ) {
+        if (cookieRefreshToken != null && !cookieRefreshToken.isEmpty()) {
+            jwtService.revokeRefreshToken(cookieRefreshToken);
+        }
+
+        Cookie cookie = new Cookie("refresh_token", null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping("/csrf-token")
     public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
