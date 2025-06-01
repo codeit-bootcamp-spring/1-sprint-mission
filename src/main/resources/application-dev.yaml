@@ -1,6 +1,3 @@
-server:
-  port: 8080
-
 spring:
   datasource: # 데이터베이스 설정
     driver-class-name: org.postgresql.Driver  # PostgreSQL 데이터베이스 사용
@@ -8,8 +5,12 @@ spring:
     username: discodeit_user  # 사용자
     password: discodeit1234 # 비밀번호
 
+server:
+  port: 8081
+
 logging: # Hibernate SQL 로그 설정
   level:
     com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug  # Hibernate가 실행하는 SQL 쿼리를 로그로 출력
     org.hibernate.orm.jdbc.bind: trace  # SQL에 바인딩된 실제 값을 출력 (? 대신 실제 값 보임)
+    org.springframework.security: trace # Spring Security 모듈의 로깅 레벨을 trace로 설정

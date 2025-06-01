@@ -6,11 +6,19 @@ import java.util.UUID;
 
 public class UserNotFoundException extends UserException {
 
-  public UserNotFoundException(UUID userId) {
-    super(ErrorCode.USER_NOT_FOUND, Collections.singletonMap("userId", userId));
+  public UserNotFoundException() {
+    super(ErrorCode.USER_NOT_FOUND);
   }
 
-  public UserNotFoundException(String username) {
-    super(ErrorCode.USER_NOT_FOUND, Collections.singletonMap("username", username));
+  public static UserNotFoundException withId(UUID userId) {
+    UserNotFoundException exception = new UserNotFoundException();
+    exception.addDetail("userId", userId);
+    return exception;
+  }
+
+  public static UserNotFoundException withUsername(String username) {
+    UserNotFoundException exception = new UserNotFoundException();
+    exception.addDetail("username", username);
+    return exception;
   }
 }

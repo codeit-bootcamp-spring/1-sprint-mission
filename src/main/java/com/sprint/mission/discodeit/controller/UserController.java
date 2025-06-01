@@ -1,13 +1,12 @@
-
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
-import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.userStatusDto.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
@@ -43,16 +42,14 @@ public class UserController implements UserApi {
   @Override
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(
-      @Valid @RequestPart("userRequest") CreateUserRequest userRequest,
+      @Valid @RequestPart("userCreateRequest") UserCreateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
-    log.info("User 생성 요청 : {}", userRequest);
-
-    Optional<CreateBinaryContentRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
+    log.info("사용자 생성 요청 : {}", request);
+    Optional<BinaryContentCreateRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
         profile);
-    UserDto userDto = userService.create(userRequest, profileRequest);
-
-    log.debug("User 생성 응답 : {}", userDto);
+    UserDto userDto = userService.create(request, profileRequest);
+    log.debug("사용자 생성 응답 : {}", userDto);
 
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -63,16 +60,16 @@ public class UserController implements UserApi {
   @PatchMapping(path = "{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @Valid @RequestPart("userRequest") UpdateUserRequest userRequest,
+      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest request,
       @RequestPart("profile") MultipartFile profile) {
 
-    log.info("User 수정 요청 : userId={}, request={}", userId, userRequest);
+    log.info("사용자 수정 요청 : id={}, request={}", userId, request);
 
-    Optional<CreateBinaryContentRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
+    Optional<BinaryContentCreateRequest> profileRequest = BinaryContentUtil.convertToBinaryContentRequest(
         profile);
-    UserDto userDto = userService.update(userId, userRequest, profileRequest);
+    UserDto userDto = userService.update(userId, request, profileRequest);
 
-    log.debug("User 수정 응답 : {}", userDto);
+    log.debug("사용자 수정 응답 : {}", userDto);
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -83,11 +80,11 @@ public class UserController implements UserApi {
   @DeleteMapping(path = "{userId}")
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
 
-    log.info("User 삭제 요청 : userId={}", userId);
+    log.info("User 삭제 요청 : id={}", userId);
 
     userService.delete(userId);
 
-    log.debug("User 삭제 성공 : userId={}", userId);
+    log.info("User 삭제 완료");
 
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
@@ -98,7 +95,9 @@ public class UserController implements UserApi {
   @GetMapping
   public ResponseEntity<List<UserDto>> findAll() {
 
+    log.info("사용자 전체 조회 요청");
     List<UserDto> userDtos = userService.findAll();
+    log.debug("사용자 전체 조회 응답: count={}", userDtos.size());
 
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -109,13 +108,11 @@ public class UserController implements UserApi {
   @PatchMapping(path = "{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @PathVariable("userId") UUID userId,
-      @Valid @RequestBody UpdateUserStatusRequest request) {
+      @Valid @RequestBody UserStatusUpdateRequest request) {
 
-    log.info("UserStatus 수정 요청 : userId={}, request={}", userId, request);
-
+    log.info("사용자 상태 수정 요청 : userId={}, request={}", userId, request);
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, request);
-
-    log.debug("UserStatus 수정 응답 : {}", userStatusDto);
+    log.info("사용자 상태 수정 응답 : {}", userStatusDto);
 
     return ResponseEntity
         .status(HttpStatus.OK)

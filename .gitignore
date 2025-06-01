@@ -17,7 +17,6 @@ build/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-node_modules/
 
 ### Eclipse ###
 .apt_generated
@@ -48,5 +47,18 @@ bin/
 ### data ###
 /data/
 
+### Discodeit ###
+.discodeit
+
 ### env ###
 *.env
+
+### 숨김 파일 ###
+.*
+!.gitignore
+
+### Github Actions ###
+!.github/
+
+### log ###
+/logs/

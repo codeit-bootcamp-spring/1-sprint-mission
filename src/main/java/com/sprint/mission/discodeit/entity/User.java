@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -38,12 +40,17 @@ public class User extends BaseUpdatableEntity {             // 유저 정보
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus status;    // 유저 접속 상태
 
+  @Column(name = "role", length = 30, nullable = false)
+  @Enumerated(EnumType.STRING)
+  private Role role;
+
   // 생성자
   public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
     this.password = password;
     this.profile = profile;
+    this.role = Role.ROLE_USER;
   }
 
   // 유저 수정
@@ -62,5 +69,10 @@ public class User extends BaseUpdatableEntity {             // 유저 정보
     if (newProfile != null) {
       this.profile = newProfile;
     }
+  }
+
+  // 권한 변경
+  public void updateRole(Role newRole) {
+    this.role = newRole;
   }
 }
