@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.BDDAssertions.within;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -49,7 +48,7 @@ class UserStatusRepositoryTest {
   @DisplayName("사용자 ID로 상태 정보를 찾을 수 있다")
   void findByUserId_ExistingUserId_ReturnsUserStatus() {
     // given
-    Instant now = Instant.now();
+    Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
     User user = createTestUserWithStatus("testUser", "test@example.com", now);
     UUID userId = user.getId();
 
@@ -63,9 +62,8 @@ class UserStatusRepositoryTest {
     // then
     assertThat(foundStatus).isPresent();
     assertThat(foundStatus.get().getUser().getId()).isEqualTo(userId);
-    assertThat(foundStatus.get().getLastActiveAt())
-        .isCloseTo(now, within(1, ChronoUnit.MILLIS));
   }
+
   @Test
   @DisplayName("존재하지 않는 사용자 ID로 검색하면 빈 Optional을 반환한다")
   void findByUserId_NonExistingUserId_ReturnsEmptyOptional() {

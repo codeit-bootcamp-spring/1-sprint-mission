@@ -1,44 +1,40 @@
-# 1단계: 빌드용 이미지
-FROM gradle:8.6-jdk17-alpine AS builder
+# 빌드 스테이지
+FROM amazoncorretto:17 AS builder
 
+# 작업 디렉토리 설정
 WORKDIR /app
 
-RUN apk add --no-cache dos2unix
-
-# Gradle Wrapper 복사 (명시적으로)
+# Gradle Wrapper 파일 먼저 복사
+COPY gradle ./gradle
 COPY gradlew ./gradlew
-COPY gradle/wrapper/gradle-wrapper.jar ./gradle/wrapper/gradle-wrapper.jar
-COPY gradle/wrapper/gradle-wrapper.properties ./gradle/wrapper/gradle-wrapper.properties
 
-
-RUN dos2unix ./gradlew && chmod +x ./gradlew
-
-# build 설정 복사
+# Gradle 캐시를 위한 의존성 파일 복사
 COPY build.gradle settings.gradle ./
 
-# 의존성 캐싱
-RUN ./gradlew dependencies --no-daemon || return 0
+# 의존성 다운로드
+RUN ./gradlew dependencies
 
-# 전체 소스 복사
+# 소스 코드 복사 및 빌드
 COPY src ./src
+RUN ./gradlew build -x test
 
-# 실제 빌드
-RUN ./gradlew clean build -x test --no-daemon
 
-# 2단계: 실행용 이미지 (경량)
-FROM amazoncorretto:17-alpine
+# 런타임 스테이지
+FROM amazoncorretto:17-alpine3.21
 
+# 작업 디렉토리 설정
 WORKDIR /app
 
-# 환경 변수 설정
+# 프로젝트 정보를 ENV로 설정
 ENV PROJECT_NAME=discodeit \
     PROJECT_VERSION=1.2-M8 \
-    JVM_OPTS="-Xmx192m -Xms92m -XX:MaxMetaspaceSize=192m -XX:+UseSerialGC"
+    JVM_OPTS=""
 
-# 빌드된 JAR만 복사
-COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
+# 빌드 스테이지에서 jar 파일만 복사
+COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
 
+# 80 포트 노출
 EXPOSE 80
 
-# 애플리케이션 실행
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+# jar 파일 실행
+ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]

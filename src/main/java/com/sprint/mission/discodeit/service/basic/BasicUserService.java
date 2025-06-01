@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,8 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final PasswordEncoder passwordEncoder;
+
 
   @Transactional
   @Override
@@ -63,7 +66,7 @@ public class BasicUserService implements UserService {
           return binaryContent;
         })
         .orElse(null);
-    String password = userCreateRequest.password();
+    String password = passwordEncoder.encode(userCreateRequest.password());
 
     User user = new User(username, email, password, nullableProfile);
     Instant now = Instant.now();
@@ -81,6 +84,16 @@ public class BasicUserService implements UserService {
         .map(userMapper::toDto)
         .orElseThrow(() -> UserNotFoundException.withId(userId));
     log.info("사용자 조회 완료: id={}", userId);
+    return userDto;
+  }
+
+  @Override
+  public UserDto find(String username) {
+    log.debug("사용자 조회 시작: username={}", username);
+    UserDto userDto = userRepository.findByUsername(username)
+        .map(userMapper::toDto)
+        .orElseThrow(() -> UserNotFoundException.withUsername(username));
+    log.info("사용자 조회 완료: username={}", username);
     return userDto;
   }
 

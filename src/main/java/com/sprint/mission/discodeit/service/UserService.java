@@ -15,6 +15,8 @@ public interface UserService {
 
   UserDto find(UUID userId);
 
+  UserDto find(String username); // username으로 사용자 조회 추가
+
   List<UserDto> findAll();
 
   UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,

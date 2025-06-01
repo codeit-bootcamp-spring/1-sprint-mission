@@ -44,14 +44,7 @@ bin/
 ### 숨김 파일 ###
 .*
 !.gitignore
-!.github
 
 
-### postgresql ###
-/postgresql_data
-
-
-### else ###
-compose.yml
-.env
-discodeit.env
+### Github Actions ###
+!.github/

@@ -3,7 +3,7 @@ spring:
     url: jdbc:h2:mem:testdb;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: sa
-    password: 00
+    password:
   jpa:
     hibernate:
       ddl-auto: create
@@ -11,9 +11,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  sql:
-    init:
-      mode: never
 
 logging:
   level:

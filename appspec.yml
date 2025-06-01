@@ -1,9 +1,0 @@
-version: 0.0
-Resources:
-  - TargetService:
-      Type: AWS::ECS::Service
-      Properties:
-        TaskDefinition: "arn:aws:ecs:ap-northeast-2:490661626696:task-definition/discodeit-task:4"
-        LoadBalancerInfo:
-          ContainerName: discodeit-app
-          ContainerPort: 80

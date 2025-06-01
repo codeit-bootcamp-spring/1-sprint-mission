@@ -16,6 +16,8 @@ logging:
     com.sprint.mission.discodeit: debug
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+    org.springframework.security: TRACE
+
 
 management:
   endpoint:
