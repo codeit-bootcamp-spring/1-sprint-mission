@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.security.filter;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,21 +21,23 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.filter.GenericFilterBean;
 
 // 로그아웃 필터 구현
 @Slf4j
 @RequiredArgsConstructor
-public class CustomLogoutFilter extends OncePerRequestFilter {
+public class CustomLogoutFilter extends GenericFilterBean {
 
   private final SessionRegistry sessionRegistry;
   private final PersistentTokenRepository persistentTokenRepository;
   private final JwtService jwtService;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
+  public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
+      FilterChain filterChain) throws IOException, ServletException {
+
+    HttpServletRequest request = (HttpServletRequest) servletRequest;
+    HttpServletResponse response = (HttpServletResponse) servletResponse;
 
     if ("/api/auth/logout".equals(request.getRequestURI()) &&
         "POST".equalsIgnoreCase(request.getMethod())) {

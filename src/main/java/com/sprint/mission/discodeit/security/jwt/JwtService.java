@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class JwtService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
 
+  @Transactional
   // UserDto정보로 토큰을 생성할 수 있다. (JwtSession을 같이 저장)
   public JwtSession generateTokens(UserDto userDto) {
 
@@ -44,6 +46,7 @@ public class JwtService {
     return jwtTokenProvider.validate(token);
   }
 
+  @Transactional
   //리프레시 토큰을 무효화할 수 있다.
   public void invalidateRefreshToken(String refreshToken) {
     //1. refreshToken 이 유효한지 검사
@@ -58,6 +61,7 @@ public class JwtService {
 
   }
 
+  @Transactional
   // 리프레시 토큰을 활용해 엑세스 토큰을 재발급할 수 있다.
   public String reissueAccessTokens(String refreshToken) {
     //1. refreshToken 이 유효한지 검사
