@@ -24,9 +24,10 @@ public class AdminAccountInitializer implements CommandLineRunner {
       log.warn("No admin password configured");
       adminPassword = "admin123"; // 기본값
     }
-
-    if (userRepository.findByUsername("admin").isEmpty()) {
-      User adminUser = new User();
+    //비밀번호 초기화 되지 않던 오류 수정
+    User adminUser = userRepository.findByUsername("admin").orElse(null);
+    if (adminUser == null) {
+      adminUser = new User();
       adminUser.setUsername("admin");
       adminUser.setEmail("admin@discodeit.com");
       adminUser.setPassword(passwordEncoder.encode(adminPassword));
@@ -35,7 +36,13 @@ public class AdminAccountInitializer implements CommandLineRunner {
       userRepository.save(adminUser);
 
       log.info("Admin account created");
+      return;
     }
+    
+    adminUser.setPassword(passwordEncoder.encode(adminPassword));
+    adminUser.setRole(Role.ADMIN);
+    userRepository.save(adminUser);
+
   }
 
   // CommandLineRunner
