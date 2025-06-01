@@ -166,6 +166,8 @@ public class SecurityConfig {
       throws Exception {
 
     http
+        // authenticationProvider(daoAuthenticationProvider)로 명시적으로 등록하는 이유
+        // : roleHierarchy 때문!
         .authenticationProvider(daoAuthenticationProvider)
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(

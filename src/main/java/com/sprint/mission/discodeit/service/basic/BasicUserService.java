@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +42,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentService binaryContentService;
   private final BinaryContentRepository binaryContentRepository;
   private final UserMapper userMapper;
-  private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final PasswordEncoder passwordEncoder;
   private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
 
   @Override
@@ -74,7 +74,7 @@ public class BasicUserService implements UserService {
     }
 
     User user = new User(createUserDto.username(), createUserDto.email(),
-        bCryptPasswordEncoder.encode(createUserDto.password()), null);
+        passwordEncoder.encode(createUserDto.password()), null);
     userRepository.save(user);
 
     log.info("사용자 생성 완료: id = {}, email = {}, username = {}", user.getId(), user.getEmail(),
@@ -151,12 +151,14 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(UUID.fromString(userId))
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    //to
     user.setUsername(
         updateUserDto.newUsername() == null ? user.getUsername() : updateUserDto.newUsername());
     user.setEmail(updateUserDto.newEmail() == null ? user.getEmail() : updateUserDto.newEmail());
+
+    String newPassword = passwordEncoder.encode(updateUserDto.newPassword());
     user.setPassword(
-        updateUserDto.newPassword() == null ? user.getPassword() : updateUserDto.newPassword());
+        updateUserDto.newPassword() == null ? user.getPassword() : newPassword);
+
     user.setUpdatedAt(
         updateUserDto.updatedAt() == null ? Instant.now() : updateUserDto.updatedAt());
 
