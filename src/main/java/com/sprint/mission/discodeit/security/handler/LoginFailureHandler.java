@@ -16,7 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
-@Component
+// @Component
 @RequiredArgsConstructor
 @Slf4j
 public class LoginFailureHandler implements AuthenticationFailureHandler {

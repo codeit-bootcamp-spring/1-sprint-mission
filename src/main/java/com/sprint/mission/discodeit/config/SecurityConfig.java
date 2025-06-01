@@ -45,6 +45,8 @@ import org.springframework.security.web.authentication.session.SessionFixationPr
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 
 @Slf4j
 @EnableMethodSecurity
@@ -52,12 +54,18 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final LoginSuccessHandler loginSuccessHandler;
-  private final LoginFailureHandler loginFailureHandler;
+  //  private final LoginSuccessHandler loginSuccessHandler;
+//  private final LoginFailureHandler loginFailureHandler;
   private final ObjectMapper objectMapper;
   private final UserDetailsService userDetailsService;
   //
   private final JwtService jwtService;
+
+
+  @Bean
+  public CsrfTokenRequestHandler csrfTokenRequestAttributeHandler() {
+    return new CsrfTokenRequestAttributeHandler();
+  }
 
   @Bean
   public CookieCsrfTokenRepository cookieCsrfTokenRepository() {
@@ -149,13 +157,15 @@ public class SecurityConfig {
 
     // formLogin 비활성화
     http.formLogin(AbstractHttpConfigurer::disable)
-        // .csrf(AbstractHttpConfigurer::disable)
+//        .csrf(AbstractHttpConfigurer::disable)
         .csrf(csrf -> csrf
             .csrfTokenRepository(cookieCsrfTokenRepository)
+            .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
             .ignoringRequestMatchers(
                 "/h2-console/**",
                 "/api/auth/logout")
         )
+
         // HTTP Basic 인증 비활성화
         .httpBasic(AbstractHttpConfigurer::disable)
         // 세션 관리 설정
@@ -163,28 +173,29 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         // URL 별 접근 권한 설정
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(
-                "/",
-                "/index.html",
-                "/assets/**",
-                "/favicon.ico",
-                "/h2-console/**",
-                "/api/auth/login",
-                "/api/auth/csrf-token",
-                "/swagger-ui/**",
-                "/v3/api-docs/**",
-                "/actuator/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-            .requestMatchers("/api/auth/role").hasRole("ADMIN")
-            .requestMatchers("/api/channels/public").hasRole("CHANNEL_MANAGER")
-            .requestMatchers(HttpMethod.PATCH, "/api/channels/{channelId}")
-            .hasRole("CHANNEL_MANAGER")
-            .requestMatchers(HttpMethod.DELETE, "/api/channels/{channelId}")
-            .hasRole("CHANNEL_MANAGER")
-            .requestMatchers("/api/**").hasRole("USER")
-            .anyRequest().authenticated()
+                .requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/assets/**",
+                    "/favicon.ico",
+                    "/h2-console/**",
+                    "/api/auth/login",
+//                "/api/auth/csrf-token",
+                    "/api/auth/me",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/actuator/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .requestMatchers("/api/auth/role").hasRole("ADMIN")
+                .requestMatchers("/api/channels/public").hasRole("CHANNEL_MANAGER")
+                .requestMatchers(HttpMethod.PATCH, "/api/channels/{channelId}")
+                .hasRole("CHANNEL_MANAGER")
+                .requestMatchers(HttpMethod.DELETE, "/api/channels/{channelId}")
+                .hasRole("CHANNEL_MANAGER")
+                .requestMatchers("/api/**").hasRole("USER")
+                .anyRequest().authenticated()
         )
-        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         // X-Frame-Options 를 SAMEORIGIN 설정 (H2 콘솔 프레임 허용)
         .headers(headers -> headers
             .frameOptions(

@@ -23,15 +23,15 @@ public class JwtSession {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
-  private String id;
+  private UUID id;
 
   @Column(name = "user_id", nullable = false)
   private UUID userId;
 
-  @Column(name = "access_token", nullable = false)
+  @Column(name = "access_token", nullable = false, columnDefinition = "TEXT")
   private String accessToken;
 
-  @Column(name = "refresh_token", nullable = false)
+  @Column(name = "refresh_token", nullable = false, columnDefinition = "TEXT")
   private String refreshToken;
 
   @Column(name = "expires_at", nullable = false)

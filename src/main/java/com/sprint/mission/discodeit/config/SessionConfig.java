@@ -8,7 +8,7 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
-@Configuration
+// @Configuration
 @RequiredArgsConstructor
 public class SessionConfig {
 

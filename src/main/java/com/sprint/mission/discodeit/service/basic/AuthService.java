@@ -44,7 +44,7 @@ public class AuthService {
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
   private final RoleRepository roleRepository;
-  private final SessionRegistry sessionRegistry;
+  // private final SessionRegistry sessionRegistry;
   private final JwtSessionRepository jwtSessionRepository;
 
   public UserDto getUserBySession() {

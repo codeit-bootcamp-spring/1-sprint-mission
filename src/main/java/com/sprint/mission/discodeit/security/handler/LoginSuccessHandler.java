@@ -29,7 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-@Component
+// @Component
 @RequiredArgsConstructor
 @Slf4j
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
