@@ -4,12 +4,16 @@ import com.sprint.mission.discodeit.controller.swagger.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
+import com.sprint.mission.discodeit.security.AccessManager;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,10 +25,19 @@ import java.util.UUID;
 public class ReadStatusController implements ReadStatusApi {
 
   private final ReadStatusService readStatusService;
+  private final AccessManager accessManager;
 
-  @PreAuthorize("@accessManager.isSelf(#request.userId(), authentication)")
+  //@PreAuthorize("@accessManager.isSelf(#request.userId(), authentication)")
   @PostMapping
-  public ResponseEntity<ReadStatusDto> create(@Valid @RequestBody ReadStatusCreateDTO request) {
+  public ResponseEntity<ReadStatusDto> create(
+          @Valid @RequestBody ReadStatusCreateDTO request,
+          Authentication authentication) {
+
+    if (!accessManager.isSelf(request.getUserId(), authentication)) {
+      throw new AccessDeniedException("권한 없음");
+    }
+
+
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(readStatusService.create(request));

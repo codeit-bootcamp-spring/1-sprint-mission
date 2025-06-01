@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 @Tag(name = "ReadStatus", description = "Message 읽음 상태 API")
 public interface ReadStatusApi {
 
-  @Operation(summary = "Message 읽음 상태 생성")
+/*  @Operation(summary = "Message 읽음 상태 생성")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "201", description = "Message 읽음 상태가 성공적으로 생성됨",
@@ -37,7 +37,7 @@ public interface ReadStatusApi {
   })
   ResponseEntity<ReadStatusDto> create(
       @Parameter(description = "Message 읽음 상태 생성 정보") ReadStatusCreateDTO request
-  );
+  );*/
 
 
   @Operation(summary = "Message 읽음 상태 수정")
@@ -67,4 +67,4 @@ public interface ReadStatusApi {
   ResponseEntity<List<ReadStatusDto>> findAllByUserId(
       @Parameter(description = "조회할 User ID") UUID userId
   );
-} 
+}

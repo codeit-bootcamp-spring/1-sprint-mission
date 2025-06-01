@@ -14,6 +14,8 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
@@ -40,7 +42,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
   private final PasswordEncoder passwordEncoder;
-  private final SessionRegistry sessionRegistry;
+  private final JwtSessionRepository jwtSessionRepository;
 
   @Override
   @Transactional
@@ -114,7 +116,6 @@ public class BasicUserService implements UserService {
     if (!userRepository.existsById(id)) {
       throw new UserNotFoundException(id);
     }
-    //userStatus ddl on delete cascade, profile jpa delete cascade
     userRepository.deleteById(id);
     log.info("사용자 삭제 완료 id: {}", id);
   }
@@ -143,26 +144,14 @@ public class BasicUserService implements UserService {
             .orElseThrow(() -> new UserNotFoundException(userId));
     user.updateRole(newRole);
 
-
-    //세션에서 지우기
-    sessionRegistry.getAllPrincipals().stream()
-            .filter(principal -> ((CustomUserDetails) principal).getUser().getId().equals(userId))
-            .findFirst()
-            .ifPresent(principal -> {
-                      List<SessionInformation> activeSessions =
-                              sessionRegistry.getAllSessions(principal, false);
-                      log.debug("Active sessions: {}", activeSessions.size());
-                      activeSessions.forEach(SessionInformation::expireNow); //세션 찾아서 만료처리
-                    }
-            );
+    // Jwt 기반 강제 로그아웃 처리
+    jwtSessionRepository.findAllByUserId(userId).forEach(JwtSession::revoke);
 
     return userMapper.toDto(user, isUserOnline(user));
   }
 
   public boolean isUserOnline(User user) {
-    return sessionRegistry.getAllPrincipals().stream()
-            .filter(principal -> principal instanceof CustomUserDetails)
-            .map(principal -> ((CustomUserDetails) principal).getUser())
-            .anyMatch(u -> u.getId().equals(user.getId()));
+    return jwtSessionRepository.existsByUserIdAndRevokedFalse(user.getId());
   }
+
 }

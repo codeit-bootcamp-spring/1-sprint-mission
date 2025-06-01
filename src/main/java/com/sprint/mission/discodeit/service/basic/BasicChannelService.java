@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
 import com.sprint.mission.discodeit.repository.jpa.MessageRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +36,7 @@ public class BasicChannelService implements ChannelService {
 
   private final UserMapper userMapper;
   private final ChannelMapper channelMapper;
-  private final SessionRegistry sessionRegistry;
-
+  private final JwtSessionRepository jwtSessionRepository;
 
 
   @Override
@@ -135,7 +135,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   private boolean isUserOnline(User user) {
-    return !sessionRegistry.getAllSessions(user, false).isEmpty();
+    return jwtSessionRepository.existsByUserIdAndRevokedFalse(user.getId());
   }
 
   private Instant findLastMessageAt(Channel channel) {

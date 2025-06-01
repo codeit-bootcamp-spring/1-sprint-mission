@@ -77,3 +77,9 @@ security:
   remember-me:
     key: my-secret-key
     token-validity-seconds: 1814400
+
+
+jwt:
+  secret: G+ccMEW0MgzTGBdn2rJgFa4pHjUzHGlh0D1YdzRv7XA=
+  access-expiration-seconds: 1800     # 30분
+  refresh-expiration-seconds: 1209600 # 2주

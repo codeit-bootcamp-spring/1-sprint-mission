@@ -1,15 +1,12 @@
 package com.sprint.mission.discodeit.security;
 
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -17,7 +14,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends OncePerRequestFilter {
 
-    private final PersistentTokenRepository tokenRepository;
+    private final JwtService jwtService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -26,31 +23,37 @@ public class CustomLogoutFilter extends OncePerRequestFilter {
         if (request.getRequestURI().equals("/api/auth/logout")
                 && request.getMethod().equalsIgnoreCase("POST")) {
 
-            //세션 무효화
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();
+            // 1. 쿠키에서 refresh_token 추출
+            String refreshToken = extractRefreshToken(request);
+
+            if (refreshToken != null) {
+                // 2. 리프레시 토큰 무효화
+                jwtService.revoke(refreshToken);
             }
 
-            // SecurityContext 제거
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            SecurityContextHolder.clearContext();
+            // 3. 쿠키 삭제
+            Cookie expiredCookie = new Cookie("refresh_token", null);
+            expiredCookie.setPath("/");
+            expiredCookie.setHttpOnly(true);
+            expiredCookie.setMaxAge(0); // 즉시 만료
+            response.addCookie(expiredCookie);
 
-            // remember-me 쿠키 삭제
-            Cookie cookie = new Cookie("remember-me", null);
-            cookie.setPath("/");
-            cookie.setMaxAge(0); // 즉시 만료
-            response.addCookie(cookie);
-
-            // DB 토큰 삭제
-            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
-                tokenRepository.removeUserTokens(auth.getName());
-            }
-
+            // 4. 응답 반환
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
         filterChain.doFilter(request, response);
     }
+
+    private String extractRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        for (Cookie cookie : request.getCookies()) {
+            if ("refresh_token".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
 }

@@ -19,10 +19,19 @@ public class UserMapper {
         user.getUsername(),
         user.getEmail(),
         binaryContentMapper.toDto(user.getProfile()),
-
-        //userStatus fetch join으로 가져오자
         isOnline,
         user.getRole()
+    );
+  }
+
+  public UserDto toDto(User user) {
+    return new UserDto(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            binaryContentMapper.toDto(user.getProfile()),
+            true,
+            user.getRole()
     );
   }
 }

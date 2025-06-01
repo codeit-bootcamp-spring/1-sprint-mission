@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.security;
 
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.repository.jpa.MessageRepository;
 import com.sprint.mission.discodeit.repository.jpa.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
@@ -17,56 +18,62 @@ public class AccessManager {
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    public boolean isSelfOrAdmin(UUID targetUserId, Authentication authentication) {
-        // 현재 사용자 ID
-        UUID currentUserId = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
+    public boolean isSelf(UUID userId, Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDto userDto) {
+            return userDto.getId().equals(userId);
+        }
+        return false;
+    }
 
-        // 본인이거나
+    public boolean isReadStatusOwner(UUID readStatusId, Authentication authentication) {
+        UUID currentUserId = extractUserId(authentication);
+        if (currentUserId == null) return false;
+
+        return readStatusRepository.findById(readStatusId)
+                .map(rs -> rs.getUser().getId().equals(currentUserId))
+                .orElse(false);
+    }
+
+    public boolean isSelfOrAdmin(UUID targetUserId, Authentication authentication) {
+        UUID currentUserId = extractUserId(authentication);
+        if (currentUserId == null) return false;
+
         if (currentUserId.equals(targetUserId)) {
             return true;
         }
 
-        // 관리자 권한이면 허용
         return authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ADMIN"));
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
     }
 
     public boolean isMessageAuthor(UUID messageId, Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        UUID currentUserId = userDetails.getUser().getId();
+        UUID currentUserId = extractUserId(authentication);
+        if (currentUserId == null) return false;
 
         return messageRepository.findById(messageId)
-                .map(message -> message.getAuthor().getId().equals(currentUserId))
+                .map(msg -> msg.getAuthor().getId().equals(currentUserId))
                 .orElse(false);
     }
 
     public boolean isMessageAuthorOrAdmin(UUID messageId, Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        UUID currentUserId = userDetails.getUser().getId();
+        UUID currentUserId = extractUserId(authentication);
+        if (currentUserId == null) return false;
 
         return messageRepository.findById(messageId)
-                .map(message ->
-                        message.getAuthor().getId().equals(currentUserId) ||
+                .map(msg ->
+                        msg.getAuthor().getId().equals(currentUserId) ||
                                 authentication.getAuthorities().stream()
-                                        .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))
+                                        .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))
                 )
                 .orElse(false);
     }
 
-    public boolean isSelf(UUID userId, Authentication authentication) {
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userDetails.getUser().getId().equals(userId);
-    }
-
-
-    public boolean isReadStatusOwner(UUID readStatusId, Authentication authentication) {
-        if (authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
-            UUID currentUserId = userDetails.getUser().getId();
-
-            return readStatusRepository.findById(readStatusId)
-                    .map(rs -> rs.getUser().getId().equals(currentUserId))
-                    .orElse(false);
+    private UUID extractUserId(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDto userDto) {
+            return userDto.getId();
         }
-        return false;
+        return null;
     }
 }
