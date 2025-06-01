@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.util.UUID;
 
 /**
  * 요청마다 MDC에 컨텍스트 정보를 추가하는 인터셉터
