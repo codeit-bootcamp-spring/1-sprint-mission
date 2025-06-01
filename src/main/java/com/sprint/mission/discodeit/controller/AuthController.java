@@ -69,7 +69,7 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<String> me(HttpServletRequest request) {
+  public ResponseEntity<UserDto> me(HttpServletRequest request) {
     log.info("내 정보 조회 요청");
 
     Cookie[] cookies = request.getCookies();
@@ -83,7 +83,12 @@ public class AuthController {
         Optional<String> accessTokenOpt = jwtService.getAccessTokenByRefreshToken(refreshToken);
 
         if (accessTokenOpt.isPresent()) {
-          return ResponseEntity.ok("\"" + accessTokenOpt.get() + "\"");
+          String accessToken = accessTokenOpt.get();
+          Optional<UserDto> userDtoOpt = jwtService.validateToken(accessToken);
+
+          if (userDtoOpt.isPresent()) {
+            return ResponseEntity.ok(userDtoOpt.get());
+          }
         }
       }
     }
@@ -92,7 +97,7 @@ public class AuthController {
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<String> refreshToken(HttpServletRequest request,
+  public ResponseEntity<UserDto> refreshToken(HttpServletRequest request,
       HttpServletResponse response) {
     Cookie[] cookies = request.getCookies();
     if (cookies != null) {
@@ -114,7 +119,10 @@ public class AuthController {
           newRefreshTokenCookie.setMaxAge(604800);
           response.addCookie(newRefreshTokenCookie);
 
-          return ResponseEntity.ok("\"" + tokens.accessToken() + "\"");
+          Optional<UserDto> userDtoOpt = jwtService.validateToken(tokens.accessToken());
+          if (userDtoOpt.isPresent()) {
+            return ResponseEntity.ok(userDtoOpt.get());
+          }
         }
       }
     }

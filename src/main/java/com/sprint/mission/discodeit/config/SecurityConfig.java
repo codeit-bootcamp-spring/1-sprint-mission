@@ -131,7 +131,8 @@ public class SecurityConfig {
       response.addCookie(refreshTokenCookie);
 
       response.setContentType("application/json");
-      response.getWriter().write("\"" + tokens.accessToken() + "\"");
+      com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+      objectMapper.writeValue(response.getWriter(), userDto);
     };
   }
 
