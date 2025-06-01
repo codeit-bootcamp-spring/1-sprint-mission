@@ -38,18 +38,21 @@ public class JwtService {
     private final JwtSessionRepository jwtSessionRepository;
     private final JwtProperties jwtProperties;
     private final Clock clock;
+    private final JwtBlacklist jwtBlacklist;
 
     @Autowired
-    public JwtService(JwtSessionRepository jwtSessionRepository, JwtProperties jwtProperties) {
-        this(jwtSessionRepository, jwtProperties, Clock.systemUTC());
+    public JwtService(JwtSessionRepository jwtSessionRepository, JwtProperties jwtProperties,
+        JwtBlacklist jwtBlacklist) {
+        this(jwtSessionRepository, jwtProperties, Clock.systemUTC(), jwtBlacklist);
     }
 
     // 테스트용 생성자 (Clock 주입 가능)
     public JwtService(JwtSessionRepository jwtSessionRepository, JwtProperties jwtProperties,
-        Clock clock) {
+        Clock clock, JwtBlacklist jwtBlacklist) {
         this.jwtSessionRepository = jwtSessionRepository;
         this.jwtProperties = jwtProperties;
         this.clock = clock;
+        this.jwtBlacklist = jwtBlacklist;
 
         // 시작 시 비밀키 검증
         // validateSecretKey();
@@ -152,7 +155,13 @@ public class JwtService {
     // 토큰 유효성 검사
     public boolean validateToken(String token) {
         try {
-            getClaims(token);
+            Claims claims = getClaims(token);
+
+            String tokenId = claims.getId();
+            if (jwtBlacklist.isBlacklisted(tokenId)) {
+                log.warn("블랙리스트에 포함된 토큰: {}", tokenId);
+                return false;
+            }
             return true;
 
         } catch (ExpiredJwtException e) {
@@ -188,17 +197,25 @@ public class JwtService {
     public void revokeRefreshToken(String refreshToken) {
         JwtSession jwtSession = findByRefreshTokenOrThrow(refreshToken);
         jwtSession.revoke();
+
+        Claims claims = getClaims(jwtSession.getAccessToken());
+        String tokenId = claims.getId();
+        Instant expiryTime = claims.getExpiration().toInstant();
+        jwtBlacklist.addToBlacklist(tokenId, expiryTime);
+
         jwtSessionRepository.save(jwtSession);
-        log.info("사용자 ID {} 의 리프레시 토큰 무효화", jwtSession.getUserId());
     }
 
     public void revokeAllUserSessions(UUID userId) {
         jwtSessionRepository.revokeAllSessionsByUserId(userId);
     }
 
-    /**
-     * 내부 유틸 메서드
-     */
+    public String getUsernameFromToken(String token) {
+        Claims claims = getClaims(token);
+        return claims.getSubject();
+    }
+
+
     // 토큰 생성 (액세스, 리프레시)
     private String generateToken(UserDetails user, long validitySeconds, TokenType type) {
         Instant now = clock.instant();
@@ -230,12 +247,6 @@ public class JwtService {
             .collect(Collectors.toList());
     }
 
-    public String getUsernameFromToken(String token) {
-        Claims claims = getClaims(token);
-        return claims.getSubject();
-    }
-
-    // 클레임에 포함된 roles 필드에서 권한 객체 목록 생성
     private Collection<SimpleGrantedAuthority> getAuthorities(Claims claims) {
         List<?> roles = claims.get("roles", List.class);
         if (roles == null) {
