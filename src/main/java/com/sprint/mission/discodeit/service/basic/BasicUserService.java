@@ -71,7 +71,7 @@ public class BasicUserService implements UserService {
         Set<UUID> onlineUserIds = sessionRegistry.getAllPrincipals().stream()
             .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
             .filter(principal -> principal instanceof CustomUserDetails)
-            .map(principal -> ((CustomUserDetails) principal).getUser().getId())
+            .map(principal -> ((CustomUserDetails) principal).getUserResponse().id())
             .collect(Collectors.toSet());
 
         List<UserResponse> userResponses = userRepository.findAll().stream()
@@ -84,6 +84,11 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponse findById(UUID id) {
         return userMapper.entityToDto(findByIdOrThrow(id));
+    }
+
+    @Override
+    public UserResponse findByUsername(String username) {
+        return userMapper.entityToDto(findByUsernameOrThrow(username));
     }
 
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
@@ -131,6 +136,13 @@ public class BasicUserService implements UserService {
         return userRepository.findById(id)
             .orElseThrow(
                 () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("id", id)));
+    }
+
+    private User findByUsernameOrThrow(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow(
+                () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND,
+                    Map.of("Username", username)));
     }
 
     private void checkDuplicateEmail(String email) {

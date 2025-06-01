@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,8 +31,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         // 인증 정보 가져오기
         CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-        User user = principal.getUser();
-        UserResponse userDto = userMapper.entityToDto(user);
+        UserResponse userDto = principal.getUserResponse();
 
         // SecurityContext에 인증 정보 설정하고 세션에 저장 (ThreadLocal 기반)
         SecurityContext context = SecurityContextHolder.createEmptyContext();

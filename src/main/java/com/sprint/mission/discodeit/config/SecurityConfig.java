@@ -1,17 +1,24 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.security.CustomAuthenticationProvider;
-import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
+import com.sprint.mission.discodeit.security.CustomUserDetailService;
 import com.sprint.mission.discodeit.security.evaluator.CustomPermissionEvaluator;
 import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtProperties;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,44 +27,47 @@ import org.springframework.security.config.annotation.web.configurers.SessionMan
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
 
     private final CustomPermissionEvaluator customPermissionEvaluator;
+    private final JwtService jwtService;
+    private final CustomUserDetailService customUserDetailService;
 
     @Bean
     SecurityFilterChain chain(
         HttpSecurity http,
-        CustomAuthenticationProvider authProvider, // DaoAuthenticationProvider
-        JsonUsernamePasswordAuthenticationFilter loginFilter,
+//        CustomAuthenticationProvider authProvider, // DaoAuthenticationProvider
         SecurityContextRepository securityContextRepository,
         CustomLogoutHandler customLogoutHandler,
         RememberMeServices rememberMeServices) throws Exception {
 
         http
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(csrfTokenRepository())
-                .ignoringRequestMatchers("/api/auth/logout")
-            )
+            .csrf(csrf -> csrf.disable())  // JWT 사용시 CSRF 불필요
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안함
 
-            .logout(logout -> logout
-                .logoutUrl("/api/auth/logout")
-                .addLogoutHandler(customLogoutHandler)
-                .logoutSuccessUrl("/")
-            )
+//            .logout(logout -> logout
+//                .logoutUrl("/api/auth/logout")
+//                .addLogoutHandler(customLogoutHandler)
+//                .logoutSuccessUrl("/")
+//            )
 
-            .authenticationProvider(authProvider)
+//            .authenticationProvider(authProvider)
 
             .securityContext(
                 context -> context.securityContextRepository(securityContextRepository))
@@ -68,7 +78,6 @@ public class SecurityConfig {
                 .rememberMeServices(rememberMeServices)
             )
 
-            // TODO : 세션을 활용한 사용자 활동 확인 - 프론트에서 어떻게 받는지 알기
             .sessionManagement(s -> s
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .sessionFixation(SessionFixationConfigurer::migrateSession) // 세션 고정보호
@@ -76,7 +85,11 @@ public class SecurityConfig {
                 .maxSessionsPreventsLogin(false)
                 .expiredUrl("/"))
 
-            .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(customAuthenticationEntryPoint()))
+
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+//            .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -87,8 +100,11 @@ public class SecurityConfig {
         auth
 
             // 허용
-            .requestMatchers("/api/auth/csrf-token").permitAll()
-            .requestMatchers("/api/auth/login").permitAll()
+
+            .requestMatchers("/", "/index.html", "/error").permitAll()
+            .requestMatchers("/.well-known/**", "/favicon.ico").permitAll()
+            .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()  // 로그인 관련은 모두 허용
+            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // Swagger 허용
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 
             // 채널 관리
@@ -106,12 +122,35 @@ public class SecurityConfig {
     }
 
     // csrf
-    private CookieCsrfTokenRepository csrfTokenRepository() {
-        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        repository.setCookieName("Csrf-Token");
-        repository.setHeaderName("X-Csrf-Token");
-        repository.setCookiePath("/");
-        return repository;
+//    private CookieCsrfTokenRepository csrfTokenRepository() {
+//        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+//        repository.setCookieName("XSRF-TOKEN");
+//        repository.setHeaderName("X-XSRF-TOKEN");
+//        repository.setCookiePath("/");
+//        return repository;
+//    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailService); // 사용자 정보 제공
+        authProvider.setPasswordEncoder(passwordEncoder); // 비밀번호 인코딩 방식 지정
+        return new ProviderManager(authProvider);
+    }
+
+//    @Bean
+//    public DaoAuthenticationProvider daoAuthenticationProvider(
+//        UserDetailsService userDetailsService,
+//        PasswordEncoder passwordEncoder) {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setUserDetailsService(userDetailsService); // 유저 정보 조회
+//        provider.setPasswordEncoder(passwordEncoder); // 비밀번호 검증
+//        return provider;
+//    }
+
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
     }
 
     // 토큰 저장소 설정
@@ -135,5 +174,15 @@ public class SecurityConfig {
         handler.setPermissionEvaluator(customPermissionEvaluator);
         handler.setRoleHierarchy(roleHierarchy);
         return handler;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtService, customUserDetailService);
+    }
+
+    @Bean
+    public AuthenticationEntryPoint customAuthenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint();
     }
 }

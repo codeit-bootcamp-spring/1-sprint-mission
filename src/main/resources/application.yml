@@ -21,11 +21,19 @@ logging:
     root: info
     com.zaxxer.hikari.HikariConfig: DEBUG
 
+jwt:
+  issuer: discodeit-api
+  access-token:
+    validity-seconds: 900 #15
+  refresh-tocken:
+    validity-seconds: 2592000  # 30일
+  secret: ${JWT_SECRET:dev-secret-key-must-be-at-least-32-characters-long}
+
 discodeit:
   admin:
-    username: ${ADMIN_USERNAME}
-    password: ${ADMIN_PASSWORD}
-    email: ${ADMIN_EMAIL}
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:admin1234}
+    email: ${ADMIN_EMAIL:admin@discodeit.com}
   storage:
     type: ${STORAGE_TYPE:local}
     local:

@@ -14,6 +14,7 @@ public enum ErrorCode {
 
     // AUTH
     AUTH_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "로그인에 실패하였습니다."),
+    AUTHENTICATION_REQUIRED(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
 
     // USER
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자가 존재하지 않습니다."),
