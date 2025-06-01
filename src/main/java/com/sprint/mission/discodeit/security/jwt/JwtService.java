@@ -56,19 +56,14 @@ public class JwtService {
     }
 
     public String generateAccessToken(UserDetails user, UserResponse userResponse) {
-        // 토큰 생성
-        String accessToken = generateTokenWithClaims(user, Map.of("userDto", userResponse));
-
-        return accessToken;
+        return generateTokenWithClaims(user, Map.of("userDto", userResponse));
     }
 
     @Transactional
     public void saveJwtSession(UserResponse userResponse, String accessToken, String refreshToken) {
-        // 만료 시간
         Date accessTokenExpiration = getExpiration(accessToken);
         Date refreshTokenExpiration = getExpiration(refreshToken);
 
-        // JwtSession 저장
         JwtSession jwtSession = JwtSession.builder()
             .userId(userResponse.id())
             .accessToken(accessToken)
@@ -79,6 +74,21 @@ public class JwtService {
             .build();
 
         jwtSessionRepository.save(jwtSession);
+    }
+
+    @Transactional
+    public void updateJwtSession(JwtSession jwtSession, String accessToken, String refreshToken) {
+        Date accessTokenExpiration = getExpiration(accessToken);
+        Date refreshTokenExpiration = getExpiration(refreshToken);
+
+        JwtSession getJwtSession = findJwtSessionByRefreshToken(jwtSession.getRefreshToken());
+
+        getJwtSession.updateAccessToken(accessToken);
+        getJwtSession.updateRefreshToken(refreshToken);
+        getJwtSession.updateAccessTokenExpiresAt(accessTokenExpiration.toInstant());
+        getJwtSession.updateAccessTokenExpiresAt(refreshTokenExpiration.toInstant());
+        getJwtSession.incrementRefreshCount();
+        jwtSessionRepository.save(getJwtSession);
     }
 
     // 액세스 토큰 생성
@@ -180,21 +190,6 @@ public class JwtService {
         jwtSession.revoke();
         jwtSessionRepository.save(jwtSession);
         log.info("사용자 ID {} 의 리프레시 토큰 무효화", jwtSession.getUserId());
-    }
-
-    @Transactional
-    public String refreshAccessToken(String refreshToken, UserDetails userDetails,
-        UserResponse userResponse) {
-
-        JwtSession jwtSession = findJwtSessionByRefreshToken(refreshToken);
-
-        String newAccessToken = generateAccessToken(userDetails, userResponse);
-        jwtSession.updateAccessToken(newAccessToken);
-        jwtSession.updateAccessTokenExpiresAt(getExpiration(newAccessToken).toInstant());
-        jwtSession.incrementRefreshCount();
-        jwtSessionRepository.save(jwtSession);
-
-        return newAccessToken;
     }
 
     public void revokeAllUserSessions(UUID userId) {

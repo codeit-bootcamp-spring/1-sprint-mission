@@ -105,7 +105,8 @@ public class AuthController implements AuthApiDocs {
 
     @PostMapping("/refresh")
     public ResponseEntity<String> getAccessTokenByRefreshToken(
-        @CookieValue(value = "refresh_token", required = false) String cookieRefreshToken
+        @CookieValue(value = "refresh_token", required = false) String cookieRefreshToken,
+        HttpServletResponse response
     ) {
         if (cookieRefreshToken == null || cookieRefreshToken.isEmpty()) {
             throw new BadCredentialsException("인증 정보가 없습니다");
@@ -116,8 +117,11 @@ public class AuthController implements AuthApiDocs {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(
             userResponse.username());
 
-        String newAccessToken = jwtService.refreshAccessToken(cookieRefreshToken, userDetails,
-            userResponse);
+        String newAccessToken = jwtService.generateAccessToken(userDetails, userResponse);
+        String newRefreshToken = jwtService.generateRefreshToken(userDetails);
+        jwtService.updateJwtSession(jwtSession, newAccessToken, newRefreshToken);
+
+        addRefreshTokenCookie(response, newRefreshToken);
 
         return ResponseEntity.ok(newAccessToken);
     }
