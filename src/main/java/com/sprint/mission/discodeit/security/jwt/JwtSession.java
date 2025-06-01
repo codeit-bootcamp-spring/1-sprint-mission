@@ -53,4 +53,23 @@ public class JwtSession extends BaseUpdatableEntity {
         this.revoked = true;
     }
 
+    public void updateAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void updateAccessTokenExpiresAt(Instant expiresAt) {
+        this.accessTokenExpiresAt = expiresAt;
+    }
+
+    public void updateRefreshTokenExpiresAt(Instant expiresAt) {
+        this.refreshTokenExpiresAt = expiresAt;
+    }
+
+    public void incrementRefreshCount() {
+        this.refreshCount++;
+    }
 }

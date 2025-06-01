@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.controller.docs.AuthApiDocs;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.security.CustomUserDetailService;
 import com.sprint.mission.discodeit.security.jwt.JwtProperties;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
@@ -40,6 +41,7 @@ public class AuthController implements AuthApiDocs {
     private final UserService userService;
     private final JwtService jwtService;
     private final JwtProperties jwtProperties;
+    private final CustomUserDetailService customUserDetailService;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(
@@ -53,13 +55,10 @@ public class AuthController implements AuthApiDocs {
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
         UserResponse userResponse = userService.findByUsername(userDetails.getUsername());
 
-        // 토큰 생성
         String accessToken = jwtService.generateAccessToken(userDetails, userResponse);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
-
         jwtService.saveJwtSession(userResponse, accessToken, refreshToken);
 
         addRefreshTokenCookie(response, refreshToken);
@@ -99,11 +98,30 @@ public class AuthController implements AuthApiDocs {
         }
 
         jwtService.validateToken(cookieRefreshToken);
-
         JwtSession jwtSession = jwtService.findJwtSessionByRefreshToken(cookieRefreshToken);
 
         return ResponseEntity.ok(jwtSession.getAccessToken());
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<String> getAccessTokenByRefreshToken(
+        @CookieValue(value = "refresh_token", required = false) String cookieRefreshToken
+    ) {
+        if (cookieRefreshToken == null || cookieRefreshToken.isEmpty()) {
+            throw new BadCredentialsException("인증 정보가 없습니다");
+        }
+
+        JwtSession jwtSession = jwtService.findJwtSessionByRefreshToken(cookieRefreshToken);
+        UserResponse userResponse = userService.findById(jwtSession.getUserId());
+        UserDetails userDetails = customUserDetailService.loadUserByUsername(
+            userResponse.username());
+
+        String newAccessToken = jwtService.refreshAccessToken(cookieRefreshToken, userDetails,
+            userResponse);
+
+        return ResponseEntity.ok(newAccessToken);
+    }
+
 
     @PutMapping("/role")
     public ResponseEntity<UserResponse> updateUserRole(
@@ -120,4 +138,5 @@ public class AuthController implements AuthApiDocs {
 
         response.addCookie(cookie);
     }
+
 }

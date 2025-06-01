@@ -56,7 +56,6 @@ public class JwtService {
     }
 
     public String generateAccessToken(UserDetails user, UserResponse userResponse) {
-
         // 토큰 생성
         String accessToken = generateTokenWithClaims(user, Map.of("userDto", userResponse));
 
@@ -181,6 +180,21 @@ public class JwtService {
         jwtSession.revoke();
         jwtSessionRepository.save(jwtSession);
         log.info("사용자 ID {} 의 리프레시 토큰 무효화", jwtSession.getUserId());
+    }
+
+    @Transactional
+    public String refreshAccessToken(String refreshToken, UserDetails userDetails,
+        UserResponse userResponse) {
+
+        JwtSession jwtSession = findJwtSessionByRefreshToken(refreshToken);
+
+        String newAccessToken = generateAccessToken(userDetails, userResponse);
+        jwtSession.updateAccessToken(newAccessToken);
+        jwtSession.updateAccessTokenExpiresAt(getExpiration(newAccessToken).toInstant());
+        jwtSession.incrementRefreshCount();
+        jwtSessionRepository.save(jwtSession);
+
+        return newAccessToken;
     }
 
     /**
