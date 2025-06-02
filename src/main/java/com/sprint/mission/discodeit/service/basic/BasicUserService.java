@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
@@ -7,15 +9,12 @@ import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
@@ -23,6 +22,9 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +40,9 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentService binaryContentService;
   private final BinaryContentRepository binaryContentRepository;
-  private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
+  private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
 
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -70,12 +73,8 @@ public class BasicUserService implements UserService {
     }
 
     User user = new User(createUserDto.username(), createUserDto.email(),
-        createUserDto.password(), null);
+        bCryptPasswordEncoder.encode(createUserDto.password()), null);
     userRepository.save(user);
-    UserStatus userStatus = new UserStatus(user);
-    userStatusRepository.save(userStatus);
-
-    log.debug("사용자 상태 객체 생성 및 연결: {}", userStatus);
 
     log.info("사용자 생성 완료: id = {}, email = {}, username = {}", user.getId(), user.getEmail(),
         user.getUsername());
@@ -163,10 +162,6 @@ public class BasicUserService implements UserService {
     User savedUser = userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", savedUser.getId());
 
-    UserStatus userStatus = userStatusRepository.findByUser(savedUser)
-        .orElseThrow(() -> new UserStatusNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
-
-    user.setStatus(userStatus);
     log.debug("사용자 상태 객체 연결");
 
     userRepository.save(user);
@@ -208,10 +203,6 @@ public class BasicUserService implements UserService {
 
     user.setUpdatedAt(updateUserDto.updatedAt());
 
-    UserStatus userStatus = user.getStatus();
-    userStatus.setUpdatedAt(updateUserDto.updatedAt());
-
-    userStatusRepository.save(userStatus);
     userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", userId);
 
@@ -230,4 +221,45 @@ public class BasicUserService implements UserService {
     log.info("사용자 삭제 완료: userId = {}", userId);
     return true;
   }
+
+  @Override
+  public UserDto findByUsername(String username) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+
+    return UserDto.builder()
+        .id(user.getId())
+        .username(user.getUsername())
+        .email(user.getEmail())
+        .role(user.getRole())
+        // 필요한 추가 정보
+        .build();
+  }
+
+  @Override
+  public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
+
+    log.info("사용자 권한 변경 시작: userId = {}, role = {}", roleUpdateRequest.getUserId(),
+        roleUpdateRequest.getNewRole().toString());
+
+    if (roleUpdateRequest == null || roleUpdateRequest.getUserId() == null
+        || roleUpdateRequest.getNewRole() == null) {
+      throw new IllegalArgumentException("Empty Data");
+    }
+
+    User user = userRepository.findById(roleUpdateRequest.getUserId())
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+    String previousRole = user.getRole();
+
+    user.setRole(roleUpdateRequest.getNewRole().toString());
+    userRepository.save(user);
+    log.info("사용자 권한 변경 완료: userId = {}, role = {}", user.getId(), user.getRole());
+
+    eventPublisher.publishEvent(
+        new UserRoleChangedEvent(user.getUsername(), previousRole, roleUpdateRequest.getNewRole()));
+
+    return userMapper.toDto(user);
+  }
+
 }

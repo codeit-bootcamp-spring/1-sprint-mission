@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,6 +56,8 @@ public class MessageController {
   }
 
   //특정 채널 메세지 수정
+  //@PreAuthorize("hasRole('ADMIN') or #updateMessageDto.userId() == authentication.principal.user.id")
+  @PreAuthorize("hasPermission(#messageId, 'Message', 'WRITE')")
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable String messageId,
       @Valid @RequestBody UpdateMessageDto updateMessageDto) {
@@ -78,6 +81,7 @@ public class MessageController {
       return ResponseEntity.ok().body(allByChannelIdWithPaging.getContents());
     }*/
 
+  //이것도 요청한 유저가 해당 채널(특히 PRIVATE)에 속하는지 검증해야하지 않을까?
   @GetMapping
   public ResponseEntity<PageResponse<MessageDto>> getMessagesWithCursor(
       @RequestParam String channelId,
@@ -90,6 +94,7 @@ public class MessageController {
   }
 
   //메세지 삭제
+  @PreAuthorize("hasPermission(#messageId, 'Message', 'DELETE')")
   @DeleteMapping("/{messageId}")
   public ResponseEntity<String> deleteMessage(@PathVariable String messageId,
       @RequestParam String userId) {

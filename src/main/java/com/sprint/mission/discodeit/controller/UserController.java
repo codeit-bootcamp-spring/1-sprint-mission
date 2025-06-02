@@ -3,16 +3,14 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +24,6 @@ import java.util.List;
 public class UserController {
 
   private final UserService userService;
-  private final UserStatusService userStatusService;
 
   //사용자 단일 조회
   @GetMapping("/{userId}")
@@ -58,6 +55,7 @@ public class UserController {
   }
 
   //사용자 정보 수정
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
   @PatchMapping("/{userId}")
   public ResponseEntity<UserDto> updateUser(@PathVariable String userId,
       @Valid @RequestPart("userUpdateRequest") UpdateUserDto updateUserDto,
@@ -80,6 +78,7 @@ public class UserController {
 
   //사용자 삭제
   @DeleteMapping("/{userId}")
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
   public ResponseEntity<String> deleteUser(@PathVariable String userId) {
     log.info("사용자 삭제 요청: userId = {}", userId);
     try {
@@ -90,28 +89,6 @@ public class UserController {
       throw e;
     }
   }
-
-
-  @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusDto> updateUserStatus(@PathVariable String userId,
-      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
-    log.info("사용자 상태 수정 요청: userId = {}", userId);
-    try {
-      UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,
-          userStatusUpdateRequest);
-      return ResponseEntity.ok().body(userStatusDto);
-    } catch (Exception e) {
-      log.error("사용자 상태 수정 중 오류 발생: {}", e.getMessage());
-      throw e;
-    }
-  }
-
-  //특정 사용자의 모든 메세지 목록 조회
-//  @GetMapping("/{userId}/messages})
-//  public ResponseEntity<List<MessageDto>> getMessagesByUserId(@PathVariable String userId) {
-//    List<MessageDto> allBySenderId = messageService.findAllByAuthorId(userId);
-//    return ResponseEntity.ok().body(allBySenderId);
-//  }
 
   //모든 사용자 조회
   @GetMapping

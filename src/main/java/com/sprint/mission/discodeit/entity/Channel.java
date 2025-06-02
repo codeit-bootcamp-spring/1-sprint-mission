@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,6 +27,7 @@ public class Channel extends BaseUpdatableEntity {
   private String name;
 
   //채널 공개 여부
+  @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private ChannelType type;
 

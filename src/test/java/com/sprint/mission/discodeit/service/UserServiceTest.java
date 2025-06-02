@@ -17,14 +17,11 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.entity.status.AccountStatus;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.lang.reflect.Field;
@@ -53,8 +50,7 @@ class UserServiceTest {
   private BinaryContentService binaryContentService;
   @Mock
   private BinaryContentRepository binaryContentRepository;
-  @Mock
-  private UserStatusRepository userStatusRepository;
+
   @Mock
   private UserMapper userMapper;
 
@@ -100,14 +96,13 @@ class UserServiceTest {
           "test",
           "test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
-      UserStatus userStatus = new UserStatus(user);
 
       // Mock: 가짜 user 객체 반환하도록 설정
       when(userRepository.save(any(User.class))).thenReturn(user);
-      when(userMapper.toDto(any(User.class))).thenReturn(expectedUserDto);
-      when(userStatusRepository.save(any(UserStatus.class))).thenReturn(userStatus);
+      when(userMapper.toDto(any(User.class), any(boolean.class))).thenReturn(expectedUserDto);
 
       // when
       UserDto userDto = userService.create(createUserDto);
@@ -117,7 +112,8 @@ class UserServiceTest {
 
       // userRepository.save가 정확히 한 번 호출되었는지 검증
       verify(userRepository, times(1)).save(any(User.class));
-      verify(userMapper, times(1)).toDto(any(User.class)); // userMapper가 호출되었는지 확인
+      verify(userMapper, times(1)).toDto(any(User.class),
+          any(boolean.class)); // userMapper가 호출되었는지 확인
 
     }
 
@@ -158,7 +154,8 @@ class UserServiceTest {
           "test",
           "test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
 
       // Mock: 가짜 user 객체 반환하도록 설정
@@ -171,7 +168,7 @@ class UserServiceTest {
       // userRepository.save가 정확히 한 번 호출되었는지 검증
       verify(userRepository, never()).save(any(User.class));
       verify(userRepository, times(1)).findByEmail("test@discodeit.com");
-      verify(userMapper, never()).toDto(any(User.class));
+      verify(userMapper, never()).toDto(any(User.class), any(boolean.class));
     }
 
     @Test
@@ -247,12 +244,13 @@ class UserServiceTest {
           "test@discodeit.com",
           true,
           // 프로필 이미지는 null,
-          binaryContentDto
+          binaryContentDto,
+          "ROLE_USER"
       );
 
       // Mock: 가짜 user 객체 반환하도록 설정
       when(userRepository.save(any(User.class))).thenReturn(user);
-      when(userMapper.toDto(any(User.class))).thenReturn(expectedUserDto);
+      when(userMapper.toDto(any(User.class), any(boolean.class))).thenReturn(expectedUserDto);
 
       // when
       UserDto userDto = userService.create(createUserDto);
@@ -265,7 +263,8 @@ class UserServiceTest {
 
       // userRepository.save가 정확히 한 번 호출되었는지 검증
       verify(userRepository, times(1)).save(any(User.class));
-      verify(userMapper, times(1)).toDto(any(User.class)); // userMapper가 호출되었는지 확인
+      verify(userMapper, times(1)).toDto(any(User.class),
+          any(boolean.class)); // userMapper가 호출되었는지 확인
 
     }
   }
@@ -278,7 +277,6 @@ class UserServiceTest {
     private UUID userId;
     private User user;
     private UserDto expectedUserDto;
-    private UserStatus userStatus;
 
     @BeforeEach
     void setUp() {
@@ -305,10 +303,10 @@ class UserServiceTest {
           "test",
           "test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
 
-      userStatus = new UserStatus(user);
     }
 
     @Test
@@ -325,8 +323,6 @@ class UserServiceTest {
       // 사용자 상태 모킹
       //userRepository 가 findById를 사용한다면, user를 return
       when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-      //userStatusRepository가 어떤 객체든 User 클래스에 속하는 객체를 파라미터로 findByUser를 사용한다면,userStatus 를 Return
-      when(userStatusRepository.findByUser(any(User.class))).thenReturn(Optional.of(userStatus));
       // userRepository가 save를 어떤 객체든, User 클래스인 객체로 save를 한다면, user를 return
       when(userRepository.save(any(User.class))).thenReturn(user);
 
@@ -336,10 +332,11 @@ class UserServiceTest {
           "new name",
           "new_test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
 
-      when(userMapper.toDto(any(User.class))).thenReturn(updatedDto);
+      when(userMapper.toDto(any(User.class), any(boolean.class))).thenReturn(updatedDto);
 
       //when
       UserDto result = userService.updateUser(userId.toString(), updateUserDto);
@@ -352,9 +349,8 @@ class UserServiceTest {
       );
 
       verify(userRepository, times(1)).findById(userId);
-      verify(userStatusRepository, times(1)).findByUser(any(User.class));
       verify(userRepository, times(2)).save(any(User.class));
-      verify(userMapper, times(1)).toDto(any(User.class));
+      verify(userMapper, times(1)).toDto(any(User.class), any(boolean.class));
     }
 
     @Test
@@ -371,7 +367,6 @@ class UserServiceTest {
     private UUID userId;
     private User user;
     private UserDto expectedUserDto;
-    private UserStatus userStatus;
 
     @BeforeEach
     void setUp() {
@@ -398,11 +393,10 @@ class UserServiceTest {
           "test",
           "test@discodeit.com",
           true,
-          null
+          null,
+          "ROLE_USER"
       );
 
-      userStatus = new UserStatus(user);
-      user.setStatus(userStatus);
 
     }
 
