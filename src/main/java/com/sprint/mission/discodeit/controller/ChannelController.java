@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class ChannelController {
 
   //공개 채널 생성
   @PostMapping("/public")
+  @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
   public ResponseEntity<ChannelDto> creatPublicChannel(
       @Valid @RequestBody CreatePublicChannelDto createPublicChannelDto) {
     log.info("Public 채널 생성 요청: newName = {}", createPublicChannelDto.name());

@@ -70,7 +70,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         //사용자 본인이거나 Admin인 경우만 가능
         boolean isSelf = user.getId().equals(currentUserId);
         boolean isAdmin = userDetails.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            .anyMatch(a -> a.getAuthority().equals("ADMIN"));
         yield isSelf || isAdmin;
       }
       default -> false;
@@ -88,7 +88,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
         //사용자 본인이거나 Admin인 경우만 가능
         boolean isSelf = userId.equals(currentUserId);
         boolean isAdmin = userDetails.getAuthorities().stream()
-            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            .anyMatch(a -> a.getAuthority().equals("ADMIN"));
         yield isSelf || isAdmin;
       }
       default -> false;
