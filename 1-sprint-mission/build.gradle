@@ -3,9 +3,13 @@ plugins {
     id 'org.springframework.boot' version '3.4.2'
     id 'io.spring.dependency-management' version '1.1.7'
 }
-
 group = 'com.sprint.mission'
 version = '0.0.1-SNAPSHOT'
+
+tasks.named('bootJar') {
+    archiveBaseName.set("discodeit")
+    archiveVersion.set("1.2-M8")
+}
 
 java {
     toolchain {
@@ -33,6 +37,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    implementation 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.mapstruct:mapstruct:1.5.2.Final'
@@ -44,6 +51,13 @@ dependencies {
     testRuntimeOnly 'com.h2database:h2:2.1.214'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testImplementation 'com.h2database:h2'
+
+    implementation 'software.amazon.awssdk:s3:2.31.7'
+    implementation 'io.github.cdimascio:dotenv-java:2.2.4'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    implementation 'com.auth0:java-jwt:4.4.0'
 }
 
 tasks.named('test') {

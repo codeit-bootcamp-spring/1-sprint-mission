@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit-app
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - JVM_OPTS=${JVM_OPTS}
+      - SERVER_PORT=${SERVER_PORT}
+      - ACCESS_KEY=${AWS_S3_ACCESS_KEY}
+      - SECRET_KEY=${AWS_S3_SECRET_KEY}
+      - REGION=${AWS_S3_REGION}
+      - BUCKET=${AWS_S3_BUCKET}
+    ports:
+      - "80:8080"
+    volumes:
+      - app-data:/app/binary-content
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    container_name: discodeit-db
+    environment:
+      - POSTGRES_DB=discodeit
+      - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME}
+      - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+
+volumes:
+  app-data:
+  db-data:

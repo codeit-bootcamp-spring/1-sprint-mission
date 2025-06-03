@@ -11,8 +11,9 @@ import lombok.Setter;
 @NotNull
 public class BinaryContentDto {
 
-  UUID id;
-  String fileName;
-  Long size;
-  String contentType;
+  private String key;
+  private UUID id;
+  private String fileName;
+  private Long size;
+  private String contentType;
 }

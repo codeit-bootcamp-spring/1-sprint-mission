@@ -18,9 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
-@EnableJpaAuditing
 class ChannelRepositoryTest {
 
   @Autowired

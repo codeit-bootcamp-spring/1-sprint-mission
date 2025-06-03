@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.configure.Role;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -20,10 +22,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +45,7 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
-  private final EntityManagerFactoryBuilder entityManagerFactoryBuilder;
+  private final BCryptPasswordEncoder encoder;
 
   @Transactional
   @Override
@@ -68,7 +75,8 @@ public class BasicUserService implements UserService {
         .orElse(null);
     String password = userCreateRequest.password();
 
-    User user = new User(username, email, password, nullableProfile);
+    User user = new User(username, email, encoder.encode(password), nullableProfile);
+    user.setRoles(Set.of(Role.ROLE_USER));
 
     UserStatus userStatus = new UserStatus(user, Instant.now());
     userStatusRepository.save(userStatus);
@@ -137,5 +145,35 @@ public class BasicUserService implements UserService {
     }
     log.debug("delete user");
     userRepository.deleteById(userId);
+  }
+
+
+  public UserDto convertToUserDto(UserDetails userDetails) {
+    User user = userRepository.findByUsername(userDetails.getUsername())
+        .orElseThrow(NoSuchElementException::new);
+
+    return userMapper.toDto(user);
+  }
+
+  public UserDto updateRoles(UserRoleUpdateRequest request) {
+    User user = userRepository.findByUsername(request.username())
+        .orElseThrow(NoSuchElementException::new);
+
+    user.setRoles(Set.of(request.role()));
+    userRepository.save(user);
+
+    SessionRegistry sessionRegistry = new SessionRegistryImpl();
+
+    sessionRegistry.getAllPrincipals().stream()
+        .filter(p -> p instanceof UserDetails)
+        .filter(p -> ((UserDetails) p).getUsername().equals(request.username()))
+        .flatMap(p -> sessionRegistry.getAllSessions(p, false).stream())
+        .forEach(SessionInformation::expireNow);
+
+    return userMapper.toDto(user);
+  }
+
+  public UUID findByUserName(String username) {
+    return userRepository.findByUsername(username).orElseThrow(NoSuchElementException::new).id;
   }
 }

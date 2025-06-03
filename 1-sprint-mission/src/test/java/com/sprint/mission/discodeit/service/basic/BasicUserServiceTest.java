@@ -45,6 +45,7 @@ class BasicUserServiceTest {
   void setUp() {
     userId = UUID.randomUUID();
     user = new User("testUser", "test@example.com", "password", null);
+    user.setId(userId);
     userDto = new UserDto(userId, "testUser", "test@example.com", null, true);
   }
 
@@ -100,13 +101,13 @@ class BasicUserServiceTest {
   @Test
   void deleteUserShouldSucceed() {
     // given
-    willDoNothing().given(userRepository).deleteById(userId);
+    given(userRepository.existsById(userId)).willReturn(true);
 
     // when
     userService.delete(userId);
 
     // then
-    then(userRepository).should().deleteById(userId);
+    then(userRepository).should().deleteById(user.getId());
   }
 
   @Test

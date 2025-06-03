@@ -1,0 +1,10 @@
+.idea
+.git
+.gitignore
+.dockerignore
+!gradlew
+*.sh
+*.md
+*.yml
+scripts
+*.env

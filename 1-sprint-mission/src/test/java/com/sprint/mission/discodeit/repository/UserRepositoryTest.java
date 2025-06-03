@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@EnableJpaAuditing
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
 
   @Autowired
@@ -26,9 +25,11 @@ class UserRepositoryTest {
   private EntityManager entityManager;
 
   @Test
-  void saveAndFindUser_Success() {
+  void saveAndFindUserSuccess() {
     // given
     User user = new User("testUser", "test@example.com", "password", null);
+    user.setCreatedAt(Instant.now());
+    user.setUpdatedAt(Instant.now());
     User savedUser = userRepository.save(user);
     entityManager.flush();
     entityManager.clear();
@@ -42,7 +43,7 @@ class UserRepositoryTest {
   }
 
   @Test
-  void findByEmail_Fail_WhenUserDoesNotExist() {
+  void findByEmailFailWhenUserDoesNotExist() {
     // when
     Optional<User> foundUser = userRepository.findByEmail("notfound@example.com");
 
