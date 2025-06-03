@@ -23,10 +23,10 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
     DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
-
+    
     JwtSession jwtSession = jwtService.generateTokens(principal.getUserDto());
 
-    Cookie refreshTokenCookie = new Cookie("refreshToken", jwtSession.getRefreshToken());
+    Cookie refreshTokenCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
     refreshTokenCookie.setHttpOnly(true); //xss 방지
     refreshTokenCookie.setSecure(false); // HTTPS에서만 전송할 수 있도록 하는 설정(운영에서는 true)
     refreshTokenCookie.setPath("/"); //전체경로에서 접근 가능

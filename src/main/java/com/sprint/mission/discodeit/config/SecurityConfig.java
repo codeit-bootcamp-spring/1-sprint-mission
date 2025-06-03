@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
+import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.CustomPermissionEvaluator;
 import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
+import com.sprint.mission.discodeit.security.filter.CustomLogoutFilter;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.JwtAuthFilter;
 
@@ -32,6 +35,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -40,8 +44,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
@@ -50,12 +52,6 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-  //권한 변경 이벤트를 위한 세션 레지스트리 빈 등록
-  @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
-  }
 
   @Bean
   public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
@@ -71,35 +67,6 @@ public class SecurityConfig {
   public BCryptPasswordEncoder bCryptPasswordEncoder() {
     return new BCryptPasswordEncoder();
   }
-
-  @Bean
-  public PersistentTokenBasedRememberMeServices rememberMeServices(
-      @Value("${security.remember-me.key}") String key,
-      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
-      DataSource dataSource,
-      UserDetailsService userDetailsService
-  ) {
-
-    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-    tokenRepository.setDataSource(dataSource);
-    tokenRepository.setCreateTableOnStartup(false);
-    // 최초 구동 시 true로 설정하면 테이블 자동 생성
-    // 테이블 생성 후 false로 변경하는게 안전
-
-    PersistentTokenBasedRememberMeServices rememberMeServices =
-        new PersistentTokenBasedRememberMeServices(key, userDetailsService, tokenRepository);
-
-    rememberMeServices.setParameter("remember-me");
-    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
-
-    return rememberMeServices;
-  }
-
-  @Bean
-  public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
-    return new RememberMeAuthenticationProvider("discodeitSecretKey123");
-  }
-
 
   @Bean
   public RoleHierarchy roleHierarchy() {
@@ -161,8 +128,7 @@ public class SecurityConfig {
       JwtTokenProvider jwtTokenProvider,
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
-      SessionRegistry sessionRegistry,
-      PersistentTokenBasedRememberMeServices rememberMeServices, JwtService jwtService)
+      JwtService jwtService)
       throws Exception {
 
     http
@@ -173,7 +139,8 @@ public class SecurityConfig {
             .requestMatchers(
                 SecurityMatchers.NON_API,
                 SecurityMatchers.GET_CSRF_TOKEN,
-                SecurityMatchers.SIGN_UP
+                SecurityMatchers.SIGN_UP,
+                SecurityMatchers.ME
             ).permitAll()
             .anyRequest().hasRole(Role.USER.name())
         )
@@ -192,7 +159,6 @@ public class SecurityConfig {
             logout
                 .logoutRequestMatcher(SecurityMatchers.LOGOUT)
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
         )
 
         //.addFilter() - Spring Security 필터 체인에 커스텀 필터 추가
@@ -201,11 +167,14 @@ public class SecurityConfig {
         //http.getSharedObject(AuthenticationConfiguration.class) - Spring이 관리하는 인증 설정 객체 가져오기
 
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
-            Customizer.withDefaults())
+            configure ->
+                configure
+                    .successHandler(new CustomLoginSuccessHandler(objectMapper, jwtService))
+                    .failureHandler(new CustomLoginFailureHandler(objectMapper)))
         //with() + Configurer 방식
         //Configurer 패턴 사용: 필터 설정을 위한 전용 설정 클래스 활용 -> Configurer 내부에서 필터 생성과 설정을 모두 관리(캡슐화)
         //DSL 스타일: Spring Security의 fluent API 패턴을 따름
-        //유연한 설정: 런타임에 동적으로 필터를 구성할 수 있다. -->
+        //유연한 설정: 런타임에 동적으로 필터를 구성할 수 있다.
 
         .csrf(csrf -> csrf
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
@@ -214,16 +183,7 @@ public class SecurityConfig {
         )
 
         .sessionManagement(session -> session
-            .sessionFixation().migrateSession() // 세션 고정 보호
-            .maximumSessions(1) // 동시 로그인 가능 개수
-            .maxSessionsPreventsLogin(false)// 동일 계정으로 로그인 했을때, 이미 로그인 되어있는 계정을 로그아웃 시킬지
-            .sessionRegistry(sessionRegistry)// 세션 이벤트 처리를 위해 필요
-            .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
-        )
-
-        // RememberMe 서비스를 빈으로 등록하면 더 세밀한 제어가 가능 (6.5.0 권장)
-        .rememberMe(rememberMe -> rememberMe
-            .rememberMeServices(rememberMeServices)
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
     return http.build();

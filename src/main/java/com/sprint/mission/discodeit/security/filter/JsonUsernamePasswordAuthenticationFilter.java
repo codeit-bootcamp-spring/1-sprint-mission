@@ -95,7 +95,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     public void init(HttpSecurity http) throws Exception {
       loginProcessingUrl(SecurityMatchers.LOGIN_URL);
       successHandler(new CustomLoginSuccessHandler(objectMapper, jwtService));
-      failureHandler(new CustomLoginFailureHandler(objectMapper, jwtService));
+      failureHandler(new CustomLoginFailureHandler(objectMapper));
     }
   }
 }

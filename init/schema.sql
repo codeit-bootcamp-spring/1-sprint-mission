@@ -80,9 +80,10 @@ CREATE TABLE jwt_sessions
 (
     id            UUID PRIMARY KEY,
     user_id       UUID          NOT NULL,
-    access_token  VARCHAR(1000) NOT NULL,
-    refresh_token VARCHAR(1000) NOT NULL,
+    access_token  VARCHAR(1000) NOT NULL UNIQUE,
+    refresh_token VARCHAR(1000) NOT NULL UNIQUE,
     created_at    TIMESTAMP     NOT NULL,
+    expires_at    TIMESTAMP     NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 

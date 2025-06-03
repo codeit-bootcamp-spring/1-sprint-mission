@@ -37,13 +37,7 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<String> getCurrentUser(Authentication authentication,
-      HttpServletRequest request) {
-
-    if (authentication == null || !authentication.isAuthenticated()
-        || authentication instanceof AnonymousAuthenticationToken) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
+  public ResponseEntity<String> getCurrentUser(HttpServletRequest request) {
     try {
       String refreshToken = extractRefreshTokenFromCookie(request);
       String accessToken = jwtService.reissueAccessTokens(refreshToken);

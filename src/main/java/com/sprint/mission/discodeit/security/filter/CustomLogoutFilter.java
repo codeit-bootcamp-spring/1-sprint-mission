@@ -28,7 +28,6 @@ import org.springframework.web.filter.GenericFilterBean;
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
 
-  private final SessionRegistry sessionRegistry;
   private final PersistentTokenRepository persistentTokenRepository;
   private final JwtService jwtService;
 
@@ -56,13 +55,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
           log.error("Failed to remove remember-me tokens for user: {}", username, e);
         }
 
-        // 해당 사용자의 모든 세션 정보 가져오기
-        List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);
-        // 모든 세션 만료 및 제거
-        for (SessionInformation sessionInfo : sessions) {
-          sessionInfo.expireNow();
-          sessionRegistry.removeSessionInformation(sessionInfo.getSessionId());
-        }
       }
 
       // SecurityContext 초기화

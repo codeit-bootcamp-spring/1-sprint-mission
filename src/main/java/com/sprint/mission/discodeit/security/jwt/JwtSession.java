@@ -32,22 +32,30 @@ public class JwtSession {
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "user_id", nullable = false, updatable = false)
   private User user;  // User 엔티티와 연관관계
 
-  @Column(name = "access_token")
+  @Column(name = "access_token", nullable = false, unique = true)
   private String accessToken;
 
-  @Setter
-  @Column(name = "refresh_token")
+  @Column(name = "refresh_token", nullable = false, unique = true)
   private String refreshToken;
 
   @Column(nullable = false)
   @CreationTimestamp
   private Instant createdAt;
 
-  public JwtSession(User user, String accessToken, String refreshToken) {
+  @Column(nullable = false)
+  private Instant expiresAt;
+
+  public JwtSession(User user, String accessToken, String refreshToken, Instant expiresAt) {
     this.user = user;
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expiresAt = expiresAt;
+  }
+
+  public void update(String accessToken, String refreshToken) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
   }

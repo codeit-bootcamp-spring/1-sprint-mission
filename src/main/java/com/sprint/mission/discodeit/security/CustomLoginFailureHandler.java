@@ -16,8 +16,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
 
   private final ObjectMapper objectMapper;
-  private final JwtService jwtService;
-
 
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
