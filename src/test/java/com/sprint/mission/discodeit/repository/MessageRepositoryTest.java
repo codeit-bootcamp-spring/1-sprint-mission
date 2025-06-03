@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -204,15 +203,15 @@ class MessageRepositoryTest {
     // then
     // 해당 채널의 메시지는 삭제되었는지 확인
     List<Message> channelMessages = messageRepository.findAllByChannelIdWithAuthor(
-        channel.getId(), 
-        Instant.now().plus(1, ChronoUnit.DAYS), 
+        channel.getId(),
+        Instant.now().plus(1, ChronoUnit.DAYS),
         PageRequest.of(0, 100)
     ).getContent();
     assertThat(channelMessages).isEmpty();
 
     // 다른 채널의 메시지는 그대로인지 확인
     List<Message> otherChannelMessages = messageRepository.findAllByChannelIdWithAuthor(
-        otherChannel.getId(), 
+        otherChannel.getId(),
         Instant.now().plus(1, ChronoUnit.DAYS),
         PageRequest.of(0, 100)
     ).getContent();

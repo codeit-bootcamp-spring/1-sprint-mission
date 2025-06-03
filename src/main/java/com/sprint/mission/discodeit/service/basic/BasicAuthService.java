@@ -8,24 +8,19 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
-import jakarta.servlet.http.HttpSessionEvent;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -33,30 +28,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class BasicAuthService implements AuthService {
 
-  private final UserRepository userRepository;
-  private final UserMapper userMapper;
   @Value("${discodeit.admin.username}")
   private String username;
   @Value("${discodeit.admin.password}")
   private String password;
   @Value("${discodeit.admin.email}")
   private String email;
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
   private final SessionRegistry sessionRegistry;
-
-  private static final Map<String, String> sessionUserMap = new ConcurrentHashMap<>();
-
-  public UserDto getCurrentUser() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
-      String username = userDetails.getUsername();
-      User user = userRepository.findByUsername(username)
-          .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
-      return userMapper.toDto(user);
-    } else {
-      throw new UsernameNotFoundException("현재 로그인한 사용자를 찾을 수 없습니다.");
-    }
-  }
+  private final JwtService jwtService;
+  private final AuthenticationManager authenticationManager;
 
   @Transactional
   @Override

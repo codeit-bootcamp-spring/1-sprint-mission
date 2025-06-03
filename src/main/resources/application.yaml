@@ -65,3 +65,13 @@ discodeit:
 logging:
   level:
     root: info
+
+security:
+  remember-me:
+    key: ${SECURITY_REMEMBER_ME_KEY}
+    token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-validity: 5m
+  refresh-token-validity: 7d
