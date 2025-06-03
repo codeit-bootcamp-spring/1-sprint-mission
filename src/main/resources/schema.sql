@@ -117,3 +117,21 @@ create table persistent_logins
     token     varchar(64) not null,
     last_used timestamp   not null
 );
+
+CREATE TABLE jwt_sessions
+(
+    id              uuid PRIMARY KEY,
+    created_at      timestamp with time zone NOT NULL,
+    updated_at      timestamp with time zone,
+    user_id         uuid                     NOT NULL,
+    access_token    varchar(512)             NOT NULL UNIQUE,
+    refresh_token   varchar(512)             NOT NULL UNIQUE,
+    expiration_time timestamp with time zone NOT NULL
+);
+
+-- JwtSession.user_id -> users.id (사용자 삭제 시 세션도 삭제)
+ALTER TABLE jwt_sessions
+    ADD CONSTRAINT fk_jwt_session_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE;
