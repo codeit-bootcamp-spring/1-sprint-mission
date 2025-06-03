@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  app:
+    image: discodeit:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit
+    ports:
+      - "8081:80"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/discodeit
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - STORAGE_TYPE=s3
+      - STORAGE_LOCAL_ROOT_PATH=.discodeit/storage
+      - AWS_S3_ACCESS_KEY=${AWS_S3_ACCESS_KEY}
+      - AWS_S3_SECRET_KEY=${AWS_S3_SECRET_KEY}
+      - AWS_S3_REGION=${AWS_S3_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_S3_PRESIGNED_URL_EXPIRATION=600
+    depends_on:
+      - db
+    volumes:
+      - binary-content-storage:/app/.discodeit/storage
+    networks:
+      - discodeit-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: discodeit-db
+    environment:
+      - POSTGRES_DB=discodeit
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - discodeit-network
+
+volumes:
+  postgres-data:
+  binary-content-storage:
+
+networks:
+  discodeit-network:
+    driver: bridge 
