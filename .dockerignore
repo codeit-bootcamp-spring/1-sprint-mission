@@ -1,0 +1,37 @@
+# 이미지 저장
+binaryContents/
+
+# Git 관련 파일
+.git
+.github
+.gitignore
+
+# IDE 설정파일 (IntelliJ, VSCode 등)
+*.iml
+.idea/
+.vscode/
+
+# OS, 에디터 임시 파일
+.DS_Store
+*.swp
+*.swo
+Thumbs.db
+
+# 로그 파일
+logs/
+*.log
+
+# 환경 설정
+.env
+
+# 빌드 결과물 (Gradle/Maven)
+.gradle/
+build/
+**/build/
+
+# 의존성 캐시
+mvnw.cmd
+mvnw
+.settings/
+.classpath
+.project
