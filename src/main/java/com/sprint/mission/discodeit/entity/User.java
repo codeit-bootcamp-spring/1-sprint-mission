@@ -47,7 +47,7 @@ public class User extends BaseUpdatableEntity {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.role = Role.ROLE_USER;
+        this.role = Role.USER;
     }
 
     public static User of(String name, String email, String password) {

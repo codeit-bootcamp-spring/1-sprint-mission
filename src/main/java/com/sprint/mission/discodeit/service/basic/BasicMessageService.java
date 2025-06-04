@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.util.LoginStatusChecker;
 import com.sprint.mission.discodeit.common.util.MultipartFileConverter;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
@@ -24,14 +25,12 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +52,7 @@ public class BasicMessageService implements MessageService {
 
     private final MultipartFileConverter multipartFileConverter;
     private final BinaryContentStorage binaryContentStorage;
-    private final SessionRegistry sessionRegistry;
+    private final LoginStatusChecker loginStatusChecker;
 
     @Override
     @Transactional
@@ -80,7 +79,8 @@ public class BasicMessageService implements MessageService {
                 message.addAttachment(savedContent);
             });
 
-        return messageMapper.toMessageDto(message, getOnline(message.getSender()), userMapper);
+        return messageMapper.toMessageDto(message,
+            loginStatusChecker.getOnline(message.getSender()), userMapper);
     }
 
     @Override
@@ -92,7 +92,8 @@ public class BasicMessageService implements MessageService {
             cursor == null ? messageRepository.findSlicedMessagesByChannel(channel, pageable)
                 : messageRepository.findSlicedMessagesByChannel(channel, cursor, pageable);
         List<MessageDto> messageDtoList = messageSlice.getContent().stream()
-            .map(message -> messageMapper.toMessageDto(message, getOnline(message.getSender()),
+            .map(message -> messageMapper.toMessageDto(message,
+                loginStatusChecker.getOnline(message.getSender()),
                 userMapper))
             .toList();
 
@@ -112,7 +113,8 @@ public class BasicMessageService implements MessageService {
 
         foundMessage.updateContent(updateMessageRequest.newContent());
 
-        return messageMapper.toMessageDto(foundMessage, getOnline(foundMessage.getSender()),
+        return messageMapper.toMessageDto(foundMessage,
+            loginStatusChecker.getOnline(foundMessage.getSender()),
             userMapper);
     }
 
@@ -129,17 +131,6 @@ public class BasicMessageService implements MessageService {
     private Message findMessageById(UUID messageId) {
         return messageRepository.findMessageById(messageId)
             .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
-    }
-
-    private boolean getOnline(User user) {
-        boolean online = false;
-        List<Object> principals = sessionRegistry.getAllPrincipals();
-        for (Object principal : principals) {
-            if (Objects.equals(((UserDetails) principal).getUsername(), user.getName())) {
-                online = true;
-            }
-        }
-        return online;
     }
 
     private void validateMessageSender(Message message, UserDetails userDetails) {

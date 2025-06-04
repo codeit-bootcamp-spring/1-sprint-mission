@@ -47,7 +47,6 @@ public class MessageController implements MessageApi {
                 messageService.createMessage(createMessageRequest, multipartFileList));
     }
 
-    @PreAuthorize("#id == authentication.principal.user.id")
     @PatchMapping(value = "/{id}")
     public ResponseEntity<MessageDto> updateMessage(
         @PathVariable UUID id,

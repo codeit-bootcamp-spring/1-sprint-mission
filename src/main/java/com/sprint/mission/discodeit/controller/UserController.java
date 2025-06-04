@@ -38,7 +38,7 @@ public class UserController implements UserApi {
             .body(userService.createUser(createUserRequest, profileImage));
     }
 
-    @PreAuthorize("#id == authentication.principal.user.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#id == authentication.principal.userDto.id or hasRole('ROLE_ADMIN')")
     @PatchMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserDto> updateUser(
         @PathVariable UUID id,
@@ -48,7 +48,7 @@ public class UserController implements UserApi {
             .body(userService.updateUser(id, updateUserRequest, profileImage));
     }
 
-    @PreAuthorize("#id == authentication.principal.user.id or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("#id == authentication.principal.userDto.id or hasRole('ROLE_ADMIN')")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
         userService.deleteUser(id);

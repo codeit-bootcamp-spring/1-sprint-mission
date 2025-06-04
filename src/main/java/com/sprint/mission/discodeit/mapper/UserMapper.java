@@ -20,7 +20,7 @@ public interface UserMapper {
 
     @AfterMapping
     default void setDefaultRole(@MappingTarget User user) {
-        user.updateRole(Role.ROLE_USER);
+        user.updateRole(Role.USER);
     }
 
     @Mapping(target = "username", source = "user.name")

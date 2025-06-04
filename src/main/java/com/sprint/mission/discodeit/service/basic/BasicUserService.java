@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.util.LoginStatusChecker;
 import com.sprint.mission.discodeit.common.util.MultipartFileConverter;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
@@ -13,13 +14,10 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +37,7 @@ public class BasicUserService implements UserService {
     private final MultipartFileConverter multipartFileConverter;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder bCryptPasswordEncoder;
-    private final SessionRegistry sessionRegistry;
+    private final LoginStatusChecker loginStatusChecker;
 
     @Override
     @Transactional
@@ -57,7 +55,7 @@ public class BasicUserService implements UserService {
         updateProfileImage(user, profileImageFile);
         User savedUser = userRepository.saveUser(user);
 
-        return userMapper.toUserDto(savedUser, getOnline(user));
+        return userMapper.toUserDto(savedUser, loginStatusChecker.getOnline(user));
     }
 
     @Override
@@ -65,7 +63,7 @@ public class BasicUserService implements UserService {
     public UserDto findUserByIdOrThrow(UUID userId) {
         User foundUser = userValidator.validateUserExistsByUserId(userId);
 
-        return userMapper.toUserDto(foundUser, getOnline(foundUser));
+        return userMapper.toUserDto(foundUser, loginStatusChecker.getOnline(foundUser));
     }
 
     @Override
@@ -87,7 +85,7 @@ public class BasicUserService implements UserService {
 
         updateProfileImage(foundUser, profileImageFile);
 
-        return userMapper.toUserDto(foundUser, getOnline(foundUser));
+        return userMapper.toUserDto(foundUser, loginStatusChecker.getOnline(foundUser));
     }
 
     @Override
@@ -113,17 +111,5 @@ public class BasicUserService implements UserService {
                     multipartFileConverter.toByteArray(file));
                 user.updateProfileImage(binaryContent);
             });
-    }
-
-    private boolean getOnline(User user) {
-        boolean online = false;
-        List<Object> principals = sessionRegistry.getAllPrincipals();
-        for (Object principal : principals) {
-            if (Objects.equals(((UserDetails) principal).getUsername(), user.getName())) {
-                online = true;
-            }
-        }
-
-        return online;
     }
 }

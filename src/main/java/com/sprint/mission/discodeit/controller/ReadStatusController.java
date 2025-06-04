@@ -29,7 +29,7 @@ public class ReadStatusController implements ReadStatusApi {
 
     private final ReadStatusService readStatusService;
 
-    @PreAuthorize("#createReadStatusRequest.userId == authentication.principal.user.id")
+    @PreAuthorize("#createReadStatusRequest.userId == authentication.principal.userDto.id")
     @PostMapping(value = "")
     public ResponseEntity<ReadStatusDto> createReadStatus(
         @RequestBody CreateReadStatusRequest createReadStatusRequest) {

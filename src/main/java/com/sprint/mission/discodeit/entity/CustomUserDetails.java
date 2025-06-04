@@ -1,33 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
+@RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private final User user;
-
-    public CustomUserDetails(User user) {
-        this.user = user;
-    }
+    private final UserDto userDto;
+    private final String password;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_".concat(userDto.role().name())));
     }
 
     @Override
     public String getPassword() {
-        return this.user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return this.user.getName();
+        return userDto.username();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CustomUserDetails that)) {
+            return false;
+        }
+        return userDto.username().equals(that.userDto.username());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userDto.username());
     }
 }
