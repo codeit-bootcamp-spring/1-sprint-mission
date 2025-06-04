@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sprint.mission.discodeit.auth.Role;
+import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -13,11 +13,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.List;
-import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Setter
@@ -56,6 +54,7 @@ public class User extends BaseUpdatableEntity {
         this.email = email;
         this.password = password;
         this.profile = profile;
+        this.role = Role.USER;
     }
 
     public void update(String username, String email, String password) {

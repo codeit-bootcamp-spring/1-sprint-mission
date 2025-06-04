@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.Interface;
 
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
@@ -16,20 +17,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
 
-  MessageDto createMessage(CreateMessageRequestDto request
-      , List<BinaryContentDto> binaryContentCreateRequests);
+    MessageDto createMessage(CreateMessageRequestDto request
+            , List<BinaryContentCreateRequest> binaryContentCreateRequests);
 
-  Message getMessageById(UUID id);
+    Message getMessageById(UUID id);
 
-  List<Message> getAllMessages();
+    List<Message> getAllMessages();
 
-  PageResponse<MessageDto> findAllByChannelId(UUID channelID, Instant cursor, int size);
+    PageResponse<MessageDto> findAllByChannelId(UUID channelID, Instant cursor, int size);
 
-  MessageDto updateMessage(UUID id, UpdateMessageRequestDto request);
+    MessageDto updateMessage(UUID id, UpdateMessageRequestDto request);
 
-  void deleteMessage(UUID id);
+    void deleteMessage(UUID id);
 
-  void deleteByChannelId(UUID channelID);
+    void deleteByChannelId(UUID channelID);
 
-  BinaryContentDto saveAttachment(MultipartFile multipartFile);
+    BinaryContentDto saveAttachment(MultipartFile multipartFile);
 }

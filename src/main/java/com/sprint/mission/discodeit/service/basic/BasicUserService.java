@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.auth.CustomUserDetails;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
-import com.sprint.mission.discodeit.auth.Role;
+import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.Interface.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
@@ -29,7 +30,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,6 +44,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
     private final PasswordEncoder passwordEncoder;
+    private final JwtSessionRepository jwtSessionRepository;
     private UUID currentSessionUserId;
 
     @Override
@@ -74,7 +75,7 @@ public class BasicUserService implements UserService {
 
         User user = new User(request.getUsername(), request.getEmail(), encodedPassword,
                 profileImage);
-        user.setRole(Role.ROLE_USER);
+        user.setRole(Role.USER);
         userRepository.save(user);
         log.debug("Saved user: id={}, email={}", user.getId(), user.getEmail());
 
@@ -84,20 +85,32 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto getUserById(UUID id) {
-        return userRepository.findById(id)
+        return userRepository.findByIdWithProfile(id)
                 .map(userMapper::toDto)
                 .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        List<User> all = userRepository.findAll();
+        /*List<User> all = userRepository.findAll();
         UUID currentUserId = getCurrentSessionUserId();
         return all.stream().map(user -> {
             UserDto dto = userMapper.toDto(user);
             dto.setOnline(user.getId().equals(currentUserId));
             return dto;
-        }).toList();
+        }).toList();*/
+
+        List<UUID> list = jwtSessionRepository.findAll().stream()
+                .map(session -> session.getUser().getId())
+                .distinct()
+                .toList();
+
+        return userRepository.findAllWithProfile().stream()
+                .map(user -> {
+                    UserDto userDto = userMapper.toDto(user);
+                    userDto.setOnline(list.contains(user.getId()));
+                    return userDto;
+                }).toList();
     }
 
 
@@ -122,9 +135,13 @@ public class BasicUserService implements UserService {
                 user.setProfile(newProfile);
             }
         }
-        String encodedPassword = passwordEncoder.encode(request.getNewPassword());
 
-        user.update(request.getNewUsername(), request.getNewEmail(), encodedPassword);
+        if (request.getNewPassword() != null) {
+            String encodedPassword = passwordEncoder.encode(request.getNewPassword());
+            user.update(request.getNewUsername(), request.getNewEmail(), encodedPassword);
+        } else {
+            user.update(request.getNewUsername(), request.getNewEmail(), request.getNewPassword());
+        }
 
         return userMapper.toDto(user);
     }

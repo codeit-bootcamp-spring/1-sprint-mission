@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.security;
 
-import com.sprint.mission.discodeit.auth.CustomUserDetails;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.session.SessionRegistry;

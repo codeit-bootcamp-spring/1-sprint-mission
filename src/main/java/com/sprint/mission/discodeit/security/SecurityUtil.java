@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.auth;
+package com.sprint.mission.discodeit.security;
 
 import java.util.UUID;
 import org.springframework.security.core.Authentication;

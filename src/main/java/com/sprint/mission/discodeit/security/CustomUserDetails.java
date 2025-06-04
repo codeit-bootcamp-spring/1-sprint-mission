@@ -1,10 +1,9 @@
-package com.sprint.mission.discodeit.auth;
+package com.sprint.mission.discodeit.security;
 
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,7 +22,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public boolean isAdmin() {
-        return user.getRole() == Role.ROLE_ADMIN;
+        return user.getRole() == Role.ADMIN;
     }
 
     public User getUser() {
@@ -37,7 +36,6 @@ public class CustomUserDetails implements UserDetails {
     public String getPassword() {
         return user.getPassword();
     }
-
 
     public boolean isAccountNonExpired() {
         return true;
@@ -56,7 +54,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override

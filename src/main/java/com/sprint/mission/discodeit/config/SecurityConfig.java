@@ -1,27 +1,30 @@
 package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.auth.CustomUserDetails;
-import com.sprint.mission.discodeit.auth.JsonLoginFilter;
-import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.CustomUserDetailsService;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.List;
-import java.util.function.Supplier;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -30,12 +33,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.SessionFixationConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -48,14 +50,8 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.csrf.CsrfTokenRequestHandler;
 import org.springframework.security.web.session.ConcurrentSessionFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.security.web.session.SessionInformationExpiredEvent;
@@ -68,14 +64,17 @@ import org.springframework.security.web.session.SessionInformationExpiredStrateg
 @Slf4j
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
     private final UserMapper userMapper;
     private final DataSource dataSource;
     private final ObjectMapper objectMapper;
+    private final JwtSessionRepository jwtSessionRepository;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtService jwtService,
+            CustomUserDetailsService customUserDetailsService)
+            throws Exception {
+        /*http
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(csrfTokenRequestHandler())
@@ -120,10 +119,47 @@ public class SecurityConfig {
                         .sessionRegistry(sessionRegistry())
                 );
 
+        return http.build();*/
+
+        // jwt
+        http
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(cookieCsrfTokenRepository())
+                        .disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper,
+                                customUserDetailsService, jwtSessionRepository),
+                        UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/me").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/binaryContents/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
+                        .requestMatchers(
+                                "/", "/index.html", "/swagger-ui/**", "/v3/api-docs/**",
+                                "/actuator/**", "/favicon.ico", "/assets/index-*.js",
+                                "/assets/index-*.css", "/static/**"
+                        ).permitAll()
+                        .anyRequest().hasRole("USER")
+                )
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+
+        ;
         return http.build();
     }
 
-    @Bean
+    private CookieCsrfTokenRepository cookieCsrfTokenRepository() {
+        CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repo.setCookieName("XSRF_TOKEN");
+        repo.setHeaderName("X-XSRF-TOKEN");
+        return repo;
+    }
+
+    /*@Bean
     public JsonLoginFilter jsonLoginFilter(AuthenticationManager authenticationManager) {
         JsonLoginFilter filter = new JsonLoginFilter(authenticationManager, objectMapper,
                 userMapper);
@@ -139,7 +175,7 @@ public class SecurityConfig {
 
         filter.setSessionAuthenticationStrategy(compositeStrategy);
         return filter;
-    }
+    }*/
 
     @Bean
     public LogoutHandler customLogoutHandler() {
@@ -172,6 +208,7 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
+        provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy()));
         return new ProviderManager(provider);
     }
 
@@ -180,7 +217,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    /*@Bean
     public CsrfTokenRequestHandler csrfTokenRequestHandler() {
         return new CsrfTokenRequestHandler() {
             private final CsrfTokenRequestAttributeHandler delegate = new CsrfTokenRequestAttributeHandler();
@@ -197,7 +234,7 @@ public class SecurityConfig {
                 return request.getHeader(token.getHeaderName());
             }
         };
-    }
+    }*/
 
     @Bean
     public ConcurrentSessionFilter concurrentSessionFilter() {
@@ -268,10 +305,10 @@ public class SecurityConfig {
             repo.saveContext(context, request, response);
 
             User user = ((CustomUserDetails) auth.getPrincipal()).getUser();
-            UserDto dto = userMapper.toDto(user);
+            UserDto userDto = userMapper.toDto(user);
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(dto));
+            response.getWriter().write(objectMapper.writeValueAsString(userDto));
 
         };
     }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.auth;
+package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.user.UserDto;
@@ -8,7 +8,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -83,9 +82,9 @@ public class JsonLoginFilter extends UsernamePasswordAuthenticationFilter {
         }
 
         User user = ((CustomUserDetails) authResult.getPrincipal()).getUser();
-        UserDto dto = userMapper.toDto(user);
+        UserDto userDto = userMapper.toDto(user);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(dto));
+        response.getWriter().write(objectMapper.writeValueAsString(userDto));
     }
 }

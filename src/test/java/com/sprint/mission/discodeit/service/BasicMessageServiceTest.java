@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.*;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.*;
@@ -88,7 +90,7 @@ class BasicMessageServiceTest {
     given(messageRepository.save(any(Message.class))).willReturn(message);
     given(messageMapper.toDto(any(Message.class))).willReturn(new MessageDto());
 
-    MessageDto result = basicMessageService.createMessage(request, List.of());
+    MessageDto result = basicMessageService.createMessage(request,  null);
 
     assertNotNull(result);
     verify(messageRepository).save(any(Message.class));
@@ -102,7 +104,7 @@ class BasicMessageServiceTest {
     CreateMessageRequestDto request = new CreateMessageRequestDto("테스트", null, userId);
     given(channelRepository.findById(null)).willReturn(Optional.empty());
     assertThrows(ChannelNotFoundException.class,
-        () -> basicMessageService.createMessage(request, List.of()));
+        () -> basicMessageService.createMessage(request, (List<BinaryContentCreateRequest>) null));
   }
 
   @Test
@@ -115,7 +117,7 @@ class BasicMessageServiceTest {
     given(userRepository.findById(null)).willReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class,
-        () -> basicMessageService.createMessage(request, List.of()));
+        () -> basicMessageService.createMessage(request, (List<BinaryContentCreateRequest>) null);
   }
 
   @Test

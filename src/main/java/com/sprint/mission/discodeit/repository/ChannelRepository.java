@@ -12,16 +12,17 @@ import org.springframework.data.repository.query.Param;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-  boolean existsById(UUID id);
+    boolean existsById(UUID id);
 
 
-  @EntityGraph(attributePaths = {"readStatuses", "messages", "readStatuses.user"})
-  @Query("""
-      select c from Channel c
-      where c.type = 'PUBLIC'
-      or c.id in (
-          select rs.channel.id from ReadStatus rs where rs.user.id = :userId
-      )
-      """)
-  List<Channel> findAllByUserId(UUID userId);
+    @EntityGraph(attributePaths = {"readStatuses", "messages", "readStatuses.user",
+            "readStatuses.user.profile"})
+    @Query("""
+            select c from Channel c
+            where c.type = 'PUBLIC'
+            or c.id in (
+                select rs.channel.id from ReadStatus rs where rs.user.id = :userId
+            )
+            """)
+    List<Channel> findAllByUserId(UUID userId);
 }

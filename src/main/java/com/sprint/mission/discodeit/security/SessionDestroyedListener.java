@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.auth;
+package com.sprint.mission.discodeit.security;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.core.session.SessionDestroyedEvent;

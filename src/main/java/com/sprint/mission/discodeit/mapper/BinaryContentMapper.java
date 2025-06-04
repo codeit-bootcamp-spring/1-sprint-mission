@@ -19,24 +19,12 @@ public class BinaryContentMapper {
             return null;
         }
 
-        byte[] fileDate = convertInputStreamToByteArray(
-                binaryContentStorage.get(entity.getId()));
-
         return new BinaryContentDto(
                 entity.getId(),
                 entity.getFileName(),
                 entity.getSize(),
-                entity.getContentType(),
-                fileDate
+                entity.getContentType()
         );
 
-    }
-
-    private byte[] convertInputStreamToByteArray(InputStream inputStream) {
-        try {
-            return inputStream.readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("파일 데이터를 읽는 중 오류 발생", e);
-        }
     }
 }

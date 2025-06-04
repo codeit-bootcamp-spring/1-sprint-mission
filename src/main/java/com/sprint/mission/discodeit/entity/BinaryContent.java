@@ -19,21 +19,19 @@ import lombok.Setter;
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
 
-  @Column(nullable = false)
-  private String fileName;
+    @Column(nullable = false)
+    private String fileName;
 
-  @Column(nullable = false)
-  private long size;
+    @Column(nullable = false)
+    private long size;
 
-  @Column(nullable = false, length = 100)
-  private String contentType;
+    @Column(nullable = false, length = 100)
+    private String contentType;
 
-  @OneToOne(mappedBy = "profile")
-  private User user;
 
-  public BinaryContent(String fileName, long size, String contentType) {
-    this.fileName = fileName;
-    this.size = size;
-    this.contentType = contentType;
-  }
+    public BinaryContent(String fileName, long size, String contentType) {
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+    }
 }
