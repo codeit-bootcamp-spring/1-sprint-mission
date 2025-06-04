@@ -155,9 +155,9 @@ public class BasicUserService implements UserService {
         updateUserDto.newUsername() == null ? user.getUsername() : updateUserDto.newUsername());
     user.setEmail(updateUserDto.newEmail() == null ? user.getEmail() : updateUserDto.newEmail());
 
-    String newPassword = passwordEncoder.encode(updateUserDto.newPassword());
     user.setPassword(
-        updateUserDto.newPassword() == null ? user.getPassword() : newPassword);
+        updateUserDto.newPassword() == null ? user.getPassword()
+            : passwordEncoder.encode(updateUserDto.newPassword()));
 
     user.setUpdatedAt(
         updateUserDto.updatedAt() == null ? Instant.now() : updateUserDto.updatedAt());
