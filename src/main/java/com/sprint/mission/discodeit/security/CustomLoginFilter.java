@@ -3,41 +3,38 @@ package com.sprint.mission.discodeit.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.ErrorResponse;
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
-import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.TokenPair;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import java.io.IOException;
 
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final SessionAuthenticationStrategy sessionStrategy;
-    private final AuthenticationSuccessHandler successHandler;
     private final ObjectMapper objectMapper;
+    private final UserMapper userMapper;
+    private final JwtService jwtService;
 
     public CustomLoginFilter(AuthenticationManager authenticationManager,
-                             SessionAuthenticationStrategy sessionStrategy,
-                             AuthenticationSuccessHandler successHandler,
-                             ObjectMapper objectMapper
+                             ObjectMapper objectMapper,
+                             UserMapper userMapper,
+                             JwtService jwtService
     ) {
         this.objectMapper = objectMapper;
         super.setAuthenticationManager(authenticationManager);
-        this.sessionStrategy = sessionStrategy;
-        this.successHandler = successHandler;
+        this.userMapper = userMapper;
+        this.jwtService = jwtService;
         setFilterProcessesUrl("/api/auth/login"); // 요청 URL 설정
     }
 
@@ -63,32 +60,26 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                            FilterChain chain, Authentication authResult) throws IOException, ServletException {
+                                            FilterChain chain, Authentication authResult) throws IOException {
 
-/*        if (this.sessionStrategy != null) {
-            this.sessionStrategy.onAuthentication(authResult, request, response);
-        }*/
+        // 1. 인증된 사용자 정보 > DTO 변환
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
+        UserDto userDto = userMapper.toDto(userDetails.getUser());
 
-        // 1. SecurityContext 생성 및 설정
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authResult);
-        SecurityContextHolder.setContext(context);
+        // 2. JWT 토큰 발급
+        TokenPair tokens = jwtService.issueTokenPair(userDto);
 
-        // 2. 세션 등록 전략 호출
-        sessionStrategy.onAuthentication(authResult, request, response);
+        // 3. 응답 본문에 액세스 토큰
+        response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+        response.getWriter().write(tokens.accessToken());
 
-        // 3. 세션에 저장
-        HttpSession session = request.getSession(true);
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-
-
-        // 4. Remember-Me 처리
-        if (getRememberMeServices() != null) {
-            getRememberMeServices().loginSuccess(request, response, authResult);
-        }
-
-        // 5. 성공 핸들러 위임
-        successHandler.onAuthenticationSuccess(request, response, authResult);
+        // 4. HttpOnly 쿠키로 리프레시 토큰 저장
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", tokens.refreshToken())
+                .path("/")
+                .httpOnly(true)
+                .maxAge(60 * 60 * 24 * 21) // 21일
+                .build();
+        response.setHeader("Set-Cookie", cookie.toString());
     }
 
     @Override

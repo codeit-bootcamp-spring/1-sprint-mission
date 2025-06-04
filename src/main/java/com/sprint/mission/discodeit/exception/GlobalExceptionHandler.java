@@ -4,7 +4,11 @@ package com.sprint.mission.discodeit.exception;
 import com.sprint.mission.discodeit.dto.ErrorResponse;
 import java.util.List;
 import java.util.Map;
+
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +23,13 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .status(exception.getErrorCode().getHttpStatus())
         .body(ErrorResponse.from(exception));
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
+    return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse.from(e, HttpServletResponse.SC_UNAUTHORIZED));
   }
 
   //valid 에러
@@ -62,4 +73,6 @@ public class GlobalExceptionHandler {
             e.getClass()
         ));
   }
+
+
 }
