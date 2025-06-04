@@ -23,7 +23,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
     DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
-    
+    jwtService.invalidateJwtSession(principal.getUserDto().id());
     JwtSession jwtSession = jwtService.generateTokens(principal.getUserDto());
 
     Cookie refreshTokenCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());

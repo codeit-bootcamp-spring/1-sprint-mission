@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.security.filter.JwtAuthFilter;
 
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtBlacklist;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 
@@ -128,7 +129,8 @@ public class SecurityConfig {
       JwtTokenProvider jwtTokenProvider,
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
-      JwtService jwtService)
+      JwtService jwtService,
+      JwtBlacklist jwtBlacklist)
       throws Exception {
 
     http
@@ -151,7 +153,7 @@ public class SecurityConfig {
 
         // JwtAuthFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
         // 앞에 추가함을 통해 Spring Security 보다 JWT 검증이 먼저 이루어짐
-        .addFilterBefore(new JwtAuthFilter(jwtTokenProvider),
+        .addFilterBefore(new JwtAuthFilter(jwtTokenProvider, jwtBlacklist),
             UsernamePasswordAuthenticationFilter.class)
 
         // 로그아웃 필터 구현

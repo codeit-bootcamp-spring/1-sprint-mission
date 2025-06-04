@@ -15,4 +15,6 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
   List<JwtSession> findByUser(User user);
 
   User user(User user);
+
+  Optional<JwtSession> findByUserId(UUID userId);
 }

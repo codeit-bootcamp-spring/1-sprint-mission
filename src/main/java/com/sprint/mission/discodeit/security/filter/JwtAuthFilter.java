@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.security.filter;
 
+import com.sprint.mission.discodeit.security.jwt.JwtBlacklist;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
+  private final JwtBlacklist jwtBlacklist;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -28,16 +31,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       return;
     }
     // 'Bearer ' 제거
-    String token = auth.substring(7);
+    String accessToken = auth.substring(7);
 
     // JWT 토큰 파싱하여 서명 검증
-    if (!jwtTokenProvider.validate(token)) {
+    if (!jwtTokenProvider.validate(accessToken)) {
+      response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid Token");
+      return;
+    }
+
+    if (jwtBlacklist.contains(accessToken)) {
       response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid Token");
       return;
     }
 
     // JWT의 Claim 에서 사용자 정보 추출
-    Authentication authentication = jwtTokenProvider.getAuthentication(token);
+    Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
 
     // Spring Security의 SecurityContext에 인증 정보 저장
     SecurityContextHolder.getContext().setAuthentication(authentication);

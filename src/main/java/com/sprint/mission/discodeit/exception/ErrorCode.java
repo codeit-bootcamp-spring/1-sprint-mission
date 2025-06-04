@@ -11,6 +11,7 @@ public enum ErrorCode {
 
   //토큰 에러
   INVALID_TOKEN("만료 또는 유효하지 않은 토큰입니다."),
+  TOKEN_NOT_FOUND("존재하지 않는 토큰입니다."),
 
   //채널 관련 에러
   CHANNEL_NOT_FOUND("채널을 찾을 수 없습니다."),

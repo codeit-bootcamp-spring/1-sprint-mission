@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.exception.auth.InvalidRefreshTokenException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +26,7 @@ public class JwtService {
   private final UserDetailsService userDetailsService;
   private final UserRepository userRepository;
   private final UserMapper userMapper;
+  private final JwtBlacklist jwtBlacklist;
 
   @Transactional
   // UserDto정보로 토큰을 생성할 수 있다. (JwtSession을 같이 저장)
@@ -58,7 +60,9 @@ public class JwtService {
 
   // 토큰의 유효성을 검사할 수 있다.
   public boolean validateToken(String token) {
-    return jwtTokenProvider.validate(token);
+    return jwtTokenProvider.validate(token)
+        && !jwtTokenProvider.isTokenExpired(token)
+        && !jwtBlacklist.contains(token);
   }
 
   @Transactional
@@ -69,12 +73,23 @@ public class JwtService {
       return;
     }
     //2. 리프레시 토큰 무효화 -> 리프레시 토큰, jwtSession 삭제
-    JwtSession jwtSession = jwtSessionRepository.findJwtSessionByRefreshToken(refreshToken)
-        .orElseThrow(() -> new NoSuchElementException("Invalid refresh token"));
-
-    jwtSessionRepository.delete(jwtSession);
-
+    jwtSessionRepository.findJwtSessionByRefreshToken(refreshToken)
+        .ifPresent(this::invalidateSession);
   }
+
+  @Transactional
+  public void invalidateJwtSession(UUID userId) {
+    jwtSessionRepository.findByUserId(userId)
+        .ifPresent(this::invalidateSession);
+  }
+
+  private void invalidateSession(JwtSession session) {
+    if (!session.isExpired()) {
+      jwtBlacklist.put(session.getAccessToken(), session.getExpiresAt());
+    }
+    jwtSessionRepository.delete(session);
+  }
+
 
   @Transactional
   // 리프레시 토큰을 활용해 엑세스 토큰을 재발급할 수 있다.
@@ -102,7 +117,10 @@ public class JwtService {
     String newRefreshToken = jwtTokenProvider.generateRefreshToken(userDetails, userDto);
     String newAccessToken = jwtTokenProvider.generateAccessToken(userDetails, userDto);
 
-    //4. 기존의 access, refresh 를 삭제하고 jwtSession 다시 저장
+    //4. 리프레시 토큰을 무효화할 때 해당 엑세스 토큰을 블랙리스트에 추가
+    jwtBlacklist.put(jwtSession.getAccessToken(), jwtSession.getExpiresAt());
+
+    //5. 기존의 access, refresh 를 삭제하고 jwtSession 다시 저장
     jwtSession.update(newAccessToken, newRefreshToken);
     jwtSessionRepository.save(jwtSession);
 

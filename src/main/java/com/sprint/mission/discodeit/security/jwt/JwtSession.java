@@ -60,4 +60,8 @@ public class JwtSession {
     this.refreshToken = refreshToken;
   }
 
+  public boolean isExpired() {
+    return expiresAt != null && expiresAt.isBefore(Instant.now());
+  }
+
 }
