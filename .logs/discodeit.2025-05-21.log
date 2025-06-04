@@ -1,0 +1,580 @@
+25-05-21 09:44:26.887 [background-preinit] INFO  o.h.validator.internal.util.Version  - HV000001: Hibernate Validator 8.0.1.Final
+25-05-21 09:44:27.006 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 22849 (/Users/byeonheejae/Desktop/Study/codeit/path/1-sprint-mission/build/classes/java/main started by byeonheejae in /Users/byeonheejae/Desktop/Study/codeit/path/1-sprint-mission)
+25-05-21 09:44:27.008 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-21 09:44:27.009 [main] INFO  c.s.m.discodeit.DiscodeitApplication - The following 1 profile is active: "dev"
+25-05-21 09:44:30.409 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-21 09:44:30.562 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 139 ms. Found 6 JPA repository interfaces.
+25-05-21 09:44:31.847 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-21 09:44:31.862 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-21 09:44:31.864 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-21 09:44:31.865 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-21 09:44:31.936 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-21 09:44:31.936 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 4863 ms
+25-05-21 09:44:32.386 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-21 09:44:32.455 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-21 09:44:32.497 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-21 09:44:32.889 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-21 09:44:32.920 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-21 09:44:33.023 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@44587c44
+25-05-21 09:44:33.024 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-21 09:44:33.141 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 14.17
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-21 09:44:34.542 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-21 09:44:34.667 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        id uuid not null,
+        created_at timestamp with time zone not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        size bigint not null,
+        primary key (id)
+    )
+25-05-21 09:44:34.687 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        id uuid not null,
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        description varchar(500),
+        name varchar(100),
+        type varchar(255) not null check (type in ('PUBLIC','PRIVATE')),
+        primary key (id)
+    )
+25-05-21 09:44:34.694 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        message_id uuid not null,
+        attachment_id uuid not null
+    )
+25-05-21 09:44:34.695 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        id uuid not null,
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        content text not null,
+        author_id uuid,
+        channel_id uuid not null,
+        primary key (id)
+    )
+25-05-21 09:44:34.698 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        id uuid not null,
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        last_read_at timestamp with time zone not null,
+        channel_id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-21 09:44:34.700 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        id uuid not null,
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        last_active_at timestamp with time zone not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-21 09:44:34.708 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        id uuid not null,
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        email varchar(100) not null,
+        password varchar(60) not null,
+        username varchar(50) not null,
+        profile_id uuid,
+        primary key (id)
+    )
+25-05-21 09:44:34.712 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists UKncf4gyvhiwvyfn0cx5jnmtrhm
+25-05-21 09:44:34.714 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - SQL Warning Code: 0, SQLState: 00000
+25-05-21 09:44:34.715 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - constraint "ukncf4gyvhiwvyfn0cx5jnmtrhm" of relation "message_attachments" does not exist, skipping
+25-05-21 09:44:34.716 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint UKncf4gyvhiwvyfn0cx5jnmtrhm unique (attachment_id)
+25-05-21 09:44:34.719 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists UKqttel343c4eq691kcxipoixr7
+25-05-21 09:44:34.721 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - SQL Warning Code: 0, SQLState: 00000
+25-05-21 09:44:34.721 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - constraint "ukqttel343c4eq691kcxipoixr7" of relation "read_statuses" does not exist, skipping
+25-05-21 09:44:34.722 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint UKqttel343c4eq691kcxipoixr7 unique (user_id, channel_id)
+25-05-21 09:44:34.724 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists UK4dhc0tcwpkot8n3tmpc6mxxp0
+25-05-21 09:44:34.726 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - SQL Warning Code: 0, SQLState: 00000
+25-05-21 09:44:34.726 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - constraint "uk4dhc0tcwpkot8n3tmpc6mxxp0" of relation "user_statuses" does not exist, skipping
+25-05-21 09:44:34.726 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint UK4dhc0tcwpkot8n3tmpc6mxxp0 unique (user_id)
+25-05-21 09:44:34.728 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists UK6dotkott2kjsp8vw4d0m25fb7
+25-05-21 09:44:34.729 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - SQL Warning Code: 0, SQLState: 00000
+25-05-21 09:44:34.729 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - constraint "uk6dotkott2kjsp8vw4d0m25fb7" of relation "users" does not exist, skipping
+25-05-21 09:44:34.729 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint UK6dotkott2kjsp8vw4d0m25fb7 unique (email)
+25-05-21 09:44:34.731 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists UKr43af9ap4edm43mmtq01oddj6
+25-05-21 09:44:34.732 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - SQL Warning Code: 0, SQLState: 00000
+25-05-21 09:44:34.732 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - constraint "ukr43af9ap4edm43mmtq01oddj6" of relation "users" does not exist, skipping
+25-05-21 09:44:34.732 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint UKr43af9ap4edm43mmtq01oddj6 unique (username)
+25-05-21 09:44:34.736 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists UK7s5nlreekaxdbfml4ofky7utw
+25-05-21 09:44:34.742 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - SQL Warning Code: 0, SQLState: 00000
+25-05-21 09:44:34.743 [main] WARN  o.h.e.jdbc.spi.SqlExceptionHelper    - constraint "uk7s5nlreekaxdbfml4ofky7utw" of relation "users" does not exist, skipping
+25-05-21 09:44:34.743 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint UK7s5nlreekaxdbfml4ofky7utw unique (profile_id)
+25-05-21 09:44:34.747 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-21 09:44:34.769 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+25-05-21 09:44:34.774 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+25-05-21 09:44:34.779 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+25-05-21 09:44:34.789 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+25-05-21 09:44:34.796 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+25-05-21 09:44:34.815 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+25-05-21 09:44:34.826 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-21 09:44:34.836 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-21 09:44:36.537 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-21 09:44:37.884 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-21 09:44:38.862 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver  - Exposing 4 endpoints beneath base path '/actuator'
+25-05-21 09:44:38.961 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-21 09:44:38.975 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-21 09:44:38.997 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 13.133 seconds (process running for 14.354)
+25-05-21 09:44:39.418 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring DispatcherServlet 'dispatcherServlet'
+25-05-21 09:44:39.419 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet    - Initializing Servlet 'dispatcherServlet'
+25-05-21 09:44:39.428 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet    - Completed initialization in 6 ms
+25-05-21 09:44:39.496 [http-nio-8080-exec-1] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:39.529 [http-nio-8080-exec-1] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:39.543 [http-nio-8080-exec-1] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:44:39.544 [http-nio-8080-exec-1] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:44:39.582 [http-nio-8080-exec-1] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:39.583 [http-nio-8080-exec-2] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:39.588 [http-nio-8080-exec-2] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:44:39.595 [http-nio-8080-exec-1] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:44:39.659 [http-nio-8080-exec-3] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:39.663 [http-nio-8080-exec-4] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:39.700 [http-nio-8080-exec-5] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:39.715 [http-nio-8080-exec-5] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:44:39.718 [http-nio-8080-exec-4] ERROR c.s.m.d.e.GlobalExceptionHandler     - 예상치 못한 오류 발생: No static resource api/auth/me.
+org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/auth/me.
+	at org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)
+	at org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+25-05-21 09:44:39.719 [http-nio-8080-exec-3] ERROR c.s.m.d.e.GlobalExceptionHandler     - 예상치 못한 오류 발생: No static resource api/auth/csrf-token.
+org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/auth/csrf-token.
+	at org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)
+	at org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+25-05-21 09:44:39.781 [http-nio-8080-exec-4] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:44:39.782 [http-nio-8080-exec-3] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:44:57.379 [http-nio-8080-exec-6] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:57.454 [http-nio-8080-exec-6] INFO  c.s.m.d.controller.UserController    - 사용자 생성 요청: UserCreateRequest[username=qwer, email=qwer@qwer.com, password=qwer1234!!]
+25-05-21 09:44:57.460 [http-nio-8080-exec-6] DEBUG c.s.m.d.s.basic.BasicUserService     - 사용자 생성 시작: UserCreateRequest[username=qwer, email=qwer@qwer.com, password=qwer1234!!]
+25-05-21 09:44:57.502 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL                    - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.email=? 
+    fetch
+        first ? rows only
+25-05-21 09:44:57.516 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL                    - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.username=? 
+    fetch
+        first ? rows only
+25-05-21 09:44:57.545 [http-nio-8080-exec-6] INFO  c.s.m.d.s.basic.BasicUserService     - 사용자 생성 완료: id=2da29268-a24a-473f-963a-2e1c950cb90d, username=qwer
+25-05-21 09:44:57.558 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL                    - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-21 09:44:57.562 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL                    - 
+    insert 
+    into
+        user_statuses
+        (created_at, last_active_at, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?)
+25-05-21 09:44:57.564 [http-nio-8080-exec-6] DEBUG c.s.m.d.controller.UserController    - 사용자 생성 응답: UserDto[id=2da29268-a24a-473f-963a-2e1c950cb90d, username=qwer, email=qwer@qwer.com, profile=null, online=true]
+25-05-21 09:44:57.573 [http-nio-8080-exec-6] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:44:57.576 [http-nio-8080-exec-7] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:44:57.577 [http-nio-8080-exec-7] ERROR c.s.m.d.e.GlobalExceptionHandler     - 예상치 못한 오류 발생: No static resource api/auth/csrf-token.
+org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/auth/csrf-token.
+	at org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)
+	at org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+25-05-21 09:44:57.578 [http-nio-8080-exec-7] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:45:30.655 [http-nio-8080-exec-8] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:45:30.663 [http-nio-8080-exec-8] INFO  c.s.m.d.controller.AuthController    - 로그인 요청: username=qwer@qwer.com
+25-05-21 09:45:30.665 [http-nio-8080-exec-8] DEBUG c.s.m.d.s.basic.BasicAuthService     - 로그인 시도: username=qwer@qwer.com
+25-05-21 09:45:30.674 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL                    - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.profile_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+25-05-21 09:45:30.689 [http-nio-8080-exec-8] ERROR c.s.m.d.e.GlobalExceptionHandler     - 커스텀 예외 발생: code=USER_NOT_FOUND, message=사용자를 찾을 수 없습니다.
+com.sprint.mission.discodeit.exception.user.UserNotFoundException: 사용자를 찾을 수 없습니다.
+	at com.sprint.mission.discodeit.exception.user.UserNotFoundException.withUsername(UserNotFoundException.java:19)
+	at com.sprint.mission.discodeit.service.basic.BasicAuthService.lambda$login$0(BasicAuthService.java:33)
+	at java.base/java.util.Optional.orElseThrow(Optional.java:403)
+	at com.sprint.mission.discodeit.service.basic.BasicAuthService.login(BasicAuthService.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:727)
+	at com.sprint.mission.discodeit.service.basic.BasicAuthService$$SpringCGLIB$$0.login(<generated>)
+	at com.sprint.mission.discodeit.controller.AuthController.login(AuthController.java:28)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+25-05-21 09:45:30.690 [http-nio-8080-exec-8] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:46:10.996 [http-nio-8080-exec-9] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:46:11.008 [http-nio-8080-exec-9] ERROR c.s.m.d.e.GlobalExceptionHandler     - 요청 유효성 검사 실패: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.sprint.mission.discodeit.dto.data.UserDto> com.sprint.mission.discodeit.controller.UserController.create(com.sprint.mission.discodeit.dto.request.UserCreateRequest,org.springframework.web.multipart.MultipartFile): [Field error in object 'userCreateRequest' on field 'password': rejected value [qwer1234]; codes [Pattern.userCreateRequest.password,Pattern.password,Pattern.java.lang.String,Pattern]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [userCreateRequest.password,password]; arguments []; default message [password],[Ljakarta.validation.constraints.Pattern$Flag;@17036e58,^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*]).{8,}$]; default message [비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다]] 
+25-05-21 09:46:11.011 [http-nio-8080-exec-9] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:46:11.726 [http-nio-8080-exec-10] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:46:11.729 [http-nio-8080-exec-10] ERROR c.s.m.d.e.GlobalExceptionHandler     - 요청 유효성 검사 실패: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.sprint.mission.discodeit.dto.data.UserDto> com.sprint.mission.discodeit.controller.UserController.create(com.sprint.mission.discodeit.dto.request.UserCreateRequest,org.springframework.web.multipart.MultipartFile): [Field error in object 'userCreateRequest' on field 'password': rejected value [qwer1234]; codes [Pattern.userCreateRequest.password,Pattern.password,Pattern.java.lang.String,Pattern]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [userCreateRequest.password,password]; arguments []; default message [password],[Ljakarta.validation.constraints.Pattern$Flag;@17036e58,^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*]).{8,}$]; default message [비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다]] 
+25-05-21 09:46:11.731 [http-nio-8080-exec-10] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:46:12.194 [http-nio-8080-exec-2] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:46:12.197 [http-nio-8080-exec-2] ERROR c.s.m.d.e.GlobalExceptionHandler     - 요청 유효성 검사 실패: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.sprint.mission.discodeit.dto.data.UserDto> com.sprint.mission.discodeit.controller.UserController.create(com.sprint.mission.discodeit.dto.request.UserCreateRequest,org.springframework.web.multipart.MultipartFile): [Field error in object 'userCreateRequest' on field 'password': rejected value [qwer1234]; codes [Pattern.userCreateRequest.password,Pattern.password,Pattern.java.lang.String,Pattern]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [userCreateRequest.password,password]; arguments []; default message [password],[Ljakarta.validation.constraints.Pattern$Flag;@17036e58,^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*]).{8,}$]; default message [비밀번호는 최소 8자 이상, 숫자, 문자, 특수문자를 포함해야 합니다]] 
+25-05-21 09:46:12.200 [http-nio-8080-exec-2] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:46:26.173 [http-nio-8080-exec-1] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:46:26.176 [http-nio-8080-exec-1] INFO  c.s.m.d.controller.UserController    - 사용자 생성 요청: UserCreateRequest[username=heejae, email=heejae@test.com, password=qwer1234!!]
+25-05-21 09:46:26.177 [http-nio-8080-exec-1] DEBUG c.s.m.d.s.basic.BasicUserService     - 사용자 생성 시작: UserCreateRequest[username=heejae, email=heejae@test.com, password=qwer1234!!]
+25-05-21 09:46:26.179 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL                    - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.email=? 
+    fetch
+        first ? rows only
+25-05-21 09:46:26.181 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL                    - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.username=? 
+    fetch
+        first ? rows only
+25-05-21 09:46:26.184 [http-nio-8080-exec-1] INFO  c.s.m.d.s.basic.BasicUserService     - 사용자 생성 완료: id=6d75be23-c3bb-41f1-bdf2-be45df081810, username=heejae
+25-05-21 09:46:26.185 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL                    - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-21 09:46:26.187 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL                    - 
+    insert 
+    into
+        user_statuses
+        (created_at, last_active_at, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?)
+25-05-21 09:46:26.189 [http-nio-8080-exec-1] DEBUG c.s.m.d.controller.UserController    - 사용자 생성 응답: UserDto[id=6d75be23-c3bb-41f1-bdf2-be45df081810, username=heejae, email=heejae@test.com, profile=null, online=true]
+25-05-21 09:46:26.191 [http-nio-8080-exec-1] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:46:26.196 [http-nio-8080-exec-5] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request started
+25-05-21 09:46:26.197 [http-nio-8080-exec-5] ERROR c.s.m.d.e.GlobalExceptionHandler     - 예상치 못한 오류 발생: No static resource api/auth/csrf-token.
+org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/auth/csrf-token.
+	at org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)
+	at org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+25-05-21 09:46:26.199 [http-nio-8080-exec-5] DEBUG c.s.m.d.config.MDCLoggingInterceptor - Request completed
+25-05-21 09:47:09.529 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-21 09:47:09.537 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-21 09:47:09.542 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-21 09:47:09.544 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-21 09:47:09.548 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.

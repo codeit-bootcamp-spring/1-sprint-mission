@@ -1,28 +1,27 @@
 package com.sprint.mission.discodeit.exception;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
-
-import javax.print.DocFlavor;
-import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@JsonPropertyOrder({"timestamp", "status", "message", "details"})
+@RequiredArgsConstructor
 public class ErrorResponse {
+    private final Instant timestamp;
+    private final String code;
+    private final String message;
+    private final Map<String, Object> details;
+    private final String exceptionType;
+    private final int status;
 
-  private final LocalDateTime timestamp;
-  private final HttpStatus status;
-  private final String message;
-  private final String details;
+    public ErrorResponse(DiscodeitException exception, int status) {
+        this(Instant.now(), exception.getErrorCode().name(), exception.getMessage(), exception.getDetails(), exception.getClass().getSimpleName(), status);
+    }
 
-  @Builder
-  public ErrorResponse(LocalDateTime timestamp, HttpStatus status, String message, String details) {
-    this.timestamp = timestamp;
-    this.status = status;
-    this.message = message;
-    this.details = details;
-  }
-}
+    public ErrorResponse(Exception exception, int status) {
+        this(Instant.now(), exception.getClass().getSimpleName(), exception.getMessage(), new HashMap<>(), exception.getClass().getSimpleName(), status);
+    }
+} 

@@ -1,76 +1,13 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.UsersDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.Base64;
+@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class, UserStatusMapper.class})
+public interface UserMapper {
 
-@Component
-public class UserMapper {
-
-  private UsersDto dto;
-  private UserDto dtos;
-
-  public UsersDto toDtos(User user) {
-    if (user == null) {
-      return null;
-    }
-    return UsersDto.builder()
-        .id(user.getId())
-        .name(user.getName())
-        .email(user.getEmail())
-        .profileImage(user.getProfileImage() != null ? new String(user.getProfileImage()) : null)
-        .online(user.isOnline())
-        .build();
-  }
-
-  public UserDto toDto(User user) {
-    if (user == null) {
-      return null;
-    }
-    
-    BinaryContentDto profileDto = null;
-    if (user.getProfile() != null) {
-      BinaryContent profile = user.getProfile();
-      profileDto = BinaryContentDto.builder()
-          .id(profile.getId())
-          .fileName(profile.getFileName())
-          .contentType(profile.getContentType())
-          .size(profile.getSize())
-          .build();
-    }
-    
-    return UserDto.builder()
-        .id(user.getId())
-        .name(user.getName())
-        .username(user.getName())
-        .email(user.getEmail())
-        .password(user.getPassword())
-        .online(user.isOnline())
-        .profileImage(user.getProfileImage() != null ? new String(user.getProfileImage()) : null)
-        .profile(profileDto)
-        .build();
-  }
-
-  private UsersDto toDTO(User user) {
-
-    if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
-      String base64Str = Base64.getEncoder().encodeToString(user.getProfileImage());
-      dto.setProfileImage(base64Str);
-    } else {
-      dto.setProfileImage("");
-    }
-
-    return UsersDto.builder()
-        .id(user.getId())
-        .name(user.getName())
-        .email(user.getEmail())
-        .online(user.isOnline())
-        .build();
-  }
-
+  @Mapping(target = "online", expression = "java(user.getStatus().isOnline())")
+  UserDto toDto(User user);
 }
