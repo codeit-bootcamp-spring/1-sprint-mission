@@ -5,22 +5,17 @@ import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.CustomPermissionEvaluator;
-import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
-import com.sprint.mission.discodeit.security.filter.CustomLogoutFilter;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.JwtAuthFilter;
 
 import com.sprint.mission.discodeit.security.SecurityMatchers;
-import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtBlacklist;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 
 import java.util.stream.IntStream;
-import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
@@ -29,16 +24,12 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -144,7 +135,7 @@ public class SecurityConfig {
                 SecurityMatchers.SIGN_UP,
                 SecurityMatchers.ME
             ).permitAll()
-            .anyRequest().hasRole(Role.USER.name())
+            .anyRequest().authenticated()
         )
 
         .httpBasic(AbstractHttpConfigurer::disable) // HTTP Basic 인증 비활성화

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +18,7 @@ public class DiscodeitUserDetailsService implements UserDetailsService {
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
+  private final RoleHierarchy roleHierarchy;
 
   @Transactional(readOnly = true)
   @Override
@@ -24,6 +26,6 @@ public class DiscodeitUserDetailsService implements UserDetailsService {
     User user = userRepository.findByUsername(username)
         .orElseThrow(() -> UserNotFoundException.withUsername(username));
 
-    return new DiscodeitUserDetails(userMapper.toDto(user), user.getPassword());
+    return new DiscodeitUserDetails(userMapper.toDto(user), user.getPassword(), roleHierarchy);
   }
 }

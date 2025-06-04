@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
   private final JwtProperties jwtProperties;
-  private final DiscodeitUserDetailsService userDetailsService; // ← 추가
+  private final DiscodeitUserDetailsService userDetailsService;
 
   private final Clock clock = Clock.systemUTC(); // 현재 시각 제공 객체 > 테스트 시 모킹 가능
 

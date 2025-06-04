@@ -239,6 +239,7 @@ public class BasicUserService implements UserService {
         .build();
   }
 
+  @Transactional
   @Override
   public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
 
