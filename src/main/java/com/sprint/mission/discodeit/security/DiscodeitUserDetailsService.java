@@ -1,26 +1,30 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission.discodeit.security;
 
-import com.sprint.mission.discodeit.entity.CustomUserDetails;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailService implements UserDetailsService {
+public class DiscodeitUserDetailsService implements UserDetailsService {
 
   private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
+  @Transactional(readOnly = true)
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    // 데이터베이스에서 사용자 조회
     User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
+        .orElseThrow(() -> new UserNotFoundException(Map.of("username", username)));
 
-    return new CustomUserDetails(user);
+    return new DiscodeitUserDetails(userMapper.toDto(user), user.getPassword());
   }
 }

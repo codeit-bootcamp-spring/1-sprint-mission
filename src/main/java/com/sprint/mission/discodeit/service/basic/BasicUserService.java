@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 //
 import java.util.UUID;
@@ -48,7 +49,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   //
-  private final BCryptPasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
   private final RoleRepository roleRepository;
 
   @Transactional
@@ -60,7 +61,6 @@ public class BasicUserService implements UserService {
     log.debug("사용자 생성 시도: userCreateRequest={}, optionalProfileCreateRequest={}", userCreateRequest,
         optionalProfileCreateRequest);
 
-    // username과 email이 다른 유저와 같이 겹치는지 검증
     if (userRepository.existsByUsername(userCreateRequest.username())) {
       log.warn("이미 존재하는 유저 이름: username={}", userCreateRequest.username());
       throw new UsernameAlreadyExistsException(Map.of("username", userCreateRequest.username()));
@@ -71,9 +71,6 @@ public class BasicUserService implements UserService {
           Map.of("email", userCreateRequest.email()));
     }
 
-    // 프로필 이미지 생성 : BinaryContent 도메인 객체 생성
-    // binaryContentService.createBinaryContent() 를 호출하는 대신
-    // 로직을 참고해 작성
     BinaryContent nullableProfile =
         optionalProfileCreateRequest.map(
                 profileRequest -> {
@@ -100,7 +97,6 @@ public class BasicUserService implements UserService {
         .email(userCreateRequest.email())
         .password(passwordEncoder.encode(userCreateRequest.password()))
         .profile(nullableProfile)
-        .roles(Set.of(role))
         .build();
 
     user = userRepository.save(user);

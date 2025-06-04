@@ -1,66 +1,44 @@
 package com.sprint.mission.discodeit.security.jwt;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
-@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "jwt_sessions")
-@AllArgsConstructor
-@NoArgsConstructor
-public class JwtSession {
+@Entity
+public class JwtSession extends BaseUpdatableEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
-
-  @Column(name = "user_id", nullable = false)
+  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
   private UUID userId;
-
-  @Column(name = "access_token", nullable = false, columnDefinition = "TEXT")
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String accessToken;
-
-  @Column(name = "refresh_token", nullable = false, columnDefinition = "TEXT")
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String refreshToken;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant expirationTime;
 
-  @Column(name = "expires_at", nullable = false)
-  private LocalDateTime refreshTokenExpiresAt;
-
-  @Column(name = "created_at", nullable = false)
-  private LocalDateTime refreshTokenCreatedAt;
-
-  @Column(name = "revoked", nullable = false)
-  private boolean revoked = false; // 로그아웃 시 true
-
-  @Column(name = "replaced_by")
-  private String replacedBy;  // 회전 시 새 토큰 ID
-
-  public void updatedRevoked(boolean isRevoked) {
-    this.revoked = isRevoked;
+  public JwtSession(UUID userId, String accessToken, String refreshToken, Instant expirationTime) {
+    this.userId = userId;
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
   }
 
-  public void updatedReplacedBy(String replacedBy) {
-    this.replacedBy = replacedBy;
-  }
-
-  // 토큰이 유효한지
-  public boolean isValid() {
-    return !revoked && refreshTokenExpiresAt.isAfter(LocalDateTime.now());
-  }
-
-  // 토큰이 만료되었는지
   public boolean isExpired() {
-    return refreshTokenExpiresAt.isBefore(LocalDateTime.now());
+    return this.expirationTime.isBefore(Instant.now());
+  }
+
+  public void update(String accessToken, String refreshToken, Instant expirationTime) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
   }
 }

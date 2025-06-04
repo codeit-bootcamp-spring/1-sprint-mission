@@ -19,10 +19,11 @@ public enum ErrorCode {
 
   // JWT
   MISSING_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰이 필요합니다."),
-  INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다."),
+  INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다."),
   JWT_SESSION_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT 세션을 찾을 수 없습니다."),
-  JWT_SESSION_REVOKED(HttpStatus.UNAUTHORIZED, "취소된 세션입니다."),
-  JWT_SESSION_EXPIRED(HttpStatus.UNAUTHORIZED, "만료된 세션입니다."),
+  INVALID_TOKEN_SECRET(HttpStatus.UNAUTHORIZED, "유효하지 않은 시크릿입니다."),
+  TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
+
 
   // 채널
   CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾을 수 없습니다."), // 404
