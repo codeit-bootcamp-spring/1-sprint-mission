@@ -2,13 +2,16 @@ package com.sprint.mission.discodeit.security.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.auth.LoginDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,15 +37,20 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
   private final SessionRegistry sessionRegistry;
   private final RememberMeServices rememberMeServices;
   private final UserOnlineStatusService statusService;
+  private final JwtService jwtService;
+  //  @Value("${app.jwt.refresh-token-expiration}")
+  private final long refreshTokenExpiration;
 
   public DiscodeitUsernamePasswordAuthenticationFilter(UserMapper userMapper,
       SessionRegistry registry, RememberMeServices rememberMeServices,
-      UserOnlineStatusService statusService) {
+      UserOnlineStatusService statusService, JwtService jwtService, long refreshTokenExpiration) {
     setFilterProcessesUrl("/api/auth/login");
     this.userMapper = userMapper;
     this.sessionRegistry = registry;
     this.rememberMeServices = rememberMeServices;
     this.statusService = statusService;
+    this.jwtService = jwtService;
+    this.refreshTokenExpiration = refreshTokenExpiration;
   }
 
   @Override
@@ -65,25 +73,38 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
   protected void successfulAuthentication(HttpServletRequest request,
       HttpServletResponse response, FilterChain chain, Authentication authResult)
       throws IOException, ServletException {
-    SecurityContextHolder.getContext().setAuthentication(authResult);
 
-//    super.successfulAuthentication(request, response, chain, authResult);
+    SecurityContextHolder.getContext().setAuthentication(authResult);
 
     new HttpSessionSecurityContextRepository().saveContext(SecurityContextHolder.getContext(),
         request, response);
 
-    rememberMeServices.loginSuccess(request, response, authResult);
+    // rememberMeServices.loginSuccess(request, response, authResult);
 
     DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authResult.getPrincipal();
     User user = userDetails.getUser();
-    UserResponseDto dto = userMapper.toDto(user, statusService);
+    UserDto dto = userMapper.toDto(user, statusService);
 
-    sessionRegistry.registerNewSession(request.getSession().getId(), authResult.getPrincipal());
+    JwtSession jwtSession = jwtService.generateJwtSession(dto);
+
+    // sessionRegistry.registerNewSession(request.getSession().getId(), authResult.getPrincipal());
+
+    Cookie refreshToken = new Cookie("refresh_token", jwtSession.getRefreshToken());
+    refreshToken.setHttpOnly(true);
+    refreshToken.setSecure(true);
+    refreshToken.setPath("/");
+    refreshToken.setMaxAge((int) (refreshTokenExpiration / 1000));
+    response.addCookie(refreshToken);
 
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
-    mapper.writeValue(response.getWriter(), dto);
+    mapper.writeValue(response.getWriter(), jwtSession.getAccessToken());
+
+//    response.setStatus(HttpServletResponse.SC_OK);
+//    response.setContentType("application/json");
+//    response.setCharacterEncoding("UTF-8");
+//    mapper.writeValue(response.getWriter(), dto);
   }
 
 

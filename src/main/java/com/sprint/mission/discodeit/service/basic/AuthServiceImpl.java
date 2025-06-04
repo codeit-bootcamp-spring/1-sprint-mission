@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 
 import com.sprint.mission.discodeit.security.auth.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.List;
 import java.util.UUID;
@@ -18,20 +19,23 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService {
 
   private final SessionRegistry sessionRegistry;
+  private final JwtService jwtService;
 
   @Override
   public void forceLogout(UUID userId) {
-    List<Object> principals = sessionRegistry.getAllPrincipals();
+    jwtService.invalidateUserSession(userId);
+//    List<Object> principals = sessionRegistry.getAllPrincipals();
+//
+//    for (Object principal : principals) {
+//      if (principal instanceof DiscodeitUserDetails userDetails && userDetails.getUser().getId()
+//          .equals(userId)) {
+//        List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);
+//        for (SessionInformation session : sessions) {
+//          session.expireNow();
+//        }
+//      }
+//    }
 
-    for (Object principal : principals) {
-      if (principal instanceof DiscodeitUserDetails userDetails && userDetails.getUser().getId()
-          .equals(userId)) {
-        List<SessionInformation> sessions = sessionRegistry.getAllSessions(principal, false);
-        for (SessionInformation session : sessions) {
-          session.expireNow();
-        }
-      }
-    }
   }
 
   @Override

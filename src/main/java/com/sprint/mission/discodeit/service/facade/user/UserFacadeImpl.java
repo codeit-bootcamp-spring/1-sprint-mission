@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.service.facade.user;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-
 import com.sprint.mission.discodeit.service.basic.PermissionService;
 import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
 import com.sprint.mission.discodeit.service.user.UserManagementService;
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +32,7 @@ public class UserFacadeImpl implements UserFacade {
 
   @Override
   @Transactional
-  public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
+  public UserDto createUser(CreateUserRequest request, MultipartFile profile) {
     User user = userMapper.toEntity(request, encoder);
     User createdUser = userManagementService.createUser(user, profile);
     log.debug("[USER CREATED] : [USERNAME: {}]", createdUser.getUsername());
@@ -45,7 +43,7 @@ public class UserFacadeImpl implements UserFacade {
 
   @Override
   @Transactional(readOnly = true)
-  public UserResponseDto findUserById(String id) {
+  public UserDto findUserById(String id) {
     User user = userManagementService.findSingleUser(id);
 
     return userMapper.toDto(user, onlineStatusService);
@@ -54,7 +52,7 @@ public class UserFacadeImpl implements UserFacade {
   @Override
   @Transactional
 
-  public UserResponseDto updateUser(String userId, MultipartFile profile,
+  public UserDto updateUser(String userId, MultipartFile profile,
       UserUpdateDto updateDto, UserDetails userDetails) {
     log.debug("[UPDATE USER REQUEST] : [ID: {}]", userId);
 
@@ -69,7 +67,7 @@ public class UserFacadeImpl implements UserFacade {
 
   @Override
   @Transactional(readOnly = true)
-  public List<UserResponseDto> findAllUsers() {
+  public List<UserDto> findAllUsers() {
     List<User> users = userManagementService.findAllUsers();
     return userMapper.toDtoList(users, onlineStatusService);
 

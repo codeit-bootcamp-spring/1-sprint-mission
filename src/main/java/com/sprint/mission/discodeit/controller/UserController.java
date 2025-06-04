@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.UserApiDocs;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.facade.user.UserFacade;
 import jakarta.validation.Valid;
@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,8 +36,8 @@ public class UserController implements UserApiDocs {
 
   @GetMapping("/{id}")
   @Override
-  public ResponseEntity<UserResponseDto> getUser(@PathVariable String id) {
-    UserResponseDto user = userFacade.findUserById(id);
+  public ResponseEntity<UserDto> getUser(@PathVariable String id) {
+    UserDto user = userFacade.findUserById(id);
     return ResponseEntity.ok(user);
   }
 
@@ -47,7 +46,7 @@ public class UserController implements UserApiDocs {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<UserResponseDto> createUser(
+  public ResponseEntity<UserDto> createUser(
       @Valid @RequestPart("userCreateRequest")
       CreateUserRequest createUserRequest,
       @RequestPart(value = "profile", required = false)
@@ -55,15 +54,15 @@ public class UserController implements UserApiDocs {
     log.debug("[CREATE USER REQUEST] : [USERNAME: {}]] , [EMAIL: {}]", createUserRequest.username(),
         createUserRequest.email());
 
-    UserResponseDto user = userFacade.createUser(createUserRequest, profile);
+    UserDto user = userFacade.createUser(createUserRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
 
   }
 
   @Override
   @GetMapping
-  public ResponseEntity<List<UserResponseDto>> getUsers() {
-    List<UserResponseDto> users = userFacade.findAllUsers();
+  public ResponseEntity<List<UserDto>> getUsers() {
+    List<UserDto> users = userFacade.findAllUsers();
     return ResponseEntity.ok(users);
   }
 
@@ -73,14 +72,14 @@ public class UserController implements UserApiDocs {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<UserResponseDto> updateUser(
+  public ResponseEntity<UserDto> updateUser(
       @PathVariable String id,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
       @Valid @RequestPart(value = "userUpdateRequest") UserUpdateDto updateDto,
       @AuthenticationPrincipal UserDetails userDetails
   ) {
 
-    UserResponseDto user = userFacade.updateUser(id, profile, updateDto, userDetails);
+    UserDto user = userFacade.updateUser(id, profile, updateDto, userDetails);
     return ResponseEntity.ok(user);
   }
 

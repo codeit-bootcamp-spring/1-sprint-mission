@@ -2,9 +2,8 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
@@ -40,14 +39,14 @@ public interface UserMapper {
   @Mapping(target = "email", source = "email")
   @Mapping(target = "profile", source = "profile")
   @Mapping(target = "online", expression = "java(onlineStatusService.isUserOnline(user.getId()))")
-  UserResponseDto toDto(User user, @Context UserOnlineStatusService onlineStatusService);
+  UserDto toDto(User user, @Context UserOnlineStatusService onlineStatusService);
 
 
   @Mapping(target = "id", source = "id")
   @Mapping(target = "profileId", source = "profile.id")
   CreateUserResponse toCreateUserResponse(User user);
 
-  List<UserResponseDto> toDtoList(List<User> users,
+  List<UserDto> toDtoList(List<User> users,
       @Context UserOnlineStatusService onlineStatusService);
 
 }

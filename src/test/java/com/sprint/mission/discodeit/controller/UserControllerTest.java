@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 
 import static org.mockito.BDDMockito.given;
-
 import static org.mockito.Mockito.mock;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -14,13 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.security.auth.DiscodeitUserDetails;
-
 import com.sprint.mission.discodeit.service.facade.user.UserFacade;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -31,9 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-
 import org.springframework.security.core.userdetails.UserDetails;
-
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
@@ -55,7 +50,7 @@ public class UserControllerTest {
   @DisplayName("GET /api/users/{id} - 성공")
   void getUser_success() throws Exception {
     String userId = UUID.randomUUID().toString();
-    UserResponseDto mockResponse = new UserResponseDto(
+    UserDto mockResponse = new UserDto(
         UUID.fromString(userId),
         "testuser", "test@example.com", null, true, UserRole.ROLE_USER);
 
@@ -97,7 +92,7 @@ public class UserControllerTest {
     );
 
     String userId = UUID.randomUUID().toString();
-    UserResponseDto dto = new UserResponseDto(UUID.fromString(userId), createUserRequest.username(),
+    UserDto dto = new UserDto(UUID.fromString(userId), createUserRequest.username(),
         createUserRequest.email(), null, true, UserRole.ROLE_USER);
     given(userFacade.createUser(createUserRequest, profile)).willReturn(dto);
 
@@ -131,13 +126,13 @@ public class UserControllerTest {
   @Test
   @DisplayName("GET /api/users - 성공(목록 조회)")
   void getUsers_success() throws Exception {
-    UserResponseDto response1 = new UserResponseDto(
+    UserDto response1 = new UserDto(
         UUID.randomUUID(), "u1", "u1@gmail.com", null, true, UserRole.ROLE_USER
     );
-    UserResponseDto response2 = new UserResponseDto(
+    UserDto response2 = new UserDto(
         UUID.randomUUID(), "u2", "u2@gmail.com", null, true, UserRole.ROLE_USER
     );
-    List<UserResponseDto> users = List.of(response1, response2);
+    List<UserDto> users = List.of(response1, response2);
     when(userFacade.findAllUsers()).thenReturn(users);
 
     mockMvc.perform(get("/api/users"))
@@ -162,7 +157,7 @@ public class UserControllerTest {
     MockMultipartFile newProfile = new MockMultipartFile(
         "profile", "newProfile.jpg", "image/jpeg", "new".getBytes()
     );
-    UserResponseDto response = new UserResponseDto(
+    UserDto response = new UserDto(
         UUID.fromString(userId),
         updateDto.newUsername(),
         updateDto.newEmail(),

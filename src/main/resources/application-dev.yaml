@@ -14,3 +14,11 @@ logging:
 
 server:
   port: 8080
+
+app:
+  service:
+    type: "basic"
+  jwt:
+    secret: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    access-token-expiration: 900000
+    refresh-token-expiration: 604800000

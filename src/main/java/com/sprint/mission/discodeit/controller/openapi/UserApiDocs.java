@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.openapi;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +14,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -36,7 +34,7 @@ public interface UserApiDocs {
           )
       )
   })
-  ResponseEntity<UserResponseDto> getUser(
+  ResponseEntity<UserDto> getUser(
       @Parameter(description = "User ID", required = true)
       String id
   );
@@ -53,7 +51,7 @@ public interface UserApiDocs {
           )
       )
   })
-  ResponseEntity<UserResponseDto> createUser(
+  ResponseEntity<UserDto> createUser(
 
       @Parameter(
           description = "User 생성 정보 (JSON)",
@@ -78,7 +76,7 @@ public interface UserApiDocs {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "모든 User 조회 성공")
   })
-  ResponseEntity<List<UserResponseDto>> getUsers();
+  ResponseEntity<List<UserDto>> getUsers();
 
   @Operation(summary = "유저 정보 업데이트")
   @ApiResponses({
@@ -86,7 +84,7 @@ public interface UserApiDocs {
       @ApiResponse(responseCode = "400", description = "중복된 email / username", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(responseCode = "404", description = "유저를 찾지 못함", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
   })
-  ResponseEntity<UserResponseDto> updateUser(
+  ResponseEntity<UserDto> updateUser(
 
       @Parameter(description = "User UUID", required = true) String id,
       @Parameter(description = "User 프로필 이미지") MultipartFile profile,

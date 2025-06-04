@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.auth.DiscodeitUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -35,18 +38,26 @@ public class SecurityConfig {
 
   private final UserMapper userMapper;
 
+  @Value("${app.jwt.refresh-token-expiration}")
+  private long refreshTokenExpiration;
 
   @Bean
-  public SecurityFilterChain chain(HttpSecurity http,
+  public SecurityFilterChain chain(
+      HttpSecurity http,
       AuthenticationManager manager,
       RememberMeServices rememberMeServices,
-      UserOnlineStatusService statusService) throws Exception {
+      UserOnlineStatusService statusService,
+      JwtService jwtService,
+      JwtAuthenticationFilter jwtAuthenticationFilter
+  ) throws Exception {
 
     CsrfTokenRequestAttributeHandler plain =
         new CsrfTokenRequestAttributeHandler();
+    plain.setCsrfRequestAttributeName("_csrf"); // test 필요
 
     DiscodeitUsernamePasswordAuthenticationFilter filter = new DiscodeitUsernamePasswordAuthenticationFilter(
-        userMapper, sessionRegistry(), rememberMeServices, statusService);
+        userMapper, sessionRegistry(), rememberMeServices, statusService, jwtService,
+        refreshTokenExpiration);
 
     filter.setAuthenticationManager(manager);
     filter.setRequiresAuthenticationRequestMatcher(
@@ -55,12 +66,14 @@ public class SecurityConfig {
 
     http
         .rememberMe(rm -> rm.rememberMeServices(rememberMeServices))
-        .sessionManagement(
-            session -> session.maximumSessions(1).maxSessionsPreventsLogin(false)
-                .sessionRegistry(sessionRegistry()))
+//        .sessionManagement(
+//            session -> session
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .sessionManagement(session -> session.sessionFixation().migrateSession())
         .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository()).csrfTokenRequestHandler(plain)
             .ignoringRequestMatchers("/api/users", "/api/auth/check-session"))
+        .addFilterBefore(jwtAuthenticationFilter,
+            DiscodeitUsernamePasswordAuthenticationFilter.class)
         .addFilterAt(filter, DiscodeitUsernamePasswordAuthenticationFilter.class)
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
@@ -95,8 +108,8 @@ public class SecurityConfig {
   @Bean
   public CsrfTokenRepository csrfTokenRepository() {
     CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-    repository.setCookieName("CSRF-TOKEN");
-    repository.setHeaderName("X-Csrf-Token");
+    repository.setCookieName("XSRF-TOKEN");
+    repository.setHeaderName("X-XSRF-TOKEN");
     repository.setCookiePath("/");
     return repository;
   }
@@ -119,7 +132,5 @@ public class SecurityConfig {
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
   }
-
-
 }
 

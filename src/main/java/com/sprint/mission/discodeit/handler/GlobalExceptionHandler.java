@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.handler;
 
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.error.ErrorResponse;
+import com.sprint.mission.discodeit.exception.AuthException;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
@@ -34,6 +35,20 @@ public class GlobalExceptionHandler {
     );
 
     return ResponseEntity.status(ex.getStatusCode()).body(er);
+  }
+
+  @ExceptionHandler(AuthException.class)
+  public ResponseEntity<ErrorResponse> handleAuthException(AuthException ex) {
+    ErrorResponse er = new ErrorResponse(
+        ex.getTimestamp(),
+        ex.getErrorCode().getCode(),
+        ex.getMessage(),
+        ex.getDetails(),
+        ex.getClass().getSimpleName(),
+        ex.getStatusCode()
+    );
+
+    return ResponseEntity.status(401).body(er);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

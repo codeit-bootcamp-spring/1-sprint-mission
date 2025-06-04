@@ -1,6 +1,10 @@
 app:
   service:
     type: "basic"
+  jwt:
+    secret: "F811B1184C98D8543B1351D939484"
+    access-token-expiration: 900000
+    refresh-token-expiration: 604800000
 
 discodeit:
   storage:

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 
 import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
-
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
@@ -114,6 +113,7 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional
   public User updateUserRole(RoleUpdateRequest request) {
+
     User user = userRepository.findById(request.userId())
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 

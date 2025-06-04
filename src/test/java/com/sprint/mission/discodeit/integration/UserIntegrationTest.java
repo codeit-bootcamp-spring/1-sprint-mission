@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -98,7 +98,7 @@ public class UserIntegrationTest {
     ResponseEntity<String> response = restTemplate.postForEntity(getBaseUrl(), parts, String.class);
     assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
 
-    UserResponseDto createdUser = objectMapper.readValue(response.getBody(), UserResponseDto.class);
+    UserDto createdUser = objectMapper.readValue(response.getBody(), UserDto.class);
     assertThat(createdUser.username()).isEqualTo("testuser");
     assertThat(createdUser.email()).isEqualTo("test@example.com");
     assertThat(createdUser.profile().fileName()).isEqualTo("profile.png");
@@ -154,7 +154,7 @@ public class UserIntegrationTest {
         jsonHeaders);
     parts.add("userCreateRequest", userPart);
     ResponseEntity<String> response = restTemplate.postForEntity(getBaseUrl(), parts, String.class);
-    UserResponseDto createdUser = objectMapper.readValue(response.getBody(), UserResponseDto.class);
+    UserDto createdUser = objectMapper.readValue(response.getBody(), UserDto.class);
 
     assertThat(createdUser.username()).isEqualTo("testuser");
 
@@ -175,8 +175,8 @@ public class UserIntegrationTest {
     parts.add("userUpdateRequest", updatePart);
     restTemplate.patchForObject(getBaseUrl() + "/" + createdUser.id(), parts, String.class);
 
-    ResponseEntity<UserResponseDto> updatedUser = restTemplate.getForEntity(
-        getBaseUrl() + "/" + userId, UserResponseDto.class);
+    ResponseEntity<UserDto> updatedUser = restTemplate.getForEntity(
+        getBaseUrl() + "/" + userId, UserDto.class);
     assertThat(updatedUser.getBody().username()).isEqualTo("updateduser");
     assertThat(userRepository.findAll()).hasSize(1);
   }
@@ -223,7 +223,7 @@ public class UserIntegrationTest {
     parts.add("userCreateRequest", userPart);
 
     ResponseEntity<String> response = restTemplate.postForEntity(getBaseUrl(), parts, String.class);
-    UserResponseDto createdUser = objectMapper.readValue(response.getBody(), UserResponseDto.class);
+    UserDto createdUser = objectMapper.readValue(response.getBody(), UserDto.class);
 
     assertThat(userRepository.findAll()).hasSize(1);
 
@@ -276,7 +276,7 @@ public class UserIntegrationTest {
 
     // then
     assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-    UserResponseDto[] users = objectMapper.readValue(response.getBody(), UserResponseDto[].class);
+    UserDto[] users = objectMapper.readValue(response.getBody(), UserDto[].class);
     assertThat(users.length).isEqualTo(2);
   }
 

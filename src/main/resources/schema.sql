@@ -67,7 +67,6 @@ CREATE TABLE message_attachments
     PRIMARY KEY (message_id, attachment_id)
 );
 
-<<<<<<< HEAD
 
 ALTER TABLE users
     ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER';
@@ -79,5 +78,10 @@ CREATE TABLE persistent_logins
     token     varchar(64) not null,
     last_used timestamp   not null
 )
-=======
->>>>>>> upstream/part3-허지웅
+
+CREATE TABLE jwt_session (
+    id UUID PRIMARY KEY,
+    user_id UUID REFERENCES users (id) NOT NULL,
+    access_token VARCHAR(512) NOT NULL UNIQUE,
+    refresh_token VARCHAR(512) NOT NULL UNIQUE
+)

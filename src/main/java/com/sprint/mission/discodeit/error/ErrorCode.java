@@ -29,7 +29,9 @@ public enum ErrorCode {
 
   READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ-STATUS-001", "Could Not Find ReadStatus."),
 
-  ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "AUTH-001", "Not Authorized To Perform This Action.");
+  ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "AUTH-001", "Not Authorized To Perform This Action."),
+  REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH-002", "Refresh Token Could Not Be Found"),
+  INVALID_TOKEN(HttpStatus.BAD_REQUEST, "AUTH-003", "Invalid Token");
 
 
   private final HttpStatus status;

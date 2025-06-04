@@ -9,15 +9,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-
 import com.sprint.mission.discodeit.security.auth.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
-
 import com.sprint.mission.discodeit.service.facade.user.UserFacadeImpl;
 import com.sprint.mission.discodeit.service.user.UserManagementService;
 import com.sprint.mission.unit.TestEntityFactory;
@@ -29,7 +27,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -66,14 +63,14 @@ public class UserFacadeUnitTest {
           "test".getBytes());
       User user = mock(User.class);
       User createdUser = mock(User.class);
-      UserResponseDto response = mock(UserResponseDto.class);
+      UserDto response = mock(UserDto.class);
 
       given(userMapper.toEntity(request, encoder)).willReturn(user);
       given(userManagementService.createUser(user, mockProfile)).willReturn(createdUser);
       given(userMapper.toDto(createdUser, userOnlineStatusService)).willReturn(response);
 
       // when
-      UserResponseDto result = userFacade.createUser(request, mockProfile);
+      UserDto result = userFacade.createUser(request, mockProfile);
 
       //then
       assertThat(result).isEqualTo(response);
@@ -118,7 +115,7 @@ public class UserFacadeUnitTest {
       UserUpdateDto req = new UserUpdateDto("new", "new@gmail.com", "newPwd");
       User tmpUser = mock(User.class);
       User updatedUser = mock(User.class);
-      UserResponseDto res = mock(UserResponseDto.class);
+      UserDto res = mock(UserDto.class);
       UserDetails details = mock(DiscodeitUserDetails.class);
       given(userMapper.toEntity(req, encoder)).willReturn(tmpUser);
       given(userManagementService.updateUser(userId, tmpUser, mockProfile)).willReturn(
@@ -126,7 +123,7 @@ public class UserFacadeUnitTest {
       given(userMapper.toDto(updatedUser, userOnlineStatusService)).willReturn(res);
 
       // when
-      UserResponseDto response = userFacade.updateUser(userId, mockProfile, req, details);
+      UserDto response = userFacade.updateUser(userId, mockProfile, req, details);
 
       //then
       assertThat(response).isEqualTo(res);
@@ -165,13 +162,13 @@ public class UserFacadeUnitTest {
       // given
       User user = TestEntityFactory.createUser("u", "u@gmail.com");
       String userId = user.getId().toString();
-      UserResponseDto response = mock(UserResponseDto.class);
+      UserDto response = mock(UserDto.class);
 
       given(userManagementService.findSingleUser(userId)).willReturn(user);
       given(userMapper.toDto(user, userOnlineStatusService)).willReturn(response);
 
       //when
-      UserResponseDto result = userFacade.findUserById(userId);
+      UserDto result = userFacade.findUserById(userId);
 
       // then
       assertThat(result).isEqualTo(response);
