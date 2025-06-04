@@ -70,9 +70,20 @@ CREATE TABLE message_attachments
         binary_contents (id) ON DELETE CASCADE
 );
 
-CREATE TABLE persistent_logins (
-                                   username VARCHAR(64) NOT NULL,
-                                   series VARCHAR(64) PRIMARY KEY,
-                                   token VARCHAR(64) NOT NULL,
-                                   last_used TIMESTAMP NOT NULL
+CREATE TABLE persistent_logins
+(
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
+);
+
+CREATE TABLE jwt_sessions
+(
+    id          UUID PRIMARY KEY,
+    created_at  TIMESTAMP   NOT NULL,
+    updated_at  TIMESTAMP,
+    user_id UUID NOT NULL,
+    access_token VARCHAR(500) NOT NULL,
+    refresh_token VARCHAR(500) NOT NULL
 );

@@ -2,13 +2,17 @@ package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
+import com.sprint.mission.discodeit.dto.auth.LoginResponse;
 import com.sprint.mission.discodeit.dto.exception.ErrorResponse;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtToken;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -29,6 +33,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
   @Autowired
   private RememberMeServices rememberMeServices;
+  @Autowired
+  private JwtService jwtService;
+
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final UserMapper userMapper;
   private final AuthenticationManager authenticationManager;
@@ -87,15 +94,24 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
       rememberMeServices.loginSuccess(request, response, authResult);
     }
 
-    response.setStatus(HttpServletResponse.SC_OK);
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
-
     CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
     User user = userDetails.getUser();
     UserDto userDto = userMapper.toDto(user);
 
-    objectMapper.writeValue(response.getWriter(), userDto);
+    JwtToken jwtToken = jwtService.generateToken(userDto);
+
+    LoginResponse loginResponse = new LoginResponse(jwtToken.accessToken(), userDto);
+
+    response.setStatus(HttpServletResponse.SC_OK);
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    objectMapper.writeValue(response.getWriter(), loginResponse);
+
+    Cookie refreshCookie = new Cookie("refresh-token", jwtToken.refreshToken());
+    refreshCookie.setHttpOnly(true);
+    refreshCookie.setPath("/");
+    refreshCookie.setMaxAge(2592000);
+    response.addCookie(refreshCookie);
   }
 
   @Override
