@@ -46,8 +46,8 @@ participant Client
 
     Note over Service: 2) 파일 저장 작업을 비동기로 위임 → 바로 리턴
 
-    Service-->>-Controller: 응답 데이터 반환
     Service->>BinaryContentStorage: 비동기요청
+    Service-->>-Controller: 응답 데이터 반환
     Controller-->>Client: HTTP 201 Created (즉시 응답)
 
     par 백그라운드 S3 업로드
