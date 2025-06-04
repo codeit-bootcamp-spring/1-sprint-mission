@@ -2,19 +2,18 @@ package com.sprint.mission.discodeit.dto.readstatus;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
 public class CreateReadStatusRequestDto {
 
-  @NotNull
-  private UUID userId;
-  @NotNull
-  private UUID channelId;
-  @NotNull
-  Instant lastReadAt;
+    @NotNull
+    Instant lastReadAt;
+    @NotNull
+    private UUID userId;
+    @NotNull
+    private UUID channelId;
 }

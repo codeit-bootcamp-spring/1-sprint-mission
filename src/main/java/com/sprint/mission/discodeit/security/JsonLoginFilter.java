@@ -22,9 +22,9 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 public class JsonLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final ObjectMapper objectMapper;
+    private final UserMapper userMapper;
     private RememberMeServices rememberMeServices;
     private SessionAuthenticationStrategy sessionAuthenticationStrategy;
-    private final UserMapper userMapper;
 
 
     public JsonLoginFilter(AuthenticationManager authenticationManager, ObjectMapper objectMapper,

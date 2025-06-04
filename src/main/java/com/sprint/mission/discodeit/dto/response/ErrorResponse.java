@@ -9,10 +9,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class ErrorResponse {
 
-  private final Instant timestamp;
-  private final String code;
-  private final String message;
-  private final Map<String, Object> details;
-  private final String exceptionType;
-  private final int status;
+    private final Instant timestamp;
+    private final String code;
+    private final String message;
+    private final Map<String, Object> details;
+    private final String exceptionType;
+    private final int status;
 }

@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -29,157 +30,161 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class MessageRepositoryTest {
 
-  @Autowired
-  private MessageRepository messageRepository;
+    @Autowired
+    private MessageRepository messageRepository;
 
-  @Autowired
-  private ChannelRepository channelRepository;
+    @Autowired
+    private ChannelRepository channelRepository;
 
-  @Autowired
-  private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-  @Autowired
-  private EntityManager em;
+    @Autowired
+    private EntityManager em;
 
-  @Test
-  void existsById() {
-    User user = userRepository.save(new User("홍길동", "hong@naver.com", "1234", null));
-    Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "공개 채널", "테스트"));
-    Message message = messageRepository.save(new Message("hello", channel, user, List.of()));
+    @Test
+    void existsById() {
+        User user = userRepository.save(new User("홍길동", "hong@naver.com", "1234", null));
+        Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "공개 채널", "테스트"));
+        Message message = messageRepository.save(new Message("hello", channel, user, List.of()));
 
-    em.flush();
-    em.clear();
+        em.flush();
+        em.clear();
 
-    boolean exists = messageRepository.existsById(message.getId());
-    assertTrue(exists);
-  }
-
-  @Test
-  void 존재하지_않는_메시지_테스트() {
-    UUID messageId = UUID.randomUUID();
-    boolean exists = messageRepository.existsById(messageId);
-    assertFalse(exists);
-  }
-
-  @Test
-  void findFirstMessages() {
-    Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "채널", null));
-    User user = userRepository.save(new User("홍길동", "hong@example.com", "1234", null));
-
-    for (int i = 0; i < 5; i++) {
-      messageRepository.save(new Message("메시지 " + i, channel, user, List.of()));
+        boolean exists = messageRepository.existsById(message.getId());
+        assertTrue(exists);
     }
 
-    Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-    em.flush();
-    em.clear();
-
-    Slice<Message> result = messageRepository.findFirstMessages(channel.getId(), pageable);
-
-    assertThat(result).hasSize(3);
-    assertThat(result.hasNext()).isTrue();
-    assertThat(result.getContent().get(0).getAuthor().getUsername()).isEqualTo("홍길동");
-  }
-
-  @Test
-  void deleteByChannelId() {
-    User user = userRepository.save(new User("홍길동", "hong@naver.com", "1234", null));
-    Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "공개 채널", "테스트"));
-    Message message = messageRepository.save(new Message("hello", channel, user, List.of()));
-
-    em.flush();
-    em.clear();
-
-    messageRepository.deleteByChannelId(channel.getId());
-
-    Optional<Message> result = messageRepository.findById(message.getId());
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  void findNextMessages() throws InterruptedException {
-    User user = userRepository.save(new User("홍길동", "hong@naver.com", "1234", null));
-    Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "공개 채널", "테스트"));
-
-    List<Message> saved = new ArrayList<>();
-    for (int i = 0; i < 3; i++) {
-      Message message = messageRepository.save(new Message("메시지 " + i, channel, user, List.of()));
-      saved.add(message);
-      Thread.sleep(1500);
+    @Test
+    void 존재하지_않는_메시지_테스트() {
+        UUID messageId = UUID.randomUUID();
+        boolean exists = messageRepository.existsById(messageId);
+        assertFalse(exists);
     }
 
-    em.flush();
-    em.clear();
-    Message foundMessage = em.find(Message.class, saved.get(0).getId());
-    Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
-    Instant cursor = saved.get(2).getCreatedAt();
-    Slice<Message> result = messageRepository.findNextMessages(channel.getId(), cursor, pageable);
+    @Test
+    void findFirstMessages() {
+        Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "채널", null));
+        User user = userRepository.save(new User("홍길동", "hong@example.com", "1234", null));
 
-    List<String> contents = result.getContent().stream()
-        .map(Message::getContent)
-        .toList();
+        for (int i = 0; i < 5; i++) {
+            messageRepository.save(new Message("메시지 " + i, channel, user, List.of()));
+        }
 
-    assertThat(contents).containsExactly("메시지 1", "메시지 0");
-    assertThat(result.hasNext()).isFalse();
+        Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-    //연관 데이터
-    Message m0 = result.getContent().get(0);
-    assertThat(m0.getAuthor()).isNotNull();
-    assertThat(m0.getAuthor().getUsername()).isEqualTo("홍길동");
-    assertThat(m0.getAuthor().getProfile()).isNull();
-    assertThat(m0.getAttachmentIds()).isEmpty();
-  }
+        em.flush();
+        em.clear();
 
-  @Test
-  void findFirstMessages_존재하지_않는_채널이면_빈결과() {
-    UUID invalidChannelId = UUID.randomUUID();
-    Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Slice<Message> result = messageRepository.findFirstMessages(channel.getId(), pageable);
 
-    Slice<Message> result = messageRepository.findFirstMessages(invalidChannelId, pageable);
+        assertThat(result).hasSize(3);
+        assertThat(result.hasNext()).isTrue();
+        assertThat(result.getContent().get(0).getAuthor().getUsername()).isEqualTo("홍길동");
+    }
 
-    assertThat(result).isEmpty();
-    assertThat(result.hasNext()).isFalse();
-  }
+    @Test
+    void deleteByChannelId() {
+        User user = userRepository.save(new User("홍길동", "hong@naver.com", "1234", null));
+        Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "공개 채널", "테스트"));
+        Message message = messageRepository.save(new Message("hello", channel, user, List.of()));
 
-  @Test
-  void findNextMessages_커서보다_이전_메시지가_없으면_빈결과() throws InterruptedException {
-    User user = userRepository.save(new User("홍길동", "hong@naver.com", "1234", null));
-    Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "공개 채널", "테스트"));
+        em.flush();
+        em.clear();
 
-    Message message = messageRepository.save(new Message("메시지 0", channel, user, List.of()));
-    Thread.sleep(5);
+        messageRepository.deleteByChannelId(channel.getId());
 
-    em.flush();
-    em.clear();
+        Optional<Message> result = messageRepository.findById(message.getId());
+        assertThat(result).isEmpty();
+    }
 
-    // 커서를 message보다 더 이전 시점으로 설정
-    Instant cursor = message.getCreatedAt().minusMillis(1000);
+    @Test
+    void findNextMessages() throws InterruptedException {
+        User user = userRepository.save(new User("홍길동", "hong@naver.com", "1234", null));
+        Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "공개 채널", "테스트"));
 
-    Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<Message> saved = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            Message message = messageRepository.save(
+                    new Message("메시지 " + i, channel, user, List.of()));
+            saved.add(message);
+            Thread.sleep(1500);
+        }
 
-    Slice<Message> result = messageRepository.findNextMessages(channel.getId(), cursor, pageable);
+        em.flush();
+        em.clear();
+        Message foundMessage = em.find(Message.class, saved.get(0).getId());
+        Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Instant cursor = saved.get(2).getCreatedAt();
+        Slice<Message> result = messageRepository.findNextMessages(channel.getId(), cursor,
+                pageable);
 
-    assertThat(result).isEmpty();
-    assertThat(result.hasNext()).isFalse();
-  }
+        List<String> contents = result.getContent().stream()
+                .map(Message::getContent)
+                .toList();
+
+        assertThat(contents).containsExactly("메시지 1", "메시지 0");
+        assertThat(result.hasNext()).isFalse();
+
+        //연관 데이터
+        Message m0 = result.getContent().get(0);
+        assertThat(m0.getAuthor()).isNotNull();
+        assertThat(m0.getAuthor().getUsername()).isEqualTo("홍길동");
+        assertThat(m0.getAuthor().getProfile()).isNull();
+        assertThat(m0.getAttachmentIds()).isEmpty();
+    }
+
+    @Test
+    void findFirstMessages_존재하지_않는_채널이면_빈결과() {
+        UUID invalidChannelId = UUID.randomUUID();
+        Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Slice<Message> result = messageRepository.findFirstMessages(invalidChannelId, pageable);
+
+        assertThat(result).isEmpty();
+        assertThat(result.hasNext()).isFalse();
+    }
+
+    @Test
+    void findNextMessages_커서보다_이전_메시지가_없으면_빈결과() throws InterruptedException {
+        User user = userRepository.save(new User("홍길동", "hong@naver.com", "1234", null));
+        Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "공개 채널", "테스트"));
+
+        Message message = messageRepository.save(new Message("메시지 0", channel, user, List.of()));
+        Thread.sleep(5);
+
+        em.flush();
+        em.clear();
+
+        // 커서를 message보다 더 이전 시점으로 설정
+        Instant cursor = message.getCreatedAt().minusMillis(1000);
+
+        Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Slice<Message> result = messageRepository.findNextMessages(channel.getId(), cursor,
+                pageable);
+
+        assertThat(result).isEmpty();
+        assertThat(result.hasNext()).isFalse();
+    }
 
 
-  @Test
-  void findNextMessages_존재하지_않는_채널이면_빈결과() {
-    UUID invalidChannelId = UUID.randomUUID();
-    Instant now = Instant.now();
-    Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
+    @Test
+    void findNextMessages_존재하지_않는_채널이면_빈결과() {
+        UUID invalidChannelId = UUID.randomUUID();
+        Instant now = Instant.now();
+        Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-    Slice<Message> result = messageRepository.findNextMessages(invalidChannelId, now, pageable);
+        Slice<Message> result = messageRepository.findNextMessages(invalidChannelId, now, pageable);
 
-    assertThat(result).isEmpty();
-    assertThat(result.hasNext()).isFalse();
-  }
+        assertThat(result).isEmpty();
+        assertThat(result.hasNext()).isFalse();
+    }
 
-  @Test
-  void 존재하진_않는_ID_삭제() {
-    UUID channelId = UUID.randomUUID();
-    assertThatCode(() -> messageRepository.deleteByChannelId(channelId)).doesNotThrowAnyException();
-  }
+    @Test
+    void 존재하진_않는_ID_삭제() {
+        UUID channelId = UUID.randomUUID();
+        assertThatCode(
+                () -> messageRepository.deleteByChannelId(channelId)).doesNotThrowAnyException();
+    }
 }

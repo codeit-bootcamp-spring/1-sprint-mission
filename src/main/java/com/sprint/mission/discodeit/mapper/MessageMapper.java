@@ -12,27 +12,27 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MessageMapper {
 
-  private final BinaryContentMapper binaryContentMapper;
-  private final BinaryContentRepository binaryContentRepository;
-  private final UserMapper userMapper;
+    private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserMapper userMapper;
 
-  public MessageDto toDto(Message entity) {
-    if (entity == null) {
-      return null;
+    public MessageDto toDto(Message entity) {
+        if (entity == null) {
+            return null;
+        }
+        MessageDto dto = new MessageDto();
+        dto.setId(entity.getId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
+        dto.setContent(entity.getContent());
+        dto.setChannelId(entity.getChannel().getId());
+        dto.setAuthor(userMapper.toDto(entity.getAuthor()));
+        dto.setAttachments(entity.getAttachmentIds().stream()
+                .map(binaryContentRepository::findById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(binaryContentMapper::toDto)
+                .collect(Collectors.toList()));
+        return dto;
     }
-    MessageDto dto = new MessageDto();
-    dto.setId(entity.getId());
-    dto.setCreatedAt(entity.getCreatedAt());
-    dto.setUpdatedAt(entity.getUpdatedAt());
-    dto.setContent(entity.getContent());
-    dto.setChannelId(entity.getChannel().getId());
-    dto.setAuthor(userMapper.toDto(entity.getAuthor()));
-    dto.setAttachments(entity.getAttachmentIds().stream()
-        .map(binaryContentRepository::findById)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .map(binaryContentMapper::toDto)
-        .collect(Collectors.toList()));
-    return dto;
-  }
 }

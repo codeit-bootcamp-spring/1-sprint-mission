@@ -3,9 +3,8 @@ package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.security.Role;
-import lombok.Getter;
-
 import java.util.UUID;
+import lombok.Getter;
 import lombok.Setter;
 
 @Getter
