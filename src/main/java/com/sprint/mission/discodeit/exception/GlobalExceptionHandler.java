@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
+import com.sprint.mission.discodeit.exception.auth.TokenException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.ChannelException;
@@ -231,6 +232,16 @@ public class GlobalExceptionHandler {
 
     ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.NOT_FOUND.value());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+  }
+
+  @ExceptionHandler(TokenException.class)
+  public ResponseEntity<ErrorResponse> handleTokenException(
+      TokenException e
+  ) {
+    log.info("토큰 예외");
+
+    ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.UNAUTHORIZED.value());
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
   }
 
 }

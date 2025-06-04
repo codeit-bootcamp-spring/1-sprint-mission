@@ -9,6 +9,9 @@ public enum ErrorCode {
   INVALID_USER_STATUS("유효하지 않은 사용자 상태입니다."),
   USER_NOT_IN_CHANNEL("사용자가 해당 채널에 있지 않습니다."),
 
+  //토큰 에러
+  INVALID_TOKEN("만료 또는 유효하지 않은 토큰입니다."),
+
   //채널 관련 에러
   CHANNEL_NOT_FOUND("채널을 찾을 수 없습니다."),
   CHANNEL_PRIVATE_NOT_UPDATABLE("PRIVATE 채널은 수정할 수 없습니다."),

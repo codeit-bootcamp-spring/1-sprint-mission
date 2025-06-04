@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.security.jwt;
 
+import com.sprint.mission.discodeit.dto.auth.TokenPair;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.auth.InvalidRefreshTokenException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.NoSuchElementException;
@@ -41,11 +42,16 @@ public class JwtService {
     // 1. JwtTokenProvider로 토큰 생성
     String accessToken = jwtTokenProvider.generateAccessToken(userDetails, userDto);
     String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails, userDto);
-
+    log.info("Generated tokens - Access: {}, Refresh: {}",
+        accessToken.substring(0, 20) + "...",
+        refreshToken.substring(0, 20) + "...");
     // 2. JwtSession을 같이 저장
     JwtSession jwtSession = new JwtSession(user, accessToken, refreshToken,
         jwtTokenProvider.getExpiration(accessToken).toInstant());
     jwtSessionRepository.save(jwtSession);
+    log.info("Saved JwtSession - Access: {}, Refresh: {}",
+        jwtSession.getAccessToken().substring(0, 20) + "...",
+        jwtSession.getRefreshToken().substring(0, 20) + "...");
 
     return jwtSession;
   }
@@ -72,7 +78,7 @@ public class JwtService {
 
   @Transactional
   // 리프레시 토큰을 활용해 엑세스 토큰을 재발급할 수 있다.
-  public String reissueAccessTokens(String refreshToken) {
+  public TokenPair reissueAccessTokens(String refreshToken) {
     //1. refreshToken 이 유효한지 검사
 
     log.info("reissueAccessTokens 호출. refreshToken: {}", refreshToken);
@@ -85,7 +91,7 @@ public class JwtService {
     //2. 유효한 refreshToken이라면 db에서 검색
     JwtSession jwtSession = jwtSessionRepository.findJwtSessionByRefreshToken(refreshToken)
         .orElseThrow(
-            () -> new NoSuchElementException("Invalid refresh token")
+            () -> new InvalidRefreshTokenException(ErrorCode.INVALID_TOKEN)
         );
 
     //3. 새로 refresh, access 발급
@@ -100,7 +106,7 @@ public class JwtService {
     jwtSession.update(newAccessToken, newRefreshToken);
     jwtSessionRepository.save(jwtSession);
 
-    return jwtSession.getAccessToken();
+    return new TokenPair(newAccessToken, newRefreshToken);
   }
 
 }
