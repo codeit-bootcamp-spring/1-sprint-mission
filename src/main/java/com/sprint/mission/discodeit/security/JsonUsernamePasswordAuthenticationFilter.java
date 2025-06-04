@@ -37,7 +37,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(),
                 LoginRequest.class);
 
-            System.out.println("확인:" + loginRequest);
+//            String rememberMeValue = request.getParameter("remember-me");
 
             // 이름과 비밀번호로 인증 토큰 생성
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

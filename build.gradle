@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = 'v1.2-M8'
+version = '2.2-M10'
 
 java {
     toolchain {
@@ -34,6 +34,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation("org.springframework.boot:spring-boot-starter-security")
+
+    // jwt
+    implementation "io.jsonwebtoken:jjwt-api:0.12.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:0.12.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.12.5"
 
     // s3
     implementation 'software.amazon.awssdk:s3:2.31.7'

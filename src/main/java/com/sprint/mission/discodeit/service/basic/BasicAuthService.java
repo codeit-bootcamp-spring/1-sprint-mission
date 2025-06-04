@@ -59,7 +59,7 @@ public class BasicAuthService implements AuthService {
 
         for (Object principal : sessionRegistry.getAllPrincipals()) {
             if (principal instanceof CustomUserDetails userDetails &&
-                userDetails.getUser().getId().equals(targetUserId)) {
+                userDetails.getUserResponse().id().equals(targetUserId)) {
 
                 for (SessionInformation session : sessionRegistry.getAllSessions(principal,
                     false)) {

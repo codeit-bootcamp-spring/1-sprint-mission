@@ -32,9 +32,6 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id")
     private BinaryContent profile;
 
-    @OneToOne(cascade = CascadeType.REMOVE, mappedBy = "user")
-    private UserStatus status;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -42,11 +39,6 @@ public class User extends BaseUpdatableEntity {
     public static User createUser(String name, String email, String password,
         BinaryContent profile) {
         return new User(name, email, password, profile, Role.USER);
-    }
-
-    public static User createUserWithRole(String name, String email, String password,
-        BinaryContent profile, Role role) {
-        return new User(name, email, password, profile, role);
     }
 
     private User(String name, String email, String password, BinaryContent profile, Role role) {
@@ -71,10 +63,6 @@ public class User extends BaseUpdatableEntity {
 
     public void updateProfile(BinaryContent profile) {
         this.profile = profile;
-    }
-
-    public void updateStatus(UserStatus userStatus) {
-        this.status = userStatus;
     }
 
     public void updateRole(Role role) {

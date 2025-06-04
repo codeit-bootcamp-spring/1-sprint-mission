@@ -45,6 +45,9 @@ management:
     env:
       enabled: true
 
+jwt:
+  secret: ${JWT_SECRET}
+
 info:
   name: ${spring.application.name}
   version: ${spring.application.version}
