@@ -42,17 +42,64 @@
 sequenceDiagram
 participant Client
     Client->>Controller: POST /api/message 
-    Controller->>Service: createMessage
+    Controller->>+Service: createMessage
 
-    Note over Service: 1) DB에 메시지/메타 저장 (생략 가능)
     Note over Service: 2) 파일 저장 작업을 비동기로 위임 → 바로 리턴
 
-    Service-->>Controller: 응답 데이터 반환
-    Service->>BinaryContentStorate: 비동기요청
+    Service-->>-Controller: 응답 데이터 반환
+    Service->>BinaryContentStorage: 비동기요청
     Controller-->>Client: HTTP 201 Created (즉시 응답)
 
     par 백그라운드 S3 업로드
-        Service->>BinaryContentStorate: uploadFilesAsync(files)
-        BinaryContentStorate-->>Service: 업로드 완료 콜백 (선택적)
+        Service->>BinaryContentStorage: uploadFilesAsync(files)
+        BinaryContentStorage-->>Service: 업로드 완료 콜백 (선택적)
     end
+
 ```
+
+## 비동기 처리를 위한 Config
+
+```mermaid
+---
+title: TaskExecutor inheritance district
+---
+classDiagram
+	Executor<|--TaskExecutor
+	Executor<|--ExecutorService
+	TaskExecutor<|..SimpleAsyncTaskExecutor
+	TaskExecutor<|..ThreadPoolTaskExecutor
+	TaskExecutor<|..CondurrentTaskExecutor
+	class Executor{
+	    <<interface>>
+	    +execute(Runnable)
+	}
+	class TaskExecutor {
+			<<interface>>
+			+execute(Runnable)
+	}
+	class ExecutorService {
+			<<interface>>
+			+submit()
+			+invokeAll()
+			+shutdown()
+	}
+	class SimpleAsyncTaskExecutor {
+	}
+	class ThreadPoolTaskExecutor {
+	}
+	class CondurrentTaskExecutor {
+	}
+```
+
+스프링 비동기 처리를 위한 config 설정
+
+```java
+
+@Configuration
+@EnableAsync
+public class AsyncConfig {
+
+}
+```
+
+![AsyncConfigurer 를 구현해야하는 이유]()
