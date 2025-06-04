@@ -30,6 +30,8 @@ public interface UserService {
 
   UserResponseDto getUserFromAuth(Authentication authentication);
 
+  String getUserFromRefreshToken(String refreshToken);
+
   UserResponseDto updateUserRole(RoleUpdateRequest roleUpdateRequest,
       HttpServletRequest httpServletRequest);
 

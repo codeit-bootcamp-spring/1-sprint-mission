@@ -72,10 +72,7 @@ logging:
         core:
           env: debug
         security: trace
-      #          web:
-      #            csrf: debug
-      #            FilterChainProxy: debug
-      #            session: debug
+        web: debug
       hibernate:
         sql: debug
         type:
@@ -108,3 +105,10 @@ server:
       force: true
     session:
       timeout: 30m
+
+# discodeit
+discodeit:
+  security:
+    csrf:
+      cookie:
+        secure: false

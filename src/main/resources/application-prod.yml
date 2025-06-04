@@ -52,3 +52,10 @@ server:
   servlet:
     encoding:
       charset: utf-8
+
+# discodeit
+discodeit:
+  security:
+    csrf:
+      cookie:
+        secure: true

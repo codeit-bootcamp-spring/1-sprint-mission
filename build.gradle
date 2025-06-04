@@ -27,7 +27,7 @@ ext {
 }
 
 group = 'com.sprint.mission'
-version = 'v2.0-M9'
+version = 'v2.2-M10'
 
 java {
     toolchain {
@@ -60,6 +60,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
 
+    // jwt
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    
     // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     // spring boot admin (client)

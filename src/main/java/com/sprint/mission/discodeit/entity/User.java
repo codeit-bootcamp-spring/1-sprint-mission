@@ -56,14 +56,13 @@ public class User extends BaseUpdatableEntity {
   @Column(name = "introduce")
   private String introduce;
 
+  @Column(name = "is_account_non_locked")
+  private boolean accountNonLocked = true; // 계정 잠김 여부
+
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
   @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_profile"), nullable = true)
   @OnDelete(action = OnDeleteAction.SET_NULL)
   private BinaryContent profile;
-
-//  @OneToOne(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.PERSIST,
-//      CascadeType.MERGE}, orphanRemoval = true)
-//  private UserStatus userStatus;  // OneToOne은 fetchType이 Eager였다
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<ChannelMember> joinedChannels = new ArrayList<>();

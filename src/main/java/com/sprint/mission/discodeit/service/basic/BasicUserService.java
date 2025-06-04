@@ -15,13 +15,19 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.security.role.RoleUpdateRequest;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.validation.Validator;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -30,11 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,11 +52,13 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
 
-  private final SessionRegistry sessionRegistry;
+//  private final SessionRegistry sessionRegistry;
 
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentService binaryContentService;
+  private final JwtSessionRepository jwtSessionRepository;
+  private final JwtService jwtService;
 
   // TODO: LoadData Entity Name Magic Number를 어떻게 하면 좋을까?
 
@@ -113,10 +117,10 @@ public class BasicUserService implements UserService {
   @Override
   public List<UserResponseDto> findAll() {
     log.debug("전체 사용자 조회 요청");
-
-    Set<String> onlineUsernames = sessionRegistry.getAllPrincipals().stream()
-        .filter(principal -> principal instanceof UserDetails)
-        .map(principal -> ((UserDetails) principal).getUsername())
+    // sessionRegistry를 사용하지 않게 되어 리팩토링
+    Set<String> onlineUsernames = jwtSessionRepository.findAll().stream()
+        .filter(session -> session.getExpiresAt().isAfter(Instant.now()))
+        .map(JwtSession::getUsername)
         .collect(Collectors.toSet());
 
     List<UserResponseDto> userList = userRepository.findAllWithDetails().stream()
@@ -209,6 +213,28 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  public String getUserFromRefreshToken(String refreshToken) {
+    if (refreshToken == null || refreshToken.isBlank()) {
+      throw new AuthenticationCredentialsNotFoundException("Missing Refresh Token");
+    }
+
+    try {
+      String username = jwtService.getUsernameFromToken(refreshToken);
+      JwtSession session = jwtSessionRepository.findByUsername(username)
+          .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("Session not found"));
+
+      if (!refreshToken.equals(session.getRefreshToken())) {
+        throw new AuthenticationCredentialsNotFoundException("Invalid Refresh Token");
+      }
+
+      return session.getAccessToken();
+    } catch (JwtException je) {
+      throw new AuthenticationCredentialsNotFoundException(
+          "Invalid Refresh Token: " + je.getMessage());
+    }
+  }
+
+  @Override
   public UserResponseDto updateUserRole(RoleUpdateRequest roleUpdateRequest,
       HttpServletRequest httpServletRequest) {
     log.info("사용자 역할 업데이트 요청");
@@ -220,25 +246,19 @@ public class BasicUserService implements UserService {
       user.updateRole(roleUpdateRequest.newRole());
       userRepository.save(user);
 
-      // 현재 로그인 중인 사용자일 경우 세션 무효화
-      SecurityContext context = (SecurityContext) httpServletRequest.getSession()
-          .getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
-
-      if (context != null && context.getAuthentication().getName()
-          .equalsIgnoreCase(user.getUsername())) {
-        log.info("현재 로그인 된 사용자의 권한이 변경되어 세션을 무효화합니다.");
-        httpServletRequest.getSession().invalidate();
-      }
+      // 로그인 중이라면 JWTSession 제거 -> 강제 로그아웃
+      Optional<JwtSession> sessionOptional = jwtSessionRepository.findByUsername(
+          user.getUsername());
+      sessionOptional.ifPresent(session -> {
+        jwtSessionRepository.delete(session);
+        log.info("사용자 역할 변경으로 인한 JWT 세션 무효화: {}", user.getUsername());
+      });
     }
-
     return userMapper.toResponseDto(user, isUserOnline(user.getUsername()));
   }
 
   @Override
   public boolean isUserOnline(String username) {
-    return sessionRegistry.getAllPrincipals().stream()
-        .filter(principal -> principal instanceof UserDetails)
-        .map(principal -> ((UserDetails) principal).getUsername())
-        .anyMatch(name -> name.equals(username));
+    return jwtSessionRepository.existsByUsername(username);
   }
 }

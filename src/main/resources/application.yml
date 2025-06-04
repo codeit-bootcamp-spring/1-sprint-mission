@@ -34,6 +34,10 @@ discodeit:
     email: ${ADMIN_EMAIL}
   cookie:
     persistent-key: ${PERSISTENT_COOKIE_KEY}
+  jwt:
+    secret: ${JWT_SECRET_KEY}
+    access-token-expiration: 900000     # 15min
+    refresh-token-expiration: 604800000   # 7day
 
 logging:
   level:

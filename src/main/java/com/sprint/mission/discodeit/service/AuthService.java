@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.user.LoginRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
 
-  UserResponseDto login(LoginRequest loginDTO);
+  String login(LoginRequest loginRequest, HttpServletResponse response);
+
+  void logout(String refreshToken, HttpServletResponse response);
+
+  String refresh(String refreshToken, HttpServletResponse response);
 }
