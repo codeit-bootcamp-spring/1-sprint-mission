@@ -66,3 +66,13 @@ CREATE TABLE message_attachments (
  FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE,
  FOREIGN KEY(attachment_id) REFERENCES binary_contents(id) ON DELETE CASCADE
 );
+
+CREATE TABLE jwt_sessions (
+ id UUID PRIMARY KEY,
+ created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ updated_at TIMESTAMP WITH TIME ZONE,
+ expiration_time TIMESTAMP WITH TIME ZONE,
+ user_id UUID NOT NULL,
+ access_token VARCHAR(512) NOT NULL,
+ refresh_token VARCHAR(512)
+);

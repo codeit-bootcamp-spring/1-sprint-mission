@@ -13,16 +13,18 @@ import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
+import com.spirnt.mission.discodeit.security.jwt.JwtService;
+import com.spirnt.mission.discodeit.security.jwt.JwtSession;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.UserService;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,19 +42,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     private final PasswordEncoder passwordEncoder;
-    private final SessionRegistry sessionRegistry;
-
-    private boolean isUserOnline(String username) {
-        return sessionRegistry.getAllPrincipals().stream()
-            .filter(principal -> principal instanceof UserDetails)
-            .map(principal -> (UserDetails) principal)
-            .anyMatch(userDetails -> userDetails.getUsername().equals(username));
-    }
-
-    private UserDto toDto(User user) {
-        return userMapper.toDto(user, isUserOnline(user.getUsername()));
-    }
-
+    private final JwtService jwtService;
 
     @Transactional
     @Override
@@ -84,7 +74,7 @@ public class BasicUserService implements UserService {
         }
         user.setProfile(binaryContent);
 
-        return toDto(user);
+        return userMapper.toDto(user);
     }
 
 
@@ -92,16 +82,23 @@ public class BasicUserService implements UserService {
     public UserDto find(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
-        return toDto(user);
+        return userMapper.toDto(user);
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {
+        /* JwtService에서 온라인 상태인(JwtSession 정보가 저장되어 있고, 아직 만료되지 않은)
+         * 사용자들의 id 모음
+         */
+        Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
+            .map(JwtSession::getUserId)
+            .collect(Collectors.toSet());
+
         List<User> users = userRepository.findAllFetchJoin();
         return users.stream()
             .sorted(Comparator.comparing(user -> user.getCreatedAt()))
-            .map(user -> toDto(user))
+            .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
             .toList();
     }
 
@@ -137,7 +134,7 @@ public class BasicUserService implements UserService {
                 : binaryContentRepository.findById(binaryContentDto.getId())
                     .orElse(null);
         user.update(username, email, password, binaryContent);
-        return toDto(user);
+        return userMapper.toDto(user);
     }
 
     @Override

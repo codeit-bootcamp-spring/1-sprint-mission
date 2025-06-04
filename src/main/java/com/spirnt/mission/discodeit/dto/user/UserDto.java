@@ -3,7 +3,6 @@ package com.spirnt.mission.discodeit.dto.user;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.entity.Role;
 import com.spirnt.mission.discodeit.entity.User;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +12,6 @@ import lombok.Getter;
 public class UserDto {
 
     private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
     private String username;
     private String email;
     private Boolean online;
@@ -22,11 +19,9 @@ public class UserDto {
     private Role role;
 
     @Builder
-    public UserDto(UUID id, Instant createdAt, Instant updatedAt, String username, String email,
+    public UserDto(UUID id, String username, String email,
         Boolean online, BinaryContentDto profile, Role role) {
         this.id = id;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
         this.username = username;
         this.email = email;
         this.online = online;
@@ -37,8 +32,6 @@ public class UserDto {
     public static UserDto from(User user, boolean isOnline) {
         return UserDto.builder()
             .id(user.getId())
-            .createdAt(user.getCreatedAt())
-            .updatedAt(user.getUpdatedAt())
             .username(user.getUsername())
             .email(user.getEmail())
             .online(isOnline)

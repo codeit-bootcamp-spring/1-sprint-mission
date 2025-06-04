@@ -22,14 +22,19 @@ logging:
     root: info
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: info
+    com.example.jwt: WARN
 info:
   datasource:
-    url: ${spring.datasource.url}
-    driver-class-name: ${spring.datasource.driver-class-name}
-    jpa:
-      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+  url: ${spring.datasource.url}
+  driver-class-name: ${spring.datasource.driver-class-name}
+  jpa:
+    ddl-auto: ${spring.jpa.hibernate.ddl-auto}
 
 management:
   info:
     env:
       enabled: false
+
+jwt:
+  secret: ${JWT_SECRET}  # 환경변수에서 주입 (필수)
+

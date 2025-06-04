@@ -6,8 +6,9 @@ import com.spirnt.mission.discodeit.security.CustomAuthenticationFailureHandler;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationFilter;
 import com.spirnt.mission.discodeit.security.CustomAuthenticationSuccessHandler;
 import com.spirnt.mission.discodeit.security.CustomUserDetailsService;
-import jakarta.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
+import com.spirnt.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.spirnt.mission.discodeit.security.jwt.JwtLogoutHandler;
+import com.spirnt.mission.discodeit.security.jwt.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,17 +22,15 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -39,15 +38,16 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-
     @Bean
     SecurityFilterChain chain(HttpSecurity httpSecurity,
         CustomAuthenticationFilter customAuthenticationFilter,
-        PersistentTokenBasedRememberMeServices rememberMeServices) throws Exception {
+        JwtAuthenticationFilter jwtAuthenticationFilter, JwtLogoutHandler jwtLogoutHandler)
+        throws Exception {
         httpSecurity
             .authorizeHttpRequests(auth -> auth
                 // 정적 리소스 요청 허용
-                .requestMatchers("/assets/**", "/favicon.ico", "/index.html").permitAll()
+                .requestMatchers("/static/**", "/assets/**", "/favicon.ico", "/index.html")
+                .permitAll()
                 .requestMatchers("/", "/error/**").permitAll()
                 // Swagger 요청 허용
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html",
@@ -62,36 +62,29 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").hasRole("USER")
                 // 그 외 인증 필요
                 .anyRequest().authenticated())
-            .csrf(csrf ->
+            .csrf(csrf -> csrf
                 // csrf 검증 제외
-                csrf.ignoringRequestMatchers("/api/users", "/api/auth/login",
-                    "/api/auth/logout"))
+                .ignoringRequestMatchers("/api/users", "/api/auth/login",
+                    "/api/auth/logout")
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // 요청으로부터 CSRF 토큰 가져오는 법: form data 또는 요청 헤더로부터 가져오는 CsrfTokenRequestAttributeHandler
+                // -> 쿠키 기반 인증 환경에 적합
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                // 기본값인 CsrfAuthenticationStrategy는 HttpSessionCsrfTokenRepository용
+                .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
+            )
             // 커스텀 인증 필터 추가: UserAuthenticationFilter 대신 CustomAuthenticationFilter 사용
             .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .rememberMe(rememberMe -> rememberMe
-                .rememberMeServices(rememberMeServices)
-            )
+            .addFilterBefore(jwtAuthenticationFilter, CustomAuthenticationFilter.class)
             .sessionManagement(session -> session
-                .sessionFixation(sf -> sf.changeSessionId())  // 세션 고정 공격 방어: 세션 ID만 변경
-                .maximumSessions(1)    // 동시 세션 제어: 동시 세션 최대 1개 허용
-                .maxSessionsPreventsLogin(false)    // 새로운 로그인 시 기존 세션을 무효화
-                .sessionRegistry(sessionRegistry())  // 세션 관리 기능
-                .expiredSessionStrategy(event -> {
-                    // 세션이 명시적으로 만료(다른 기기에서 로그인)되었을 때 401 응답
-                    HttpServletResponse response = event.getResponse();
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Session Expired");
-                })
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .logout(logout -> logout.logoutRequestMatcher(
+            .logout(logout -> logout
+                .logoutRequestMatcher(
                     new AntPathRequestMatcher("/api/auth/logout"))  // POST /api/auth/logout으로 로그아웃
                 .logoutSuccessUrl("/") // 세션 무효화 후 홈으로
-                .deleteCookies("JSESSIONID", "remember-me")    // 쿠키 삭제
-                .invalidateHttpSession(true)    // 로그아웃 시 세션 삭제
-                .logoutSuccessHandler(((request, response, authentication) -> {
-                    rememberMeServices.logout(request, response,
-                        authentication);   // rememberme 토큰 삭제
-                    response.setStatus(HttpServletResponse.SC_OK);
-                }))
+                .deleteCookies("REFRESH-TOKEN")    // 쿠키 삭제
+                .addLogoutHandler(jwtLogoutHandler) // 리프레시 토큰 무효화 핸들러
             );
         return httpSecurity.build();
     }
@@ -133,10 +126,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CustomAuthenticationSuccessHandler successHandler(SessionRegistry sessionRegistry,
-        ObjectMapper objectMapper, RememberMeServices rememberMeServices) {
-        return new CustomAuthenticationSuccessHandler(objectMapper, sessionRegistry,
-            rememberMeServices);
+    public CustomAuthenticationSuccessHandler successHandler(
+        ObjectMapper objectMapper, JwtService jwtService) {
+        return new CustomAuthenticationSuccessHandler(objectMapper, jwtService);
     }
 
     @Bean
@@ -160,31 +152,5 @@ public class SecurityConfig {
         return handler;
     }
 
-    @Bean
-    public SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
-    }
-
-    @Bean
-    public PersistentTokenBasedRememberMeServices rememberMeServices(
-        UserDetailsService userDetailsService,
-        PersistentTokenRepository persistentTokenRepository) {
-        PersistentTokenBasedRememberMeServices services =
-            new PersistentTokenBasedRememberMeServices("mySecretKey123!", userDetailsService,
-                persistentTokenRepository);
-        services.setParameter("remember-me");  // 클라이언트에서 /auth/login?remember-me=true와 같이 보냄
-        services.setCookieName("remember-me");  // 쿠키 이름
-        services.setTokenValiditySeconds(60 * 60 * 24 * 21);   // 쿠키 유효 시간 21일
-        return services;
-    }
-
-    @Bean
-    public PersistentTokenRepository persistentTokenRepository(DataSource dataSource) {
-        JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
-        repository.setDataSource(dataSource);
-        repository.setCreateTableOnStartup(false);
-
-        return repository;
-    }
 
 }
