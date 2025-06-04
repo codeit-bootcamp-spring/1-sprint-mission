@@ -13,14 +13,9 @@
 - `Kafka` 도입하기
 - `Redis` 도입하기
 
-## 1. 비동기 처리하기.
+## 1. 비동기 처리하기
 
 ### 파일 업로드 로직을 비동기 처리하기
-
-작업해야하는 메소드
-
-- com.sprint.mission.discodeit.storage.s3.S3BinaryContentStorage
-- package com.sprint.mission.discodeit.storage.local.LocalBinaryContentStorage
 
 현재 put (파일 업로드) 메소드를 사용하고 있는곳
 
@@ -33,15 +28,15 @@
 
 ### Message Service
 
-Message Controller 의 create, POST /api/message   
-Request -> Controller -> Service -> Repository
+**Message Controller** 의 create, `POST /api/message`   
+`Request` -> `Controller` -> `Service` -> `Repository`
 
 1. DB Channel 조회
 2. DB User 조회
 3. DB에 BinaryContent 저장
 4. S3에 파일 저장 : 여러 파일 가능
 
-이 중 DB에 메타데이터를 저장 후, 생성된 UUID 를 S3 Key 값으로 저장을 하는데, 동기처리에서 비동기 처리로 변경합니다.
+이 중 DB에 메타데이터를 저장 후, 생성된 UUID 를 S3 Key 값으로 저장을 하는데, **동기처리에서 비동기 처리로 변경**합니다.
 
 ```mermaid
 sequenceDiagram
@@ -57,7 +52,7 @@ participant Client
     Controller-->>Client: HTTP 201 Created (즉시 응답)
 
     par 백그라운드 S3 업로드
-        Service->>S3Service: uploadFilesAsync(files)
-        S3Service-->>Service: 업로드 완료 콜백 (선택적)
+        Service->>BinaryContentStorate: uploadFilesAsync(files)
+        BinaryContentStorate-->>Service: 업로드 완료 콜백 (선택적)
     end
 ```
