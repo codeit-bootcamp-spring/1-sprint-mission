@@ -37,6 +37,8 @@
   <!-- 파일 로그 -->
   <property name="LOG_FILE" value="${LOG_PATH}/application.log"/>
 
+  <property name="LOG_PATH" value="D:/here"/>
+
   <!-- 루트 로거 설정 -->
   <root level="INFO">
     <appender-ref ref="Console"/>
