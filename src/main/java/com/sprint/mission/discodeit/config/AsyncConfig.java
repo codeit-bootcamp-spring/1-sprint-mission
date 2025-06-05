@@ -8,9 +8,14 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableAsync
+@RequiredArgsConstructor
 public class AsyncConfig implements AsyncConfigurer {
+
+	private final ContextPropagatingTaskDecorator decorator;
 
 	@Override
 	public Executor getAsyncExecutor() {
@@ -20,6 +25,7 @@ public class AsyncConfig implements AsyncConfigurer {
 		threadPoolTaskExecutor.setQueueCapacity(1000);
 		threadPoolTaskExecutor.setThreadNamePrefix("io-AsyncExecutor-");
 		threadPoolTaskExecutor.setKeepAliveSeconds(60);
+		threadPoolTaskExecutor.setTaskDecorator(decorator);
 		threadPoolTaskExecutor.initialize();
 		return threadPoolTaskExecutor;
 	}

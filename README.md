@@ -102,4 +102,23 @@ public class AsyncConfig {
 }
 ```
 
-![AsyncConfigurer 를 구현해야하는 이유]()
+[AsyncConfigurer 를 구현해야하는 이유]()
+
+## ThreadLocal 의 특성 상 비동기 처리를 하는 스레드에서의 컨텍스트 유실
+
+```mermaid
+---
+config:
+  theme: neo-dark
+---
+sequenceDiagram
+    participant M as Main Thread<br/>(ThreadLocal: TraceID=123)
+    participant P as Thread Pool
+    participant W as Worker Thread<br/>(ThreadLocal: empty)
+
+    M->>M: MDC.put("traceId", "123")
+    M->>P: submit(task)
+    P->>W: execute(task)
+    W->>W: MDC.get("traceId") = null (X)
+    Note over W: 컨텍스트 유실!
+```

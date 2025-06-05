@@ -23,7 +23,9 @@ import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -56,6 +58,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 		}
 		try (OutputStream outputStream = Files.newOutputStream(filePath)) {
 			outputStream.write(bytes);
+			log.info("Local 파일 업로드 성공: {}", filePath.toString());
 		} catch (IOException e) {
 			CompletableFuture<UUID> failed = new CompletableFuture<>();
 			failed.completeExceptionally(e);
