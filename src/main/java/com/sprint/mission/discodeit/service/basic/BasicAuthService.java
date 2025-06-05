@@ -7,16 +7,13 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +32,7 @@ public class BasicAuthService implements AuthService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
-  private final SessionRegistry sessionRegistry;
+  private final JwtService jwtService;
 
   @Transactional
   @Override
@@ -64,17 +61,7 @@ public class BasicAuthService implements AuthService {
         .orElseThrow(() -> UserNotFoundException.withId(userId));
     user.updateRole(request.newRole());
 
-    sessionRegistry.getAllPrincipals().stream()
-        .filter(principal -> ((DiscodeitUserDetails) principal).getUserDto().id().equals(userId))
-        .findFirst()
-        .ifPresent(principal -> {
-              List<SessionInformation> activeSessions = sessionRegistry.getAllSessions(principal,
-                  false);
-              log.debug("Active sessions: {}", activeSessions.size());
-              activeSessions.forEach(SessionInformation::expireNow);
-            }
-        );
-
+    jwtService.invalidateJwtSession(user.getId());
     return userMapper.toDto(user);
   }
 }

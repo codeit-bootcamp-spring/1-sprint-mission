@@ -5,8 +5,8 @@ FROM amazoncorretto:17 AS builder
 WORKDIR /app
 
 # Gradle Wrapper 파일 먼저 복사
-COPY ../0-sprint-mission-s9-base/gradle ./gradle
-COPY ../0-sprint-mission-s9-base/gradlew ./gradlew
+COPY gradle ./gradle
+COPY gradlew ./gradlew
 
 # Gradle 캐시를 위한 의존성 파일 복사
 COPY build.gradle settings.gradle ./
@@ -15,7 +15,7 @@ COPY build.gradle settings.gradle ./
 RUN ./gradlew dependencies
 
 # 소스 코드 복사 및 빌드
-COPY ../0-sprint-mission-s9-base/src ./src
+COPY src ./src
 RUN ./gradlew build -x test
 
 
