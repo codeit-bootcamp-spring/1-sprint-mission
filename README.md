@@ -122,3 +122,70 @@ sequenceDiagram
     W->>W: MDC.get("traceId") = null (X)
     Note over W: 컨텍스트 유실!
 ```
+
+`@Async` 등으로 비동기 스레드에서 작업을 수행할 때
+
+1. slf4j MDC 정보
+2. 스프링 시큐리티 컨텍스트
+   는 기본적으로 부모 스레드에 저장된 ThreadLocal 에만 남아있으며, 비동기로 실행되는 새로운 스레드에서는 비어있거나 디폴트가 된다.
+
+```text
+25-06-05 13:29:37.398 [http-nio-8080-exec-7] INFO  c.s.m.d.controller.UserController    [177a46c782894ca3ab956ca118d3fbbe | POST | /api/users] - 사용자 생성 요청: UserCreateRequest[username=test, email=test@mail.com, password=qorwodn1!]
+25-06-05 13:29:37.432 [io-AsyncExecutor-1] INFO  c.s.m.d.s.l.LocalBinaryContentStorage [ |  | ] - Local 파일 업로드 성공: .discodeit\storage\d52f55d0-c341-418d-abc4-bf04e1af6573
+```
+
+이 문제를 해결하기 위해서 TaskDecorator 패턴을 사용한다.
+
+```mermaid
+sequenceDiagram
+    participant M as Main Thread
+    participant T as TaskDecorator
+    participant W as Worker Thread
+    M->>T:1.컨텍스트 캡처
+    T->>T:2.Runnable 래핑
+    T->>W:3.컨텍스트 복원
+    W->>W:4.작업 실행
+    W->>W:5.컨텍스트 정리
+```
+
+`package com.sprint.mission.discodeit.ContextPropagatingTaskDecorator` 참고
+
+```mermaid
+sequenceDiagram
+  participant P1 as ExecutorTask
+  participant P2 as TaskDecorator
+  participant P3 as WorkThread
+
+  %% 1) Executor가 데코레이터에 원본 Runnable을 전달
+  P1 ->> P2: decorate(originalRunnable)
+
+  %% 2) 데코레이터 내부에서 부모 쓰레드의 MDC/보안 컨텍스트를 캡처
+  P2 ->> P2: capture parentMdc = MDC.getCopyOfContextMap()
+  P2 ->> P2: capture parentCtx = SecurityContextHolder.getContext()
+
+  %% 3) 데코레이터가 “부모 콘텍스트를 주입하는 로직을 추가한 래핑 Runnable” 반환
+  P2 -->> P1: decoratedRunnable
+
+  %% 4) Executor는 데코레이터가 반환한 래핑 Runnable을 스레드 풀에 제출
+  P1 ->> P3: execute(decoratedRunnable)
+
+  %% 5) WorkThread(풀 내부 쓰레드)에서 실행 직전에 MDC/보안 컨텍스트를 설정
+  P3 ->> P3: if(parentMdc != null) MDC.setContextMap(parentMdc)
+  P3 ->> P3: SecurityContextHolder.setContext(parentCtx)
+
+  %% 6) WorkThread에서 실제 비즈니스 로직(run()) 수행
+  P3 ->> P3: originalRunnable.run()
+
+  %% 7) 실행 완료 후 MDC와 SecurityContext를 클리어
+  P3 ->> P3: MDC.clear()
+  P3 ->> P3: SecurityContextHolder.clearContext()
+```
+
+결과
+
+```text
+25-06-05 14:19:38.517 [http-nio-8080-exec-1] INFO  c.s.m.d.controller.UserController    [3022e9ac844a4b6599d233bf17304af9 | POST | /api/users] - 사용자 생성 요청: UserCreateRequest[username=test, email=test@mail.com, password=qorwodn1!]
+25-06-05 14:19:38.547 [io-AsyncExecutor-1] INFO  c.s.m.d.s.l.LocalBinaryContentStorage [3022e9ac844a4b6599d233bf17304af9 | POST | /api/users] - Local 파일 업로드 성공: .discodeit\storage\bb2330ff-e4fe-459f-863d-b3dad835c39f
+```
+
+복원에 성공한 것을 확인할 수 있다.
