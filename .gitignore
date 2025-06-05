@@ -50,5 +50,6 @@ bin/
 !.github/
 
 *.yaml
+*.yml
 .env
 discodeit.env
