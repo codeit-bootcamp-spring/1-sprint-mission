@@ -204,14 +204,14 @@ sequenceDiagram
   participant S as Service
   participant D as DB
   participant AsyncUploader
-  participant BinaryContent
 
   C->>S: create(request)
   S->>+D: save(BinaryContent)<br/>트랜잭션시작
   S->>AsyncUploader: put 비동기 시작
-  AsyncUploader->>BinaryContent: commit❌
+  AsyncUploader->>AsyncUploader: upload
+  AsyncUploader->>DB: updateById<br/>commit❌
   DB->>AsyncUploader: EntityNotFound
-  Note over AsyncUploader: BinaryContent Entity가 아직 DB에 저장되지 않은 상태
+  Note over AsyncUploader, DB: Entity가 아직 DB에 저장되지 않은 상태
   D->>-S: commit 트랜잭션
 ```
 
