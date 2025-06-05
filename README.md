@@ -196,7 +196,7 @@ sequenceDiagram
 
 - Spring Retry의 `@Retryable` 어노테이션을 사용해 재시도 정책
 
-## upload 로직 
+## upload 로직
 
 ```mermaid
 sequenceDiagram
@@ -213,10 +213,12 @@ sequenceDiagram
   DB->>AsyncUploader: EntityNotFound
   D->>-S: commit 트랜잭션
 ```
+
 비동기로 업로드를 시작하는데, 이때 BinaryContent Entity가 아직 DB에 저장되지 않은 상태에서 업로드를 시도하면, EntityNotFound 예외가 발생한다.
 이를 해결하기 위해, 트랜잭션이 커밋이 완료된 후 비동기 업로드를 시작하도록 변경한다.
 
 ```mermaid
+sequenceDiagram
     participant Controller
     participant Service
     participant DB
@@ -233,6 +235,8 @@ sequenceDiagram
     TransactionManager->>AsyncUploader: put(id, bytes) (비동기 시작)
     AsyncUploader->>BinaryContentService: updateStatus(SUCCESS)
     BinaryContentService->>DB: update(BinaryContent.status)
+    
 ```
+
 비동기 처리 결과를 기다리지 않고 트랜잭션을 완료한 후에 요청에 대한 응답을 반환한다.   
 이후 비동기 업로드가 완료되면, BinaryContentService를 통해 DB에 상태를 업데이트한다.
