@@ -80,4 +80,5 @@ public class BasicBinaryContentService implements BinaryContentService {
 		binaryContentRepository.deleteById(binaryContentId);
 		log.info("바이너리 컨텐츠 삭제 완료: id={}", binaryContentId);
 	}
+
 }
