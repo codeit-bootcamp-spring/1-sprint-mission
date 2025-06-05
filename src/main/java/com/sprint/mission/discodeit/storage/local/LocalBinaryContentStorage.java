@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -16,10 +17,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.storage.AsyncTaskFailure;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import jakarta.annotation.PostConstruct;
@@ -51,6 +58,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 	}
 
 	@Async
+	@Retryable(
+		retryFor = {DiscodeitException.class},
+		noRetryFor = {IllegalArgumentException.class},
+		backoff = @Backoff(delay = 2000, multiplier = 2.0),
+		recover = "recoverUpload"
+	)
 	public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
 		Path filePath = resolvePath(binaryContentId);
 		if (Files.exists(filePath)) {
@@ -60,11 +73,20 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 			outputStream.write(bytes);
 			log.info("Local 파일 업로드 성공: {}", filePath.toString());
 		} catch (IOException e) {
-			CompletableFuture<UUID> failed = new CompletableFuture<>();
-			failed.completeExceptionally(e);
-			return failed;
+			throw new DiscodeitException(ErrorCode.UPLOAD_FAILED);
 		}
 		return CompletableFuture.completedFuture(binaryContentId);
+	}
+
+	@Recover
+	public CompletableFuture<UUID> recoverUpload(DiscodeitException e, UUID binaryContentId) {
+		AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure(
+			"LocalBinaryContentStorage#put",
+			MDC.get("requestId"),
+			"파일 업로드 실패: " + e.getMessage()
+		);
+		log.error("파일 업로드 실패: {}, 요청 ID: {}", asyncTaskFailure.failureReason(), asyncTaskFailure.requestId());
+		return CompletableFuture.failedFuture(e);
 	}
 
 	public InputStream get(UUID binaryContentId) {
