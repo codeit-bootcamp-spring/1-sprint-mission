@@ -22,6 +22,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,7 @@ public class BasicMessageService implements MessageService {
     private final PageResponseMapper pageResponseMapper;
     private final BinaryContentStatusService binaryContentStatusService;
 
+    @Timed(value = "message.create", description = "메시지 생성 시간")
     @Transactional
     @Override
     public MessageDto create(MessageCreateRequest messageCreateRequest,
