@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -88,7 +87,6 @@ public class BasicMassageService implements MessageService {
             new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND,
                 Map.of("channelId", channelId)));
 
-//        Pageable pageable = PageRequest.of(0, 50, Sort.by("createdAt").descending());
         Slice<Message> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
             Optional.ofNullable(createdAt).orElse(Instant.now()), pageable);
         Slice<MessageResponse> responseSlice = slice.map(messageMapper::entityToDto);
@@ -107,7 +105,6 @@ public class BasicMassageService implements MessageService {
         return messageMapper.entityToDto(findByIdOrThrow(id));
     }
 
-    @PreAuthorize("hasPermission(#id, 'Message', 'UPDATE')")
     @Override
     @Transactional
     public MessageResponse update(UUID id, MessageRequest.Update request) {
@@ -119,7 +116,6 @@ public class BasicMassageService implements MessageService {
         return messageMapper.entityToDto(message);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasPermission(#id, 'Message', 'DELETE')")
     @Override
     public void deleteById(UUID id) {
         findByIdOrThrow(id);

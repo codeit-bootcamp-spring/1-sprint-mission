@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,7 +33,6 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    @PreAuthorize("hasPermission(#id, 'Message', 'CREATE')")
     @Override
     public ReadStatusResponse create(ReadStatusRequest.Create request) {
         UUID userId = request.getUserId();
@@ -78,7 +76,6 @@ public class BasicReadStatusService implements ReadStatusService {
             .collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasPermission(#id, 'Message', 'UPDATE')")
     @Override
     public ReadStatusResponse update(UUID id, ReadStatusRequest.Update request) {
         ReadStatus readStatus = findByIdOrThrow(id);
