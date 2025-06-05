@@ -84,7 +84,14 @@ public class BasicMessageService implements MessageService {
                 .map(binaryRequest -> {
                     BinaryContent savedContent = binaryContentService.saveBinaryContent(
                             binaryRequest);
-                    binaryContentStorage.put(savedContent.getId(), binaryRequest.bytes());
+                    binaryContentStorage.putAsync(
+                            savedContent.getId(),
+                            binaryRequest.bytes(),
+                            status -> {
+                                savedContent.setUploadStatus(status);
+                                binaryContentRepository.save(savedContent);
+                            }
+                    );
                     log.debug("첨부파일 저장 완료: id={}, name={}", savedContent.getId(),
                             binaryRequest.fileName());
                     return savedContent.getId();

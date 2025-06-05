@@ -90,8 +90,4 @@ public class MessageController implements MessageApi {
                 size);
         return ResponseEntity.ok(response);
     }
-
-    private BinaryContentDto saveAttachment(MultipartFile multipartFile) {
-        return messageService.saveAttachment(multipartFile);
-    }
 }

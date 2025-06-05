@@ -138,6 +138,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/binaryContents/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/upload/**").permitAll()//테스트용
                         .requestMatchers(
                                 "/", "/index.html", "/swagger-ui/**", "/v3/api-docs/**",
                                 "/actuator/**", "/favicon.ico", "/assets/index-*.js",

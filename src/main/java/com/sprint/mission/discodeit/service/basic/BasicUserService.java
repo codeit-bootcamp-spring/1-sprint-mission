@@ -181,7 +181,14 @@ public class BasicUserService implements UserService {
         BinaryContent savedContent = binaryContentRepository.save(binaryContent);
 
         try {
-            binaryContentStorage.put(savedContent.getId(), profileFile.getBytes());
+            binaryContentStorage.putAsync(
+                    savedContent.getId(),
+                    profileFile.getBytes(),
+                    status -> {
+                        savedContent.setUploadStatus(status);
+                        binaryContentRepository.save(savedContent);
+                    }
+            );
         } catch (IOException e) {
             throw new FileUploadFailedException();
         }
