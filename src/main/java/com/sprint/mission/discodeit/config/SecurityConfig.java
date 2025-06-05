@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.CustomUserDetailService;
 import com.sprint.mission.discodeit.security.evaluator.CustomPermissionEvaluator;
@@ -31,7 +32,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -53,7 +53,7 @@ public class SecurityConfig {
         HttpSecurity http,
         SecurityContextRepository securityContextRepository,
         CustomLogoutHandler customLogoutHandler,
-        RememberMeServices rememberMeServices) throws Exception {
+        AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
         http
             .csrf(AbstractHttpConfigurer::disable)  // JWT 사용시 CSRF 불필요
@@ -65,12 +65,8 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(this::configureAuthorization)
 
-            .rememberMe(r -> r
-                .rememberMeServices(rememberMeServices)
-            )
-
             .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(customAuthenticationEntryPoint()))
+                .authenticationEntryPoint(authenticationEntryPoint))
 
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -83,7 +79,6 @@ public class SecurityConfig {
         auth
 
             // 허용
-
             .requestMatchers("/", "/index.html", "/error").permitAll()
             .requestMatchers("/.well-known/**", "/favicon.ico").permitAll()
             .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()  // 로그인 관련은 모두 허용
@@ -165,7 +160,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationEntryPoint customAuthenticationEntryPoint() {
-        return new CustomAuthenticationEntryPoint();
+    public AuthenticationEntryPoint customAuthenticationEntryPoint(ObjectMapper objectMapper) {
+        return new CustomAuthenticationEntryPoint(objectMapper);
     }
 }
