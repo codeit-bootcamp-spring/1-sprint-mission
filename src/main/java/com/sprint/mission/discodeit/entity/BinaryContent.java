@@ -20,10 +20,24 @@ public class BinaryContent extends BaseEntity {
   private Long size;
   @Column(length = 100, nullable = false)
   private String contentType;
+  @Column
+  private uploadStatus status;
+
 
   public BinaryContent(String fileName, Long size, String contentType) {
     this.fileName = fileName;
     this.size = size;
     this.contentType = contentType;
+    this.status = uploadStatus.WAITING;
+  }
+
+  public void updateStatus(uploadStatus status) {
+    this.status = status;
+  }
+
+  public enum uploadStatus {
+    WAITING,
+    SUCCESS,
+    FAILED
   }
 }
