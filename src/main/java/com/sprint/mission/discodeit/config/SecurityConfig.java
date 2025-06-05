@@ -1,196 +1,134 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.security.CustomAuthenticationFilter;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import javax.sql.DataSource;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
+import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.SecurityMatchers;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import java.util.List;
+import java.util.stream.IntStream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
   @Bean
-  public SecurityFilterChain chain(HttpSecurity http,
-      CustomAuthenticationFilter customAuthenticationFilter,
-      PersistentTokenRepository tokenRepository) throws Exception {
-
+  public SecurityFilterChain filterChain(
+      HttpSecurity http,
+      ObjectMapper objectMapper,
+      DaoAuthenticationProvider daoAuthenticationProvider,
+      JwtService jwtService
+  )
+      throws Exception {
     http
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-            .requestMatchers("/api/auth/login",
-                "/api/auth/csrf-token")
-            .permitAll()
-            .requestMatchers("/api/channels/public").hasRole("CHANNEL_MANAGER")
-            .requestMatchers(HttpMethod.PATCH, "/api/channels/**").hasRole("CHANNEL_MANAGER")
-            .requestMatchers(HttpMethod.DELETE, "/api/channels/**").hasRole("CHANNEL_MANAGER")
-            .requestMatchers("/api/auth/role").hasAnyRole("ADMIN")
-            .anyRequest().hasRole("USER")
+        .authenticationProvider(daoAuthenticationProvider)
+        .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
+            .anyRequest().hasRole(Role.USER.name())
         )
-        .addFilterAt(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .sessionFixation().changeSessionId()
-            .maximumSessions(1)
-            .maxSessionsPreventsLogin(false)
-            .sessionRegistry(sessionRegistry())
+        .csrf(csrf ->
+            csrf
+                .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
         )
-        .logout(logout -> logout
-            .logoutUrl("/api/auth/logout")
-            .logoutSuccessHandler((request, response, authentication) -> {
-              Cookie cookie = new Cookie("JSESSIONID", "");
-              cookie.setMaxAge(0);
-              cookie.setPath("/");
-              cookie.setHttpOnly(true);
-              response.addCookie(cookie);
+        .logout(logout ->
+            logout
+                .logoutRequestMatcher(SecurityMatchers.LOGOUT)
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                .addLogoutHandler(new JwtLogoutHandler(jwtService))
+        )
+        .with(
+            new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+            configurer ->
+                configurer
+                    .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))
+                    .failureHandler(new CustomLoginFailureHandler(objectMapper))
+        )
+        .sessionManagement(session ->
+            session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+        .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
+            JsonUsernamePasswordAuthenticationFilter.class)
+    ;
 
-              response.setStatus(HttpServletResponse.SC_OK);
-            })
-            .invalidateHttpSession(true)
-            .clearAuthentication(true)
-        )
-        .rememberMe(r -> r
-            .rememberMeParameter("remember-me")
-            .tokenRepository(tokenRepository)
-            .tokenValiditySeconds(60 * 60 * 24 * 21)
-            .key("mySuperSecretKey123!")
-        )
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .formLogin(AbstractHttpConfigurer::disable)
-        .csrf(csrf -> csrf
-              .ignoringRequestMatchers("/api/auth/logout")
-            .csrfTokenRepository(csrfTokenRepository())
-        );
-//        .csrf(AbstractHttpConfigurer::disable);
     return http.build();
   }
 
   @Bean
-  public WebSecurityCustomizer webSecurityCustomizer() {
-    return web -> web.ignoring()
-        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-        .requestMatchers("/",
-            "/static/**",
-            "/assets/**",
-            "/index.html",
-            "/favicon.ico");
-  }
-
-  @Bean
-  public CsrfTokenRepository csrfTokenRepository() {
-    CookieCsrfTokenRepository repo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-    repo.setCookieName("XSRF-TOKEN");
-    repo.setHeaderName("X-XSRF-TOKEN");
-    return repo;
+  public String debugFilterChain(SecurityFilterChain chain) {
+    log.debug("Debug Filter Chain...");
+    int filterSize = chain.getFilters().size();
+    IntStream.range(0, filterSize)
+        .forEach(idx -> {
+          log.debug("[{}/{}] {}", idx + 1, filterSize, chain.getFilters().get(idx));
+        });
+    return "debugFilterChain";
   }
 
   @Bean
   public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder(10);
+    return new BCryptPasswordEncoder();
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-      throws Exception {
-    return config.getAuthenticationManager();
+  public DaoAuthenticationProvider daoAuthenticationProvider(
+      UserDetailsService userDetailsService,
+      PasswordEncoder passwordEncoder,
+      RoleHierarchy roleHierarchy
+  ) {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder);
+    provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
+    return provider;
   }
 
   @Bean
-  public HttpSessionSecurityContextRepository securityContextRepository() {
-    return new HttpSessionSecurityContextRepository();
-  }
-
-  @Bean
-  public CustomAuthenticationFilter customAuthFilter(AuthenticationManager authenticationManager,
-      HttpSessionSecurityContextRepository securityContextRepository,
-      UserMapper userMapper, CompositeSessionAuthenticationStrategy sessionAuthenticationStrategy) {
-
-    return new CustomAuthenticationFilter(
-        authenticationManager, securityContextRepository, userMapper,
-        sessionAuthenticationStrategy);
-  }
-  @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
-  }
-
-  @Bean
-  public HttpSessionEventPublisher httpSessionEventPublisher() {
-    return new HttpSessionEventPublisher();
+  public AuthenticationManager authenticationManager(
+      List<AuthenticationProvider> authenticationProviders) {
+    return new ProviderManager(authenticationProviders);
   }
 
   @Bean
   public RoleHierarchy roleHierarchy() {
-    return RoleHierarchyImpl.fromHierarchy(
-        "ROLE_ADMIN > ROLE_CHANNEL_MANAGER\n" +
-            "ROLE_CHANNEL_MANAGER > ROLE_USER"
-    );
+    return RoleHierarchyImpl.withDefaultRolePrefix()
+        .role(Role.ADMIN.name())
+        .implies(Role.USER.name(), Role.CHANNEL_MANAGER.name())
+
+        .role(Role.CHANNEL_MANAGER.name())
+        .implies(Role.USER.name())
+
+        .build();
   }
-
-  @Bean
-  public CompositeSessionAuthenticationStrategy sessionAuthenticationStrategy() {
-    ConcurrentSessionControlAuthenticationStrategy concurrentStrategy =
-        new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry());
-    concurrentStrategy.setMaximumSessions(1);
-    concurrentStrategy.setExceptionIfMaximumExceeded(false);
-
-    return new CompositeSessionAuthenticationStrategy(Arrays.asList(
-        concurrentStrategy,
-        new SessionFixationProtectionStrategy(),
-        new RegisterSessionAuthenticationStrategy(sessionRegistry())
-    ));
-  }
-
-  @Bean
-  public PersistentTokenRepository tokenRepository(DataSource dataSource) {
-    JdbcTokenRepositoryImpl repository = new JdbcTokenRepositoryImpl();
-    repository.setDataSource(dataSource);
-    return repository;
-  }
-
-  @Bean
-  public RememberMeServices rememberMeServices(UserDetailsService userDetailsService,
-      PersistentTokenRepository tokenRepository) {
-    PersistentTokenBasedRememberMeServices services =
-        new PersistentTokenBasedRememberMeServices("remember-me-key", userDetailsService, tokenRepository);
-    services.setTokenValiditySeconds(60 * 60 * 24 * 21);
-    services.setAlwaysRemember(false);
-    return services;
-  }
-
 }

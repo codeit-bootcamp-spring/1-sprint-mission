@@ -1,44 +1,40 @@
-# ==========================
-# Stage 1: Build
-# ==========================
-FROM gradle:8.12.1-jdk17 AS builder
+# 빌드 스테이지
+FROM amazoncorretto:17 AS builder
 
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 빌드 캐시 최적화를 위해 의존성 먼저 복사
-COPY gradlew .
-COPY gradle/ gradle/
-COPY build.gradle .
-COPY settings.gradle .
+# Gradle Wrapper 파일 먼저 복사
+COPY gradle ./gradle
+COPY gradlew ./gradlew
 
-# 의존성만 미리 받아두기
-RUN ./gradlew dependencies --no-daemon
+# Gradle 캐시를 위한 의존성 파일 복사
+COPY build.gradle settings.gradle ./
 
-# 프로젝트 소스 복사 (불필요한 파일은 .dockerignore에서 제외!)
-COPY . .
+# 의존성 다운로드
+RUN ./gradlew dependencies
 
-# 실제 빌드 수행
-RUN ./gradlew clean build -x test --no-daemon
+# 소스 코드 복사 및 빌드
+COPY src ./src
+RUN ./gradlew build -x test
 
-# ==========================
-# Stage 2: Runtime
-# ==========================
-FROM amazoncorretto:17
+
+# 런타임 스테이지
+FROM amazoncorretto:17-alpine3.21
 
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 환경 변수 설정: 프로젝트 정보
-ENV PROJECT_NAME=discodeit
-ENV PROJECT_VERSION=1.2-M8
-ENV JVM_OPTS=""
+# 프로젝트 정보를 ENV로 설정
+ENV PROJECT_NAME=discodeit \
+    PROJECT_VERSION=1.2-M8 \
+    JVM_OPTS=""
 
-# 빌드 결과물만 복사
-COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
+# 빌드 스테이지에서 jar 파일만 복사
+COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
 
-# 포트 80 노출
+# 80 포트 노출
 EXPOSE 80
 
-# 애플리케이션 실행
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+# jar 파일 실행
+ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]

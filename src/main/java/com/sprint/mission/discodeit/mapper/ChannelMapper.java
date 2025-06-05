@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.time.Instant;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,7 +21,6 @@ public abstract class ChannelMapper {
   private MessageRepository messageRepository;
   @Autowired
   private ReadStatusRepository readStatusRepository;
-
   @Autowired
   private UserMapper userMapper;
 
@@ -29,20 +28,21 @@ public abstract class ChannelMapper {
   @Mapping(target = "lastMessageAt", expression = "java(resolveLastMessageAt(channel))")
   abstract public ChannelDto toDto(Channel channel);
 
-
   protected Instant resolveLastMessageAt(Channel channel) {
-    return messageRepository.findByChannelId(channel.getId())
-        .stream()
-        .max(Comparator.comparing(BaseEntity::getCreatedAt))
-        .map(BaseEntity::getCreatedAt)
+    return messageRepository.findLastMessageAtByChannelId(
+            channel.getId())
         .orElse(Instant.MIN);
   }
 
   protected List<UserDto> resolveParticipants(Channel channel) {
-    return readStatusRepository.findByChannelId(channel.getId())
-        .stream()
-        .map(ReadStatus::getUser)
-        .map(userMapper::toDto)
-        .toList();
+    List<UserDto> participants = new ArrayList<>();
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
+      readStatusRepository.findAllByChannelIdWithUser(channel.getId())
+          .stream()
+          .map(ReadStatus::getUser)
+          .map(userMapper::toDto)
+          .forEach(participants::add);
+    }
+    return participants;
   }
 }
