@@ -128,7 +128,7 @@ public class JwtService {
                 .ifPresent(session -> {
                     Claims claims = getClaims(session.getAccessToken());
                     long exp = claims.getExpiration().getTime();
-                    jwtBlacklist.blacklist(session.getAccessToken(), exp);
+                    jwtBlacklist.addToBlacklist(session.getAccessToken(), exp);
 
                     jwtSessionRepository.delete(session);
                 });

@@ -11,7 +11,7 @@ public class JwtBlacklist {
 
     private final Map<String, Long> blacklist = new ConcurrentHashMap<>();
 
-    public void blacklist(String token, long expirationMs) {
+    public void addToBlacklist(String token, long expirationMs) {
         blacklist.put(token, expirationMs);
     }
 

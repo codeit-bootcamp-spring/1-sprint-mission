@@ -27,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -96,48 +97,22 @@ public class AuthController {
     }*/
 
     @GetMapping("/me")
-    public ResponseEntity<String> getAccessTokenFromRefreshToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No cookies found");
-        }
-
-        String refreshToken = null;
-        for (Cookie cookie : cookies) {
-            if ("refresh_token".equals(cookie.getName())) {
-                refreshToken = cookie.getValue();
-                break;
-            }
-        }
-
+    public ResponseEntity<String> getAccessTokenFromRefreshToken(
+            @CookieValue(value = "refresh_token") String refreshToken) {
         if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No refresh token found");
         }
 
         Optional<String> accessToken = jwtService.getAccessTokenByRefreshToken(refreshToken);
 
-        if (accessToken.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
-        }
+        return accessToken.map(ResponseEntity::ok).orElseGet(
+                () -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token"));
 
-        return ResponseEntity.ok(accessToken.get());
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        String refreshToken = null;
-        for (Cookie cookie : cookies) {
-            if ("refresh_token".equals(cookie.getName())) {
-                refreshToken = cookie.getValue();
-                break;
-            }
-        }
-
+    public ResponseEntity<Void> logout(@CookieValue(value = "refresh_token") String refreshToken,
+            HttpServletResponse response) {
         if (refreshToken == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -153,20 +128,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No cookies found");
-        }
-
-        String refreshToken = null;
-        for (Cookie cookie : cookies) {
-            if ("refresh_token".equals(cookie.getName())) {
-                refreshToken = cookie.getValue();
-                break;
-            }
-        }
-
+    public ResponseEntity<?> refresh(@CookieValue(value = "refresh_token") String refreshToken,
+            HttpServletResponse response) {
         if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No refresh token found");
         }
@@ -202,7 +165,7 @@ public class AuthController {
                 .ifPresent(session -> {
                     Claims claims = jwtService.getClaims(session.getAccessToken());
                     long exp = claims.getExpiration().getTime();
-                    jwtBlacklist.blacklist(session.getAccessToken(), exp);
+                    jwtBlacklist.addToBlacklist(session.getAccessToken(), exp);
                     jwtSessionRepository.delete(session);
                 });
 
