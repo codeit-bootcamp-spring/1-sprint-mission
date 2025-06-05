@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.security.jwt;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,14 +27,17 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
     void revokeAllSessionsByUserId(@Param("userId") UUID userId);
 
     @Query("SELECT DISTINCT js.userId FROM JwtSession js " +
-        "WHERE js.accessTokenExpiresAt > CURRENT_TIMESTAMP " +
+        "WHERE js.accessTokenExpiresAt > :currentTime " +
         "AND js.revoked = false")
-    Set<UUID> findUserIdsWithActiveAccessTokens();
+    Set<UUID> findUserIdsWithActiveAccessTokens(@Param("currentTime") Instant currentTime);
 
     @Query("SELECT js FROM JwtSession js " +
         "WHERE js.userId = :userId " +
-        "AND js.accessTokenExpiresAt > CURRENT_TIMESTAMP " +
+        "AND js.accessTokenExpiresAt > :currentTime " +
         "AND js.revoked = false")
-    List<JwtSession> findActiveSessionsByUserId(@Param("userId") UUID userId);
+    List<JwtSession> findActiveSessionsByUserId(
+        @Param("userId") UUID userId,
+        @Param("currentTime") Instant currentTime
+    );
 
 }

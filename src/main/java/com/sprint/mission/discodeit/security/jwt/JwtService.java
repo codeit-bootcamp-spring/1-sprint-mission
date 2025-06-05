@@ -67,7 +67,7 @@ public class JwtService {
 
         // 동시 로그인 제한
         List<JwtSession> activeSessions = jwtSessionRepository.findActiveSessionsByUserId(
-            userResponse.id());
+            userResponse.id(), Instant.now());
         if (!activeSessions.isEmpty()) {
             activeSessions.forEach(JwtSession::revoke);
         }

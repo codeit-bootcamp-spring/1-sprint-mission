@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,7 +68,8 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserResponse> findAll() {
 
-        Set<UUID> onlineUserIds = jwtSessionRepository.findUserIdsWithActiveAccessTokens();
+        Set<UUID> onlineUserIds = jwtSessionRepository.findUserIdsWithActiveAccessTokens(
+            Instant.now());
 
         List<UserResponse> userResponses = userRepository.findAll().stream()
             .map(user -> userMapper.entityToDto(user, onlineUserIds.contains(user.getId())))
