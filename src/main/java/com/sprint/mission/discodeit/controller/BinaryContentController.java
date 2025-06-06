@@ -22,44 +22,40 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/binaryContents")
 public class BinaryContentController implements BinaryContentApi {
 
-  private final BinaryContentService binaryContentService;
-  private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
-  @GetMapping(path = "{binaryContentId}")
-  public ResponseEntity<BinaryContentDto> find(
-      @PathVariable("binaryContentId") UUID binaryContentId) {
-    log.debug("Starting find binary content: binaryContentId={}", binaryContentId);
-    BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
+    @GetMapping(path = "{binaryContentId}")
+    public ResponseEntity<BinaryContentDto> find(
+        @PathVariable("binaryContentId") UUID binaryContentId) {
+        log.info("바이너리 컨텐츠 조회 요청: id={}", binaryContentId);
+        BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
+        log.debug("바이너리 컨텐츠 조회 응답: {}", binaryContent);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(binaryContent);
+    }
 
-    log.debug("Completed finding binary content: filename={}, size={}",
-        binaryContent.fileName(), binaryContent.size());
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(binaryContent);
-  }
+    @GetMapping
+    public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
+        @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+        log.info("바이너리 컨텐츠 목록 조회 요청: ids={}", binaryContentIds);
+        List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(
+            binaryContentIds);
+        log.debug("바이너리 컨텐츠 목록 조회 응답: count={}", binaryContents.size());
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(binaryContents);
+    }
 
-  @GetMapping
-  public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
-      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-    log.debug("Starting find all binary contents in list: count={}", binaryContentIds.size());
-    List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-
-    log.debug("Completed finding binary contents in list: requested={}, actual={}",
-        binaryContentIds.size(), binaryContents.size());
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(binaryContents);
-  }
-
-  @GetMapping(path = "{binaryContentId}/download")
-  public ResponseEntity<?> download(
-      @PathVariable("binaryContentId") UUID binaryContentId) {
-    log.info("Starting binary content download: binaryContentId={}", binaryContentId);
-
-    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
-
-    log.info("Processing binary content download: filename={}, size={}",
-        binaryContentDto.fileName(), binaryContentDto.size());
-    return binaryContentStorage.download(binaryContentDto);
-  }
+    @GetMapping(path = "{binaryContentId}/download")
+    public ResponseEntity<?> download(
+        @PathVariable("binaryContentId") UUID binaryContentId) {
+        log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
+        BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+        ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
+        log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}",
+            response.getHeaders().getContentType(), response.getHeaders().getContentLength());
+        return response;
+    }
 }

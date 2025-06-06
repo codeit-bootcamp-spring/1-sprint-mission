@@ -6,19 +6,23 @@ import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.user.UserExceptions;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,24 +37,22 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        log.debug("사용자 생성 시작: {}", userCreateRequest);
+
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
-        log.info("Processing user creation: username={}, email={}", username, email);
-        log.debug("hasProfile={}", optionalProfileCreateRequest.isPresent());
-
         if (userRepository.existsByEmail(email)) {
-            log.warn("User creation failed: email already exists - {}", email);
-            throw UserExceptions.emailAlreadyExists(email);
+            throw UserAlreadyExistsException.withEmail(email);
         }
         if (userRepository.existsByUsername(username)) {
-            log.warn("User creation failed: username already exists - {}", username);
-            throw UserExceptions.userNameAlreadyExists(username);
+            throw UserAlreadyExistsException.withUsername(username);
         }
 
         BinaryContent nullableProfile = optionalProfileCreateRequest
@@ -58,9 +60,6 @@ public class BasicUserService implements UserService {
                 String fileName = profileRequest.fileName();
                 String contentType = profileRequest.contentType();
                 byte[] bytes = profileRequest.bytes();
-
-                log.debug("Generating user profile: filename={}, contentType={}, size={}",
-                    fileName, contentType, bytes.length);
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
@@ -68,69 +67,64 @@ public class BasicUserService implements UserService {
                 return binaryContent;
             })
             .orElse(null);
-
         String password = userCreateRequest.password();
 
         String hashedPassword = passwordEncoder.encode(password);
-        log.debug("Password hashed successfully for user: {}", username);
-
         User user = new User(username, email, hashedPassword, nullableProfile);
-        Instant now = Instant.now();
-        UserStatus userStatus = new UserStatus(user, now);
 
         userRepository.save(user);
-
-        log.info("User created successfully: userId={}, username={}", user.getId(), username);
+        log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
         return userMapper.toDto(user);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserDto find(UUID userId) {
-        log.debug("Finding user by id: {}", userId);
-
-        return userRepository.findById(userId)
-            .map(user -> {
-                log.debug("User found: userId={}, username={}", userId, user.getUsername());
-                return userMapper.toDto(user);
-            })
-            .orElseThrow(() -> {
-                log.warn("User not found: userId={}", userId);
-                return UserExceptions.notFound(userId);
-            });
+        log.debug("사용자 조회 시작: id={}", userId);
+        UserDto userDto = userRepository.findById(userId)
+            .map(userMapper::toDto)
+            .orElseThrow(() -> UserNotFoundException.withId(userId));
+        log.info("사용자 조회 완료: id={}", userId);
+        return userDto;
     }
 
     @Override
     public List<UserDto> findAll() {
-        log.debug("Finding all user");
-        return userRepository.findAllWithProfileAndStatus()
+        log.debug("모든 사용자 조회 시작");
+        Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
+            .map(JwtSession::getUserId)
+            .collect(Collectors.toSet());
+
+        List<UserDto> userDtos = userRepository.findAllWithProfile()
             .stream()
-            .map(userMapper::toDto)
+            .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
             .toList();
+        log.info("모든 사용자 조회 완료: 총 {}명", userDtos.size());
+        return userDtos;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-
-        log.info("Processing user update: userId={}, newUsername={}, newEmail={}",
-            userId, userUpdateRequest.newUsername(), userUpdateRequest.newEmail());
+        log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
-                log.warn("User update failed: user not found - userId={}", userId);
-                return UserExceptions.notFound(userId);
+                UserNotFoundException exception = UserNotFoundException.withId(userId);
+                return exception;
             });
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
+
         if (userRepository.existsByEmail(newEmail)) {
-            log.warn("User update failed: email already exists - {}", newEmail);
-            throw UserExceptions.emailAlreadyExists(newEmail);
+            throw UserAlreadyExistsException.withEmail(newEmail);
         }
+
         if (userRepository.existsByUsername(newUsername)) {
-            log.warn("User update failed: username already exists - {}", newUsername);
-            throw UserExceptions.userNameAlreadyExists(newUsername);
+            throw UserAlreadyExistsException.withUsername(newUsername);
         }
 
         BinaryContent nullableProfile = optionalProfileCreateRequest
@@ -139,9 +133,6 @@ public class BasicUserService implements UserService {
                 String fileName = profileRequest.fileName();
                 String contentType = profileRequest.contentType();
                 byte[] bytes = profileRequest.bytes();
-
-                log.debug("Generating user new profile: filename={}, contentType={}, size={}",
-                    fileName, contentType, bytes.length);
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
@@ -151,28 +142,25 @@ public class BasicUserService implements UserService {
             .orElse(null);
 
         String newPassword = userUpdateRequest.newPassword();
-        String hashedNewPassword = null;
-        if (newPassword != null) {
-            hashedNewPassword = passwordEncoder.encode(newPassword);
-            log.debug("New password hashed successfully for userId: {}", userId);
-        }
-
+        String hashedNewPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
+            .orElse(null);
         user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
-        log.info("User updated successfully: userId={}", userId);
+        log.info("사용자 수정 완료: id={}", userId);
         return userMapper.toDto(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Transactional
     @Override
     public void delete(UUID userId) {
-        log.info("Processing user deletion: userId={}", userId);
+        log.debug("사용자 삭제 시작: id={}", userId);
+
         if (!userRepository.existsById(userId)) {
-            log.warn("User deletion failed: user not found - userId={}", userId);
-            throw UserExceptions.notFound(userId);
+            throw UserNotFoundException.withId(userId);
         }
 
         userRepository.deleteById(userId);
-        log.info("User deleted successfully: userId={}", userId);
+        log.info("사용자 삭제 완료: id={}", userId);
     }
 }

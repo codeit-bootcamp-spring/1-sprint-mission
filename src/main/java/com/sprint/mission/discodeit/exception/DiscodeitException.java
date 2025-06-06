@@ -8,47 +8,35 @@ import lombok.Getter;
 @Getter
 public class DiscodeitException extends RuntimeException {
 
-  private final Instant timestamp;
-  private final ErrorCode errorCode;
-  private final Map<String, Object> details;
+    private final Instant timestamp;
+    private final ErrorCode errorCode;
+    private final Map<String, Object> details;
 
-  public DiscodeitException(ErrorCode errorCode) {
-    super(errorCode.getMessage());
-    this.timestamp = Instant.now();
-    this.errorCode = errorCode;
-    this.details = new HashMap<>();
-  }
+    public DiscodeitException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.timestamp = Instant.now();
+        this.errorCode = errorCode;
+        this.details = new HashMap<>();
+    }
 
-  public DiscodeitException(ErrorCode errorCode, String message) {
-    super(message);
-    this.timestamp = Instant.now();
-    this.errorCode = errorCode;
-    this.details = new HashMap<>();
-  }
+    public DiscodeitException(ErrorCode errorCode, Throwable cause) {
+        super(errorCode.getMessage(), cause);
+        this.timestamp = Instant.now();
+        this.errorCode = errorCode;
+        this.details = new HashMap<>();
+    }
 
-  public DiscodeitException(ErrorCode errorCode, Map<String, Object> details) {
-    super(errorCode.getMessage());
-    this.timestamp = Instant.now();
-    this.errorCode = errorCode;
-    this.details = details;
-  }
+    public DiscodeitException(ErrorCode errorCode, Map<String, Object> details) {
+        this(errorCode);
+        this.details.putAll(details);
+    }
 
-  public DiscodeitException(ErrorCode errorCode, String message, Map<String, Object> details) {
-    super(message);
-    this.timestamp = Instant.now();
-    this.errorCode = errorCode;
-    this.details = details;
-  }
+    public DiscodeitException(ErrorCode errorCode, Map<String, Object> details, Throwable cause) {
+        this(errorCode, cause);
+        this.details.putAll(details);
+    }
 
-
-  /**
-   * @param key
-   * @param value
-   * @return details: 예외 발생 상황에 대한 추가정보를 저장하기 위한 속성
-   */
-  public static Map<String, Object> createDetails(String key, Object value) {
-    Map<String, Object> details = new HashMap<>();
-    details.put(key, value);
-    return details;
-  }
-}
+    public void addDetail(String key, Object value) {
+        this.details.put(key, value);
+    }
+} 

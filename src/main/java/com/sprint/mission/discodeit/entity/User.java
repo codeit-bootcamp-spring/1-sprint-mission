@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,7 +13,6 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "users")
@@ -31,30 +29,16 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", columnDefinition = "uuid")
     private BinaryContent profile;
-    @JsonManagedReference
-    @Setter(AccessLevel.PROTECTED)
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStatus status;
-
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Role role = Role.ROLE_USER;
+    @Column(nullable = false)
+    private Role role;
 
     public User(String username, String email, String password, BinaryContent profile) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.profile = profile;
-        this.role = Role.ROLE_USER;
-    }
-
-    //관리자 생성용 생성자
-    public User(String username, String email, String password, BinaryContent profile, Role role) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.profile = profile;
-        this.role = role;
+        this.role = Role.USER;
     }
 
     public void update(String newUsername, String newEmail, String newPassword,
@@ -74,7 +58,7 @@ public class User extends BaseUpdatableEntity {
     }
 
     public void updateRole(Role newRole) {
-        if (newRole != null && !newRole.equals(this.role)) {
+        if (this.role != newRole) {
             this.role = newRole;
         }
     }

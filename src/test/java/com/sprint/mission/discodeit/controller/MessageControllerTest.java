@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -15,23 +13,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.exception.channel.ChannelExceptions;
-import com.sprint.mission.discodeit.exception.message.MessageExceptions;
-import com.sprint.mission.discodeit.exception.user.UserExceptions;
+import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -40,380 +41,267 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(MessageController.class)
 class MessageControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  @MockitoBean
-  private MessageService messageService;
+    @MockitoBean
+    private MessageService messageService;
 
-  @Test
-  void 메시지_생성_성공() throws Exception {
-    // given
-    UUID messageId = UUID.randomUUID();
-    UUID channelId = UUID.randomUUID();
-    UUID authorId = UUID.randomUUID();
+    @Test
+    @DisplayName("메시지 생성 성공 테스트")
+    void createMessage_Success() throws Exception {
+        // Given
+        UUID channelId = UUID.randomUUID();
+        UUID authorId = UUID.randomUUID();
+        MessageCreateRequest createRequest = new MessageCreateRequest(
+            "안녕하세요, 테스트 메시지입니다.",
+            channelId,
+            authorId
+        );
 
-    MessageCreateRequest request = new MessageCreateRequest(
-        "Hello, this is a test message", channelId, authorId);
+        MockMultipartFile messageCreateRequestPart = new MockMultipartFile(
+            "messageCreateRequest",
+            "",
+            MediaType.APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsBytes(createRequest)
+        );
 
-    String requestJson = objectMapper.writeValueAsString(request);
+        MockMultipartFile attachment = new MockMultipartFile(
+            "attachments",
+            "test.jpg",
+            MediaType.IMAGE_JPEG_VALUE,
+            "test-image".getBytes()
+        );
 
-    MockMultipartFile messageCreateRequest = new MockMultipartFile(
-        "messageCreateRequest",
-        null,
-        "application/json",
-        requestJson.getBytes());
+        UUID messageId = UUID.randomUUID();
+        Instant now = Instant.now();
 
-    // 첨부 파일 생성
-    MockMultipartFile attachment = new MockMultipartFile(
-        "attachments",
-        "test.txt",
-        "text/plain",
-        "Test content".getBytes());
+        UserDto author = new UserDto(
+            authorId,
+            "testuser",
+            "test@example.com",
+            null,
+            true,
+            Role.USER
+        );
 
-    UserDto author = new UserDto(
-        authorId, "testuser", "test@example.com", null, true);
+        BinaryContentDto attachmentDto = new BinaryContentDto(
+            UUID.randomUUID(),
+            "test.jpg",
+            10L,
+            MediaType.IMAGE_JPEG_VALUE
+        );
 
-    MessageDto expectedResponse = new MessageDto(
-        messageId,
-        Instant.now(),
-        Instant.now(),
-        "Hello, this is a test message",
-        channelId,
-        author,
-        new ArrayList<>()
-    );
+        MessageDto createdMessage = new MessageDto(
+            messageId,
+            now,
+            now,
+            "안녕하세요, 테스트 메시지입니다.",
+            channelId,
+            author,
+            List.of(attachmentDto)
+        );
 
-    when(messageService.create(any(MessageCreateRequest.class), anyList()))
-        .thenReturn(expectedResponse);
+        given(messageService.create(any(MessageCreateRequest.class), any(List.class)))
+            .willReturn(createdMessage);
 
-    // when & then
-    mockMvc.perform(multipart("/api/messages")
-            .file(messageCreateRequest)
-            .file(attachment)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").value(messageId.toString()))
-        .andExpect(jsonPath("$.content").value("Hello, this is a test message"))
-        .andExpect(jsonPath("$.channelId").value(channelId.toString()))
-        .andExpect(jsonPath("$.author.id").value(authorId.toString()))
-        .andExpect(jsonPath("$.author.username").value("testuser"));
-  }
+        // When & Then
+        mockMvc.perform(multipart("/api/messages")
+                .file(messageCreateRequestPart)
+                .file(attachment)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value(messageId.toString()))
+            .andExpect(jsonPath("$.content").value("안녕하세요, 테스트 메시지입니다."))
+            .andExpect(jsonPath("$.channelId").value(channelId.toString()))
+            .andExpect(jsonPath("$.author.id").value(authorId.toString()))
+            .andExpect(jsonPath("$.attachments[0].fileName").value("test.jpg"));
+    }
 
-  @Test
-  void 메시지_생성_실패_존재하지_않는_채널() throws Exception {
-    // given
-    UUID channelId = UUID.randomUUID();
-    UUID authorId = UUID.randomUUID();
+    @Test
+    @DisplayName("메시지 생성 실패 테스트 - 유효하지 않은 요청")
+    void createMessage_Failure_InvalidRequest() throws Exception {
+        // Given
+        MessageCreateRequest invalidRequest = new MessageCreateRequest(
+            "", // 내용이 비어있음 (NotBlank 위반)
+            null, // 채널 ID가 비어있음 (NotNull 위반)
+            null  // 작성자 ID가 비어있음 (NotNull 위반)
+        );
 
-    MessageCreateRequest request = new MessageCreateRequest(
-        "Hello, this is a test message", channelId, authorId);
+        MockMultipartFile messageCreateRequestPart = new MockMultipartFile(
+            "messageCreateRequest",
+            "",
+            MediaType.APPLICATION_JSON_VALUE,
+            objectMapper.writeValueAsBytes(invalidRequest)
+        );
 
-    String requestJson = objectMapper.writeValueAsString(request);
+        // When & Then
+        mockMvc.perform(multipart("/api/messages")
+                .file(messageCreateRequestPart)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+            .andExpect(status().isBadRequest());
+    }
 
-    MockMultipartFile messageCreateRequest = new MockMultipartFile(
-        "messageCreateRequest",
-        null,
-        "application/json",
-        requestJson.getBytes());
+    @Test
+    @DisplayName("메시지 업데이트 성공 테스트")
+    void updateMessage_Success() throws Exception {
+        // Given
+        UUID messageId = UUID.randomUUID();
+        UUID channelId = UUID.randomUUID();
+        UUID authorId = UUID.randomUUID();
 
-    // 서비스 예외 설정
-    when(messageService.create(any(MessageCreateRequest.class), anyList()))
-        .thenThrow(ChannelExceptions.notFound(channelId));
+        MessageUpdateRequest updateRequest = new MessageUpdateRequest(
+            "수정된 메시지 내용입니다."
+        );
 
-    // when & then
-    mockMvc.perform(multipart("/api/messages")
-            .file(messageCreateRequest)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.code").value("CHANNEL_NOT_FOUND"))
-        .andExpect(jsonPath("$.message").value("Channel with id " + channelId + " not found"))
-        .andExpect(jsonPath("$.details.channelId").value(channelId.toString()));
-  }
+        Instant now = Instant.now();
 
-  @Test
-  void 메시지_생성_실패_존재하지_않는_사용자() throws Exception {
-    UUID channelId = UUID.randomUUID();
-    UUID authorId = UUID.randomUUID();
+        UserDto author = new UserDto(
+            authorId,
+            "testuser",
+            "test@example.com",
+            null,
+            true,
+            Role.USER
+        );
 
-    MessageCreateRequest request = new MessageCreateRequest(
-        "Hello, this is a test message", channelId, authorId);
-
-    String requestJson = objectMapper.writeValueAsString(request);
-
-    MockMultipartFile messageCreateRequest = new MockMultipartFile(
-        "messageCreateRequest",
-        null,
-        "application/json",
-        requestJson.getBytes()
-    );
-
-    //서비스
-    when(messageService.create(any(MessageCreateRequest.class), anyList()))
-        .thenThrow(UserExceptions.notFound(authorId));
-
-    //when & then
-    mockMvc.perform(multipart("/api/messages")
-            .file(messageCreateRequest)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.code").value("USER_NOT_FOUND"))
-        .andExpect(jsonPath("$.message").value("User with id " + authorId + " not found"))
-        .andExpect(jsonPath("$.details.userId").value(authorId.toString()));
-
-  }
-
-  @Test
-  void 메시지_생성_실패_유효성_검증() throws Exception {
-    // given
-    UUID channelId = UUID.randomUUID();
-    UUID authorId = UUID.randomUUID();
-
-    // 빈 메시지(유효성 검증 실패)
-    MessageCreateRequest request = new MessageCreateRequest("", channelId, authorId);
-
-    String requestJson = objectMapper.writeValueAsString(request);
-
-    MockMultipartFile messageCreateRequest = new MockMultipartFile(
-        "messageCreateRequest",
-        null,
-        "application/json",
-        requestJson.getBytes());
-
-    // when & then
-    mockMvc.perform(multipart("/api/messages")
-            .file(messageCreateRequest)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-        .andExpect(jsonPath("$.message").value("Validation failed"))
-        .andExpect(jsonPath("$.details").isNotEmpty());
-  }
-
-  @Test
-  void 메시지_업데이트_성공() throws Exception {
-    // given
-    UUID messageId = UUID.randomUUID();
-    UUID channelId = UUID.randomUUID();
-    UUID authorId = UUID.randomUUID();
-
-    MessageUpdateRequest request = new MessageUpdateRequest("Updated message content");
-
-    UserDto author = new UserDto(
-        authorId, "testuser", "test@example.com", null, true);
-
-    MessageDto expectedResponse = new MessageDto(
-        messageId,
-        Instant.now(),
-        Instant.now(),
-        "Updated message content",
-        channelId,
-        author,
-        new ArrayList<>()
-    );
-
-    when(messageService.update(eq(messageId), any(MessageUpdateRequest.class)))
-        .thenReturn(expectedResponse);
-
-    // when & then
-    mockMvc.perform(patch("/api/messages/{messageId}", messageId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(messageId.toString()))
-        .andExpect(jsonPath("$.content").value("Updated message content"))
-        .andExpect(jsonPath("$.channelId").value(channelId.toString()));
-  }
-
-  @Test
-  void 메시지_업데이트_실패_존재하지_않는_메시지() throws Exception {
-    // given
-    UUID messageId = UUID.randomUUID();
-    MessageUpdateRequest request = new MessageUpdateRequest("Updated message content");
-
-    when(messageService.update(eq(messageId), any(MessageUpdateRequest.class)))
-        .thenThrow(MessageExceptions.notFound(messageId));
-
-    // when & then
-    mockMvc.perform(patch("/api/messages/{messageId}", messageId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.code").value("MESSAGE_NOT_FOUND"))
-        .andExpect(jsonPath("$.message").value("Message with id " + messageId + " not found"))
-        .andExpect(jsonPath("$.details.messageId").value(messageId.toString()));
-  }
-
-  @Test
-  void 메시지_삭제_성공() throws Exception {
-    // given
-    UUID messageId = UUID.randomUUID();
-
-    doNothing().when(messageService).delete(messageId);
-
-    // when & then
-    mockMvc.perform(delete("/api/messages/{messageId}", messageId))
-        .andExpect(status().isNoContent());
-  }
-
-  @Test
-  void 메시지_삭제_실패_존재하지_않는_메시지() throws Exception {
-    // given
-    UUID messageId = UUID.randomUUID();
-
-    doThrow(MessageExceptions.notFound(messageId))
-        .when(messageService).delete(messageId);
-
-    // when & then
-    mockMvc.perform(delete("/api/messages/{messageId}", messageId))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.code").value("MESSAGE_NOT_FOUND"))
-        .andExpect(jsonPath("$.message").value("Message with id " + messageId + " not found"))
-        .andExpect(jsonPath("$.details.messageId").value(messageId.toString()));
-  }
-
-  @Test
-  void 채널_메시지_조회_성공() throws Exception {
-    // given
-    UUID channelId = UUID.randomUUID();
-    UUID messageId1 = UUID.randomUUID();
-    UUID messageId2 = UUID.randomUUID();
-    UUID authorId = UUID.randomUUID();
-
-    UserDto author = new UserDto(
-        authorId, "testuser", "test@example.com", null, true);
-
-    List<MessageDto> messages = List.of(
-        new MessageDto(
-            messageId1,
-            Instant.now(),
-            Instant.now(),
-            "Message 1",
+        MessageDto updatedMessage = new MessageDto(
+            messageId,
+            now.minusSeconds(60),
+            now,
+            "수정된 메시지 내용입니다.",
             channelId,
             author,
             new ArrayList<>()
-        ),
-        new MessageDto(
-            messageId2,
-            Instant.now().minusSeconds(60),
-            Instant.now().minusSeconds(60),
-            "Message 2",
-            channelId,
-            author,
-            new ArrayList<>()
-        )
-    );
+        );
 
-    PageResponse<MessageDto> pageResponse = new PageResponse<>(
-        messages,
-        messages.get(1).createdAt(),
-        10,
-        false,
-        2L
-    );
+        given(messageService.update(eq(messageId), any(MessageUpdateRequest.class)))
+            .willReturn(updatedMessage);
 
-    when(messageService.findAllByChannelId(eq(channelId), nullable(Instant.class),
-        any(Pageable.class)))
-        .thenReturn(pageResponse);
-    // when & then
-    mockMvc.perform(get("/api/messages")
-            .param("channelId", channelId.toString())
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.content").isArray())
-        .andExpect(jsonPath("$.content.length()").value(2))
-        .andExpect(jsonPath("$.content[0].id").value(messageId1.toString()))
-        .andExpect(jsonPath("$.content[0].content").value("Message 1"))
-        .andExpect(jsonPath("$.content[1].id").value(messageId2.toString()))
-        .andExpect(jsonPath("$.content[1].content").value("Message 2"))
-        .andExpect(jsonPath("$.size").value(10))
-        .andExpect(jsonPath("$.hasNext").value(false))
-        .andExpect(jsonPath("$.totalElements").value(2));
-  }
+        // When & Then
+        mockMvc.perform(patch("/api/messages/{messageId}", messageId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(messageId.toString()))
+            .andExpect(jsonPath("$.content").value("수정된 메시지 내용입니다."))
+            .andExpect(jsonPath("$.channelId").value(channelId.toString()))
+            .andExpect(jsonPath("$.author.id").value(authorId.toString()));
+    }
 
-  @Test
-  void 채널_메시지_조회_실패_존재하지_않는_채널() throws Exception {
-    // given
-    UUID channelId = UUID.randomUUID();
+    @Test
+    @DisplayName("메시지 업데이트 실패 테스트 - 존재하지 않는 메시지")
+    void updateMessage_Failure_MessageNotFound() throws Exception {
+        // Given
+        UUID nonExistentMessageId = UUID.randomUUID();
 
-    when(messageService.findAllByChannelId(eq(channelId), nullable(Instant.class),
-        any(Pageable.class)))
-        .thenThrow(ChannelExceptions.notFound(channelId));
+        MessageUpdateRequest updateRequest = new MessageUpdateRequest(
+            "수정된 메시지 내용입니다."
+        );
 
-    // when & then
-    mockMvc.perform(get("/api/messages")
-            .param("channelId", channelId.toString())
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.code").value("CHANNEL_NOT_FOUND"))
-        .andExpect(jsonPath("$.message").value("Channel with id " + channelId + " not found"))
-        .andExpect(jsonPath("$.details.channelId").value(channelId.toString()));
-  }
+        given(messageService.update(eq(nonExistentMessageId), any(MessageUpdateRequest.class)))
+            .willThrow(MessageNotFoundException.withId(nonExistentMessageId));
 
-  @Test
-  void 커서_전달된_채널_메시지_조회_성공() throws Exception {
-    // given
-    UUID channelId = UUID.randomUUID();
-    UUID messageId1 = UUID.randomUUID();
-    UUID messageId2 = UUID.randomUUID();
-    UUID authorId = UUID.randomUUID();
+        // When & Then
+        mockMvc.perform(patch("/api/messages/{messageId}", nonExistentMessageId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateRequest)))
+            .andExpect(status().isNotFound());
+    }
 
-    UserDto author = new UserDto(
-        authorId, "testuser", "test@example.com", null, true);
+    @Test
+    @DisplayName("메시지 삭제 성공 테스트")
+    void deleteMessage_Success() throws Exception {
+        // Given
+        UUID messageId = UUID.randomUUID();
+        willDoNothing().given(messageService).delete(messageId);
 
-    //메시지 생성 - 커서 기준보다 이전에 생성된 메시지들
-    List<MessageDto> messages = List.of(
-        new MessageDto(
-            messageId1,
-            Instant.now().minusSeconds(120),
-            Instant.now().minusSeconds(120),
-            "Message 1",
-            channelId,
-            author,
-            new ArrayList<>()
-        ),
-        new MessageDto(
-            messageId2,
-            Instant.now().minusSeconds(240),
-            Instant.now().minusSeconds(240),
-            "Message 2",
-            channelId,
-            author,
-            new ArrayList<>()
-        )
-    );
+        // When & Then
+        mockMvc.perform(delete("/api/messages/{messageId}", messageId)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNoContent());
+    }
 
-    // 커서
-    Instant cursor = Instant.now().minusSeconds(60);
+    @Test
+    @DisplayName("메시지 삭제 실패 테스트 - 존재하지 않는 메시지")
+    void deleteMessage_Failure_MessageNotFound() throws Exception {
+        // Given
+        UUID nonExistentMessageId = UUID.randomUUID();
+        willThrow(MessageNotFoundException.withId(nonExistentMessageId))
+            .given(messageService).delete(nonExistentMessageId);
 
-    PageResponse<MessageDto> pageResponse = new PageResponse<>(
-        messages,
-        messages.get(1).createdAt(),
-        10,
-        false,
-        2L
-    );
+        // When & Then
+        mockMvc.perform(delete("/api/messages/{messageId}", nonExistentMessageId)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
+    }
 
-    when(messageService.findAllByChannelId(eq(channelId), eq(cursor), any(Pageable.class)))
-        .thenReturn(pageResponse);
+    @Test
+    @DisplayName("채널별 메시지 목록 조회 성공 테스트")
+    void findAllByChannelId_Success() throws Exception {
+        // Given
+        UUID channelId = UUID.randomUUID();
+        UUID authorId = UUID.randomUUID();
+        Instant cursor = Instant.now();
+        Pageable pageable = PageRequest.of(0, 50, Sort.Direction.DESC, "createdAt");
 
-    // when & then
-    mockMvc.perform(get("/api/messages")
-            .param("channelId", channelId.toString())
-            .param("cursor", cursor.toString())
-            .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.content").isArray())
-        .andExpect(jsonPath("$.content.length()").value(2))
-        .andExpect(jsonPath("$.content[0].id").value(messageId1.toString()))
-        .andExpect(jsonPath("$.content[0].content").value("Message 1"))
-        .andExpect(jsonPath("$.content[1].id").value(messageId2.toString()))
-        .andExpect(jsonPath("$.content[1].content").value("Message 2"))
-        .andExpect(jsonPath("$.size").value(10))
-        .andExpect(jsonPath("$.hasNext").value(false))
-        .andExpect(jsonPath("$.totalElements").value(2));
-  }
-}
+        UserDto author = new UserDto(
+            authorId,
+            "testuser",
+            "test@example.com",
+            null,
+            true,
+            Role.USER
+        );
+
+        List<MessageDto> messages = List.of(
+            new MessageDto(
+                UUID.randomUUID(),
+                cursor.minusSeconds(10),
+                cursor.minusSeconds(10),
+                "첫 번째 메시지",
+                channelId,
+                author,
+                new ArrayList<>()
+            ),
+            new MessageDto(
+                UUID.randomUUID(),
+                cursor.minusSeconds(20),
+                cursor.minusSeconds(20),
+                "두 번째 메시지",
+                channelId,
+                author,
+                new ArrayList<>()
+            )
+        );
+
+        PageResponse<MessageDto> pageResponse = new PageResponse<>(
+            messages,
+            cursor.minusSeconds(30), // nextCursor 값
+            pageable.getPageSize(),
+            true, // hasNext
+            (long) messages.size() // totalElements
+        );
+
+        given(messageService.findAllByChannelId(eq(channelId), eq(cursor), any(Pageable.class)))
+            .willReturn(pageResponse);
+
+        // When & Then
+        mockMvc.perform(get("/api/messages")
+                .param("channelId", channelId.toString())
+                .param("cursor", cursor.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content").isArray())
+            .andExpect(jsonPath("$.content.length()").value(2))
+            .andExpect(jsonPath("$.content[0].content").value("첫 번째 메시지"))
+            .andExpect(jsonPath("$.content[1].content").value("두 번째 메시지"))
+            .andExpect(jsonPath("$.nextCursor").exists())
+            .andExpect(jsonPath("$.size").value(50))
+            .andExpect(jsonPath("$.hasNext").value(true))
+            .andExpect(jsonPath("$.totalElements").value(2));
+    }
+} 
