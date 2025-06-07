@@ -79,12 +79,15 @@ public class BasicMessageService implements MessageService {
                         @Override
                         public void afterCommit() {
                             binaryContentStorage.put(binaryContent.getId(), bytes)
-                                .thenAccept(uuid ->
-                                    binaryContentStatusService.updateBinaryStatus(uuid,
-                                        BinaryContentUploadStatus.SUCCESS))
-                                .exceptionally(ex -> {
-                                    binaryContentStatusService.updateBinaryStatus(binaryContent.getId(),
-                                        BinaryContentUploadStatus.FAILED);
+                                .handle((uuid, ex) -> {
+                                    if (ex != null) {
+                                        binaryContentStatusService.updateBinaryStatus(binaryContent.getId(),
+                                            BinaryContentUploadStatus.FAILED);
+                                        log.error("업로드 실패", ex);
+                                    } else {
+                                        binaryContentStatusService.updateBinaryStatus(uuid,
+                                            BinaryContentUploadStatus.SUCCESS);
+                                    }
                                     return null;
                                 });
                         }

@@ -71,7 +71,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 		}
 		try (OutputStream outputStream = Files.newOutputStream(filePath)) {
 			outputStream.write(bytes);
-			log.info("Local 파일 업로드 성공: {}", filePath.toString());
+			log.info("Local 파일 업로드 성공: {}", filePath);
 		} catch (IOException e) {
 			throw new DiscodeitException(ErrorCode.UPLOAD_FAILED);
 		}
