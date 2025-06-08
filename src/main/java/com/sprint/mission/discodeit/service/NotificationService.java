@@ -5,11 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NotificationService {
-    // 알림 생성
-    // 알림 수정
-    // 알리 삭제
-    // 알림 조회
-    List<NotificationDto> findAll();
+
+    List<NotificationDto> findAll(UUID userId);
 
     void deleteById(UUID notificationId);
 

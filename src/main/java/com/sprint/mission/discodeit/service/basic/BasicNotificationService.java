@@ -23,8 +23,12 @@ public class BasicNotificationService implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationDto> findAll() {
-        return List.of();
+    @PreAuthorize("principal.userDto.id == #userId")
+    public List<NotificationDto> findAll(UUID userId) {
+        log.debug("알림 조회 시작: userId={}", userId);
+        return notificationRepository.findAllByReceiverId(userId).stream()
+            .map(notificationMapper::toDto)
+            .toList();
     }
 
     @Override
