@@ -2,17 +2,23 @@ package com.sprint.mission.discodeit.storage.s3;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -51,9 +57,18 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         this.bucket = bucket;
     }
 
+    @Timed(value = "binary.content.upload.sync", description = "Time taken for synchronous file upload")
     @Override
     public UUID put(UUID binaryContentId, byte[] bytes) {
         String key = binaryContentId.toString();
+
+        //성능 비교를 위한 지연
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         try {
             S3Client s3Client = getS3Client();
 
@@ -72,8 +87,55 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         }
     }
 
+    @Async("fileUploadExecutor")
+    @Timed(value = "binary.content.upload.async", description = "Time taken for asynchronous file upload")
+    @Retryable(
+        retryFor = {Exception.class},
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 2.0)
+    )
+    @Override
+    public CompletableFuture<UUID> putAsync(UUID binaryContentId, byte[] bytes) {
+        log.info("비동기 S3 파일 업로드 시작: id={}", binaryContentId);
+
+        String key = binaryContentId.toString();
+
+        //성능 비교를 위한 지연
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        try {
+            S3Client s3Client = getS3Client();
+
+            PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+            s3Client.putObject(request, RequestBody.fromBytes(bytes));
+            log.info("비동기 S3 파일 업로드 성공: {}", key);
+
+            return CompletableFuture.completedFuture(binaryContentId);
+        } catch (S3Exception e) {
+            log.error("비동기 S3 파일 업로드 실패: {}", e.getMessage());
+            throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
+        }
+    }
+
+    @Recover
+    public CompletableFuture<UUID> recoverFromUploadFailure(Exception ex, UUID binaryContentId,
+        byte[] bytes) {
+        log.error("모든 재시도 실패, 복구 로직 수행: id={}", binaryContentId, ex);
+        return CompletableFuture.failedFuture(ex);
+    }
+
+
     @Override
     public InputStream get(UUID binaryContentId) {
+
         String key = binaryContentId.toString();
         try {
             S3Client s3Client = getS3Client();
