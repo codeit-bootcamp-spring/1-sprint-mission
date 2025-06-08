@@ -15,11 +15,12 @@ CREATE TABLE users
 -- BinaryContent
 CREATE TABLE binary_contents
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    varchar(255)             NOT NULL,
-    size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
+    id            uuid PRIMARY KEY,
+    created_at    timestamp with time zone NOT NULL,
+    file_name     varchar(255)             NOT NULL,
+    size          bigint                   NOT NULL,
+    content_type  varchar(100)             NOT NULL,
+    upload_status varchar(20)              NOT NULL DEFAULT 'WAITING'
 --     ,bytes        bytea        NOT NULL
 );
 
@@ -64,6 +65,15 @@ CREATE TABLE read_statuses
     channel_id   uuid                     NOT NULL,
     last_read_at timestamp with time zone NOT NULL,
     UNIQUE (user_id, channel_id)
+);
+
+CREATE TABLE async_task_failures
+(
+    id             uuid PRIMARY KEY,
+    created_at     timestamp with time zone NOT NULL,
+    task_name      varchar(100)             NOT NULL,
+    request_id     varchar(50),
+    failure_reason varchar(1000)            NOT NULL
 );
 
 
