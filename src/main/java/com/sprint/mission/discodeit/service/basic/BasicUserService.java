@@ -13,8 +13,10 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.service.AsyncUploadService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +28,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +42,10 @@ public class BasicUserService implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AsyncUploadService asyncUploadService;
 
+
+    @Timed(value = "user.create.async", description = "Time taken for creation with async upload")
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
@@ -63,7 +70,17 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+
+                //트랜잭션 커밋 후 비동기 업로드 실행
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            asyncUploadService.uploadFileAsync(binaryContent.getId(), bytes);
+                        }
+                    }
+                );
+
                 return binaryContent;
             })
             .orElse(null);
@@ -104,6 +121,7 @@ public class BasicUserService implements UserService {
     }
 
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
+    @Timed(value = "user.update.async", description = "Time taken for update with async upload")
     @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
@@ -136,7 +154,17 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+
+                //트랜잭션 커밋 후 비동기 업로드 실행
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            asyncUploadService.uploadFileAsync(binaryContent.getId(), bytes);
+                        }
+                    }
+                );
+                
                 return binaryContent;
             })
             .orElse(null);
