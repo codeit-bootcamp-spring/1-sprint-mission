@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.config;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -13,6 +14,7 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
 @EnableRetry
 public class AsyncConfig {
 
+    @Bean(name = "fileUploadExecutor")
     public Executor fileUploadExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
