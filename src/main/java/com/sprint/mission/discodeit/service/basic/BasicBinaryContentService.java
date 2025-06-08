@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.AsyncUploadService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +56,31 @@ public class BasicBinaryContentService implements BinaryContentService {
         );
 
         log.info("바이너리 컨텐츠 생성 완료: id={}, fileName={}, size={}",
+            binaryContent.getId(), fileName, bytes.length);
+        return binaryContentMapper.toDto(binaryContent);
+    }
+
+    // 동기 처리 메서드
+    @Transactional
+    @Timed(value = "binary.content.upload.sync", description = "동기 파일 업로드 성능 측정")
+    public BinaryContentDto createSync(BinaryContentCreateRequest request) {
+        log.debug("동기 바이너리 컨텐츠 생성 시작: fileName={}, size={}, contentType={}",
+            request.fileName(), request.bytes().length, request.contentType());
+
+        String fileName = request.fileName();
+        byte[] bytes = request.bytes();
+        String contentType = request.contentType();
+        BinaryContent binaryContent = new BinaryContent(
+            fileName,
+            (long) bytes.length,
+            contentType
+        );
+        binaryContentRepository.save(binaryContent);
+
+        binaryContentStorage.put(binaryContent.getId(), bytes);
+        binaryContent.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
+
+        log.info("동기 바이너리 컨텐츠 생성 완료: id={}, fileName={}, size={}",
             binaryContent.getId(), fileName, bytes.length);
         return binaryContentMapper.toDto(binaryContent);
     }

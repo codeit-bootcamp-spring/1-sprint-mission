@@ -27,9 +27,11 @@ public class SecurityMatchers {
     public static final RequestMatcher DOWNLOAD = new AntPathRequestMatcher(
         "/api/binaryContents/*/download", HttpMethod.GET.name()
     );
+    public static final RequestMatcher PERFORMANCE_TEST = new AntPathRequestMatcher(
+        "/api/performance-test/**");
 
     public static final RequestMatcher[] PUBLIC_MATCHERS = new RequestMatcher[]{
-        NON_API, GET_CSRF_TOKEN, SIGN_UP, LOGIN, LOGOUT, ME, REFRESH, DOWNLOAD
+        NON_API, GET_CSRF_TOKEN, SIGN_UP, LOGIN, LOGOUT, ME, REFRESH, DOWNLOAD, PERFORMANCE_TEST
     };
 
 }
