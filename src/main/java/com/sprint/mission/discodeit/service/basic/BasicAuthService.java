@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.event.UserRoleUpdateEvent;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class BasicAuthService implements AuthService {
 	private final UserMapper userMapper;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	@Override
@@ -62,8 +65,9 @@ public class BasicAuthService implements AuthService {
 		UUID userId = request.userId();
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> UserNotFoundException.withId(userId));
-		user.updateRole(request.newRole());
-
+		Role newRole = request.newRole();
+		user.updateRole(newRole);
+		eventPublisher.publishEvent(new UserRoleUpdateEvent(userId, newRole));
 		jwtService.invalidateJwtSession(user.getId());
 		return userMapper.toDto(user);
 	}

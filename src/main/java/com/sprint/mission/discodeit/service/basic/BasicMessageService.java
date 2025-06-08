@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,6 +52,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final PageResponseMapper pageResponseMapper;
     private final BinaryContentStatusService binaryContentStatusService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Timed(value = "message.create", description = "메시지 생성 시간")
     @Transactional
@@ -104,8 +107,8 @@ public class BasicMessageService implements MessageService {
             author,
             attachments
         );
-
         messageRepository.save(message);
+        eventPublisher.publishEvent(new MessageCreatedEvent(channelId, content));
         log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
         return messageMapper.toDto(message);
     }

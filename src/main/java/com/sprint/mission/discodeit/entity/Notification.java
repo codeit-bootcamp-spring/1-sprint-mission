@@ -5,11 +5,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,17 +18,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notification extends BaseUpdatableEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "receiver_id", columnDefinition = "uuid", nullable = false)
-    private User receiver;
+    @Column(name = "receiver_id", columnDefinition = "uuid", nullable = false)
+    private UUID receiverId;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private NotificationType notificationType;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "target_id", columnDefinition = "uuid", nullable = false)
-    private Channel target;
+    @Column(name = "target_id", columnDefinition = "uuid")
+    private UUID targetId;
     @Column(length = 50)
     private String title;
     @Column(columnDefinition = "text")
     private String content;
+
+    @Builder
+    public Notification(UUID receiverId, NotificationType notificationType, UUID targetId, String title,
+        String content) {
+        this.receiverId = receiverId;
+        this.notificationType = notificationType;
+        this.targetId = targetId;
+        this.title = title;
+        this.content = content;
+    }
 }
