@@ -37,6 +37,8 @@ public enum ErrorCode {
 	TOKEN_NOT_FOUND("토큰을 찾을 수 없습니다."),
 
 	UPLOAD_FAILED("파일 업로드에 실패했습니다."),
+
+	NOTIFICATION_NOT_FOUND("알림을 찾을 수 없습니다."),
 	;
 
 	private final String message;
