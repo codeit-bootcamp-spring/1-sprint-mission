@@ -18,8 +18,10 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.AsyncUploadService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -44,7 +48,9 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentRepository binaryContentRepository;
     private final PageResponseMapper pageResponseMapper;
+    private final AsyncUploadService asyncUploadService;
 
+    @Timed(value = "message.create.async", description = "Time taken for message creation with async upload")
     @Transactional
     @Override
     public MessageDto create(MessageCreateRequest messageCreateRequest,
@@ -67,7 +73,17 @@ public class BasicMessageService implements MessageService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+
+                //트랜잭션 커밋 후 비동기 업로드 실행
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            asyncUploadService.uploadFileAsync(binaryContent.getId(), bytes);
+                        }
+                    }
+                );
+                
                 return binaryContent;
             })
             .toList();
