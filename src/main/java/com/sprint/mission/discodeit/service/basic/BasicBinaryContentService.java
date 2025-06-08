@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.AsyncUploadService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentStorage binaryContentStorage;
+    private final AsyncUploadService asyncUploadService;
 
     @Transactional
     @Override
@@ -39,7 +43,15 @@ public class BasicBinaryContentService implements BinaryContentService {
             contentType
         );
         binaryContentRepository.save(binaryContent);
-        binaryContentStorage.put(binaryContent.getId(), bytes);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    asyncUploadService.uploadFileAsync(binaryContent.getId(), bytes);
+                }
+            }
+        );
 
         log.info("바이너리 컨텐츠 생성 완료: id={}, fileName={}, size={}",
             binaryContent.getId(), fileName, bytes.length);
