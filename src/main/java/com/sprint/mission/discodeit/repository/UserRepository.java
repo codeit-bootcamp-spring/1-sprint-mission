@@ -11,27 +11,26 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-  @EntityGraph(attributePaths = {"status", "profile"})
+  @EntityGraph(attributePaths = {"profile"})
   void removeUserById(UUID id);
 
-  @EntityGraph(attributePaths = {"status"})
   @NonNull
   List<User> findAll();
 
-  @EntityGraph(attributePaths = {"status", "profile"})
+  @EntityGraph(attributePaths = {"profile"})
   @NonNull
   Optional<User> findById(@NonNull UUID userId);
 
-  @EntityGraph(attributePaths = {"status", "profile"})
+  @EntityGraph(attributePaths = {"profile"})
   List<User> findByIdIn(List<UUID> participantIds);
 
-  @Query("select u from User u left join fetch u.status left join fetch u.profile")
+  @Query("select u from User u left join fetch u.profile")
   List<User> findUsers();
 
-  @EntityGraph(attributePaths = {"status", "profile"})
+  @EntityGraph(attributePaths = {"profile"})
   User findUserByUsername(String username);
 
-  @EntityGraph(attributePaths = {"status", "profile"})
+  @EntityGraph(attributePaths = {"profile"})
   User findUserByEmail(String email);
 
   boolean existsByUsername(String username);
