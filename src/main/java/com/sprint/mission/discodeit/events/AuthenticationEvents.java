@@ -8,16 +8,16 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class AuthenticationEvent {
+public class AuthenticationEvents {
 
   @EventListener
   public void onSuccess(AuthenticationSuccessEvent authenticationSuccessEvent) {
-    log.info("인증 성공: {}", authenticationSuccessEvent.getAuthentication().getName());
+    log.info("로그인 성공: {}", authenticationSuccessEvent.getAuthentication().getName());
   }
 
   @EventListener
   public void onFailure(AbstractAuthenticationFailureEvent failureEvent) {
-    log.error("인증 실패: {}, {}", failureEvent.getAuthentication().getName(),
+    log.error("로그인 실패: {}, {}", failureEvent.getAuthentication().getName(),
         failureEvent.getException().getMessage());
   }
 }
