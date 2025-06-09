@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.response.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.message.MessageContentUpdateRequest;
 import com.sprint.mission.discodeit.entity.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.events.NotiMessageEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.ChannelAuthorNotFoundException;
@@ -15,8 +17,10 @@ import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.entitymapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.entitymapper.PageResponseMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -28,6 +32,8 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -46,21 +52,24 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
+  private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final PageResponseMapper<MessageDto> mapper = new PageResponseMapper<>();
+  private final MessageMapper messageMapper;
+  private final ApplicationEventPublisher eventPublisher;
+  private final ReadStatusRepository readStatusRepository;
 
   /**
    * 메세지 만들기
    */
+  @CacheEvict(cacheNames = "noti", allEntries = true)
   @Override
-  public MessageDto create(MessageCreateRequest request,
-      List<MultipartFile> attachments) {
+  public MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments) {
 
     if (request.authorId() == null) {
       log.error("잘못된 유저 접근");
       throw new ChannelAuthorNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
-          Map.of(request.channelId().toString(), ErrorCode.USER_NOT_FOUND.getMessage())
-      );
+          Map.of(request.channelId().toString(), ErrorCode.USER_NOT_FOUND.getMessage()));
     }
 
     Channel findChannel = getChannel(request);
@@ -70,11 +79,28 @@ public class BasicMessageService implements MessageService {
     Message message = createMessage(request, findChannel, findUser);
     message.attachFiles(files);
     messageRepository.save(message);
-
     uploadFiles(attachments, files);
 
+    sendNotification(request, message);
+
     log.info("메세지 전송: {}", message.getId());
-    return MessageMapper.toDto(message);
+    return messageMapper.toDto(message);
+  }
+
+  /**
+   * @methodName : sendNotification
+   * @date : 2025. 6. 5. 10:36
+   * @author : wongil
+   * @Description: 알림 발송
+   **/
+  private void sendNotification(MessageCreateRequest request, Message message) {
+    log.info("🔔 이벤트 발행 시도: authorId={}, channelId={}, content={}",
+        request.authorId(), request.channelId(), message.getContent());
+
+    eventPublisher.publishEvent(
+        new NotiMessageEvent(request.authorId(), request.channelId(), message.getContent()));
+    
+    log.info("✅ 이벤트 발행 완료");
   }
 
 
@@ -103,8 +129,7 @@ public class BasicMessageService implements MessageService {
     if (!messageRepository.existsById(messageId)) {
       log.error("메세지 삭제 실패: {}", messageId);
       throw new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND,
-          Map.of(messageId.toString(), ErrorCode.MESSAGE_NOT_FOUND.getMessage())
-      );
+          Map.of(messageId.toString(), ErrorCode.MESSAGE_NOT_FOUND.getMessage()));
     }
 
     messageRepository.deleteById(messageId);
@@ -116,50 +141,45 @@ public class BasicMessageService implements MessageService {
    */
   @Override
   public MessageDto update(UUID messageId, MessageContentUpdateRequest request) {
-    Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> {
-          log.error("존재하지 않은 메세지 삭제");
-          return new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND,
-              Map.of(messageId.toString(), ErrorCode.MESSAGE_NOT_FOUND.getMessage())
-          );
-        });
+    Message message = messageRepository.findById(messageId).orElseThrow(() -> {
+      log.error("존재하지 않은 메세지 삭제");
+      return new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND,
+          Map.of(messageId.toString(), ErrorCode.MESSAGE_NOT_FOUND.getMessage()));
+    });
 
     message.updateContent(request.newContent());
     log.info("메세지 수정: {}", message.getId());
 
-    return MessageMapper.toDto(message);
+    return messageMapper.toDto(message);
   }
 
   /**
    * pageRequest 얻기
    */
   private static PageRequest getPageRequest(Pageable pageable) {
-    return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-        pageable.getSort());
+    return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
   }
 
   // 파일 업로드
-  private void uploadFiles(List<MultipartFile> attachments,
-      List<BinaryContent> files) {
+  private void uploadFiles(List<MultipartFile> attachments, List<BinaryContent> files) {
     if (attachments != null) {
       attachments.forEach(file -> files.forEach(bin -> {
-            try {
-              binaryContentStorage.put(bin.getId(), file.getBytes());
-              log.info("파일 업로드: {}", bin.getFileName());
-            } catch (IOException e) {
-              log.error("업로드 실패: {}", bin.getFileName());
-              throw new RuntimeException(e);
-            }
-          })
-      );
+        try {
+          binaryContentStorage.put(bin.getId(), file.getBytes());
+          bin.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
+          log.info("파일 업로드: {}", bin.getFileName());
+        } catch (IOException e) {
+          log.error("업로드 실패: {}", bin.getFileName());
+          bin.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+          throw new RuntimeException(e);
+        }
+      }));
     }
   }
 
   private PageImpl<MessageDto> convertToMessageDto(Pageable pageable,
       Slice<Message> pagedMessages) {
-    List<MessageDto> messageDtos = pagedMessages.stream()
-        .map(MessageMapper::toDto)
-        .toList();
+    List<MessageDto> messageDtos = pagedMessages.stream().map(messageMapper::toDto).toList();
 
     return new PageImpl<>(messageDtos, pageable, 0);
   }
@@ -172,38 +192,31 @@ public class BasicMessageService implements MessageService {
     if (attachments == null) {
       files = new ArrayList<>();
     } else {
-      files = attachments.stream()
-          .map(file -> new BinaryContent(file.getOriginalFilename(), file.getSize(),
-              file.getContentType()))
-          .toList();
+      files = attachments.stream().map(
+          file -> new BinaryContent(file.getOriginalFilename(), file.getSize(),
+              file.getContentType(), BinaryContentUploadStatus.WATING)).toList();
     }
     return files;
   }
 
   private Message createMessage(MessageCreateRequest request, Channel findChannel, User findUser) {
-    return Message.builder()
-        .content(request.content())
-        .channel(findChannel)
-        .author(findUser)
+    return Message.builder().content(request.content()).channel(findChannel).author(findUser)
         .build();
   }
 
   private User getUser(MessageCreateRequest request) {
-    return userRepository.findById(request.authorId())
-        .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
-            Map.of(request.authorId().toString(), ErrorCode.USER_NOT_FOUND.getMessage())
-        ));
+    return userRepository.findById(request.authorId()).orElseThrow(
+        () -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
+            Map.of(request.authorId().toString(), ErrorCode.USER_NOT_FOUND.getMessage())));
   }
 
   private Channel getChannel(MessageCreateRequest request) {
-    return channelRepository.findById(request.channelId())
-        .orElseThrow(() -> {
-          log.error("존재하지 않는 채널: {}", request.channelId());
+    return channelRepository.findById(request.channelId()).orElseThrow(() -> {
+      log.error("존재하지 않는 채널: {}", request.channelId());
 
-          return new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND,
-              Map.of(request.channelId().toString(), ErrorCode.CHANNEL_NOT_FOUND.getMessage())
-          );
-        });
+      return new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND,
+          Map.of(request.channelId().toString(), ErrorCode.CHANNEL_NOT_FOUND.getMessage()));
+    });
   }
 
   // 커서 기반 페이징
@@ -223,17 +236,10 @@ public class BasicMessageService implements MessageService {
       content = content.subList(0, content.size() - 1);
     }
 
-    List<MessageDto> messageDtos = content.stream()
-        .map(MessageMapper::toDto)
-        .toList();
+    List<MessageDto> messageDtos = content.stream().map(messageMapper::toDto).toList();
 
-    return PageResponse.<MessageDto>builder()
-        .content(messageDtos)
-        .nextCursor(nextCursor)
-        .size(pageRequest.getPageSize())
-        .hasNext(hasNext)
-        .totalElements(totalCount)
-        .build();
+    return PageResponse.<MessageDto>builder().content(messageDtos).nextCursor(nextCursor)
+        .size(pageRequest.getPageSize()).hasNext(hasNext).totalElements(totalCount).build();
   }
 
   // 일반 페이징

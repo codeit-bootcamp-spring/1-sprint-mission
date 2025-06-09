@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.message.Message;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -15,11 +17,16 @@ public interface MessageRepository extends JpaRepository<Message, UUID>, Message
 
   @Override
   @NonNull
-  @EntityGraph(attributePaths = {"channel", "author", "author.profile", "attachments",
-      "author.status"})
+  @EntityGraph(attributePaths = {"channel", "author", "author.profile", "attachments"})
   Optional<Message> findById(@NonNull UUID uuid);
 
   @EntityGraph(attributePaths = {"attachments"})
   @Override
   void deleteById(@NonNull UUID messageId);
+
+  void deleteAllByauthor_id(UUID authorId);
+
+  boolean existsByidAndAuthor_Id(UUID id, UUID authorId);
+
+  List<Message> findAllByAuthor_IdAndChannel_IdIn(UUID authorId, Collection<UUID> channelIds);
 }

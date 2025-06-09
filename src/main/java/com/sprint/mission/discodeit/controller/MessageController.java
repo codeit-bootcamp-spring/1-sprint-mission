@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.response.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.message.MessageContentUpdateRequest;
 import com.sprint.mission.discodeit.entity.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.security.AuthorizationChecker;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +15,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController {
 
   private final MessageService messageService;
+  private final AuthorizationChecker authorizationChecker;
 
   /**
    * 메세지 생성
@@ -67,6 +71,7 @@ public class MessageController {
    * 메세지 삭제
    */
   @Operation(summary = "메세지 삭제")
+  @PreAuthorize("hasRole('ADMIN') or @authorizationChecker.isMessageAuthor(#messageId, authentication.principal.id)")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/{messageId}")
   public String deleteMessage(@NotNull @PathVariable("messageId") UUID messageId) {
@@ -80,8 +85,10 @@ public class MessageController {
    * 메세지 내용 수정
    */
   @Operation(summary = "메세지 수정")
+  @PreAuthorize("@authorizationChecker.isMessageAuthor(#messageId, authentication.principal.id)")
   @PatchMapping("/{messageId}")
-  public MessageDto updateMessage(@NotNull @PathVariable("messageId") UUID messageId,
+  public MessageDto updateMessage(
+      @NotNull @P("messageId") @PathVariable("messageId") UUID messageId,
       @Validated @RequestBody MessageContentUpdateRequest request) {
 
     return messageService.update(messageId, request);
