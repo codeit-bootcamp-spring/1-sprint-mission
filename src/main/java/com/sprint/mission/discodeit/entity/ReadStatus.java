@@ -24,24 +24,48 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity {
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "user_id", columnDefinition = "uuid")
-  private User user;
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
-  private Channel channel;
-  @Column(columnDefinition = "timestamp with time zone", nullable = false)
-  private Instant lastReadAt;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", columnDefinition = "uuid")
+    private User user;
 
-  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
-    this.user = user;
-    this.channel = channel;
-    this.lastReadAt = lastReadAt;
-  }
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "channel_id", columnDefinition = "uuid")
+    private Channel channel;
 
-  public void update(Instant newLastReadAt) {
-    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
-      this.lastReadAt = newLastReadAt;
+    @Column(columnDefinition = "timestamp with time zone", nullable = false)
+    private Instant lastReadAt;
+
+    @Column(nullable = false)
+    private Boolean notificationEnabled;
+
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = lastReadAt;
+        this.notificationEnabled = channel.getType() == ChannelType.PRIVATE;
     }
-  }
+
+    public ReadStatus(User user, Channel channel, Instant lastReadAt, Boolean notificationEnabled) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = lastReadAt;
+        this.notificationEnabled = notificationEnabled != null ? notificationEnabled :
+            (channel.getType() == ChannelType.PRIVATE);
+    }
+
+    public void update(Instant newLastReadAt) {
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+        }
+    }
+
+    public void update(Instant newLastReadAt, Boolean newNotificationEnabled) {
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+        }
+        if (newNotificationEnabled != null && !newNotificationEnabled.equals(
+            this.notificationEnabled)) {
+            this.notificationEnabled = newNotificationEnabled;
+        }
+    }
 }
