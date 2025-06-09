@@ -68,6 +68,18 @@ CREATE TABLE read_statuses
     UNIQUE (user_id, channel_id)
 );
 
+-- Notification
+CREATE TABLE notifications
+(
+    id          uuid PRIMARY KEY,
+    created_at  timestamp with time zone NOT NULL,
+    receiver_id uuid                     NOT NULL,
+    title       varchar(255)             NOT NULL,
+    content     text                     NOT NULL,
+    type        varchar(20)              NOT NULL,
+    target_id   uuid
+);
+
 CREATE TABLE async_task_failures
 (
     id             uuid PRIMARY KEY,
@@ -119,6 +131,13 @@ ALTER TABLE read_statuses
     ADD CONSTRAINT fk_read_status_channel
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
+            ON DELETE CASCADE;
+
+-- Notification (N) -> User (1)
+ALTER TABLE notifications
+    ADD CONSTRAINT fk_notification_user
+        FOREIGN KEY (receiver_id)
+            REFERENCES users (id)
             ON DELETE CASCADE;
 
 CREATE TABLE persistent_logins
