@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -31,6 +32,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -67,7 +70,32 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+
+          TransactionSynchronizationManager.registerSynchronization(
+              new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                  try {
+                    binaryContentStorage.put(binaryContent.getId(), bytes)
+                        .thenAccept(id -> {
+                          binaryContent.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
+                          binaryContentRepository.save(binaryContent);
+                        })
+                        .exceptionally(ex -> {
+                          log.error("파일 업로드 실패 (커밋 후): {}", ex.getMessage(), ex);
+                          binaryContent.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+                          binaryContentRepository.save(binaryContent);
+                          return null;
+                        });
+                  } catch (Exception ex) {
+                    log.error("비동기 업로드 실행 중 예외 발생", ex);
+                    binaryContent.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+                    binaryContentRepository.save(binaryContent);
+                  }
+                }
+              }
+          );
+
           return binaryContent;
         })
         .toList();

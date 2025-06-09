@@ -1,18 +1,30 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import com.sprint.mission.discodeit.dto.data.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.upload.CriticalException;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -51,24 +63,27 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     this.bucket = bucket;
   }
 
+  @Retryable(
+      value = { IOException.class },
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 2000)
+  )
+  @Async
   @Override
-  public UUID put(UUID binaryContentId, byte[] bytes) {
-    String key = binaryContentId.toString();
+  public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
     try {
       S3Client s3Client = getS3Client();
-
       PutObjectRequest request = PutObjectRequest.builder()
           .bucket(bucket)
-          .key(key)
+          .key(binaryContentId.toString())
           .build();
 
       s3Client.putObject(request, RequestBody.fromBytes(bytes));
-      log.info("S3에 파일 업로드 성공: {}", key);
-
-      return binaryContentId;
+      log.info("S3에 파일 업로드 성공: {}", binaryContentId);
+      return CompletableFuture.completedFuture(binaryContentId);
     } catch (S3Exception e) {
       log.error("S3에 파일 업로드 실패: {}", e.getMessage());
-      throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
+      throw new RuntimeException("S3에 파일 업로드 실패: " + binaryContentId, e);
     }
   }
 
@@ -148,4 +163,33 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         )
         .build();
   }
+
+  @Recover
+  private AsyncTaskFailure recover(IOException e, UUID binaryContentId, byte[] bytes) {
+    log.warn("업로드 재시도 모두 실패. 로컬 백업 시도: {}", binaryContentId, e);
+
+    try {
+      Path backupDir = Paths.get("/backup/binary");
+      Files.createDirectories(backupDir);
+
+      Path backupPath = backupDir.resolve(binaryContentId.toString());
+      Files.write(backupPath, bytes);
+
+      String requestId = MDC.get("requestId");
+
+      AsyncTaskFailure failure = new AsyncTaskFailure(
+          "BinaryUpload",
+          requestId != null ? requestId : "UNKNOWN",
+          "Failed after retries: " + e.getMessage()
+      );
+      log.error("AsyncTaskFailure 기록: {}", failure);
+
+      return failure;
+
+    } catch (IOException ioEx) {
+      log.error("로컬 백업도 실패", ioEx);
+      throw new CriticalException("로컬 백업 실패", ioEx);
+    }
+  }
+
 } 

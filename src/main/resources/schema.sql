@@ -15,11 +15,12 @@ CREATE TABLE users
 -- BinaryContent
 CREATE TABLE binary_contents
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    varchar(255)             NOT NULL,
-    size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
+    id            uuid PRIMARY KEY,
+    created_at    timestamp with time zone NOT NULL,
+    file_name     varchar(255)             NOT NULL,
+    size          bigint                   NOT NULL,
+    content_type  varchar(100)             NOT NULL,
+    upload_status varchar(100)             NOT NULL
 --     ,bytes        bytea        NOT NULL
 );
 

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -26,6 +27,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,6 +46,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+
     log.debug("사용자 생성 시작: {}", userCreateRequest);
 
     String username = userCreateRequest.username();
@@ -60,20 +64,46 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType);
+
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+
+          TransactionSynchronizationManager.registerSynchronization(
+              new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                  try {
+                    binaryContentStorage.put(binaryContent.getId(), bytes)
+                        .thenAccept(id -> {
+                          binaryContent.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
+                          binaryContentRepository.save(binaryContent);
+                        })
+                        .exceptionally(ex -> {
+                          log.error("파일 업로드 실패 (커밋 후): {}", ex.getMessage(), ex);
+                          binaryContent.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+                          binaryContentRepository.save(binaryContent);
+                          return null;
+                        });
+                  } catch (Exception ex) {
+                    log.error("비동기 업로드 실행 중 예외 발생", ex);
+                    binaryContent.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+                    binaryContentRepository.save(binaryContent);
+                  }
+                }
+              }
+          );
+
           return binaryContent;
         })
         .orElse(null);
-    String password = userCreateRequest.password();
 
+    String password = userCreateRequest.password();
     String hashedPassword = passwordEncoder.encode(password);
     User user = new User(username, email, hashedPassword, nullableProfile);
 
     userRepository.save(user);
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
+
     return userMapper.toDto(user);
   }
 
@@ -136,7 +166,14 @@ public class BasicUserService implements UserService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+
+          try {
+            binaryContentStorage.put(binaryContent.getId(), bytes).join();
+          } catch (Exception ex) {
+            log.error("파일 저장 실패: {}", ex.getMessage(), ex);
+            throw new RuntimeException("파일 저장 중 오류 발생", ex);
+          }
+
           return binaryContent;
         })
         .orElse(null);
