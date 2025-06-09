@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.util;
 
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class BinaryContentUtils {
           BinaryContentStorage.class);
 
       binaryContentStorage.put(savedMember.getProfile().getId(), file.getBytes());
+      savedMember.getProfile().updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
       log.info("profile image 저장: {}", file.getOriginalFilename());
     }
   }
@@ -28,6 +30,7 @@ public class BinaryContentUtils {
       BinaryContentStorage binaryContentStorage) throws IOException {
     if (file != null && savedMember.getProfile() != null) {
       binaryContentStorage.put(savedMember.getProfile().getId(), file.getBytes());
+      savedMember.getProfile().updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
       log.info("profile image 저장: {}", file.getOriginalFilename());
     }
   }
@@ -42,6 +45,7 @@ public class BinaryContentUtils {
           .fileName(file.getOriginalFilename())
           .size(file.getSize())
           .contentType(file.getContentType())
+          .uploadStatus(BinaryContentUploadStatus.WATING)
           .build();
 
       bin.changeCreateAt(Instant.now());

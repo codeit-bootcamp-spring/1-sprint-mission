@@ -42,6 +42,8 @@ public class BinaryContentServiceImpl implements BinaryContentService {
       );
     }
 
+    log.info("파일 단건 조회: {}", binaryContentId);
+    
     return new BinaryContentResponse(binaryContent.getId(), binaryContent.getFileName(),
         binaryContent.getSize(), binaryContent.getContentType());
   }
