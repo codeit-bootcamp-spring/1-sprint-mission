@@ -3,10 +3,31 @@ server:
   servlet:
     session:
       timeout: 15m
+      cookie:
+        max-age: 900
 
 spring:
   application:
     name: discodeit
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        "[spring.json.add.type.headers]": true
+
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      enable-auto-commit: true
+      properties:
+        "[spring.deserializer.value.delegate.class]": org.springframework.kafka.support.serializer.JsonDeserializer
+        "[spring.json.trusted.packages]": com.sprint.mission.discodeit.events,com.sprint.mission.discodeit.dto.response
+        "[spring.json.use.type.headers]": true
+
   boot:
     admin:
       client:
@@ -16,6 +37,9 @@ spring:
       max-file-size: 100MB
       max-request-size: 500MB
       enabled: true
+  output:
+    ansi:
+      enabled: always
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -41,13 +65,15 @@ spring:
     redis:
       host: localhost
       port: 6379
-      password: qwerqwer
+#      password: qwerqwer
 
 logging:
+  pattern:
+    console: ${LOGPATTERN_CONSOLE:%green(%d{HH:mm:ss.SSS}) %blue(%-5level) %red([%thread]) %yellow(%logger{15}) - %msg%n}
   level:
     org.hibernate.SQL: debug
-    com.sprint.mission.discodeit: debug
-    org.springframework.security: trace
+    com.sprint.mission.discodeit: info
+#    org.springframework.security: trace
 
 decorator:
   datasource:
@@ -72,4 +98,9 @@ discodeit:
 
 file:
   dir: .discodeit/storage
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  accessTokenExpire: 900000
+  refreshTokenExpire: 604800000
 
