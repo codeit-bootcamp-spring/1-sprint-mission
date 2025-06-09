@@ -16,6 +16,10 @@ spring:
       - dev
   config:
     import: optional:file:.env[.properties]
+  cache:
+    type: caffeine
+    caffeine:
+      spec: initialCapacity=100,maximumSize=1000,expireAfterWrite=30m,recordStats
 
 management:
   endpoints:
@@ -25,6 +29,8 @@ management:
   endpoint:
     health:
       show-details: always
+    caches:
+      access: true
 
 info:
   name: Discodeit
@@ -45,6 +51,9 @@ info:
     multipart:
       max-file-size: ${spring.servlet.multipart.maxFileSize}
       max-request-size: ${spring.servlet.multipart.maxRequestSize}
+    cache:
+      type: ${spring.cache.type}
+      caffeine-spec: ${spring.cache.caffeine.spec}
 
 discodeit:
   storage:
@@ -65,6 +74,8 @@ discodeit:
 logging:
   level:
     root: info
+    org.springframework.cache: debug
+    com.github.benmanes.caffeine: debug
 
 security:
   remember-me:
