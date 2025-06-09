@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.event.AsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.util.UUID;
@@ -12,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class AsyncUploadService {
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentRepository binaryContentRepository;
     private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void uploadFileAsync(UUID binaryContentId, byte[] bytes) {
         String requestId = MDC.get("requestId");
@@ -44,6 +48,9 @@ public class AsyncUploadService {
                 } else {
                     updateUploadStatusToFailed(binaryContentId);
                     recordFailure("FILE_UPLOAD", requestId, throwable.getMessage());
+
+                    //비동기 작업 실패 이벤트 발행
+                    publishAsyncTaskFailedEvent(context, requestId, throwable.getMessage());
                     log.error("파일 업로드 실패: id={}", binaryContentId, throwable);
                 }
             } finally {
@@ -78,5 +85,27 @@ public class AsyncUploadService {
         AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId,
             failureReason);
         asyncTaskFailureRepository.save(failure);
+    }
+
+    private void publishAsyncTaskFailedEvent(SecurityContext context, String requestId,
+        String failureReason) {
+        try {
+            SecurityContextHolder.setContext(context);
+            if (context.getAuthentication() != null &&
+                context.getAuthentication()
+                    .getPrincipal() instanceof DiscodeitUserDetails userDetails) {
+
+                UUID userId = userDetails.getUserDto().id();
+                AsyncTaskFailedEvent event = new AsyncTaskFailedEvent(
+                    userId, "FILE_UPLOAD", requestId, failureReason
+                );
+                eventPublisher.publishEvent(event);
+                log.debug("비동기 작업 실패 이벤트 발행: userId={}, requestId={}", userId, requestId);
+            }
+        } catch (Exception e) {
+            log.error("비동기 작업 실패 이벤트 발행 중 오류: requestId={}", requestId, e);
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
 }
