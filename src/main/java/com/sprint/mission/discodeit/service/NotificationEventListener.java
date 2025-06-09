@@ -11,7 +11,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.basic.BasicNotificationService;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
@@ -29,6 +31,7 @@ public class NotificationEventListener {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final BasicNotificationService notificationService;
 
     @Async
     @TransactionalEventListener
@@ -41,6 +44,9 @@ public class NotificationEventListener {
         try {
             log.debug("알림 이벤트 처리 시작: receiverId={}, type={}", event.receiverId(), event.type());
             createNotification(event);
+
+            notificationService.evictUserNotificationsCache(event.receiverId());
+
             log.info("알림 이벤트 처리 완료: receiverId={}, type={}", event.receiverId(), event.type());
         } catch (Exception e) {
             log.error("알림 이벤트 처리 실패: receiverId={}, type={}",
@@ -64,9 +70,9 @@ public class NotificationEventListener {
             List<ReadStatus> notificationEnabledStatuses = readStatusRepository
                 .findAllByChannelIdWithUserWhereNotificationEnabled(event.channelId());
 
-            notificationEnabledStatuses.stream()
+            List<UUID> notificationTargetIds = notificationEnabledStatuses.stream()
                 .filter(readStatus -> !readStatus.getUser().getId().equals(event.authorId()))
-                .forEach(readStatus -> {
+                .map(readStatus -> {
                     User receiver = readStatus.getUser();
                     String title = "새로운 메시지";
                     String content = "새로운 메시지가 도착했습니다: " +
@@ -80,9 +86,22 @@ public class NotificationEventListener {
                     notificationRepository.save(notification);
                     log.debug("새 메시지 알림 생성: receiverId={}, channelId={}",
                         receiver.getId(), event.channelId());
-                });
 
-            log.info("새 메시지 이벤트 처리 완료: channelId={}", event.channelId());
+                    return receiver.getId();
+                })
+                .toList();
+
+            notificationTargetIds.forEach(receiverId -> {
+                try {
+                    notificationService.evictUserNotificationsCache(receiverId);
+                    log.debug("새 메시지 알림 캐시 무효화: receiverId={}", receiverId);
+                } catch (Exception e) {
+                    log.warn("알림 캐시 무효화 실패: receiverId={}", receiverId, e);
+                }
+            });
+
+            log.info("새 메시지 이벤트 처리 완료: channelId={}, 알림 대상자 {}명 - 알림 캐시 무효화",
+                event.channelId(), notificationTargetIds.size());
         } catch (Exception e) {
             log.error("새 메시지 이벤트 처리 실패: channelId={}", event.channelId(), e);
             throw e;
@@ -111,7 +130,9 @@ public class NotificationEventListener {
                     user, title, content, NotificationType.ROLE_CHANGED, event.userId()
                 );
                 notificationRepository.save(notification);
-                log.info("권한 변경 알림 생성: userId={}, oldRole={}, newRole={}",
+
+                notificationService.evictUserNotificationsCache(event.userId());
+                log.info("권한 변경 알림 생성: userId={}, oldRole={}, newRole={} - 알림 캐시 무효화",
                     event.userId(), event.oldRole(), event.newRole());
             }
         } catch (Exception e) {
@@ -142,7 +163,10 @@ public class NotificationEventListener {
                     user, title, content, NotificationType.ASYNC_FAILED, null
                 );
                 notificationRepository.save(notification);
-                log.info("비동기 작업 실패 알림 생성: userId={}, taskName={}",
+
+                notificationService.evictUserNotificationsCache(event.userId());
+
+                log.info("비동기 작업 실패 알림 생성: userId={}, taskName={} - 알림 캐시 무효화",
                     event.userId(), event.taskName());
             }
         } catch (Exception e) {
