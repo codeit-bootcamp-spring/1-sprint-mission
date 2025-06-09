@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.event.NewMessageEvent;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,6 +51,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final PageResponseMapper pageResponseMapper;
     private final AsyncUploadService asyncUploadService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Timed(value = "message.create.async", description = "Time taken for message creation with async upload")
     @Transactional
@@ -83,7 +86,7 @@ public class BasicMessageService implements MessageService {
                         }
                     }
                 );
-                
+
                 return binaryContent;
             })
             .toList();
@@ -97,6 +100,17 @@ public class BasicMessageService implements MessageService {
         );
 
         messageRepository.save(message);
+        
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    NewMessageEvent event = new NewMessageEvent(channelId, authorId, content);
+                    eventPublisher.publishEvent(event);
+                }
+            }
+        );
+
         log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
         return messageMapper.toDto(message);
     }
