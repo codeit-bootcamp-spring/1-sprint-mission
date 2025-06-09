@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,7 @@ public class ChannelController {
    * public 채널 생성
    */
   @Operation(summary = "공개 채널 생성")
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/public")
   public ChannelDto createPublicChannel(
@@ -62,6 +64,7 @@ public class ChannelController {
    * 채널 삭제
    */
   @Operation(summary = "채널 삭제")
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/{channelId}")
   public void deleteChannel(@NotNull @PathVariable("channelId") UUID channelId) {
@@ -73,6 +76,7 @@ public class ChannelController {
    * 채널 수정
    */
   @Operation(summary = "채널 정보 수정")
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @PatchMapping("/{channelId}")
   public ChannelDto updateChannel(@NotNull @PathVariable("channelId") UUID channelId,
       @Validated @RequestBody ChannelModifyRequest request) {
@@ -87,7 +91,7 @@ public class ChannelController {
   @GetMapping
   public List<ChannelDto> findAllChannelsByUser(
       @NotNull @RequestParam("userId") UUID userId) {
-    
+
     return channelService.findAllChannelsByUserId(userId);
   }
 }

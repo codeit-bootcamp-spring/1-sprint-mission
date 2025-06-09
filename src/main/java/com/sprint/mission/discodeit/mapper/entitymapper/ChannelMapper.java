@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.service.status.UserSessionService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Component;
 public class ChannelMapper {
 
   private final ReadStatusRepository readStatusRepository;
+  private final UserSessionService userSessionService;
+  private final UserMapper userMapper;
 
   public ChannelDto toDto(Channel channel) {
     if (channel == null) {
@@ -26,17 +29,10 @@ public class ChannelMapper {
     }
 
     List<UserDto> users = readStatusRepository.findAllByChannel(channel).stream()
-        .map(st -> UserMapper.toDto(st.getUser()))
-        .toList();
+        .map(st -> userMapper.toDto(st.getUser())).toList();
 
-    return ChannelDto.builder()
-        .id(channel.getId())
-        .type(channel.getType())
-        .name(channel.getName())
-        .description(channel.getDescription())
-        .participants(users)
-        .lastMessageAt(
-            readStatusRepository.findFirstByChannelOrderByLastReadAtDesc(channel).getLastReadAt())
-        .build();
+    return new ChannelDto(channel.getId(), channel.getType(), channel.getName(),
+        channel.getDescription(), users,
+        readStatusRepository.findFirstByChannelOrderByLastReadAtDesc(channel).getLastReadAt());
   }
 }

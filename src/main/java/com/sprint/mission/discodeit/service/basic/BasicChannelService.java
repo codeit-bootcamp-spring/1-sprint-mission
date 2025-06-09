@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,10 +42,12 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelMapper mapper;
+  private final UserMapper userMapper;
 
   /**
    * 공개채널 생성
    */
+  @CacheEvict(cacheNames = "channels", allEntries = true, beforeInvocation = true)
   @Override
   public ChannelDto createPublic(PublicChannelCreateRequest request) {
     if (request.name() == null || request.description() == null) {
@@ -59,7 +63,7 @@ public class BasicChannelService implements ChannelService {
         .map(BaseEntity::getId)
         .toList();
 
-    List<ReadStatus> readStatuses = createParticipantsReadStatus(participants, channel);
+    List<ReadStatus> readStatuses = createParticipantsReadStatus(participants, channel, false);
     List<UserDto> userDtoList = getParticipants(readStatuses);
 
     log.info("Public Channel 생성: {}", channel.getId());
@@ -69,6 +73,7 @@ public class BasicChannelService implements ChannelService {
   /**
    * 비공개 채널 생성
    */
+  @CacheEvict(cacheNames = "channels", allEntries = true, beforeInvocation = true)
   @Override
   public ChannelDto createPrivate(PrivateChannelCreateRequest request) {
     if (request.participantIds() == null || request.participantIds().isEmpty()) {
@@ -82,7 +87,8 @@ public class BasicChannelService implements ChannelService {
         .build();
     channelRepository.save(channel);
 
-    List<ReadStatus> readStatuses = createParticipantsReadStatus(request.participantIds(), channel);
+    List<ReadStatus> readStatuses = createParticipantsReadStatus(request.participantIds(), channel,
+        true);
     List<UserDto> participants = getParticipants(readStatuses);
 
     log.info("Private Channel 생성: {}", channel.getId());
@@ -94,6 +100,7 @@ public class BasicChannelService implements ChannelService {
    * <p>
    * 관련된 정보 다 삭제(메세지, 파일)
    */
+  @CacheEvict(cacheNames = "channels", allEntries = true, beforeInvocation = true)
   @Override
   public void remove(UUID channelId) {
     channelRepository.deleteById(channelId);
@@ -104,6 +111,7 @@ public class BasicChannelService implements ChannelService {
   /**
    * 채널 정보 수정
    */
+  @CacheEvict(cacheNames = "channels", allEntries = true, beforeInvocation = true)
   @Override
   public ChannelDto update(UUID channelId, ChannelModifyRequest request) {
     Channel channel = channelRepository.findById(channelId)
@@ -129,6 +137,7 @@ public class BasicChannelService implements ChannelService {
    */
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(cacheNames = "channels", key = "#root.methodName", sync = true)
   public List<ChannelDto> findAllChannelsByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
       throw new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
@@ -149,19 +158,14 @@ public class BasicChannelService implements ChannelService {
   private List<UserDto> getUsers(List<ReadStatus> readStatusList) {
 
     return readStatusList.stream()
-        .map(read -> UserMapper.toDto(read.getUser()))
+        .map(read -> userMapper.toDto(read.getUser()))
         .toList();
   }
 
   private ChannelDto convertToChannelDto(Channel channel, List<UserDto> participants) {
-    return ChannelDto.builder()
-        .id(channel.getId())
-        .type(channel.getType())
-        .name(channel.getName())
-        .description(channel.getDescription())
-        .participants(participants)
-        .lastMessageAt(Instant.now())
-        .build();
+    return new ChannelDto(channel.getId(), channel.getType(), channel.getName(),
+        channel.getDescription(), participants,
+        Instant.now());
   }
 
   // userDTO로 변환 후 저장
@@ -172,18 +176,19 @@ public class BasicChannelService implements ChannelService {
 
   // 유저를 찾고, 유저의 readStatus 생성
   private List<ReadStatus> createParticipantsReadStatus(List<UUID> participantIds,
-      Channel channel) {
+      Channel channel, boolean notificationEnabled) {
 
     List<User> users = userRepository.findByIdIn(participantIds);
-    return getReadStatuses(users, channel);
+    return getReadStatuses(users, channel, notificationEnabled);
   }
 
   // 유저 정보로 readStatus 생성
-  private List<ReadStatus> getReadStatuses(List<User> users, Channel channel) {
+  private List<ReadStatus> getReadStatuses(List<User> users, Channel channel,
+      boolean notificationEnabled) {
     return users.stream()
         .map(user -> {
           log.info("read status 생성: {}", user.getId());
-          return ReadStatus.create(user, channel);
+          return ReadStatus.create(user, channel, notificationEnabled);
         })
         .toList();
   }
