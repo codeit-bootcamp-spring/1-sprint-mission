@@ -25,7 +25,6 @@ public class CacheConfig {
   public CacheManager cacheManager(RedisConnectionFactory connectionFactory,
       ObjectMapper objectMapper) {
 
-    // List<UserCreateResponse> 타입을 명시적으로 지정
     Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(objectMapper,
         Object.class);
 
