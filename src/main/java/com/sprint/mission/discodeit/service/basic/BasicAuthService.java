@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheConfig;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.event.RoleChangedEvent;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
@@ -14,6 +15,9 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,6 +44,7 @@ public class BasicAuthService implements AuthService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
+    @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
     @Override
     public UserDto initAdmin() {
         if (userRepository.existsByEmail(email) || userRepository.existsByUsername(username)) {
@@ -53,12 +58,16 @@ public class BasicAuthService implements AuthService {
         userRepository.save(admin);
 
         UserDto adminDto = userMapper.toDto(admin);
-        log.info("어드민이 초기화되었습니다. {}", adminDto);
+        log.info("어드민이 초기화되었습니다. {} - 전체 사용자 목록 캐시 무효화", adminDto);
         return adminDto;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
+    @Caching(
+        put = @CachePut(value = CacheConfig.USER_DETAIL, key = "#request.userId()"),
+        evict = @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
+    )
     @Override
     public UserDto updateRole(RoleUpdateRequest request) {
         UUID userId = request.userId();
@@ -72,6 +81,8 @@ public class BasicAuthService implements AuthService {
 
         jwtService.invalidateJwtSession(user.getId());
 
+        UserDto updatedUserDto = userMapper.toDto(user);
+
         TransactionSynchronizationManager.registerSynchronization(
             new TransactionSynchronization() {
                 @Override
@@ -82,6 +93,9 @@ public class BasicAuthService implements AuthService {
                 }
             }
         );
-        return userMapper.toDto(user);
+
+        log.info("권한 변경 완료: userId={}, {} -> {} - 사용자 상세 캐시 갱신, 전체 사용자 목록 캐시 무효화",
+            userId, oldRole, newRole);
+        return updatedUserDto;
     }
 }
