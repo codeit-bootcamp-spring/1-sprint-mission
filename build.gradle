@@ -40,6 +40,10 @@ dependencies {
     implementation 'org.springframework.retry:spring-retry:2.0.10'
     implementation 'org.springframework:spring-aspects'
 
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     implementation 'org.mapstruct:mapstruct:1.6.3'
