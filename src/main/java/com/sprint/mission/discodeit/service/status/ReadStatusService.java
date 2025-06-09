@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +44,7 @@ public class ReadStatusService {
 
     IsAlreadyReadStatus(request, user, channel);
 
-    ReadStatus readStatus = new ReadStatus(user, channel, request.lastReadAt());
+    ReadStatus readStatus = new ReadStatus(user, channel, request.lastReadAt(), false);
     readStatusRepository.save(readStatus);
     log.info("read status 생성: {}", readStatus.getId());
 
@@ -52,29 +54,32 @@ public class ReadStatusService {
   /**
    * 읽음 상태 조회
    */
+  @Cacheable(cacheNames = "readStatuses", key = "#userId", sync = true)
   public List<ReadStatusDto> findByUserId(UUID userId) {
     List<ReadStatus> readStatuses = readStatusRepository.findAllByUser_Id(userId);
 
     if (readStatuses.isEmpty()) {
       throw new ReadStatusNotFoundException(Instant.now(), ErrorCode.READ_STATUS_NOT_FOUND,
-          Map.of(userId.toString(), ErrorCode.READ_STATUS_NOT_FOUND.getMessage())
-      );
+          Map.of(userId.toString(), ErrorCode.READ_STATUS_NOT_FOUND.getMessage()));
     }
 
-    return readStatuses.stream()
-        .map(ReadStatusMapper::toDto)
-        .toList();
+    return readStatuses.stream().map(ReadStatusMapper::toDto).toList();
   }
 
   /**
    * 읽음 상태 수정
    */
+  @CacheEvict(cacheNames = "readStatuses", allEntries = true)
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(
-            () -> new ReadStatusNotFoundException(Instant.now(), ErrorCode.READ_STATUS_NOT_FOUND,
-                Map.of(readStatusId.toString(), ErrorCode.READ_STATUS_NOT_FOUND.getMessage())
-            ));
+    ReadStatus readStatus = readStatusRepository.findById(readStatusId).orElseThrow(
+        () -> new ReadStatusNotFoundException(Instant.now(), ErrorCode.READ_STATUS_NOT_FOUND,
+            Map.of(readStatusId.toString(), ErrorCode.READ_STATUS_NOT_FOUND.getMessage())));
+
+    if (request.newNotificationEnabled() == null) {
+      readStatus.updateNotificationEnabled(readStatus.isNotificationEnabled());
+    } else {
+      readStatus.updateNotificationEnabled(request.newNotificationEnabled());
+    }
 
     ReadStatus modifiedStat = readStatus.changeLastReadAt(request.newLastReadAt());
     log.info("Read Status 수정: {}", readStatusId);
@@ -89,8 +94,7 @@ public class ReadStatusService {
 
     if (findReadStatus.isPresent()) {
       throw new ReadStatusExistsException(Instant.now(), ErrorCode.EXIST_READ_STATUS,
-          Map.of(user.getStatus().getId().toString(), ErrorCode.EXIST_READ_STATUS.getMessage())
-      );
+          Map.of(ErrorCode.EXIST_READ_STATUS.getCode(), ErrorCode.EXIST_READ_STATUS.getMessage()));
     }
   }
 }

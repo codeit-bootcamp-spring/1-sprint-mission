@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,6 +36,7 @@ public class ReadStatusController {
    */
   @Operation(summary = "읽음 상태 생성")
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("#request.userId() == authentication.principal.id")
   @PostMapping
   public ReadStatusDto createReadStatus(@Validated @RequestBody ReadStatusRequest request) {
     return readStatusService.create(request);
@@ -52,8 +55,10 @@ public class ReadStatusController {
    * 읽음 상태 수정
    */
   @Operation(summary = "읽음 상태 수정")
+  @PreAuthorize("@authorizationChecker.isReadStatusUser(#readStatusId, authentication.principal.id)")
   @PatchMapping("/{readStatusId}")
-  public ReadStatusDto updateReadStatus(@PathVariable("readStatusId") UUID readStatusId,
+  public ReadStatusDto updateReadStatus(
+      @P("readStatusId") @PathVariable("readStatusId") UUID readStatusId,
       @Validated @RequestBody ReadStatusUpdateRequest request) {
 
     return readStatusService.update(readStatusId, request);
