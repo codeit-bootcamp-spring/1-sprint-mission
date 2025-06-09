@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.storage.s3;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.binary.AWSException;
+import com.sprint.mission.discodeit.exception.binary.NotSavedBinaryContentException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
@@ -12,13 +17,19 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -32,8 +43,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
-import software.amazon.awssdk.transfer.s3.model.CompletedFileUpload;
-import software.amazon.awssdk.transfer.s3.model.FileUpload;
 import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
 
 @Slf4j
@@ -41,6 +50,7 @@ import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
 public class S3BinaryContentStorage implements BinaryContentStorage {
 
+  private final BinaryContentRepository binaryContentRepository;
   private final S3AsyncClient s3AsyncClient;
   private final S3TransferManager s3TransferManager;
 
@@ -57,12 +67,16 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   private String bucket;
 
   @Autowired
-  public S3BinaryContentStorage(S3AsyncClient s3AsyncClient, S3TransferManager s3TransferManager) {
+  public S3BinaryContentStorage(BinaryContentRepository binaryContentRepository,
+      S3AsyncClient s3AsyncClient, S3TransferManager s3TransferManager) {
+    this.binaryContentRepository = binaryContentRepository;
     this.s3AsyncClient = s3AsyncClient;
     this.s3TransferManager = s3TransferManager;
   }
 
-  public S3BinaryContentStorage(String accessKey, String secretKey, String region, String bucket) {
+  public S3BinaryContentStorage(BinaryContentRepository binaryContentRepository, String accessKey,
+      String secretKey, String region, String bucket) {
+    this.binaryContentRepository = binaryContentRepository;
     this.accessKey = accessKey;
     this.secretKey = secretKey;
     this.region = region;
@@ -97,9 +111,16 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
   }
 
-  // 파일 업로드
+  /**
+   * @methodName : put
+   * @date : 2025-06-03 오후 5:28
+   * @author : wongil
+   * @Description: 비동기 파일 업로드
+   **/
+  @Retryable(retryFor = NotSavedBinaryContentException.class, maxAttempts = 5, backoff = @Backoff(delay = 3000), recover = "recover")
+  @Async("fileUploadExecutor")
   @Override
-  public UUID put(UUID fileId, byte[] bytes) {
+  public CompletableFuture<UUID> put(UUID fileId, byte[] bytes) {
     String bucketName = PropertiesUtils.getBucket();
 
     try {
@@ -111,17 +132,27 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
           .source(tempFile)
           .build();
 
-      FileUpload fileUpload = s3TransferManager.uploadFile(request);
-      CompletedFileUpload uploadResult = fileUpload.completionFuture().join();
+      return s3TransferManager.uploadFile(request)
+          .completionFuture()
+          .whenComplete((res, ex) -> {
+            try {
+              Files.deleteIfExists(tempFile);
+            } catch (IOException e) {
+              log.error("임시 파일 삭제 실패: {}", tempFile, e);
+            }
+          })
+          .thenApply(uploaded -> {
+            log.info("파일 업로드: {}", uploaded.response().eTag());
 
-      Files.delete(tempFile);
-      log.info("파일 업로드: {}", uploadResult.response().eTag());
-
-      return fileId;
-    } catch (Exception e) {
-      log.error("파일 업로드 실패: {}", fileId);
-      throw new AWSException(Instant.now(), ErrorCode.AWS_ERROR,
-          Map.of(fileId.toString(), ErrorCode.AWS_ERROR.getMessage()));
+            return fileId;
+          })
+          .exceptionally(exception -> {
+            log.error("파일 업로드 실패: {}", fileId);
+            throw new AWSException(Instant.now(), ErrorCode.AWS_ERROR,
+                Map.of(fileId.toString(), ErrorCode.AWS_ERROR.getMessage()));
+          });
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -175,6 +206,22 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
       throw new AWSException(Instant.now(), ErrorCode.AWS_ERROR,
           Map.of(key, ErrorCode.AWS_ERROR.getMessage()));
     }
+  }
+
+  @Recover
+  public CompletableFuture<UUID> recover(NotSavedBinaryContentException e, UUID fileId,
+      byte[] bytes,
+      Path filePath) {
+
+    BinaryContent binaryContent = binaryContentRepository.findById(fileId)
+        .orElseThrow();
+
+    String requestId = MDC.get("requestId");
+
+    log.error("파일 재시도 복구 시도: {}, file: {}", requestId, fileId, e);
+    binaryContent.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+
+    return CompletableFuture.completedFuture(fileId);
   }
 
 }

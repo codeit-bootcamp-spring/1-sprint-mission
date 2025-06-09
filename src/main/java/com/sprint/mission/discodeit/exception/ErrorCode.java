@@ -28,7 +28,11 @@ public enum ErrorCode {
   FAIL_READ_FILE("INTERNAL_SERVER_ERROR", "서버에 문제가 생겼습니다."),
   FAIL_BEAN_VALIDATE("BAD_REQUEST", "잘못된 데이터입니다."),
   AWS_ERROR("INTERNAL_SERVER_ERROR", "AWS 에러"),
-  MODIFY_PRIVATE_CHANNEL("BAD_REQUEST", "Private Channel 수정할 수 없습니다.");
+  MODIFY_PRIVATE_CHANNEL("BAD_REQUEST", "Private Channel 수정할 수 없습니다."),
+  UNAUTHORIZED("UNAUTHORIZED", "인증이 되지 않은 요청입니다."),
+  FORBIDDEN("FORBIDDEN", "인가 되지 않은 요청입니다."),
+  JWT_INVALID("INVALID TOKEN", "JWT 토큰이 유효하지 않습니다."),
+  NOT_FOUND_JWT("NOT FOUND TOKEN", "JWT 토큰이 존재하지 않습니다.");
 
   private final String code;
 
