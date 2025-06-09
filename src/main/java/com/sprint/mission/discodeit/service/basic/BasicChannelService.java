@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
-    //
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
@@ -58,7 +57,7 @@ public class BasicChannelService implements ChannelService {
 
         List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds())
             .stream()
-            .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
+            .map(user -> new ReadStatus(user, channel, channel.getCreatedAt(), true))
             .toList();
         readStatusRepository.saveAll(readStatuses);
 
