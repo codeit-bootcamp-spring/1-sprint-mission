@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheConfig;
 import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
@@ -11,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationMapper notificationMapper;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.USER_NOTIFICATIONS, key = "#receiverId")
     @Override
     public List<NotificationDto> findAllByReceiverId(UUID receiverId) {
         log.debug("사용자별 알림 목록 조회 시작: receiverId={}", receiverId);
@@ -57,7 +61,16 @@ public class BasicNotificationService implements NotificationService {
             throw exception;
         }
 
+        UUID receiverId = notification.getReceiver().getId();
         notificationRepository.delete(notification);
-        log.info("알림 삭제 완료: notifcationId={}", notificationId);
+
+        evictUserNotificationsCache(receiverId);
+        log.info("알림 삭제 완료: notificationId={}, receiverId={} - 알림 캐시 무효화", notificationId,
+            receiverId);
+    }
+
+    @CacheEvict(value = CacheConfig.USER_NOTIFICATIONS, key = "#receiverId")
+    public void evictUserNotificationsCache(UUID receiverId) {
+        log.debug("사용자 알림 캐시 무효화: receiverId={}", receiverId);
     }
 }
