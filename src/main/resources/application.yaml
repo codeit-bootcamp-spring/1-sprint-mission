@@ -61,6 +61,8 @@ discodeit:
     username: ${DISCODEIT_ADMIN_USERNAME}
     email: ${DISCODEIT_ADMIN_EMAIL}
     password: ${DISCODEIT_ADMIN_PASSWORD}
+  cache:
+    type: ${CACHE_TYPE:local} # local | redis (기본값: local)
 
 logging:
   level:

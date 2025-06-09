@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,6 +77,7 @@ public class BasicChannelService implements ChannelService {
 			.orElseThrow(() -> ChannelNotFoundException.withId(channelId));
 	}
 
+	@Cacheable(cacheNames = "channelList", key = "#userId")
 	@Transactional(readOnly = true)
 	@Override
 	public List<ChannelDto> findAllByUserId(UUID userId) {
