@@ -8,13 +8,29 @@ DROP TABLE IF EXISTS binary_contents;
 
 create table if not exists binary_contents
 (
-    id           uuid primary key,
-    created_at   timestamp with time zone not null,
-    file_name    varchar(255)             not null,
-    size         bigint                   not null,
-    content_type varchar(100)             not null
+    id
+    uuid
+    primary
+    key,
+    created_at
+    timestamp
+    with
+    time
+    zone
+    not
+    null,
+    file_name
+    varchar
+(
+    255
+) not null,
+    size bigint not null,
+    content_type varchar
+(
+    100
+) not null
 --     bytes        bytea        not null
-);
+    );
 
 create table users
 (
@@ -26,6 +42,7 @@ create table users
     email      varchar(100)             not null
         constraint always_have_email unique,
     password   varchar(60)              not null,
+    role       varchar(20),
     profile_id uuid references binary_contents on delete cascade
 );
 

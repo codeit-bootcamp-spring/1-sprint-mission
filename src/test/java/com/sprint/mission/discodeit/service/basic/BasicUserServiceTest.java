@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
-import com.sprint.mission.discodeit.entity.status.user.UserStatus;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateResponse;
@@ -23,8 +23,10 @@ import com.sprint.mission.discodeit.entity.user.dto.UserUpdateResponse;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.status.UserStateService;
+import com.sprint.mission.discodeit.service.status.UserSessionService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityManager;
 import java.io.IOException;
@@ -34,6 +36,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +45,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.ReflectionUtils;
@@ -53,12 +57,24 @@ class BasicUserServiceTest {
 
   @Mock
   private UserRepository userRepository;
-  @Mock
-  private UserStateService userStateService;
+
   @Mock
   private BinaryContentStorage binaryContentStorage;
+
   @Mock
   private EntityManager entityManager;
+
+  @Mock
+  private PasswordEncoder passwordEncoder;
+
+  @Mock
+  private UserSessionService userSessionService;
+
+  @Mock
+  private ReadStatusRepository readStatusRepository;
+
+  @Mock
+  private MessageRepository messageRepository;
 
   @InjectMocks
   private BasicUserService userService;
@@ -80,14 +96,10 @@ class BasicUserServiceTest {
     User savedUser = new User("user", "user@mail.com", "1234", null, null);
     when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
-    UserStatus userStatus = new UserStatus(savedUser, Instant.now());
-    when(userStateService.create(any(UserStatus.class))).thenReturn(userStatus);
-
     UserCreateResponse joinUser = userService.join(request, null);
 
     assertNotNull(joinUser);
     verify(userRepository).save(any(User.class));
-    verify(userStateService).create(any(UserStatus.class));
   }
 
   @Test
@@ -104,15 +116,13 @@ class BasicUserServiceTest {
     when(mockProfile.getName()).thenReturn("test.txt");
 
     BinaryContent binaryContent = new BinaryContent(mockProfile.getName(), mockProfile.getSize(),
-        mockProfile.getContentType());
-    when(binaryContentStorage.put(any(), any())).thenReturn(binaryContent.getId());
+        mockProfile.getContentType(), BinaryContentUploadStatus.WATING);
+    when(binaryContentStorage.put(any(), any())).thenReturn(
+        CompletableFuture.completedFuture(binaryContent.getId()));
 
     User user = new User("test", "test@mail.com", "1234", binaryContent, null);
     setUserId(user, UUID.randomUUID());
     when(userRepository.save(any(User.class))).thenReturn(user);
-
-    UserStatus userStatus = new UserStatus(user, Instant.now());
-    when(userStateService.create(any(UserStatus.class))).thenReturn(userStatus);
 
     UserCreateResponse joinUser = userService.join(request, mockProfile);
 
@@ -121,7 +131,6 @@ class BasicUserServiceTest {
 
     verify(userRepository).save(any(User.class));
     verify(binaryContentStorage).put(any(), any());
-    verify(userStateService).create(any(UserStatus.class));
   }
 
   @Test
@@ -161,11 +170,7 @@ class BasicUserServiceTest {
   @DisplayName("전체 유저 목록 조회")
   void findAllUser() throws Exception {
     User savedUser1 = new User("user1", "user1@mail.com", "1234", null, null);
-    UserStatus status1 = new UserStatus(savedUser1, Instant.now());
     User savedUser2 = new User("user2", "user2@mail.com", "1234", null, null);
-    UserStatus status2 = new UserStatus(savedUser2, Instant.now());
-    savedUser1.changeUserStatus(status1);
-    savedUser2.changeUserStatus(status2);
 
     List<User> userList = List.of(savedUser1, savedUser2);
     when(userRepository.findUsers()).thenReturn(userList);
@@ -220,7 +225,7 @@ class BasicUserServiceTest {
 
     when(userRepository.findById(findUser.getId())).thenReturn(Optional.of(findUser));
 
-    UserUpdateResponse updatedUser = userService.update(findUser.getId(), request, null);
+    UserUpdateResponse updatedUser = userService.update(findUser.getId(), request, null, null);
 
     assertNotNull(updatedUser);
     assertEquals("newName", updatedUser.username());
@@ -245,7 +250,7 @@ class BasicUserServiceTest {
         .when(entityManager).flush();
 
     assertThrows(ConstraintViolationException.class, () -> {
-      userService.update(oldUser.getId(), request, null);
+      userService.update(oldUser.getId(), request, null, null);
     });
 
     verify(entityManager).flush();
@@ -265,14 +270,11 @@ class BasicUserServiceTest {
         request);
 
     assertNotNull(response);
-    assertEquals(now, user.getStatus().getLastActiveAt());
-
     verify(userRepository).findById(user.getId());
   }
 
   private User createUserWithUSerStatus() {
     User user = new User("user", "user@mail.com", "password1234", null, null);
-    user.changeUserStatus(new UserStatus(user, null));
     UUID userId = UUID.randomUUID();
     setUserId(user, userId);
 

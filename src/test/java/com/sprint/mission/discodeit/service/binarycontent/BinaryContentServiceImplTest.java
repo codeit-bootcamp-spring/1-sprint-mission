@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.binarycontent.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.binary.BinaryContentNotFoundException;
@@ -46,7 +47,8 @@ class BinaryContentServiceImplTest {
   @DisplayName("파일 찾기 - 성공")
   void findFile() throws Exception {
     UUID fileId = UUID.randomUUID();
-    BinaryContent binaryContent = new BinaryContent("test.json", 1024L, "application/json");
+    BinaryContent binaryContent = new BinaryContent("test.json", 1024L, "application/json",
+        BinaryContentUploadStatus.SUCCESS);
 
     when(binaryContentRepository.findById(any(UUID.class))).thenReturn(Optional.of(binaryContent));
 
@@ -97,7 +99,8 @@ class BinaryContentServiceImplTest {
   @DisplayName("파일 다운로드 - 성공")
   void downloadFile() {
     UUID testId = UUID.randomUUID();
-    BinaryContent binaryContent = new BinaryContent("test1.json", 12L, "application/json");
+    BinaryContent binaryContent = new BinaryContent("test1.json", 12L, "application/json",
+        BinaryContentUploadStatus.SUCCESS);
 
     when(binaryContentRepository.findById(testId))
         .thenReturn(Optional.of(binaryContent));

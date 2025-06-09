@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: Discodeit
   servlet:
@@ -6,6 +8,11 @@ spring:
       max-file-size: 100MB
       max-request-size: 500MB
       enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: qwerqwer
   datasource:
     url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
@@ -16,7 +23,7 @@ spring:
     #    database-platform: org.hibernate.dialect.PostgreSQLDialect
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
     properties:
       hibernate:
         default_batch_fetch_size: 1000
@@ -65,3 +72,8 @@ file:
 
 server:
   port: 0  # 랜덤 포트 사용 (테스트 시 포트 충돌 방지)
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+  accessTokenExpire: 900000
+  refreshTokenExpire: 604800000
