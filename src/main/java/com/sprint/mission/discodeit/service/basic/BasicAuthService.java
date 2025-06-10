@@ -15,7 +15,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,6 +41,7 @@ public class BasicAuthService implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final ApplicationEventPublisher eventPublisher;
+    private final CacheManager cacheManager;
 
     @Transactional
     @Override
@@ -108,8 +109,17 @@ public class BasicAuthService implements AuthService {
         return updatedUserDto;
     }
 
-    @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
-    public void evictAllUsersCache() {
-        log.debug("전체 사용자 목록 캐시 무효화");
+    private void evictAllUsersCache() {
+        try {
+            org.springframework.cache.Cache cache = cacheManager.getCache(CacheConfig.ALL_USERS);
+            if (cache != null) {
+                cache.clear();
+                log.debug("전체 사용자 목록 캐시 무효화 완료");
+            } else {
+                log.warn("전체 사용자 캐시를 찾을 수 없음: cacheName={}", CacheConfig.ALL_USERS);
+            }
+        } catch (Exception e) {
+            log.error("전체 사용자 목록 캐시 무효화 실패", e);
+        }
     }
 }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -39,7 +40,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
-
+    private final CacheManager cacheManager;
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
@@ -56,7 +57,7 @@ public class BasicChannelService implements ChannelService {
             new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    evictUserChannelsCacheForAllUsers();
+                    evictUserChannelsCache();
                     log.info("공개 채널 생성 완료: id={}, name={} - 트랜잭션 커밋 후 모든 사용자 채널 캐시 무효화",
                         channel.getId(), channel.getName());
                 }
@@ -84,7 +85,7 @@ public class BasicChannelService implements ChannelService {
             new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    evictUserChannelsCacheForUsers(request.participantIds());
+                    evictUserChannelsCache();
                     log.info("비공개 채널 생성 완료: id={} - 트랜잭션 커밋 후 참여자 {}명의 채널 캐시 무효화",
                         channel.getId(), request.participantIds().size());
                 }
@@ -147,7 +148,8 @@ public class BasicChannelService implements ChannelService {
             new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    evictUserChannelsCacheForAllUsers();
+                    evictChannelDetailCache(channelId);
+                    evictUserChannelsCache();
                     log.info("채널 수정 완료: id={}, name={} - 트랜잭션 커밋 후 채널 상세 캐시 갱신, 모든 사용자 채널 캐시 무효화",
                         channelId, channel.getName());
                 }
@@ -179,7 +181,8 @@ public class BasicChannelService implements ChannelService {
             new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    evictChannelRelatedCaches(channelId, participantIds);
+                    evictChannelDetailCache(channelId);
+                    evictUserChannelsCache();
                     log.info("채널 삭제 완료: id={} - 트랜잭션 커밋 후 관련 캐시 무효화", channelId);
                 }
             }
@@ -188,22 +191,33 @@ public class BasicChannelService implements ChannelService {
         log.info("채널 삭제 완료: id={} - 관련 캐시 무효화", channelId);
     }
 
-
-    @CacheEvict(value = CacheConfig.USER_CHANNELS, allEntries = true)
-    public void evictUserChannelsCacheForAllUsers() {
-        log.debug("모든 사용자의 채널 캐시 무효화");
+    private void evictUserChannelsCache() {
+        try {
+            org.springframework.cache.Cache cache = cacheManager.getCache(
+                CacheConfig.USER_CHANNELS);
+            if (cache != null) {
+                cache.clear();
+                log.debug("사용자 채널 캐시 무효화 완료");
+            } else {
+                log.warn("사용자 채널 캐시를 찾을 수 없음: cacheName={}", CacheConfig.USER_CHANNELS);
+            }
+        } catch (Exception e) {
+            log.error("사용자 채널 캐시 무효화 실패", e);
+        }
     }
 
-    @CacheEvict(value = CacheConfig.USER_CHANNELS, allEntries = true)
-    public void evictUserChannelsCacheForUsers(List<UUID> userIds) {
-        log.debug("사용자들의 채널 캐시 무효화: userIds={}", userIds);
-    }
-
-    @Caching(evict = {
-        @CacheEvict(value = CacheConfig.CHANNEL_DETAIL, key = "#channelId"),
-        @CacheEvict(value = CacheConfig.USER_CHANNELS, allEntries = true)
-    })
-    protected void evictChannelRelatedCaches(UUID channelId, List<UUID> participantIds) {
-        log.debug("채널 관련 캐시 무효화: channelId={}, participantIds={}", channelId, participantIds);
+    private void evictChannelDetailCache(UUID channelId) {
+        try {
+            org.springframework.cache.Cache cache = cacheManager.getCache(
+                CacheConfig.CHANNEL_DETAIL);
+            if (cache != null) {
+                cache.evict(channelId);
+                log.debug("채널 상세 캐시 무효화 완료: channelId={}", channelId);
+            } else {
+                log.warn("채널 상세 캐시를 찾을 수 없음: cacheName={}", CacheConfig.CHANNEL_DETAIL);
+            }
+        } catch (Exception e) {
+            log.error("채널 상세 캐시 무효화 실패: channelId={}", channelId, e);
+        }
     }
 }

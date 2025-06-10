@@ -24,10 +24,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class BasicUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AsyncUploadService asyncUploadService;
-
+    private final CacheManager cacheManager;
 
     @Timed(value = "user.create.async", description = "Time taken for creation with async upload")
     @Transactional
@@ -230,19 +230,58 @@ public class BasicUserService implements UserService {
         );
     }
 
-    @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
-    public void evictAllUsersCache() {
-        log.debug("전체 사용자 목록 캐시 무효화");
+    private void evictAllUsersCache() {
+        try {
+            Cache cache = cacheManager.getCache(CacheConfig.ALL_USERS);
+            if (cache != null) {
+                cache.clear();
+                log.debug("전체 사용자 목록 캐시 무효화 완료");
+            } else {
+                log.warn("전체 사용자 캐시를 찾을 수 없음: cacheName={}", CacheConfig.ALL_USERS);
+            }
+        } catch (Exception e) {
+            log.error("전체 사용자 목록 캐시 무효화 실패", e);
+        }
     }
 
-    @Caching(evict = {
-        @CacheEvict(value = CacheConfig.USER_DETAIL, key = "#userId"),
-        @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true),
-        @CacheEvict(value = CacheConfig.USER_CHANNELS, key = "#userId"),
-        @CacheEvict(value = CacheConfig.USER_NOTIFICATIONS, key = "#userId")
-    })
-    public void evictUserRelatedCaches(UUID userId) {
-        log.debug("사용자 관련 모든 캐시 무효화: userId={}", userId);
+    private void evictUserRelatedCaches(UUID userId) {
+        try {
+            // 사용자 상세 캐시 무효화
+            Cache userDetailCache = cacheManager.getCache(
+                CacheConfig.USER_DETAIL);
+            if (userDetailCache != null) {
+                userDetailCache.evict(userId);
+                log.debug("사용자 상세 캐시 무효화 완료: userId={}", userId);
+            }
+
+            // 전체 사용자 목록 캐시 무효화
+            Cache allUsersCache = cacheManager.getCache(
+                CacheConfig.ALL_USERS);
+            if (allUsersCache != null) {
+                allUsersCache.clear();
+                log.debug("전체 사용자 목록 캐시 무효화 완료");
+            }
+
+            // 사용자 채널 캐시 무효화
+            Cache userChannelsCache = cacheManager.getCache(
+                CacheConfig.USER_CHANNELS);
+            if (userChannelsCache != null) {
+                userChannelsCache.evict(userId);
+                log.debug("사용자 채널 캐시 무효화 완료: userId={}", userId);
+            }
+
+            // 사용자 알림 캐시 무효화
+            Cache userNotificationsCache = cacheManager.getCache(
+                CacheConfig.USER_NOTIFICATIONS);
+            if (userNotificationsCache != null) {
+                userNotificationsCache.evict(userId);
+                log.debug("사용자 알림 캐시 무효화 완료: userId={}", userId);
+            }
+
+            log.debug("사용자 관련 모든 캐시 무효화 완료: userId={}", userId);
+        } catch (Exception e) {
+            log.error("사용자 관련 캐시 무효화 실패: userId={}", userId, e);
+        }
     }
 
 

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.config.CacheConfig;
 import com.sprint.mission.discodeit.dto.event.AsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.dto.event.NewMessageEvent;
 import com.sprint.mission.discodeit.dto.event.NotificationEvent;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
@@ -33,6 +36,7 @@ public class NotificationEventListener {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final BasicNotificationService notificationService;
+    private final CacheManager cacheManager;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -46,7 +50,7 @@ public class NotificationEventListener {
             log.debug("알림 이벤트 처리 시작: receiverId={}, type={}", event.receiverId(), event.type());
             createNotification(event);
 
-            notificationService.evictUserNotificationsCache(event.receiverId());
+            evictUserNotificationsCache(event.receiverId());
 
             log.info("알림 이벤트 처리 완료: receiverId={}, type={}", event.receiverId(), event.type());
         } catch (Exception e) {
@@ -94,7 +98,7 @@ public class NotificationEventListener {
 
             notificationTargetIds.forEach(receiverId -> {
                 try {
-                    notificationService.evictUserNotificationsCache(receiverId);
+                    evictUserNotificationsCache(receiverId);
                     log.debug("새 메시지 알림 캐시 무효화: receiverId={}", receiverId);
                 } catch (Exception e) {
                     log.warn("알림 캐시 무효화 실패: receiverId={}", receiverId, e);
@@ -132,7 +136,7 @@ public class NotificationEventListener {
                 );
                 notificationRepository.save(notification);
 
-                notificationService.evictUserNotificationsCache(event.userId());
+                evictUserNotificationsCache(event.userId());
                 log.info("권한 변경 알림 생성: userId={}, oldRole={}, newRole={} - 알림 캐시 무효화",
                     event.userId(), event.oldRole(), event.newRole());
             }
@@ -165,8 +169,7 @@ public class NotificationEventListener {
                 );
                 notificationRepository.save(notification);
 
-                notificationService.evictUserNotificationsCache(event.userId());
-
+                evictUserNotificationsCache(event.userId());
                 log.info("비동기 작업 실패 알림 생성: userId={}, taskName={} - 알림 캐시 무효화",
                     event.userId(), event.taskName());
             }
@@ -184,6 +187,20 @@ public class NotificationEventListener {
                 receiver, event.title(), event.content(), event.type(), event.targetId()
             );
             notificationRepository.save(notification);
+        }
+    }
+
+    private void evictUserNotificationsCache(UUID receiverId) {
+        try {
+            Cache cache = cacheManager.getCache(CacheConfig.USER_NOTIFICATIONS);
+            if (cache != null) {
+                cache.evict(receiverId);
+                log.debug("사용자 알림 캐시 무효화 완료: receiverId={}", receiverId);
+            } else {
+                log.warn("알림 캐시를 찾을 수 없음: cacheName={}", CacheConfig.USER_NOTIFICATIONS);
+            }
+        } catch (Exception e) {
+            log.error("알림 캐시 무효화 실패: receiverId={}", receiverId, e);
         }
     }
 }

@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class BasicNotificationService implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
+    private final CacheManager cacheManager;
 
     @Transactional(readOnly = true)
     @Cacheable(value = CacheConfig.USER_NOTIFICATIONS, key = "#receiverId")
@@ -81,8 +83,17 @@ public class BasicNotificationService implements NotificationService {
             receiverId);
     }
 
-    @CacheEvict(value = CacheConfig.USER_NOTIFICATIONS, key = "#receiverId")
-    public void evictUserNotificationsCache(UUID receiverId) {
-        log.debug("사용자 알림 캐시 무효화: receiverId={}", receiverId);
+    private void evictUserNotificationsCache(UUID receiverId) {
+        try {
+            Cache cache = cacheManager.getCache(CacheConfig.USER_NOTIFICATIONS);
+            if (cache != null) {
+                cache.evict(receiverId);
+                log.debug("사용자 알림 캐시 무효화 완료: receiverId={}", receiverId);
+            } else {
+                log.warn("알림 캐시를 찾을 수 없음: cacheName={}", CacheConfig.USER_NOTIFICATIONS);
+            }
+        } catch (Exception e) {
+            log.error("알림 캐시 무효화 실패: receiverId={}", receiverId, e);
+        }
     }
 }
