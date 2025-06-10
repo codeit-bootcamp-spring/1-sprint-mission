@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -38,6 +41,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
 
 
+    @CacheEvict(value = "userChannels", allEntries = true)
     @Override
     @Transactional
     public ChannelDto createPublicChannel(PublicChannelCreateRequestDto request) {
@@ -49,6 +53,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(save);
     }
 
+    @CacheEvict(value = "userChannels", allEntries = true)
     @Override
     @Transactional
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequestDto request) {
@@ -81,6 +86,7 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(ChannelNotFoundException::new);
     }
 
+    @Cacheable(value = "userChannels", key = "#userId")
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
         log.debug("Find all channels by userId: {}", userId);
@@ -92,6 +98,7 @@ public class BasicChannelService implements ChannelService {
         return channels;
     }
 
+    @CachePut(value = "channelById", key = "#id")
     @Override
     @Transactional
     public ChannelDto updateChannel(UUID id, ChannelUpdateRequestDto request) {
@@ -109,6 +116,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(channel);
     }
 
+    @CacheEvict(value = "userChannels", allEntries = true)
     @Override
     @Transactional
     public void deleteChannel(UUID id) {

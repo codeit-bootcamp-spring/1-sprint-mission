@@ -5,9 +5,12 @@ import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -23,6 +26,9 @@ public class NotificationEventListener {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -49,6 +55,8 @@ public class NotificationEventListener {
                 receiver.getId(), event.getType(), event.getTitle());*/
 
         for (UUID receiverId : event.getReceivers()) {
+            Optional.ofNullable(cacheManager.getCache("userNotification"))
+                    .ifPresent(cache -> cache.evictIfPresent(receiverId));
             userRepository.findById(receiverId).ifPresent(receiver -> {
                 Notification notification =
                         Notification.of(

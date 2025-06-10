@@ -28,6 +28,9 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,6 +51,7 @@ public class BasicUserService implements UserService {
     private final JwtSessionRepository jwtSessionRepository;
     private UUID currentSessionUserId;
 
+    @CacheEvict(value = "allUsers", allEntries = true)
     @Override
     @Transactional
     public UserDto createUser(UserCreateRequestDto request, MultipartFile profile) {
@@ -96,6 +100,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    @Cacheable(value = "allUsers")
     @Override
     public List<UserDto> getAllUsers() {
         /*List<User> all = userRepository.findAll();
@@ -120,6 +125,7 @@ public class BasicUserService implements UserService {
     }
 
 
+    @CacheEvict(value = "allUsers", allEntries = true)
     @Override
     @Transactional
     public UserDto updateUser(UUID userId, UserUpdateRequestDto request, MultipartFile profile) {
@@ -153,6 +159,7 @@ public class BasicUserService implements UserService {
     }
 
 
+    @CacheEvict(value = "allusers", allEntries = true)
     @Override
     @Transactional
     public void deleteUser(UUID userId) {

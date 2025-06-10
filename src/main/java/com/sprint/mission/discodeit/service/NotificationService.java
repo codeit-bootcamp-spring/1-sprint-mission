@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.Notification;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
+    @Cacheable(value = "userNotifications", key = "#userId")
     @Transactional(readOnly = true)
     public List<NotificationDto> getUserNotifications(UUID userId) {
         System.out.println("알림 개수: " + notificationRepository.findAllByReceiver_Id(userId).size());
@@ -25,6 +28,7 @@ public class NotificationService {
                 .stream().map(notificationMapper::toDto).toList();
     }
 
+    @CacheEvict(value = "userNotifications", key = "#userId")
     @Transactional
     public void deletedIfOwner(UUID notificationId, UUID userId) {
         Notification notification = notificationRepository.findById(notificationId)
