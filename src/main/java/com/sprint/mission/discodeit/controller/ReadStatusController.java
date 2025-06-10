@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.Interface.ReadStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -38,7 +38,7 @@ public class ReadStatusController implements ReadStatusApi {
     @Override
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable UUID readStatusId,
-            @Valid @RequestBody UpdateReadStatusRequestDto request) {
+            @Valid @RequestBody ReadStatusUpdateRequest request) {
         ReadStatusDto updatedReadStatus = readStatusService.update(readStatusId, request);
         return ResponseEntity.ok(updatedReadStatus);
     }

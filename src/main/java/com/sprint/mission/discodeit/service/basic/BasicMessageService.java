@@ -1,16 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import static com.sprint.mission.discodeit.entity.NotificationType.NEW_MESSAGE;
+
 import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
-import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.file.FileUploadFailedException;
 import com.sprint.mission.discodeit.exception.file.InvalidFileDataException;
@@ -22,11 +25,11 @@ import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.SecurityUtil;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.service.Interface.MessageService;
-import com.sprint.mission.discodeit.service.Interface.ReadStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -53,11 +57,12 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
-    private final ReadStatusService readStatusService;
     private final MessageMapper messageMapper;
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
     private final PageResponseMapper pageResponseMapper;
+    private final ApplicationEventPublisher eventPublisher;
+    private final ReadStatusRepository readStatusRepository;
 
 
     @Override
@@ -87,6 +92,7 @@ public class BasicMessageService implements MessageService {
                     binaryContentStorage.putAsync(
                             savedContent.getId(),
                             binaryRequest.bytes(),
+                            request.getAuthorId(),
                             status -> {
                                 savedContent.setUploadStatus(status);
                                 binaryContentRepository.save(savedContent);
@@ -100,6 +106,26 @@ public class BasicMessageService implements MessageService {
 
         Message message = new Message(request.getContent(), channel, author, attachmentIds);
         Message saved = messageRepository.save(message);
+
+        String title = String.format("%s님이 %s 채널에 메시지를 보냈습니다.", author.getUsername(),
+                channel.getName());
+
+        List<User> receivers = readStatusRepository.findAllByChannel_IdAndNotificationEnabledTrue(
+                        channel.getId())
+                .stream()
+                .map(ReadStatus::getUser)
+                .filter(user -> !user.getId().equals(author.getId()))//본인 제외
+                .toList();
+
+        List<UUID> receiversIds = receivers.stream().map(User::getId).toList();
+
+        if (receivers.isEmpty()) {
+            log.warn("⚠️ 알림 수신 대상자가 없습니다. 채널 ID: {}", channel.getId());
+        }
+
+        eventPublisher.publishEvent(
+                NotificationEvent.of(receiversIds, title, message.getContent(), NEW_MESSAGE,
+                        channel.getId()));
 
         log.info("메시지 생성 완료: id={}, authorId={}", saved.getId(), author.getId());
         return messageMapper.toDto(saved);
@@ -162,9 +188,6 @@ public class BasicMessageService implements MessageService {
 
         message.update(request.getNewContent());
         log.debug("메시지 내용 수정 완료");
-
-        readStatusService.update(message.getId(), new UpdateReadStatusRequestDto(Instant.now()));
-        log.debug("읽음 상태 업데이트 완료");
 
         return messageMapper.toDto(message);
     }

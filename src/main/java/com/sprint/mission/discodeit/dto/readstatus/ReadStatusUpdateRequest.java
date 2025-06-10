@@ -7,8 +7,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UpdateReadStatusRequestDto {
+public class ReadStatusUpdateRequest {
 
-    @NotNull
-    private Instant newLastReadAt;
+    //    @NotNull
+//    private Instant newLastReadAt;
+    private Boolean newNotificationEnabled;
 }

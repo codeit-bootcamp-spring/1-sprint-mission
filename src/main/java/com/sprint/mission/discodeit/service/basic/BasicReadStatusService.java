@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -54,7 +54,7 @@ public class BasicReadStatusService implements ReadStatusService {
         }
 
         Instant now = request.getLastReadAt();
-        ReadStatus readStatus = new ReadStatus(user, channel, now);
+        ReadStatus readStatus = ReadStatus.createWithDefaultNotification(user, channel, now);
 
         return readStatusMapper.toDto(readStatusRepository.save(readStatus));
     }
@@ -73,7 +73,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     @Transactional
-    public ReadStatusDto update(UUID readStatusId, UpdateReadStatusRequestDto request) {
+    public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(ReadStatusNotFoundException::new);
 
@@ -82,7 +82,8 @@ public class BasicReadStatusService implements ReadStatusService {
         if (!readStatus.getUser().getId().equals(currentUserId)) {
             throw new AccessDeniedException("본인만 수정 가능");
         }
-        readStatus.update(request.getNewLastReadAt());
+        //readStatus.update(request.getNewLastReadAt());
+        readStatus.updatedNotificationEnabled(request.getNewNotificationEnabled());
         return readStatusMapper.toDto(readStatus);
     }
 

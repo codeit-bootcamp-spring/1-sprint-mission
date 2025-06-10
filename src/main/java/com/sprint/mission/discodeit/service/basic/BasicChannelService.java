@@ -65,7 +65,8 @@ public class BasicChannelService implements ChannelService {
         Channel savedChannel = channelRepository.save(channel);
 
         participants.forEach(user -> {
-            ReadStatus readStatus = new ReadStatus(user, savedChannel, Instant.now());
+            ReadStatus readStatus = ReadStatus.createWithDefaultNotification(user, savedChannel,
+                    Instant.now());
             readStatusRepository.save(readStatus);
         });
 

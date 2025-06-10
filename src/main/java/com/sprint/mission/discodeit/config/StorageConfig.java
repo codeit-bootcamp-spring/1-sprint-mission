@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.storage.S3BinaryContentStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -52,17 +53,20 @@ public class StorageConfig {
             S3Client s3Client,
             S3Presigner s3Presigner,
             @Value("${discodeit.storage.s3.bucket}") String bucket,
-            @Value("${discodeit.storage.s3.presigned-url-expiration:600}") int expirationSeconds
+            @Value("${discodeit.storage.s3.presigned-url-expiration:600}") int expirationSeconds,
+            ApplicationEventPublisher eventPublisher
     ) {
         log.info("✅ Using S3BinaryContentStorage");
-        return new S3BinaryContentStorage(s3Client, s3Presigner, bucket, expirationSeconds);
+        return new S3BinaryContentStorage(s3Client, s3Presigner, bucket, expirationSeconds,
+                eventPublisher);
     }
 
     @Bean
     @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local", matchIfMissing = true)
     public BinaryContentStorage localStorage(
-            @Value("${discodeit.storage.local.root-path}") String rootPath) {
+            @Value("${discodeit.storage.local.root-path}") String rootPath,
+            ApplicationEventPublisher eventPublisher) {
         log.info("✅ Using LocalBinaryContentStorage");
-        return new LocalBinaryContentStorage(rootPath);
+        return new LocalBinaryContentStorage(rootPath, eventPublisher);
     }
 }

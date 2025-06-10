@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
+import static com.sprint.mission.discodeit.entity.NotificationType.*;
+
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -13,10 +16,11 @@ import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.security.jwt.TokenPair;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +31,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,6 +54,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final JwtSessionRepository jwtSessionRepository;
     private final JwtBlacklist jwtBlacklist;
+    private final ApplicationEventPublisher eventPublisher;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest,
@@ -153,6 +159,7 @@ public class AuthController {
 
     @PutMapping("/role")
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public ResponseEntity<UserDto> updateUserRole(@RequestBody RoleUpdateRequest request) {
         User user = userRepository.findById(request.userId())
                 .orElseThrow(UserNotFoundException::new);
@@ -168,6 +175,14 @@ public class AuthController {
                     jwtBlacklist.addToBlacklist(session.getAccessToken(), exp);
                     jwtSessionRepository.delete(session);
                 });
+
+        eventPublisher.publishEvent(NotificationEvent.of(
+                List.of(user.getId()),
+                "권한이 변경되었습니다",
+                request.newRole().name(),
+                ROLE_CHANGE,
+                user.getId()
+        ));
 
         return ResponseEntity.ok().build();
     }

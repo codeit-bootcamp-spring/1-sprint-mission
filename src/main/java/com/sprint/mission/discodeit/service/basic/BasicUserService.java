@@ -69,16 +69,21 @@ public class BasicUserService implements UserService {
             throw new DuplicatedUsernameException();
         }
 
-        BinaryContent profileImage =
-                (profile != null && !profile.isEmpty()) ? saveProfile(profile) : null;
-
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = new User(request.getUsername(), request.getEmail(), encodedPassword,
-                profileImage);
+                null);
         user.setRole(Role.USER);
         userRepository.save(user);
+
         log.debug("Saved user: id={}, email={}", user.getId(), user.getEmail());
+
+        if (profile != null && !profile.isEmpty()) {
+            BinaryContent profileImage =
+                    (profile != null && !profile.isEmpty()) ? saveProfile(profile, user.getId())
+                            : null;
+            user.setProfile(profileImage);
+        }
 
         return userMapper.toDto(user);
     }
@@ -132,7 +137,7 @@ public class BasicUserService implements UserService {
                     binaryContentRepository.deleteById(oldProfile.getId());
                 }
 
-                BinaryContent newProfile = saveProfile(profile);
+                BinaryContent newProfile = saveProfile(profile, user.getId());
                 user.setProfile(newProfile);
             }
         }
@@ -167,7 +172,7 @@ public class BasicUserService implements UserService {
         return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
     }
 
-    private BinaryContent saveProfile(MultipartFile profileFile) {
+    private BinaryContent saveProfile(MultipartFile profileFile, UUID userId) {
         if (profileFile == null || profileFile.isEmpty()) {
             throw new InvalidFileDataException();
         }
@@ -184,6 +189,7 @@ public class BasicUserService implements UserService {
             binaryContentStorage.putAsync(
                     savedContent.getId(),
                     profileFile.getBytes(),
+                    userId,
                     status -> {
                         savedContent.setUploadStatus(status);
                         binaryContentRepository.save(savedContent);

@@ -12,10 +12,10 @@ import org.springframework.http.ResponseEntity;
 
 public interface BinaryContentStorage {
 
-    CompletableFuture<Void> putAsync(UUID id, byte[] data,
+    CompletableFuture<Void> putAsync(UUID id, byte[] data, UUID userId,
             Consumer<BinaryContentUploadStatus> statusCallback);
 
-    CompletableFuture<Void> recover(FileUploadFailedException e, UUID id, byte[] data,
+    CompletableFuture<Void> recover(FileUploadFailedException e, UUID id, byte[] data, UUID userId,
             Consumer<BinaryContentUploadStatus> statusCallback);
 
     UUID put(UUID id, byte[] data) throws IOException;

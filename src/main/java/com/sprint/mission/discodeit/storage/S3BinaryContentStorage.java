@@ -3,17 +3,21 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.async.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.exception.file.FileUploadFailedException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -37,6 +41,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     private final S3Presigner presigner;
     private final String bucket;
     private final int expirationSeconds;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Async("contextAwareExecutor")
     @Retryable(
@@ -45,18 +50,28 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
             backoff = @Backoff(delay = 1000)
     )
     public CompletableFuture<Void> putAsync(UUID id, byte[] data,
+            UUID userId,
             Consumer<BinaryContentUploadStatus> statusCallback) {
         try {
             put(id, data);
             statusCallback.accept(BinaryContentUploadStatus.SUCCESS);
             return CompletableFuture.completedFuture(null);
         } catch (FileUploadFailedException e) {
+            log.error("비동기 파일 업로드 실패: {}", id);
+            eventPublisher.publishEvent(NotificationEvent.of(
+                    List.of(userId),
+                    "파일 업로드 실패",
+                    "첨부파일 업로드 중 문제가 발생했습니다.",
+                    NotificationType.ASYNC_FAILED,
+                    null
+            ));
             throw new FileUploadFailedException();
         }
     }
 
     @Recover
     public CompletableFuture<Void> recover(FileUploadFailedException e, UUID id, byte[] data,
+            UUID userId,
             Consumer<BinaryContentUploadStatus> statusCallback) {
         String requestId = MDC.get("requestId");
         String taskName = "FileUpload";

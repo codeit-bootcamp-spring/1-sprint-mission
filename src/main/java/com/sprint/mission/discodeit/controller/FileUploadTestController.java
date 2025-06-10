@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
+import static com.sprint.mission.discodeit.security.SecurityUtil.getCurrentUserId;
+
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.micrometer.core.annotation.Timed;
 import java.io.IOException;
@@ -28,8 +30,11 @@ public class FileUploadTestController {
     @Timed("upload.async")
     @PostMapping("/async")
     public ResponseEntity<String> asyncUpload(@RequestBody byte[] data) {
-        storage.putAsync(UUID.randomUUID(), data, status -> {
-        });
+        UUID userId = getCurrentUserId();
+        storage.putAsync(UUID.randomUUID(), data,
+                userId,
+                status -> {
+                });
         return ResponseEntity.ok("비동기 업로드 완료");
     }
 }
