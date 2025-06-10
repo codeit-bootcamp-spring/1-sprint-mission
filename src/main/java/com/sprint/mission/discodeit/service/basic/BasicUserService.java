@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheConfig;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -24,6 +25,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,6 +52,7 @@ public class BasicUserService implements UserService {
 
     @Timed(value = "user.create.async", description = "Time taken for creation with async upload")
     @Transactional
+    @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -95,6 +101,7 @@ public class BasicUserService implements UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.USER_DETAIL, key = "#userId")
     @Override
     public UserDto find(UUID userId) {
         log.debug("사용자 조회 시작: id={}", userId);
@@ -105,6 +112,7 @@ public class BasicUserService implements UserService {
         return userDto;
     }
 
+    @Cacheable(value = CacheConfig.ALL_USERS, key = "'all_users'")
     @Override
     public List<UserDto> findAll() {
         log.debug("모든 사용자 조회 시작");
@@ -123,6 +131,10 @@ public class BasicUserService implements UserService {
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Timed(value = "user.update.async", description = "Time taken for update with async upload")
     @Transactional
+    @Caching(
+        put = @CachePut(value = CacheConfig.USER_DETAIL, key = "#userId"),
+        evict = @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
+    )
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -164,7 +176,7 @@ public class BasicUserService implements UserService {
                         }
                     }
                 );
-                
+
                 return binaryContent;
             })
             .orElse(null);
@@ -174,12 +186,19 @@ public class BasicUserService implements UserService {
             .orElse(null);
         user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
-        log.info("사용자 수정 완료: id={}", userId);
-        return userMapper.toDto(user);
+        UserDto updatedUserDto = userMapper.toDto(user);
+        log.info("사용자 수정 완료: id={} - 사용자 상세 캐시 갱신, 전체 사용자 목록 캐시 무효화", userId);
+        return updatedUserDto;
     }
 
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConfig.USER_DETAIL, key = "#userId"),
+        @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true),
+        @CacheEvict(value = CacheConfig.USER_CHANNELS, key = "#userId"),
+        @CacheEvict(value = CacheConfig.USER_NOTIFICATIONS, key = "#userId")
+    })
     @Override
     public void delete(UUID userId) {
         log.debug("사용자 삭제 시작: id={}", userId);
