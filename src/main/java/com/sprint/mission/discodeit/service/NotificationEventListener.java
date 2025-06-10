@@ -21,6 +21,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
@@ -34,7 +35,7 @@ public class NotificationEventListener {
     private final BasicNotificationService notificationService;
 
     @Async
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Retryable(
         retryFor = {Exception.class},
         maxAttempts = 3,
@@ -56,7 +57,7 @@ public class NotificationEventListener {
     }
 
     @Async
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Retryable(
         retryFor = {Exception.class},
         maxAttempts = 3,
@@ -109,7 +110,7 @@ public class NotificationEventListener {
     }
 
     @Async
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Retryable(
         retryFor = {Exception.class},
         maxAttempts = 3,
@@ -142,7 +143,7 @@ public class NotificationEventListener {
     }
 
     @Async
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Retryable(
         retryFor = {Exception.class},
         maxAttempts = 3,

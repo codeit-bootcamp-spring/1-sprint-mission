@@ -16,6 +16,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +66,17 @@ public class BasicNotificationService implements NotificationService {
         UUID receiverId = notification.getReceiver().getId();
         notificationRepository.delete(notification);
 
-        evictUserNotificationsCache(receiverId);
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictUserNotificationsCache(receiverId);
+                    log.info("알림 삭제 완료: notificationId={}, receiverId={} - 트랜잭션 커밋 후 알림 캐시 무효화",
+                        notificationId, receiverId);
+                }
+            }
+        );
+
         log.info("알림 삭제 완료: notificationId={}, receiverId={} - 알림 캐시 무효화", notificationId,
             receiverId);
     }

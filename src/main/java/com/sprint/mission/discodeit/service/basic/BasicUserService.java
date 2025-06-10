@@ -16,7 +16,6 @@ import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AsyncUploadService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.micrometer.core.annotation.Timed;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +43,6 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AsyncUploadService asyncUploadService;
@@ -52,7 +50,6 @@ public class BasicUserService implements UserService {
 
     @Timed(value = "user.create.async", description = "Time taken for creation with async upload")
     @Transactional
-    @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -96,6 +93,18 @@ public class BasicUserService implements UserService {
         User user = new User(username, email, hashedPassword, nullableProfile);
 
         userRepository.save(user);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictAllUsersCache();
+                    log.info("사용자 생성 완료: id={}, username={} - 트랜잭션 커밋 후 전체 사용자 목록 캐시 무효화",
+                        user.getId(), username);
+                }
+            }
+        );
+
         log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
         return userMapper.toDto(user);
     }
@@ -112,6 +121,7 @@ public class BasicUserService implements UserService {
         return userDto;
     }
 
+    @Transactional(readOnly = true)
     @Cacheable(value = CacheConfig.ALL_USERS, key = "'all_users'")
     @Override
     public List<UserDto> findAll() {
@@ -131,10 +141,7 @@ public class BasicUserService implements UserService {
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Timed(value = "user.update.async", description = "Time taken for update with async upload")
     @Transactional
-    @Caching(
-        put = @CachePut(value = CacheConfig.USER_DETAIL, key = "#userId"),
-        evict = @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
-    )
+    @CachePut(value = CacheConfig.USER_DETAIL, key = "#userId")
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -187,18 +194,21 @@ public class BasicUserService implements UserService {
         user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
         UserDto updatedUserDto = userMapper.toDto(user);
-        log.info("사용자 수정 완료: id={} - 사용자 상세 캐시 갱신, 전체 사용자 목록 캐시 무효화", userId);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictAllUsersCache();
+                    log.info("사용자 수정 완료: id={} - 트랜잭션 커밋 후 사용자 상세 캐시 갱신, 전체 사용자 목록 캐시 무효화", userId);
+                }
+            }
+        );
         return updatedUserDto;
     }
 
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Transactional
-    @Caching(evict = {
-        @CacheEvict(value = CacheConfig.USER_DETAIL, key = "#userId"),
-        @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true),
-        @CacheEvict(value = CacheConfig.USER_CHANNELS, key = "#userId"),
-        @CacheEvict(value = CacheConfig.USER_NOTIFICATIONS, key = "#userId")
-    })
     @Override
     public void delete(UUID userId) {
         log.debug("사용자 삭제 시작: id={}", userId);
@@ -208,6 +218,32 @@ public class BasicUserService implements UserService {
         }
 
         userRepository.deleteById(userId);
-        log.info("사용자 삭제 완료: id={}", userId);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictUserRelatedCaches(userId);
+                    log.info("사용자 삭제 완료: id={} - 트랜잭션 커밋 후 관련 캐시 무효화", userId);
+                }
+            }
+        );
     }
+
+    @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
+    public void evictAllUsersCache() {
+        log.debug("전체 사용자 목록 캐시 무효화");
+    }
+
+    @Caching(evict = {
+        @CacheEvict(value = CacheConfig.USER_DETAIL, key = "#userId"),
+        @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true),
+        @CacheEvict(value = CacheConfig.USER_CHANNELS, key = "#userId"),
+        @CacheEvict(value = CacheConfig.USER_NOTIFICATIONS, key = "#userId")
+    })
+    public void evictUserRelatedCaches(UUID userId) {
+        log.debug("사용자 관련 모든 캐시 무효화: userId={}", userId);
+    }
+
+
 }

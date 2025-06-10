@@ -21,7 +21,6 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AsyncUploadService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import java.util.List;
@@ -47,7 +46,6 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final MessageMapper messageMapper;
-    private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentRepository binaryContentRepository;
     private final PageResponseMapper pageResponseMapper;
     private final AsyncUploadService asyncUploadService;
@@ -100,27 +98,31 @@ public class BasicMessageService implements MessageService {
         );
 
         messageRepository.save(message);
-        
+
         TransactionSynchronizationManager.registerSynchronization(
             new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
                     NewMessageEvent event = new NewMessageEvent(channelId, authorId, content);
                     eventPublisher.publishEvent(event);
+                    log.info("메시지 생성 완료: id={}, channelId={} - 트랜잭션 커밋 후 새 메시지 이벤트 발행",
+                        message.getId(), channelId);
                 }
             }
         );
 
-        log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
         return messageMapper.toDto(message);
     }
 
     @Transactional(readOnly = true)
     @Override
     public MessageDto find(UUID messageId) {
-        return messageRepository.findById(messageId)
+        log.debug("메시지 조회 시작: id={}", messageId);
+        MessageDto messageDto = messageRepository.findById(messageId)
             .map(messageMapper::toDto)
             .orElseThrow(() -> MessageNotFoundException.withId(messageId));
+        log.info("메시지 조회 완료: id={}", messageId);
+        return messageDto;
     }
 
     @Transactional(readOnly = true)

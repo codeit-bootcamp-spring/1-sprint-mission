@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,7 +43,6 @@ public class BasicAuthService implements AuthService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
     @Override
     public UserDto initAdmin() {
         if (userRepository.existsByEmail(email) || userRepository.existsByUsername(username)) {
@@ -58,16 +56,23 @@ public class BasicAuthService implements AuthService {
         userRepository.save(admin);
 
         UserDto adminDto = userMapper.toDto(admin);
-        log.info("어드민이 초기화되었습니다. {} - 전체 사용자 목록 캐시 무효화", adminDto);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictAllUsersCache();
+                    log.info("어드민 초기화 완료: {} - 트랜잭션 커밋 후 전체 사용자 목록 캐시 무효화", adminDto);
+                }
+            }
+        );
+
         return adminDto;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    @Caching(
-        put = @CachePut(value = CacheConfig.USER_DETAIL, key = "#request.userId()"),
-        evict = @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
-    )
+    @CachePut(value = CacheConfig.USER_DETAIL, key = "#request.userId()")
     @Override
     public UserDto updateRole(RoleUpdateRequest request) {
         UUID userId = request.userId();
@@ -90,12 +95,21 @@ public class BasicAuthService implements AuthService {
                     RoleChangedEvent event = new RoleChangedEvent(userId, oldRole,
                         newRole);
                     eventPublisher.publishEvent(event);
+
+                    evictAllUsersCache();
+
+                    log.info(
+                        "권한 변경 완료: userId={}, {} -> {} - 트랜잭션 커밋 후 사용자 상세 캐시 갱신, 전체 사용자 목록 캐시 무효화, 권한 변경 이벤트 발행",
+                        userId, oldRole, newRole);
                 }
             }
         );
 
-        log.info("권한 변경 완료: userId={}, {} -> {} - 사용자 상세 캐시 갱신, 전체 사용자 목록 캐시 무효화",
-            userId, oldRole, newRole);
         return updatedUserDto;
+    }
+
+    @CacheEvict(value = CacheConfig.ALL_USERS, allEntries = true)
+    public void evictAllUsersCache() {
+        log.debug("전체 사용자 목록 캐시 무효화");
     }
 }

@@ -22,9 +22,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -40,7 +43,6 @@ public class BasicChannelService implements ChannelService {
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
-    @CacheEvict(value = CacheConfig.USER_CHANNELS, allEntries = true)
     @Override
     public ChannelDto create(PublicChannelCreateRequest request) {
         log.debug("채널 생성 시작: {}", request);
@@ -49,6 +51,18 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
         channelRepository.save(channel);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictUserChannelsCacheForAllUsers();
+                    log.info("공개 채널 생성 완료: id={}, name={} - 트랜잭션 커밋 후 모든 사용자 채널 캐시 무효화",
+                        channel.getId(), channel.getName());
+                }
+            }
+        );
+
         log.info("채널 생성 완료: id={}, name={} - 모든 사용자 채널 캐시 무효화", channel.getId(), channel.getName());
         return channelMapper.toDto(channel);
     }
@@ -66,10 +80,17 @@ public class BasicChannelService implements ChannelService {
             .toList();
         readStatusRepository.saveAll(readStatuses);
 
-        evictUserChannelsCacheForUsers(request.participantIds());
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictUserChannelsCacheForUsers(request.participantIds());
+                    log.info("비공개 채널 생성 완료: id={} - 트랜잭션 커밋 후 참여자 {}명의 채널 캐시 무효화",
+                        channel.getId(), request.participantIds().size());
+                }
+            }
+        );
 
-        log.info("채널 생성 완료: id={}, name={} - 참여자 {}의 채널 캐시 무효화", channel.getId(), channel.getName(),
-            request.participantIds().size());
         return channelMapper.toDto(channel);
     }
 
@@ -107,8 +128,9 @@ public class BasicChannelService implements ChannelService {
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
-    @CacheEvict(value = {CacheConfig.CHANNEL_DETAIL, CacheConfig.USER_CHANNELS},
-        key = "#channelId", allEntries = true)
+    @Caching(evict = {
+        @CacheEvict(value = CacheConfig.CHANNEL_DETAIL, key = "#channelId")
+    })
     @Override
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
         log.debug("채널 수정 시작: id={}, request={}", channelId, request);
@@ -120,8 +142,18 @@ public class BasicChannelService implements ChannelService {
             throw PrivateChannelUpdateException.forChannel(channelId);
         }
         channel.update(newName, newDescription);
-        log.info("채널 수정 완료: id={}, name={} - 채널 상세 및 모든 사용자 채널 캐시 무효화", channelId,
-            channel.getName());
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictUserChannelsCacheForAllUsers();
+                    log.info("채널 수정 완료: id={}, name={} - 트랜잭션 커밋 후 채널 상세 캐시 갱신, 모든 사용자 채널 캐시 무효화",
+                        channelId, channel.getName());
+                }
+            }
+        );
+
         return channelMapper.toDto(channel);
     }
 
@@ -143,22 +175,35 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.deleteAllByChannelId(channelId);
         channelRepository.deleteById(channelId);
 
-        evictChannelRelatedCaches(channelId, participantIds);
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictChannelRelatedCaches(channelId, participantIds);
+                    log.info("채널 삭제 완료: id={} - 트랜잭션 커밋 후 관련 캐시 무효화", channelId);
+                }
+            }
+        );
 
         log.info("채널 삭제 완료: id={} - 관련 캐시 무효화", channelId);
     }
 
 
-    /**
-     * 특정 사용자들의 채널 캐시 무효화
-     */
+    @CacheEvict(value = CacheConfig.USER_CHANNELS, allEntries = true)
+    public void evictUserChannelsCacheForAllUsers() {
+        log.debug("모든 사용자의 채널 캐시 무효화");
+    }
+
     @CacheEvict(value = CacheConfig.USER_CHANNELS, allEntries = true)
     public void evictUserChannelsCacheForUsers(List<UUID> userIds) {
         log.debug("사용자들의 채널 캐시 무효화: userIds={}", userIds);
     }
 
-    private void evictChannelRelatedCaches(UUID channelId, List<UUID> participantIds) {
+    @Caching(evict = {
+        @CacheEvict(value = CacheConfig.CHANNEL_DETAIL, key = "#channelId"),
+        @CacheEvict(value = CacheConfig.USER_CHANNELS, allEntries = true)
+    })
+    protected void evictChannelRelatedCaches(UUID channelId, List<UUID> participantIds) {
         log.debug("채널 관련 캐시 무효화: channelId={}, participantIds={}", channelId, participantIds);
-        evictUserChannelsCacheForUsers(participantIds);
     }
 }

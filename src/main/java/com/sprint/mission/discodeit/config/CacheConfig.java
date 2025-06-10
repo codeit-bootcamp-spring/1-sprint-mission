@@ -70,7 +70,7 @@ public class CacheConfig {
         return Caffeine.newBuilder()
             .initialCapacity(50)
             .maximumSize(300)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
             .recordStats()
             .evictionListener((key, value, cause) ->
                 log.debug("사용자 알림 캐시 제거: key={}, cause={}", key, cause));
@@ -83,7 +83,7 @@ public class CacheConfig {
         return Caffeine.newBuilder()
             .initialCapacity(10)
             .maximumSize(20)
-            .expireAfterWrite(20, TimeUnit.MINUTES)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
             .recordStats()
             .evictionListener((key, value, cause) ->
                 log.debug("전체 사용자 캐시 제거: key={}, cause={}", key, cause));
