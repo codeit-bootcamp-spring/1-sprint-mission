@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.2-M10'
+version = '2.3-M11'
 
 java {
     toolchain {
@@ -25,6 +25,9 @@ repositories {
 }
 
 dependencies {
+
+    implementation 'org.springframework:spring-aspects'
+    implementation 'org.springframework.retry:spring-retry'
 
     // JWT 라이브러리 - 가장 많이 쓰이는 것
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'

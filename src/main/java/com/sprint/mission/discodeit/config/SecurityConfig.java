@@ -120,13 +120,15 @@ public class SecurityConfig {
                                 "/api/users",
                                 "/api/readStatuses/**",
                                 "/api/messages",
-                                "/api/channels"))
+                                "/api/channels",
+                                "/api/binaryContents/**"))
                 .logout(logout -> logout.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll() // 회원가입만 허용
                         .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
+                        .requestMatchers("/api/binaryContents/**").permitAll() //프론트에서 Authorization 안보내나?
                         .requestMatchers(new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**"))).permitAll()
                         .requestMatchers(
                                 "/api/auth/login?**",
@@ -135,7 +137,7 @@ public class SecurityConfig {
                         .anyRequest().hasRole("USER")
                 )
                 .formLogin(form -> form.disable())
-                .addFilterBefore(accessTokenAuthenticationFilter, CustomLoginFilter.class)
+                .addFilterBefore(accessTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(customLoginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(customLogoutFilter, LogoutFilter.class);
         return http.build();
