@@ -24,14 +24,8 @@ public class ReadStatusController {
 
   private final ReadStatusService readStatusService;
 
-  //개별 조회
-//  @GetMapping("/{readStatusId}")
-//  public ReadStatusResponseDto getReadStatus(@PathVariable String readStatusId) {
-//    return readStatusService.findById(readStatusId);
-//  }
-
   //개별 생성
-  @PreAuthorize("hasPermission(#createReadStatusDto.userId, 'ReadStatus', 'CREATE')")
+  @PreAuthorize("#createReadStatusDto.userId() == authentication.principal.userDto.id.toString()")
   @PostMapping
   public ResponseEntity<ReadStatusDto> createReadStatus(
       @Valid @RequestBody CreateReadStatusDto createReadStatusDto) {
@@ -39,7 +33,6 @@ public class ReadStatusController {
         .body(readStatusService.create(createReadStatusDto));
   }
 
-  @PreAuthorize("hasPermission(#readStatusId, 'ReadStatus', 'UPDATE')")
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable String readStatusId,
       @Valid @RequestBody UpdateReadStatusDto updateReadStatusDto) {
@@ -54,12 +47,4 @@ public class ReadStatusController {
     return readStatusService.findAllByUserId(userId);
   }
 
-  //특정 채널의 메세지 수신 정보 수정
-  @PreAuthorize("hasPermission(#channelId, 'ReadStatus', 'UPDATE_CHANNEL')")
-  @PatchMapping
-  public ResponseEntity<List<ReadStatusDto>> updateChannelReadStatus(
-      @RequestParam String channelId,
-      @Valid @RequestBody UpdateReadStatusDto updateReadStatusDto) {
-    return ResponseEntity.ok(readStatusService.updateByChannelId(channelId, updateReadStatusDto));
-  }
 }

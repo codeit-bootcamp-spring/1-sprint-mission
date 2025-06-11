@@ -19,6 +19,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -78,6 +80,7 @@ public class BasicReadStatusService implements ReadStatusService {
     return readStatusMapper.toDto(readStatus);
   }
 
+  @PostAuthorize("authentication.principal.userDto.id == returnObject.userId()")
   @Override
   @Transactional
   public ReadStatusDto update(String readStatusId,
@@ -96,6 +99,7 @@ public class BasicReadStatusService implements ReadStatusService {
     return readStatusMapper.toDto(readStatus);
   }
 
+  @PreAuthorize("#userId == authentication.principal.userDto.id.toString()")
   @Override
   @Transactional
   public List<ReadStatusDto> updateByUserId(String userId,
