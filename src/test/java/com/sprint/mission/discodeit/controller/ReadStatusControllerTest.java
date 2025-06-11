@@ -93,7 +93,7 @@ class ReadStatusControllerTest {
 
   @Test
   @DisplayName("읽음 상태 업데이트 성공 테스트")
-  void update_Success() throws Exception {
+  void update_LastReadAt_Success() throws Exception {
     // Given
     UUID readStatusId = UUID.randomUUID();
     UUID userId = UUID.randomUUID();
@@ -125,7 +125,7 @@ class ReadStatusControllerTest {
 
   @Test
   @DisplayName("읽음 상태 업데이트 실패 테스트 - 존재하지 않는 읽음 상태")
-  void update_Failure_ReadStatusNotFound() throws Exception {
+  void update_LastReadAt_Failure_ReadStatusNotFound() throws Exception {
     // Given
     UUID nonExistentId = UUID.randomUUID();
     Instant newLastReadAt = Instant.now();

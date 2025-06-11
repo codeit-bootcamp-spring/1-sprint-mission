@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContent.uploadStatus;
+import com.sprint.mission.discodeit.entity.Notification.NotificationType;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.NotificationService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.UUID;
@@ -26,6 +28,7 @@ public class AsyncBinaryContentUploadService {
   private final BinaryContentStorage storage;
   private final BinaryContentRepository repository;
   private final AsyncTaskFailureRepository failureRepository;
+  private final NotificationService notificationService;
 
   @Async
   @Retryable(
@@ -48,7 +51,7 @@ public class AsyncBinaryContentUploadService {
   }
 
   @Recover
-  public void onUploadFailure(IOException e, UUID contentId, byte[] bytes) {
+  public void onUploadFailure(IOException e, UUID contentId) {
     log.error("업로드 실패 (재시도 모두 실패): id={}, message={}", contentId, e.getMessage());
 
     String requestId = MDC.get("requestId");
@@ -63,5 +66,8 @@ public class AsyncBinaryContentUploadService {
       content.updateStatus(uploadStatus.FAILED);
       repository.save(content);
     });
+
+    String content = String.format("파일 업로드 실패 - 파일 ID: %s, 요청 ID: %s", contentId, requestId);
+    notificationService.createNotification(content, NotificationType.ASYNC_FAILED, null);
   }
 }

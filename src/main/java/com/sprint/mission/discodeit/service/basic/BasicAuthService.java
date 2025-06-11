@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
+import com.sprint.mission.discodeit.entity.Notification.NotificationType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.NotificationService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,16 +25,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class BasicAuthService implements AuthService {
 
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
+  private final NotificationService notificationService;
   @Value("${discodeit.admin.username}")
   private String username;
   @Value("${discodeit.admin.password}")
   private String password;
   @Value("${discodeit.admin.email}")
   private String email;
-  private final UserRepository userRepository;
-  private final UserMapper userMapper;
-  private final PasswordEncoder passwordEncoder;
-  private final JwtService jwtService;
 
   @Transactional
   @Override
@@ -60,6 +63,9 @@ public class BasicAuthService implements AuthService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> UserNotFoundException.withId(userId));
     user.updateRole(request.newRole());
+
+    String content = String.format("%s님이 %s 역할로 변경되었습니다.", username, request.newRole().name());
+    notificationService.createNotification(content, NotificationType.ROLE_CHANGED, userId);
 
     jwtService.invalidateJwtSession(user.getId());
     return userMapper.toDto(user);

@@ -146,7 +146,7 @@ class ReadStatusApiIntegrationTest {
 
   @Test
   @DisplayName("읽음 상태 업데이트 API 통합 테스트")
-  void updateReadStatus_Success() throws Exception {
+  void updateLastReadAtReadStatus_Success() throws Exception {
     // Given
     // 테스트 사용자 생성
     UserCreateRequest userRequest = new UserCreateRequest(
@@ -195,7 +195,7 @@ class ReadStatusApiIntegrationTest {
 
   @Test
   @DisplayName("읽음 상태 업데이트 실패 API 통합 테스트 - 존재하지 않는 읽음 상태")
-  void updateReadStatus_Failure_NotFound() throws Exception {
+  void updateLastReadAtReadStatus_Failure_NotFound() throws Exception {
     // Given
     UUID nonExistentReadStatusId = UUID.randomUUID();
 
