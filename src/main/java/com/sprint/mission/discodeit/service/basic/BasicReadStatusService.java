@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheConfig;
 import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
@@ -20,10 +21,14 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,6 +39,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusMapper readStatusMapper;
+    private final CacheManager cacheManager;
 
     @PreAuthorize("principal.userDto.id == #request.userId()")
     @Transactional
@@ -58,8 +64,19 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt, notificationEnabled);
         readStatusRepository.save(readStatus);
 
-        log.info("읽음 상태 생성 완료: id={}, userId={}, channelId={}",
-            readStatus.getId(), userId, channelId);
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictUserChannelsCache(userId);
+                    evictChannelDetailCache(channelId);
+                    log.info(
+                        "읽음 상태 생성 완료: id={}, userId={}, channelId={} - 사용자 채널 캐시 및 채널 상세 캐시 무효화",
+                        readStatus.getId(), userId, channelId);
+                }
+            }
+        );
+
         return readStatusMapper.toDto(readStatus);
     }
 
@@ -93,9 +110,28 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(() -> ReadStatusNotFoundException.withId(readStatusId));
 
+        UUID userId = readStatus.getUser().getId();
+        UUID channelId = readStatus.getChannel().getId();
+
         readStatus.update(request.newLastReadAt(), request.newNotificationEnabled());
 
-        log.info("읽음 상태 수정 완료: id={}", readStatusId);
+        Boolean notificationEnabled = request.newNotificationEnabled();
+        if (notificationEnabled != null && !notificationEnabled.equals(
+            readStatus.getNotificationEnabled())) {
+
+            TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        evictChannelDetailCache(channelId);
+                        log.info("읽음 상태 수정 완료: id={} - 채널 상세 캐시 무효화", readStatusId);
+                    }
+                }
+            );
+        } else {
+            log.info("읽음 상태 수정 완료: id={}", readStatusId);
+        }
+
         return readStatusMapper.toDto(readStatus);
     }
 
@@ -103,10 +139,53 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public void delete(UUID readStatusId) {
         log.debug("읽음 상태 삭제 시작: id={}", readStatusId);
-        if (!readStatusRepository.existsById(readStatusId)) {
-            throw ReadStatusNotFoundException.withId(readStatusId);
-        }
+
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+            .orElseThrow(() -> ReadStatusNotFoundException.withId(readStatusId));
+
+        UUID userId = readStatus.getUser().getId();
+        UUID channelId = readStatus.getChannel().getId();
+
         readStatusRepository.deleteById(readStatusId);
-        log.info("읽음 상태 삭제 완료: id={}", readStatusId);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictUserChannelsCache(userId);
+                    evictChannelDetailCache(channelId);
+                    log.info("읽음 상태 삭제 완료: id={} - 사용자 채널 캐시 및 채널 상세 캐시 무효화", readStatusId);
+                }
+            }
+        );
+    }
+
+
+    private void evictUserChannelsCache(UUID userId) {
+        try {
+            Cache cache = cacheManager.getCache(CacheConfig.USER_CHANNELS);
+            if (cache != null) {
+                cache.evict(userId);
+                log.debug("사용자 채널 캐시 무효화 완료: userId={}", userId);
+            } else {
+                log.warn("사용자 채널 캐시를 찾을 수 없음: cacheName={}", CacheConfig.USER_CHANNELS);
+            }
+        } catch (Exception e) {
+            log.error("사용자 채널 캐시 무효화 실패: userId={}", userId, e);
+        }
+    }
+
+    private void evictChannelDetailCache(UUID channelId) {
+        try {
+            Cache cache = cacheManager.getCache(CacheConfig.CHANNEL_DETAIL);
+            if (cache != null) {
+                cache.evict(channelId);
+                log.debug("채널 상세 캐시 무효화 완료: channelId={}", channelId);
+            } else {
+                log.warn("채널 상세 캐시를 찾을 수 없음: cacheName={}", CacheConfig.CHANNEL_DETAIL);
+            }
+        } catch (Exception e) {
+            log.error("채널 상세 캐시 무효화 실패: channelId={}", channelId, e);
+        }
     }
 }
