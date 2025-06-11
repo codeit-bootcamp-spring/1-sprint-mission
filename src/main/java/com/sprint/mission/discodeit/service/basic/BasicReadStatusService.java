@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
@@ -56,8 +57,12 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new DiscodeitException(ErrorCode.READ_STATUS_ALREADY_EXIST);
     }
 
-    readStatus = new ReadStatus(channel, user, createReadStatusDto.lastReadAt());
-    ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
+    if (channel.getType() == ChannelType.PRIVATE) {
+      readStatus = new ReadStatus(channel, user, createReadStatusDto.lastReadAt(), true);
+    } else {
+      readStatus = new ReadStatus(channel, user, createReadStatusDto.lastReadAt(), false);
+    }
+    readStatusRepository.save(readStatus);
 
     return readStatusMapper.toDto(readStatus);
   }
@@ -168,7 +173,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public boolean delete(String readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
         .orElseThrow(() -> new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
-    
+
     readStatusRepository.delete(readStatus);
     return true;
   }

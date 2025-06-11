@@ -1,19 +1,30 @@
 package com.sprint.mission.discodeit.storage.local;
 
+import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.event.AsyncFailedNotificationEvent;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentUploadException;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -21,6 +32,11 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +46,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final Path rootPath;
+  private final ApplicationEventPublisher eventPublisher;
 
-  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath) {
+  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath,
+      ApplicationEventPublisher eventPublisher) {
     this.rootPath = Paths.get(rootPath);
+    this.eventPublisher = eventPublisher;
     init();
   }
 
@@ -57,9 +76,24 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     return rootPath.resolve(id.toString());
   }
 
+  // SecurityContext에서 사용자 정보 가져오기
+  private UserDto getCurrentUser() {
+    return ((DiscodeitUserDetails) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal()).getUserDto();
+  }
+
   @Override
   @Transactional
+  @Timed(value = "file.upload.sync", description = "동기 파일 업로드")
   public UUID put(UUID id, byte[] content) {
+
+    // 의도적인 지연 추가
+//    try {
+//      Thread.sleep(2000);
+//    } catch (InterruptedException e) {
+//      Thread.currentThread().interrupt();
+//    }
+
     log.info("파일 저장: id = {}", id);
     try {
       Path filePath = resolvePath(id);
@@ -70,6 +104,69 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       log.error("파일 쓰기 오류: {}", e.getMessage());
       throw new RuntimeException("Failed to store file", e);
     }
+  }
+
+
+  @Async //일반 타입으로 반환하면 @Async가 무시되고 동기 실행된다!
+  // CompletableFuture<T> - 비동기 + 결과 추적 (권장: 결과가 필요한 경우)
+  @Override
+  @Retryable(
+      retryFor = {
+          IOException.class,
+          FileSystemException.class,
+          BinaryContentUploadException.class
+      },
+      maxAttempts = 3,
+      backoff = @Backoff(
+          delay = 500,      // 0.5초 시작
+          multiplier = 2.0, // 매번 2배씩 증가
+          maxDelay = 10000   // 최대 10초
+      )
+  )
+  @Timed(value = "file.upload.async", description = "비동기 파일 업로드")
+  public CompletableFuture<UUID> asyncPut(UUID id, byte[] file) {
+
+    // 의도적인 지연 추가
+//    try {
+//      Thread.sleep(2000);
+//    } catch (InterruptedException e) {
+//      Thread.currentThread().interrupt();
+//    }
+
+    log.info("파일 저장 시작: id = {}, 스레드 = {}, 사용자 = {}",
+        id,
+        Thread.currentThread().getName(),
+        getCurrentUser().id()
+    );
+    try {
+      Path filePath = resolvePath(id);
+      Files.write(filePath, file);
+      log.info("파일 저장 완료: id = {}", id);
+      return CompletableFuture.completedFuture(id);
+    } catch (IOException e) {
+      log.error("파일 저장 실패: id = {}, 오류 = {}", id, e.getMessage());
+      throw new BinaryContentUploadException(ErrorCode.FILE_NOT_SAVED, e);
+    }
+  }
+
+  // 재시도 실패 시 처리 - 무조건 맨 첫번째 매개변수는 예외여야함
+  @Recover
+  public CompletableFuture<UUID> recoverAsyncPut(BinaryContentUploadException ex, UUID id,
+      byte[] content) {
+
+    AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure("UPLOAD_FILE",
+        MDC.get("requestId"),
+        ex.getMessage());
+
+    log.error("파일 저장 최종 실패: AsyncTaskFailure = {}", asyncTaskFailure.toString());
+
+    UUID userId = getCurrentUser().id();
+    AsyncFailedNotificationEvent event = new AsyncFailedNotificationEvent(userId, ex.getMessage());
+    eventPublisher.publishEvent(event);
+
+    CompletableFuture<UUID> future = new CompletableFuture<>();
+    future.completeExceptionally(ex);
+    return future;
   }
 
   @Override

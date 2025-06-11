@@ -68,6 +68,19 @@ CREATE TABLE "message_attachments"
     CONSTRAINT unique_message_attachment UNIQUE (message_id, attachment_id)
 );
 
+CREATE TABLE "notification"
+(
+    "id"          UUID PRIMARY KEY,
+    "created_at"  timestamptz NOT NULL,
+    "receiver_id" UUID        NOT NULL,
+    "title"       varchar(100),
+    "content"     varchar(500),
+    "type"        varchar(50) NOT NULL,
+    "target_id"   UUID,
+    "is_read"     bool        NOT NULL,
+    FOREIGN KEY (receiver_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
 CREATE TABLE persistent_logins
 (
     username  VARCHAR(64) NOT NULL,

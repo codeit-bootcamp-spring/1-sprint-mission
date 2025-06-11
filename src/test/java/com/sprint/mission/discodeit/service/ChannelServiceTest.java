@@ -184,12 +184,14 @@ public class ChannelServiceTest {
       ReadStatus readStatus1 = new ReadStatus(
           channel,
           user1,
-          Instant.now()
+          Instant.now(),
+          true
       );
       ReadStatus readStatus2 = new ReadStatus(
           channel,
           user2,
-          Instant.now()
+          Instant.now(),
+          true
       );
       when(userRepository.findById(userId1)).thenReturn(Optional.of(user1));
       when(userRepository.findById(userId2)).thenReturn(Optional.of(user2));
