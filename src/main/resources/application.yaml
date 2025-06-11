@@ -20,6 +20,22 @@ spring:
     type: caffeine
     caffeine:
       spec: initialCapacity=100,maximumSize=1000,expireAfterWrite=30m,recordStats
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: true
+        retries: 3
+        acks: all
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        isolation.level: read_committed
 
 management:
   endpoints:
@@ -51,6 +67,8 @@ info:
     cache:
       type: ${spring.cache.type}
       caffeine-spec: ${spring.cache.caffeine.spec}
+    kafka:
+      bootstrap-servers: ${spring.kafka.bootstrap-servers}
 
 discodeit:
   storage:
@@ -67,6 +85,13 @@ discodeit:
     username: ${DISCODEIT_ADMIN_USERNAME}
     email: ${DISCODEIT_ADMIN_EMAIL}
     password: ${DISCODEIT_ADMIN_PASSWORD}
+  kafka:
+    topics:
+      new-message: discodeit.new-message
+      role-changed: discodeit.role-changed
+      async-task-failed: discodeit.async-task-failed
+      notification: discodeit.notification
+
 
 logging:
   level:
