@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;

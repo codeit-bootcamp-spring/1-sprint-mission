@@ -19,13 +19,10 @@ public class DiscodeitUserDetails implements UserDetails {
 
   private final UserDto userDto;
   private final String password;
-  private final RoleHierarchy roleHierarchy;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    Set<GrantedAuthority> authorities = new HashSet<>();
-    authorities.add(new SimpleGrantedAuthority("ROLE_".concat(userDto.role().name())));
-    return roleHierarchy.getReachableGrantedAuthorities(authorities);
+    return List.of(new SimpleGrantedAuthority("ROLE_".concat(userDto.role().name())));
   }
 
   @Override

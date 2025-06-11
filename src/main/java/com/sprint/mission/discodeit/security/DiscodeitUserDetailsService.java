@@ -18,7 +18,6 @@ public class DiscodeitUserDetailsService implements UserDetailsService {
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
-  private final RoleHierarchy roleHierarchy;
 
   @Transactional(readOnly = true)
   @Override
@@ -26,6 +25,6 @@ public class DiscodeitUserDetailsService implements UserDetailsService {
     User user = userRepository.findByUsername(username)
         .orElseThrow(() -> UserNotFoundException.withUsername(username));
 
-    return new DiscodeitUserDetails(userMapper.toDto(user), user.getPassword(), roleHierarchy);
+    return new DiscodeitUserDetails(userMapper.toDto(user), user.getPassword());
   }
 }

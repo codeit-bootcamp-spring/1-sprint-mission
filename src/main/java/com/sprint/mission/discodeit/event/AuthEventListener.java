@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.event;
 
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -17,10 +18,10 @@ public class AuthEventListener {
   @EventListener
   @Async
   public void handleUserAuthorityChanged(UserRoleChangedEvent event) {
-    String username = event.username();
+    UUID userId = event.userId();
 
-    log.info("권한 변경된 사용자 세션 무효화 시작: username = {}", username);
+    log.info("권한 변경된 사용자 세션 무효화 시작: userId = {}", userId);
 
-    jwtService.invalidateRefreshToken(username);
+    jwtService.invalidateJwtSession(userId);
   }
 }

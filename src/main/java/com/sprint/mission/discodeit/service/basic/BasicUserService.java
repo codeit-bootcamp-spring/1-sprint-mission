@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.event.RoleChangedNotificationEvent;
 import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
@@ -165,8 +166,6 @@ public class BasicUserService implements UserService {
     User savedUser = userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", savedUser.getId());
 
-    log.debug("사용자 상태 객체 연결");
-
     userRepository.save(user);
 
     return userMapper.toDto(savedUser);
@@ -259,8 +258,14 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
     log.info("사용자 권한 변경 완료: userId = {}, role = {}", user.getId(), user.getRole());
 
+    log.debug("사용자 권한 변경 후 세션 종료를 위한 이벤트 호출");
     eventPublisher.publishEvent(
-        new UserRoleChangedEvent(user.getUsername(), previousRole, roleUpdateRequest.getNewRole()));
+        new UserRoleChangedEvent(user.getId(), previousRole, roleUpdateRequest.getNewRole()));
+
+    log.debug("사용자 권한 변경 후 알림 발행을 위한 이벤트 호출");
+    eventPublisher.publishEvent(
+        new RoleChangedNotificationEvent(
+            user.getId(), user.getId(), roleUpdateRequest.getNewRole().toString()));
 
     return userMapper.toDto(user);
   }
