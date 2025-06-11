@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.sprint.mission.discodeit.config.CacheConfig;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.http.ResponseEntity;
@@ -95,7 +95,7 @@ public class CacheMetricsController {
     @Operation(summary = "캐시 키 목록 조회")
     @GetMapping("/keys/{cacheName}")
     public ResponseEntity<Map<String, Object>> getCacheKeys(@PathVariable String cacheName) {
-        org.springframework.cache.Cache springCache = cacheManager.getCache(cacheName);
+        Cache springCache = cacheManager.getCache(cacheName);
         if (springCache == null) {
             log.warn("존재하지 않는 캐시: {}", cacheName);
             return ResponseEntity.notFound().build();
@@ -103,7 +103,8 @@ public class CacheMetricsController {
 
         Map<String, Object> result = new HashMap<>();
         if (springCache instanceof CaffeineCache caffeineCache) {
-            Cache<Object, Object> nativeCache = caffeineCache.getNativeCache();
+            com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache =
+                caffeineCache.getNativeCache();
             result.put("cacheName", cacheName);
             result.put("keys", nativeCache.asMap().keySet());
             result.put("size", nativeCache.estimatedSize());
@@ -118,30 +119,42 @@ public class CacheMetricsController {
      */
     private Map<String, Object> getCacheStatistics(String cacheName) {
         Map<String, Object> stats = new HashMap<>();
-        org.springframework.cache.Cache springCache = cacheManager.getCache(cacheName);
+        Cache springCache = cacheManager.getCache(cacheName);
 
         if (springCache instanceof CaffeineCache caffeineCache) {
-            Cache<Object, Object> nativeCache = caffeineCache.getNativeCache();
+            com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache =
+                caffeineCache.getNativeCache();
             CacheStats cacheStats = nativeCache.stats();
+
+            long requestCount = cacheStats.requestCount();
 
             stats.put("cacheName", cacheName);
             stats.put("estimatedSize", nativeCache.estimatedSize());
-            stats.put("requestCount", cacheStats.requestCount());
+            stats.put("requestCount", requestCount);
             stats.put("hitCount", cacheStats.hitCount());
-            stats.put("hitRate", String.format("%.2f%%", cacheStats.hitRate() * 100));
+
+            if (requestCount == 0) {
+                stats.put("hitRate", "N/A (요청 없음)");
+                stats.put("missRate", "N/A (요청 없음)");
+                stats.put("status", "UNUSED");
+            } else {
+                double hitRate = (double) cacheStats.hitCount() / requestCount * 100;
+                double missRate = (double) cacheStats.missCount() / requestCount * 100;
+                stats.put("hitRate", String.format("%.2f%%", hitRate));
+                stats.put("missRate", String.format("%.2f%%", missRate));
+                stats.put("status", "ACTIVE");
+            }
+
             stats.put("missCount", cacheStats.missCount());
-            stats.put("missRate", String.format("%.2f%%", cacheStats.missRate() * 100));
             stats.put("loadCount", cacheStats.loadCount());
             stats.put("evictionCount", cacheStats.evictionCount());
-            stats.put("averageLoadTime",
-                String.format("%.2f ms", cacheStats.averageLoadPenalty() / 1_000_000.0));
         }
 
         return stats;
     }
 
     private boolean clearCache(String cacheName) {
-        org.springframework.cache.Cache springCache = cacheManager.getCache(cacheName);
+        Cache springCache = cacheManager.getCache(cacheName);
         if (springCache != null) {
             springCache.clear();
             return true;
