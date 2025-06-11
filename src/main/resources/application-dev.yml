@@ -16,6 +16,17 @@ spring:
   config:
     activate:
       on-profile: dev
+  kafka:
+    bootstrap-servers: broker:9092
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  data:
+    redis:
+      host: redis
+      port: 6379
 
 server:
   port: 8080

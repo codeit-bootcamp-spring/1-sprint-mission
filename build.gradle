@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.2-M10'
+version = '2.3-M11'
 
 java {
     toolchain {
@@ -48,7 +48,13 @@ dependencies {
 
     //캐시
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'com.github.ben-manes.caffeine:caffeine'
+    //implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    //Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
@@ -83,5 +89,5 @@ springBoot {
 
 bootJar {
     archiveBaseName.set("discodeit")
-    archiveVersion.set("2.0-M9")
+    archiveVersion.set("2.3-M11")
 }
