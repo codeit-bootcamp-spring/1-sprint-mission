@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.dto.binaryContent;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-
+import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -10,7 +9,8 @@ public record BinaryContentDto(
     String fileName,
     String contentType,
     Instant createdAt,
-    Long size
+    Long size,
+    BinaryContentUploadStatus uploadStatus
 ) {
 
 }

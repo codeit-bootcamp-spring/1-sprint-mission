@@ -1,10 +1,11 @@
 CREATE TABLE binary_contents
 (
-    "id"           UUID PRIMARY KEY,
-    "created_at"   timestamptz  NOT NULL,
-    "file_name"    varchar(255) NOT NULL,
-    "size"         bigint       NOT NULL,
-    "content_type" varchar(100) NOT NULL
+    "id"            UUID PRIMARY KEY,
+    "created_at"    timestamptz  NOT NULL,
+    "file_name"     varchar(255) NOT NULL,
+    "size"          bigint       NOT NULL,
+    "content_type"  varchar(100) NOT NULL,
+    "upload_status" varchar(50)  NOT NULL
 );
 
 CREATE TABLE users
@@ -32,12 +33,13 @@ CREATE TABLE "channels"
 
 CREATE TABLE "read_statuses"
 (
-    "id"           UUID PRIMARY KEY,
-    "created_at"   timestamptz NOT NULL,
-    "updated_at"   timestamptz,
-    "channel_id"   UUID,
-    "user_id"      UUID,
-    "last_read_at" timestamptz NOT NULL,
+    "id"                   UUID PRIMARY KEY,
+    "created_at"           timestamptz NOT NULL,
+    "updated_at"           timestamptz,
+    "channel_id"           UUID,
+    "user_id"              UUID,
+    "last_read_at"         timestamptz NOT NULL,
+    "notification_enabled" bool        NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
     CONSTRAINT unique_user_channel UNIQUE (channel_id, user_id)

@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
@@ -10,6 +14,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageMissMatchException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -22,12 +28,15 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,10 +52,11 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
-  private final ReadStatusRepository readStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
   private final MessageMapper messageMapper;
+  private final ReadStatusRepository readStatusRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   //텍스트만 있는 메세지
   @Override
@@ -61,23 +71,36 @@ public class BasicMessageService implements MessageService {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    log.debug("사용자가 채널에 속해있는지 ReadStatus로 검증 시작: channelId = {}, userId = {}",
-        createMessageDto.getChannelId(), createMessageDto.getAuthorId());
+    UUID channelId = createMessageDto.getChannelId();
+    UUID authorId = createMessageDto.getAuthorId();
 
-    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
-            createMessageDto.getChannelId(), createMessageDto.getAuthorId())
+    Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
-    //해당 채널에 참여하지 않은 사용자가 해당 private 채널이 존재한다는 사실도 몰라야 한다.
-    //그래서 user not in channel 이 아닌 Channel not found 로 예외처리
+    User author = userRepository.findById(authorId)
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    log.debug("사용자가 채널에 속해있는지 ReadStatus로 검증 완료: readStatusId = {}, channelId = {}, userId = {}",
-        readStatus.getId(), readStatus.getChannel().getId(), readStatus.getUser().getId());
-
-    Message message = new Message(readStatus.getUser(), createMessageDto.content(),
-        readStatus.getChannel());
+    Message message = new Message(author, createMessageDto.content(), channel);
     Message saved = messageRepository.save(message);
 
     log.info("메세지 생성 완료: messageId = {}", saved.getId());
+
+    log.info("메세지 생성 이후 알림 발송 시작: messageId = {}", saved.getId());
+
+    List<ReadStatus> subscribers = readStatusRepository.findByChannelId(channelId);
+    log.debug("해당 채널 구독자 수 = {}", subscribers.size());
+
+    subscribers.stream()
+        .filter(ReadStatus::isNotificationEnabled) // 구독한 사용자들
+        .filter(readStatus -> !readStatus.getUser().getId().equals(authorId)) // 보낸사람 제외
+        .forEach(readStatus -> {
+          NewMessageNotificationEvent event = new NewMessageNotificationEvent(
+              readStatus.getUser().getId(),
+              createMessageDto.getChannelId(),
+              channel.getName()
+          );
+          eventPublisher.publishEvent(event);
+        });
+    log.info("메세지 생성 이후 알림 생성 이벤트 호출 완료: messageId = {}", saved.getId());
 
     return messageMapper.toDto(saved);
   }
@@ -99,29 +122,33 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageDto.id())
         .orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
 
-    //더 좋은 방법이 없을까... 이건 Service를 의존해서 create를 쓰는게 좋을까?
     log.debug("첨부 파일과 메세지 연결 시작");
-    for (MultipartFile file : files) {
-      BinaryContent savedContent = null;
+    files.forEach(file -> {
       try {
-        BinaryContent binaryContent = new BinaryContent(file.getName(), file.getContentType(),
-            file.getSize());
-        savedContent = binaryContentRepository.save(binaryContent);
-        log.debug("첨부 파일 저장 완료: attachmentId = {}", savedContent.getId());
-      } catch (RuntimeException e) {
-        log.error("첨부 파일 저장 중 오류 발생: {}", e.getMessage());
-        throw new RuntimeException(e);
-      }
-      message.addFile(savedContent);
-      log.debug("첨부 파일과 메세지 연결 완료: messageId ={}, attachmentId = {}", message.getId(),
-          savedContent.getId());
-    }
+        BinaryContent binaryContent = new BinaryContent(file.getOriginalFilename(),
+            file.getContentType(),
+            file.getSize(), BinaryContentUploadStatus.WAITING);
 
-    Message createdMessage = messageRepository.save(message);
-    log.info("첨부 파일이 있는 메세지 생성 완료: messageId ={}", createdMessage.getId());
+        binaryContent = binaryContentRepository.save(binaryContent);
+
+        message.addFile(binaryContent);
+
+        eventPublisher.publishEvent(new BinaryContentCreatedEvent(
+            binaryContent.getId(),
+            file.getBytes()
+        ));
+        log.debug("첨부 파일 저장 이벤트 발행 완료: attachmentId = {}", binaryContent.getId());
+      } catch (IOException e) {
+        throw new BinaryContentException(ErrorCode.FILE_NOT_SAVED);
+      }
+    });
+    log.info("첨부 파일이 있는 메세지 생성 완료: messageId ={}", message.getId());
+
+    messageRepository.save(message);
 
     return messageMapper.toDto(message);
   }
+
 
   @Override
   @Transactional(readOnly = true)
@@ -246,7 +273,7 @@ public class BasicMessageService implements MessageService {
     return pageResponseMapper.fromSlice(messageDtoSlice);
   }*/
 
-
+  @PreAuthorize("principal.userDto.id == @basicMessageService.findById(#messageId).author.id")
   @Override
   @Transactional
   public MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto)
@@ -287,6 +314,7 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.findById(#messageId).author.id")
   @Override
   @Transactional
   public boolean delete(String messageId, String userId) throws DiscodeitException {

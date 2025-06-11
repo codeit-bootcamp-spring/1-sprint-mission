@@ -1,17 +1,28 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentUploadException;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -70,6 +81,62 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         RequestBody.fromBytes(bytes));
 
     return id;
+  }
+
+  @Async
+  @Override
+  @Retryable(
+      retryFor = {
+          BinaryContentUploadException.class
+      },
+      maxAttempts = 3,
+      backoff = @Backoff(
+          delay = 500,      // 0.5초 시작
+          multiplier = 2.0, // 매번 2배씩 증가
+          maxDelay = 5000   // 최대 5초
+      )
+  )
+  public CompletableFuture<UUID> asyncPut(UUID id, byte[] file) {
+    log.info("파일 s3에 저장 시작: id = {}, 스레드 = {}, 사용자 = {}",
+        id,
+        Thread.currentThread().getName(),
+        getCurrentUser().id()
+    );
+
+    //s3로 보낼 요청(PutObjectRequest) 만들기
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        .bucket(bucket)
+        .key(id.toString())
+        // .acl("public-read") 퍼블릭 읽기 권한 주기
+        .build();
+
+    //s3에 파일과 요청 업로드
+    s3Client.putObject(putObjectRequest,
+        RequestBody.fromBytes(file));
+
+    return CompletableFuture.completedFuture(id);
+  }
+
+  // SecurityContext에서 사용자 정보 가져오기
+  private UserDto getCurrentUser() {
+    return ((DiscodeitUserDetails) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal()).getUserDto();
+  }
+
+  // 재시도 실패 시 처리 - 무조건 맨 첫번째 매개변수는 예외여야함
+  @Recover
+  public CompletableFuture<UUID> recoverAsyncPut(BinaryContentUploadException ex, UUID id,
+      byte[] content) {
+
+    AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure("UPLOAD_FILE",
+        MDC.get("requestId"),
+        ex.getMessage());
+
+    log.error("파일 저장 최종 실패: AsyncTaskFailure = {}", asyncTaskFailure.toString());
+
+    CompletableFuture<UUID> future = new CompletableFuture<>();
+    future.completeExceptionally(ex);
+    return future;
   }
 
   @Override

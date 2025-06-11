@@ -2,18 +2,19 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentUploadException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,27 +28,45 @@ import java.util.List;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentMapper binaryContentMapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   @Transactional
   public BinaryContentDto create(MultipartFile file) {
     log.info("파일 정보 생성 시작 : {}", file);
+    BinaryContent binaryContent = new BinaryContent(
+        file.getName(),
+        file.getContentType(),
+        file.getSize(),
+        BinaryContentUploadStatus.WAITING
+    );
+
+    BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+
+//    // 동기 처리로 임시 변경 (성능 비교용)
+//    UUID contentId = binaryContent.getId();
+//    try {
+//      UUID result = binaryContentStorage.put(contentId, file.getBytes());
+//      binaryContentStatusService.updateStatus(contentId, BinaryContentUploadStatus.SUCCESS);
+//      log.info("동기 파일 업로드 성공: id = {}", result);
+//    } catch (Exception e) {
+//      binaryContentStatusService.updateStatus(contentId, BinaryContentUploadStatus.FAILED);
+//      log.error("동기 파일 업로드 실패: {}", e.getMessage());
+//    }
+
+    log.info("비동기 파일 업로드");
+
     try {
-      BinaryContent binaryContent = new BinaryContent(
-          file.getName(),
-          file.getContentType(),
-          file.getSize()
-      );
-      BinaryContent savedContent = binaryContentRepository.save(binaryContent);
-      UUID contentId = binaryContentStorage.put(binaryContent.getId(), file.getBytes());
-      log.info("파일 정보 생성 완료: binaryContentId = {}", contentId);
-      return binaryContentMapper.toDto(savedContent);
+      eventPublisher.publishEvent(new BinaryContentCreatedEvent(
+          savedContent.getId(),
+          file.getBytes()
+      ));
     } catch (IOException e) {
-      log.error("파일 정보 생성 중 오류 발생");
-      throw new BinaryContentException(ErrorCode.FILE_NOT_CREATED);
+      throw new BinaryContentUploadException(ErrorCode.FILE_NOT_SAVED);
     }
+
+    return binaryContentMapper.toDto(savedContent);
   }
 
   @Override
