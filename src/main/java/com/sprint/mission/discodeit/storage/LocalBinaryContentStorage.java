@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,6 +21,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -46,13 +49,20 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Async("fileUploadTaskExecutor")
+    @Retryable(
+        value = BinaryContentOperationException.class,
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
     @Override
-    public void put(UUID id, byte[] bytes) {
+    public CompletableFuture<Void> put(UUID id, byte[] bytes) {
         try (
             FileOutputStream fileOutputStream = new FileOutputStream(resolvePath(id).toFile());
         ) {
             fileOutputStream.write(bytes);
+            return CompletableFuture.completedFuture(null);
         } catch (IOException e) {
+            log.warn("Upload failed for {}, will retry", id, e);
             throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
         }
     }

@@ -8,6 +8,7 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -57,7 +58,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public void put(UUID id, byte[] bytes) {
+    public CompletableFuture<Void> put(UUID id, byte[] bytes) {
         // PutObjectRequest
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucket)
@@ -67,7 +68,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         try {
             s3Client.putObject(putObjectRequest,
                 RequestBody.fromBytes(bytes));
-
+            return CompletableFuture.completedFuture(null);
         } catch (S3Exception e) {
             log.error("S3 예외 발생 - 코드: {}, 메시지: {}", e.awsErrorDetails().errorCode(),
                 e.awsErrorDetails().errorMessage());
