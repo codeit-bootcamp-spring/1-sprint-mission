@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
@@ -24,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentService binaryContentService;
   private final BinaryContentRepository binaryContentRepository;
   private final UserMapper userMapper;
-  private final BCryptPasswordEncoder bCryptPasswordEncoder;
+  private final PasswordEncoder passwordEncoder;
   private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
 
   @Override
@@ -73,7 +74,7 @@ public class BasicUserService implements UserService {
     }
 
     User user = new User(createUserDto.username(), createUserDto.email(),
-        bCryptPasswordEncoder.encode(createUserDto.password()), null);
+        passwordEncoder.encode(createUserDto.password()), null);
     userRepository.save(user);
 
     log.info("사용자 생성 완료: id = {}, email = {}, username = {}", user.getId(), user.getEmail(),
@@ -150,12 +151,14 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(UUID.fromString(userId))
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    //to
     user.setUsername(
         updateUserDto.newUsername() == null ? user.getUsername() : updateUserDto.newUsername());
     user.setEmail(updateUserDto.newEmail() == null ? user.getEmail() : updateUserDto.newEmail());
+
     user.setPassword(
-        updateUserDto.newPassword() == null ? user.getPassword() : updateUserDto.newPassword());
+        updateUserDto.newPassword() == null ? user.getPassword()
+            : passwordEncoder.encode(updateUserDto.newPassword()));
+
     user.setUpdatedAt(
         updateUserDto.updatedAt() == null ? Instant.now() : updateUserDto.updatedAt());
 
@@ -236,23 +239,23 @@ public class BasicUserService implements UserService {
         .build();
   }
 
+  @Transactional
   @Override
   public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
 
     log.info("사용자 권한 변경 시작: userId = {}, role = {}", roleUpdateRequest.getUserId(),
         roleUpdateRequest.getNewRole().toString());
 
-    if (roleUpdateRequest == null || roleUpdateRequest.getUserId() == null
-        || roleUpdateRequest.getNewRole() == null) {
+    if (roleUpdateRequest.getUserId() == null || roleUpdateRequest.getNewRole() == null) {
       throw new IllegalArgumentException("Empty Data");
     }
 
     User user = userRepository.findById(roleUpdateRequest.getUserId())
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    String previousRole = user.getRole();
+    Role previousRole = user.getRole();
 
-    user.setRole(roleUpdateRequest.getNewRole().toString());
+    user.setRole(roleUpdateRequest.getNewRole());
     userRepository.save(user);
     log.info("사용자 권한 변경 완료: userId = {}, role = {}", user.getId(), user.getRole());
 

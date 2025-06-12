@@ -42,6 +42,8 @@ cloud:
     s3:
       bucket: ${AWS_S3_BUCKET}
 
+jwt:
+  secret: ${JWT_SECRET}
 
 logging:
   level:
@@ -54,3 +56,4 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: INFO
     org.springframework.jdbc.core.JdbcTemplate: INFO
     org.springframework.jdbc.core.StatementCreatorUtils: INFO
+    com.example.jwt: WARN

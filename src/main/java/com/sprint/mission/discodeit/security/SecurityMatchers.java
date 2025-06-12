@@ -1,0 +1,30 @@
+package com.sprint.mission.discodeit.security;
+
+import org.springframework.http.HttpMethod;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+public class SecurityMatchers {
+
+  //NegatedRequestMatcher는 RequestMatcher 기본 matches()값을 반대로 반환.
+  //RequestMatcher의 matches()가 true -> NegatedRequestMatcher()의 matches()는 false
+  //따라서 /api/** 에 속하는 모든 것들은 matches() -> false 반환 (인증 없이 접근 불가)
+  public static final RequestMatcher NON_API = new NegatedRequestMatcher(
+      new AntPathRequestMatcher("/api/**"));
+
+  //AntPathRequestMatcher(String pattern, String httpMethod)생성자로 같은 URI 경로라도,
+  //HTTP 메서드에 따라 다르게 처리할 수 있게 할 수 있음!
+  public static final RequestMatcher GET_CSRF_TOKEN = new AntPathRequestMatcher(
+      "/api/auth/csrf-token", HttpMethod.GET.name());
+  public static final RequestMatcher SIGN_UP = new AntPathRequestMatcher(
+      "/api/users", HttpMethod.POST.name());
+  public static final RequestMatcher LOGIN = new AntPathRequestMatcher(
+      "/api/auth/login", HttpMethod.POST.name());
+  public static final String LOGIN_URL = "/api/auth/login";
+  public static final RequestMatcher LOGOUT = new AntPathRequestMatcher(
+      "/api/auth/logout", HttpMethod.POST.name());
+  public static final RequestMatcher ME = new AntPathRequestMatcher(
+      "/api/auth/me", HttpMethod.GET.name());
+
+}

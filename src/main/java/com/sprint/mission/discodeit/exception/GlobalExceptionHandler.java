@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
+import com.sprint.mission.discodeit.exception.auth.TokenException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.ChannelException;
@@ -20,6 +21,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -233,4 +235,21 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
   }
 
+  @ExceptionHandler(TokenException.class)
+  public ResponseEntity<ErrorResponse> handleTokenException(
+      TokenException e
+  ) {
+    log.info("토큰 예외");
+
+    ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.UNAUTHORIZED.value());
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+  }
+
+  @ExceptionHandler(InternalAuthenticationServiceException.class)
+  public ResponseEntity<ErrorResponse> handleInternalAuthenticationServiceException(
+      InternalAuthenticationServiceException e) {
+    log.info("사용자 인증 오류: {}", e.getMessage());
+    ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.NOT_FOUND.value());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+  }
 }

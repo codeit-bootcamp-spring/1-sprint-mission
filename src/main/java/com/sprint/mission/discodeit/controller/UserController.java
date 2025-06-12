@@ -55,7 +55,7 @@ public class UserController {
   }
 
   //사용자 정보 수정
-  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.userDto.id.toString()")
   @PatchMapping("/{userId}")
   public ResponseEntity<UserDto> updateUser(@PathVariable String userId,
       @Valid @RequestPart("userUpdateRequest") UpdateUserDto updateUserDto,

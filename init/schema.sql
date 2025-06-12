@@ -75,3 +75,18 @@ CREATE TABLE persistent_logins
 );
 
 CREATE INDEX ix_persistent_logins_username ON persistent_logins (username);
+
+CREATE TABLE jwt_sessions
+(
+    id            UUID PRIMARY KEY,
+    user_id       UUID          NOT NULL,
+    access_token  VARCHAR(1000) NOT NULL UNIQUE,
+    refresh_token VARCHAR(1000) NOT NULL UNIQUE,
+    created_at    TIMESTAMP     NOT NULL,
+    expires_at    TIMESTAMP     NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- 인덱스 생성
+CREATE INDEX idx_jwt_sessions_user_id ON jwt_sessions (user_id);
+CREATE INDEX idx_jwt_sessions_refresh_token ON jwt_sessions (refresh_token);

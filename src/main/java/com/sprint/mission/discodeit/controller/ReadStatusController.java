@@ -31,7 +31,7 @@ public class ReadStatusController {
 //  }
 
   //개별 생성
-  @PreAuthorize("authentication.principal.userId.toString() == #createReadStatusDto.userId()")
+  @PreAuthorize("hasPermission(#createReadStatusDto.userId, 'ReadStatus', 'CREATE')")
   @PostMapping
   public ResponseEntity<ReadStatusDto> createReadStatus(
       @Valid @RequestBody CreateReadStatusDto createReadStatusDto) {

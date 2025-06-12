@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.exception;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,5 +25,10 @@ public class ErrorResponse {
     this.message = e.getMessage();
     this.details = e.getDetails();
     this.status = status;
+  }
+
+  public ErrorResponse(Exception exception, int status) {
+    this(Instant.now(), exception.getClass().getSimpleName(), exception.getMessage(),
+        new HashMap<>(), exception.getClass().getSimpleName(), status);
   }
 }

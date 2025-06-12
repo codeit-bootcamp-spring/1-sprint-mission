@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.config;
+package com.sprint.mission.discodeit.security;
 
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -24,18 +24,25 @@ public class AdminAccountInitializer implements CommandLineRunner {
       log.warn("No admin password configured");
       adminPassword = "admin123"; // 기본값
     }
-
-    if (userRepository.findByUsername("admin").isEmpty()) {
-      User adminUser = new User();
+    //비밀번호 초기화 되지 않던 오류 수정
+    User adminUser = userRepository.findByUsername("admin").orElse(null);
+    if (adminUser == null) {
+      adminUser = new User();
       adminUser.setUsername("admin");
       adminUser.setEmail("admin@discodeit.com");
       adminUser.setPassword(passwordEncoder.encode(adminPassword));
-      adminUser.setRole("ROLE_ADMIN");
+      adminUser.setRole(Role.ADMIN);
 
       userRepository.save(adminUser);
 
       log.info("Admin account created");
+      return;
     }
+    
+    adminUser.setPassword(passwordEncoder.encode(adminPassword));
+    adminUser.setRole(Role.ADMIN);
+    userRepository.save(adminUser);
+
   }
 
   // CommandLineRunner

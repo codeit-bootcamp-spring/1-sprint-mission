@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.event;
 
 
-import javax.management.relation.Role;
+import com.sprint.mission.discodeit.entity.Role;
 
 public record UserRoleChangedEvent(
     String username,
-    String previousRole,
+    Role previousRole,
     Role newRole) {
 
 }

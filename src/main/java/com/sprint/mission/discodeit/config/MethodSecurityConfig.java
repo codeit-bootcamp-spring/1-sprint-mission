@@ -8,6 +8,5 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 public class MethodSecurityConfig {
 
   // @EnableMethodSecurity 를 활성화 해 주어야 @PreAuthorize 와 @PostAuthorize 등 애노테이션을 사용할 수 있음
-
   // 추가 설정이 필요하면 여기에...
 }
