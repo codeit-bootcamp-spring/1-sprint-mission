@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.security.AccessManager;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -50,6 +51,7 @@ public class ReadStatusController implements ReadStatusApi {
         .status(HttpStatus.OK)
         .body(readStatusService.update(readStatusId, request));
   }
+
 
   @GetMapping
   public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {

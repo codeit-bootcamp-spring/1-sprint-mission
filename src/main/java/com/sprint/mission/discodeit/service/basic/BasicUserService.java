@@ -24,6 +24,8 @@ import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,6 +54,7 @@ public class BasicUserService implements UserService {
   private final NotificationEventPublisher notificationEventPublisher;
 
 
+  @CacheEvict(cacheNames = "allUsers", allEntries = true)
   @Override
   @Transactional
   public UserDto create(UserCreateDTO dto,
@@ -86,6 +89,8 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(findUser, isUserOnline(findUser));
   }
 
+
+  @Cacheable(cacheNames = "allUsers")
   @Override
   @Transactional(readOnly = true)
   public List<UserDto> findAll() {
@@ -94,6 +99,7 @@ public class BasicUserService implements UserService {
         .toList();
   }
 
+  @CacheEvict(cacheNames = "allUsers", allEntries = true)
   @Override
   @Transactional
   public UserDto update(UUID id, UserUpdateDTO dto,
@@ -118,6 +124,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(findUser, isUserOnline(findUser));
   }
 
+  @CacheEvict(cacheNames = "allUsers", allEntries = true)
   @Override
   @Transactional
   public void delete(UUID id) {

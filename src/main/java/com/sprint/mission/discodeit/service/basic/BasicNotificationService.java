@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.notification.NotificationEvent;
 import com.sprint.mission.discodeit.repository.jpa.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -26,6 +28,8 @@ public class BasicNotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
+
+    @Cacheable(cacheNames = "notificationsByUser", key = "#receiverId")
     @Transactional(readOnly = true)
     public List<NotificationDto> findAllByReceiver(UUID receiverId) {
         return notificationRepository.findAllByReceiver_IdOrderByCreatedAtDesc(receiverId).stream()
@@ -53,6 +57,7 @@ public class BasicNotificationService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000)
     )
+    @CacheEvict(cacheNames = "notificationsByUser", key = "#event.receiverId")
     @Transactional
     public void send(NotificationEvent event) {
         Notification notification = Notification.builder()

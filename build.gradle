@@ -26,6 +26,11 @@ repositories {
 
 dependencies {
 
+    // Caffeine 캐시
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    // 비동기 처리
     implementation 'org.springframework:spring-aspects'
     implementation 'org.springframework.retry:spring-retry'
 
