@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -27,65 +28,65 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(value = "discodeit.storage.type", havingValue = "local", matchIfMissing = false)
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-  private final Path root;
+    private final Path root;
 
-  public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path path) {
-    this.root = path;
-    init();
-  }
-
-  public void init() {
-    if (!Files.exists(root)) {
-      try {
-        Files.createDirectories(root);
-      } catch (IOException e) {
-        throw new BinaryContentOperationException(ErrorCode.BINARY_STORAGE_INIT_FAILED);
-      }
+    public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path path) {
+        this.root = path;
+        init();
     }
-  }
 
-  @Override
-  public UUID put(UUID id, byte[] bytes) {
-    try (
-        FileOutputStream fileOutputStream = new FileOutputStream(resolvePath(id).toFile());
-    ) {
-      fileOutputStream.write(bytes);
-    } catch (IOException e) {
-      throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
+    public void init() {
+        if (!Files.exists(root)) {
+            try {
+                Files.createDirectories(root);
+            } catch (IOException e) {
+                throw new BinaryContentOperationException(ErrorCode.BINARY_STORAGE_INIT_FAILED);
+            }
+        }
     }
-    return id;
-  }
 
-  @Override
-  public InputStream get(UUID id) {
-    if (!Files.exists(root)) {
-      throw new BinaryContentOperationException(ErrorCode.BINARY_READ_FAILED);
+    @Async("fileUploadTaskExecutor")
+    @Override
+    public void put(UUID id, byte[] bytes) {
+        try (
+            FileOutputStream fileOutputStream = new FileOutputStream(resolvePath(id).toFile());
+        ) {
+            fileOutputStream.write(bytes);
+        } catch (IOException e) {
+            throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
+        }
     }
-    try {
-      return new FileInputStream(resolvePath(id).toFile());
-    } catch (FileNotFoundException e) {
-      throw new BinaryContentOperationException(ErrorCode.STREAM_CREATION_FAILED);
+
+    @Override
+    public InputStream get(UUID id) {
+        if (!Files.exists(root)) {
+            throw new BinaryContentOperationException(ErrorCode.BINARY_READ_FAILED);
+        }
+        try {
+            return new FileInputStream(resolvePath(id).toFile());
+        } catch (FileNotFoundException e) {
+            throw new BinaryContentOperationException(ErrorCode.STREAM_CREATION_FAILED);
+        }
     }
-  }
 
-  @Override
-  public ResponseEntity<Resource> download(BinaryContentResponse binaryContentResponse) {
-    //참고: "When using InputStreamResource, the underlying stream is closed automatically after the response is written."
-    InputStream inputStream = get(binaryContentResponse.id());
-    InputStreamResource resource = new InputStreamResource(inputStream);
+    @Override
+    public ResponseEntity<Resource> download(BinaryContentResponse binaryContentResponse) {
+        //참고: "When using InputStreamResource, the underlying stream is closed automatically after the response is written."
+        InputStream inputStream = get(binaryContentResponse.id());
+        InputStreamResource resource = new InputStreamResource(inputStream);
 
-    log.info("Binary content download succeeded - id: {}", binaryContentResponse.id());
-    return ResponseEntity.status(HttpStatus.OK)
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION,
-            "attachment; filename=\""
-                + binaryContentResponse.fileName() + "\"")
-        .contentType(MediaType.valueOf(binaryContentResponse.contentType()))
-        .body(resource);
-  }
+        log.info("Binary content download succeeded - id: {}", binaryContentResponse.id());
+        return ResponseEntity.status(HttpStatus.OK)
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\""
+                    + binaryContentResponse.fileName() + "\"")
+            .contentType(MediaType.valueOf(binaryContentResponse.contentType()))
+            .body(resource);
+    }
 
-  private Path resolvePath(UUID uuid) {
-    return root.resolve(uuid.toString());
-  }
+    private Path resolvePath(UUID uuid) {
+        return root.resolve(uuid.toString());
+    }
 
 }
