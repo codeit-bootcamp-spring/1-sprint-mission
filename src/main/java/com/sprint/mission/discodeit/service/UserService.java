@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
@@ -13,7 +13,8 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +41,7 @@ public class UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
-  private final SessionRegistry sessionRegistry;
+  private final JwtService jwtService;
 
   @Transactional
   public UserDto createUser(UserCreateRequest userCreateRequest, MultipartFile profile) {
@@ -62,10 +62,8 @@ public class UserService {
 
   public List<UserDto> readAll() {
     log.debug("readAll() 호출");
-    Set<UUID> onlineUserIds = sessionRegistry.getAllPrincipals().stream()
-        .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
-        .filter(principal -> principal instanceof DiscodeitUserDetails)
-        .map(principal -> ((DiscodeitUserDetails) principal).getUser().id())
+    Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
+        .map(JwtSession::getUserId)
         .collect(Collectors.toSet());
 
     return userRepository.findAllWithProfile().stream()

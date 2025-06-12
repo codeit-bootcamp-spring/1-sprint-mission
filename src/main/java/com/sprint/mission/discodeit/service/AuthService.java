@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.User.Role;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import java.util.UUID;
@@ -15,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +27,8 @@ public class AuthService {
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
-  private final SessionRegistry sessionRegistry;
   private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
 
   @Value("${discodeit.admin.username}")
   private String adminUsername;
@@ -68,15 +66,7 @@ public class AuthService {
     if (newRole != null) {
       user.updateRole(newRole);
     }
-
-    sessionRegistry.getAllPrincipals().stream()
-        .filter(principal -> ((DiscodeitUserDetails) principal).getUsername().equals(user.getUsername()))
-        .findFirst()
-        .ifPresent(principal -> {
-              sessionRegistry.getAllSessions(principal, false)
-                  .forEach(SessionInformation::expireNow);
-            }
-        );
+    jwtService.invalidateJwtSession(userId);
 
     return userMapper.toDto(user);
   }

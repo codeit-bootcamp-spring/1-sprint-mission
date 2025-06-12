@@ -13,7 +13,7 @@ RUN ./gradlew dependencies
 COPY . .
 RUN chmod +x gradlew
 
-RUN ./gradlew clean build --no-daemon
+RUN ./gradlew clean build --no-daemon -x test
 
 FROM amazoncorretto:17
 
@@ -24,7 +24,7 @@ COPY --from=builder /app/build/libs/*.jar /app
 EXPOSE 80
 
 ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=1.2-M10 \
+    PROJECT_VERSION=2.0-M10 \
     JVM_OPTS=""
 
 ENTRYPOINT ["/bin/bash", "-c", "java -jar ${JVM_OPTS} ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]

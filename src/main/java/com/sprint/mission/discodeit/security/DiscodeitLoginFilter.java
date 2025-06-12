@@ -44,22 +44,13 @@ public class DiscodeitLoginFilter extends UsernamePasswordAuthenticationFilter {
   public static class Configurer extends
       AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, DiscodeitLoginFilter> {
 
-    private final ObjectMapper objectMapper;
-
     public Configurer(ObjectMapper objectMapper) {
       super(new DiscodeitLoginFilter(objectMapper), SecurityMatchers.LOGIN_URL);
-      this.objectMapper = objectMapper;
     }
 
     @Override
     protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
       return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.POST.name());
-    }
-
-    @Override
-    public void init(HttpSecurity http) throws Exception {
-      successHandler(new LoginSuccessHandler(objectMapper));
-      failureHandler(new LoginFailureHandler(objectMapper));
     }
   }
 }

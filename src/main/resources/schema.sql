@@ -12,7 +12,7 @@ create table users(
 	updated_at timestamp,
 	username varchar(50) not null unique,
 	email varchar(100) not null unique,
-	password varchar(60) not null,
+	password varchar(255) not null,
     role varchar(30) not null default 'ROLE_USER',
 	profile_id uuid references binary_contents(id) on delete set null
 );
@@ -61,10 +61,12 @@ create table message_attachments(
     primary key (message_id, attachment_id)
 );
 
-create table persistent_logins
-(
-    username  varchar(64) not null,
-    series    varchar(64) primary key,
-    token     varchar(64) not null,
-    last_used timestamp   not null
+create table jwt_sessions(
+    id uuid primary key,
+    created_at timestamp not null,
+    updated_at timestamp,
+    user_id uuid not null,
+    access_token varchar(512) not null unique,
+    refresh_token varchar(512) not null unique,
+    expiration_time timestamp not null
 );
