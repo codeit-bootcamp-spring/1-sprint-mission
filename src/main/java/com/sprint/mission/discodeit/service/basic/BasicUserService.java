@@ -159,7 +159,7 @@ public class BasicUserService implements UserService {
     }
 
 
-    @CacheEvict(value = "allusers", allEntries = true)
+    @CacheEvict(value = "allUsers", allEntries = true)
     @Override
     @Transactional
     public void deleteUser(UUID userId) {
