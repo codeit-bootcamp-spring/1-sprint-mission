@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -46,8 +46,13 @@ public class BasicReadStatusService implements ReadStatusService {
       ));
     }
 
+    boolean notificationEnabled = switch (findChannel.getChannelType()) { //notificationEnabled 필드 추가
+      case PRIVATE -> true;
+      case PUBLIC -> false;
+    };
+
     ReadStatus readStatus = readStatusRepository.save(
-        new ReadStatus(findUser, findChannel, dto.getLastReadAt()));
+        new ReadStatus(findUser, findChannel, dto.getLastReadAt(), notificationEnabled)); //notificationEnabled 필드 추가
     return readStatusMapper.toDto(readStatus);
   }
 
@@ -75,10 +80,11 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
-  public ReadStatusDto update(UUID id, ReadStatusUpdateDTO dto) {
+  public ReadStatusDto update(UUID id, ReadStatusUpdateRequest dto) {
     ReadStatus findReadStatus = readStatusRepository.findById(id).
         orElseThrow(() -> new ReadStatusNotFoundException(id));
     findReadStatus.updateLastReadAt(dto.getNewLastReadAt());
+    findReadStatus.updateNotificationEnabled(dto.isNewNotificationEnabled());
     return readStatusMapper.toDto(findReadStatus);
   }
 

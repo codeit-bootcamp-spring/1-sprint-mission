@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS messages
     author_id  UUID        REFERENCES users (id) ON DELETE SET NULL
     );
 
-CREATE TABLE IF NOT EXISTS read_statuses
+/*CREATE TABLE IF NOT EXISTS read_statuses
 (
     id           UUID PRIMARY KEY,
     created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -67,6 +67,18 @@ CREATE TABLE IF NOT EXISTS read_statuses
     channel_id   UUID        NOT NULL REFERENCES channels (id) ON DELETE CASCADE,
     last_read_at TIMESTAMP WITH TIME ZONE,
                                                                 UNIQUE (user_id, channel_id)
+    );*/
+
+CREATE TABLE IF NOT EXISTS read_statuses
+(
+    id                     UUID PRIMARY KEY,
+    created_at             TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at             TIMESTAMP WITH TIME ZONE,
+    user_id                UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    channel_id             UUID NOT NULL REFERENCES channels (id) ON DELETE CASCADE,
+    last_read_at           TIMESTAMP WITH TIME ZONE,
+    notification_enabled   BOOLEAN NOT NULL DEFAULT FALSE,
+    UNIQUE (user_id, channel_id)
     );
 
 CREATE TABLE IF NOT EXISTS message_attachments

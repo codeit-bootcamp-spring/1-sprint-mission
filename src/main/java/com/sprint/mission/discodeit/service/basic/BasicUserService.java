@@ -5,14 +5,13 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
-import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 
 import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.notification.NotificationEvent;
+import com.sprint.mission.discodeit.notification.NotificationEventPublisher;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
@@ -49,6 +48,9 @@ public class BasicUserService implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtSessionRepository jwtSessionRepository;
   private final BinaryContentUploadExecutor uploadExecutor;
+
+  private final NotificationEventPublisher notificationEventPublisher;
+
 
   @Override
   @Transactional
@@ -181,6 +183,16 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
     user.updateRole(newRole);
+
+    //알림 이벤트 발행 (트랜잭션 안에서 호출 → AFTER_COMMIT 리스너에서 처리됨)
+    notificationEventPublisher.publish(new NotificationEvent(
+            userId,
+            "권한이 변경되었어요",
+            "새로운 권한: " + newRole.name(),
+            NotificationType.ROLE_CHANGED,
+            userId
+    ));
+
 
     // Jwt 기반 강제 로그아웃 처리
     jwtSessionRepository.findAllByUserId(userId).forEach(JwtSession::revoke);

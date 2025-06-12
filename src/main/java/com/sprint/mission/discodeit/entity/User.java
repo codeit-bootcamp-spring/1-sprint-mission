@@ -9,6 +9,8 @@ import lombok.Getter;
 
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -55,6 +57,14 @@ public class User extends BaseUpdatableEntity {
 
   public void updateRole(Role role) {
     this.role = role;
+  }
+
+
+  //음.. 프록시를 위해서? 이게 맞나
+  public static User withId(UUID id) {
+    User user = new User();
+    user.setId(id);
+    return user;
   }
 
 }

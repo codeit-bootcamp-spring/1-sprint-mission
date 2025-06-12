@@ -12,10 +12,9 @@ import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
-import com.sprint.mission.discodeit.repository.jpa.MessageRepository;
-import com.sprint.mission.discodeit.repository.jpa.UserRepository;
+import com.sprint.mission.discodeit.notification.NotificationEvent;
+import com.sprint.mission.discodeit.notification.NotificationEventPublisher;
+import com.sprint.mission.discodeit.repository.jpa.*;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
@@ -39,13 +38,14 @@ public class BasicMessageService implements MessageService {
 
 
   private final MessageRepository messageRepository;
-
+  private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final MessageMapper messageMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentUploadExecutor uploadExecutor;
+  private final NotificationEventPublisher notificationEventPublisher;
 
 
   @Override
@@ -76,8 +76,7 @@ public class BasicMessageService implements MessageService {
           BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
           // 트랜잭션 커밋 이후 비동기 업로드 실행
-          TransactionSynchronizationManager.registerSynchronization(
-                  new TransactionSynchronization() {
+          TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
                       String requestId = MDC.get("requestId");
@@ -93,9 +92,31 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.save(message);
 
+    //여기서 커밋 이후 알림 발행 등록
+    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+      @Override
+      public void afterCommit() {
+        List<UUID> receivers = readStatusRepository
+                .findUserIdsByChannelIdAndNotificationEnabledTrue(dto.getChannelId());
+
+        for (UUID receiverId : receivers) {
+          notificationEventPublisher.publish(new NotificationEvent(
+                  receiverId,
+                  "새 메시지가 도착했어요!",
+                  message.getContent(),
+                  NotificationType.NEW_MESSAGE,
+                  dto.getChannelId()
+          ));
+        }
+      }
+    });
+
+
     log.info("메시지 생성 완료 id: {}", message.getId());
     return messageMapper.toDto(message);
   }
+
+
 
 
   //no use

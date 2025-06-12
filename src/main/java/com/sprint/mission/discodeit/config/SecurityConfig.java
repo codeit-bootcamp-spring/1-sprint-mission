@@ -121,7 +121,8 @@ public class SecurityConfig {
                                 "/api/readStatuses/**",
                                 "/api/messages",
                                 "/api/channels",
-                                "/api/binaryContents/**"))
+                                "/api/binaryContents/**",
+                                "/api/notifications/**"))
                 .logout(logout -> logout.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

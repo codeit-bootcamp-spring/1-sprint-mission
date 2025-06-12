@@ -54,11 +54,13 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
 
+    boolean notificationEnabled = channel.getChannelType().equals(ChannelType.PRIVATE);
+
     List<UserDto> participants = dto.getParticipantIds().stream()
             .map(userId -> {
               User user = userRepository.findById(userId)
                       .orElseThrow(() -> new UserNotFoundException(userId));
-              readStatusRepository.save(new ReadStatus(user, channel, Instant.EPOCH));
+              readStatusRepository.save(new ReadStatus(user, channel, Instant.EPOCH, notificationEnabled));
               return userMapper.toDto(user, isUserOnline(user));
             })
             .toList();

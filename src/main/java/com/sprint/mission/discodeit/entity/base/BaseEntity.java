@@ -28,4 +28,8 @@ public abstract class BaseEntity {
   public void forceCreatedAt(Instant instant) {
     this.createdAt = instant;
   }
+
+  protected void setId(UUID id) {
+    this.id = id;
+  }
 }

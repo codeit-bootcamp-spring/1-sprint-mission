@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
@@ -19,4 +21,8 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
   //테스트 하려고 추가한 메서드
   List<ReadStatus> findAllByChannel_Id(UUID channelId);
+
+  @Query("select rs.user.id from ReadStatus rs " +
+          "where rs.channel.id = :channelId and rs.notificationEnabled = true")
+  List<UUID> findUserIdsByChannelIdAndNotificationEnabledTrue(@Param("channelId") UUID channelId);
 }

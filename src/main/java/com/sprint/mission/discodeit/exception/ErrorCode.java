@@ -12,6 +12,7 @@ public enum ErrorCode {
   MISSING_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 없습니다."),
 
   //NOT_FOUND
+  NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "Notification을 찾을 수 없습니다."),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User을 찾을 수 없습니다."),
   CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "Channel을 찾을 수 없습니다."),
   MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Message를 찾을 수 없습니다."),
