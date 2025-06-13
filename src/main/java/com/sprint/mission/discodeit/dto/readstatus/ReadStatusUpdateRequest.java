@@ -11,5 +11,6 @@ public class ReadStatusUpdateRequest {
 
     //    @NotNull
 //    private Instant newLastReadAt;
-    private Boolean newNotificationEnabled;
+    @NotNull
+    private boolean newNotificationEnabled;
 }

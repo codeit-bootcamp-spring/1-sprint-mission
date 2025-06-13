@@ -28,8 +28,8 @@ public class ReadStatus extends BaseUpdatableEntity {
     @Column(nullable = false)
     private Instant lastReadAt;
 
-    @Column
-    private Boolean notificationEnabled;
+    @Column(nullable = false)
+    private boolean notificationEnabled;
 
     protected ReadStatus(User user, Channel channel, Instant lastReadAt,
             boolean notificationEnabled) {

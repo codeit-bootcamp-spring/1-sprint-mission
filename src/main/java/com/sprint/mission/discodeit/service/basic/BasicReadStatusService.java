@@ -83,7 +83,7 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new AccessDeniedException("본인만 수정 가능");
         }
         //readStatus.update(request.getNewLastReadAt());
-        readStatus.updatedNotificationEnabled(request.getNewNotificationEnabled());
+        readStatus.updatedNotificationEnabled(request.isNewNotificationEnabled());
         return readStatusMapper.toDto(readStatus);
     }
 

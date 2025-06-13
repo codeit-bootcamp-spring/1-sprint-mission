@@ -55,7 +55,7 @@ public class NotificationEventListener {
                 receiver.getId(), event.getType(), event.getTitle());*/
 
         for (UUID receiverId : event.getReceivers()) {
-            Optional.ofNullable(cacheManager.getCache("userNotification"))
+            Optional.ofNullable(cacheManager.getCache("userNotifications"))
                     .ifPresent(cache -> cache.evictIfPresent(receiverId));
             userRepository.findById(receiverId).ifPresent(receiver -> {
                 Notification notification =

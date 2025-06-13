@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.config;
 //import com.github.benmanes.caffeine.cache.Caffeine;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.springframework.cache.CacheManager;
@@ -35,10 +36,12 @@ public class CacheConfig {
 
     @Bean
     public RedisCacheConfiguration redisCacheConfiguration() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         return RedisCacheConfiguration.defaultCacheConfig()
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
-                                new GenericJackson2JsonRedisSerializer(new ObjectMapper())
+                                new GenericJackson2JsonRedisSerializer(mapper)
                         )
                 )
                 .entryTtl(Duration.ofMinutes(10))

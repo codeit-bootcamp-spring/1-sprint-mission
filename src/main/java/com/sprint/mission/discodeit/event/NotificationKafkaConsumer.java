@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.notification.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ public class NotificationKafkaConsumer {
     private final UserRepository userRepository;
     private final CacheManager cacheManager;
     private final ObjectMapper objectMapper;
+    private final NotificationMapper notificationMapper;
 
     @KafkaListener(topics = {
             "discodeit.new-message",
@@ -34,9 +38,10 @@ public class NotificationKafkaConsumer {
             log.info("Kafka 알림 수신: {}", event);
 
             for (UUID receiverId : event.getReceivers()) {
-                Optional.ofNullable(cacheManager.getCache("userNotification"))
-                        .ifPresent(cache -> cache.evict(receiverId));
-
+                List<NotificationDto> updated = notificationRepository.findAllByReceiver_Id(
+                                receiverId)
+                        .stream().map(notificationMapper::toDto).toList();
+                cacheManager.getCache("userNotifications").put(receiverId, updated);
                 userRepository.findById(receiverId).ifPresent(receiver -> {
                     Notification notification = Notification.of(
                             receiver,
