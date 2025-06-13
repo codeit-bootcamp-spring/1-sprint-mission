@@ -23,11 +23,10 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 //
@@ -83,6 +82,9 @@ public class BasicUserService implements UserService {
                       .contentType(profileRequest.contentType())
                       .build();
                   BinaryContent content = binaryContentRepository.save(binaryContent);
+
+                  MDC.put("traceId", String.valueOf(UUID.randomUUID()));
+
                   binaryContentStorage.put(content.getId(), profileRequest.bytes());
                   return content;
                 })

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.storage.local;
 
+import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -13,12 +14,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -44,9 +52,18 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
   }
 
+  @Retryable( // 2초, 4초, 8초 (3회)
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 2000, multiplier = 2.0)
+  )
+  @Async
   @Override
   public UUID put(UUID id, byte[] bytes) {
-    log.info("파일 업로드 시도");
+    log.info("파일 업로드 시작, traceId={}, fileId={}", MDC.get("traceId"), id);
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    log.info("인증 정보 : {}", auth.getName());
+
     // 파일 저장 경로 지정
     Path filePath = resolvePath(id);
     File file = filePath.toFile(); // Path 객체 -> File 객체
@@ -61,6 +78,20 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
     log.info("파일 업로드 시도 성공");
     // 저장한 파일 UUID 반환
+    return id;
+  }
+
+  // 타켓 메서드랑 반환값 일치시켜야해?
+  @Recover
+  public UUID recover(IOException e, UUID id, byte[] bytes) {
+    String requestId = MDC.get("traceId");
+    AsyncTaskFailure failure = AsyncTaskFailure
+        .builder()
+        .taskName("put")
+        .requestId(requestId)
+        .failureReason(e.getMessage())
+        .build();
+    log.error("파일 비동기 작업 중 실패: {}", failure);
     return id;
   }
 
