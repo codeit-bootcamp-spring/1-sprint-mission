@@ -15,12 +15,14 @@ import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 //
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +39,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
+  private final BinaryContentStorage binaryContentStorage;
+  //
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
@@ -48,6 +52,7 @@ public class BasicMessageService implements MessageService {
   //
   private final InputHandler inputHandler;
   private final PageResponseMapper<MessageDto> pageResponseMapper; // 제네릭 타입 명시 안해주면 Raw Type을 쓰고 있다고 경고를 준다.
+  private final BinaryContentRepository binaryContentRepository;
 
   @Transactional
   @Override
@@ -56,13 +61,26 @@ public class BasicMessageService implements MessageService {
     log.info("메세지 생성 시도: messageContent={}", messageCreateRequest.content());
 
     // 메세지 첨부 파일 생성
-    List<BinaryContent> binaryContents = null;
+    List<BinaryContent> binaryContents = new ArrayList<>();
     if (binaryContentCreateRequests != null) {
       log.info("메세지 첨부 파일 생성");
-      binaryContents = binaryContentCreateRequests.stream()
-          .map(binaryContentService::createBinaryContent)
-          .map(binaryContentMapper::toEntity)
-          .toList();
+
+      for (BinaryContentCreateRequest req : binaryContentCreateRequests) {
+
+        BinaryContent binaryContent = BinaryContent
+            .builder()
+            .fileName(req.fileName())
+            .size(req.size())
+            .contentType(req.contentType())
+            .build();
+
+        binaryContents.add(binaryContent);
+
+        BinaryContent content = binaryContentRepository.save(binaryContent);
+        log.info("메세지 첨부 파일 DB에 저장, contentId={}", content.getId());
+
+        binaryContentStorage.put(content.getId(), req.bytes());
+      }
     }
 
     // 메세지 생성

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import java.util.Map;
+import org.springframework.lang.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
@@ -17,6 +18,8 @@ public class ContextPropagatingTaskDecorator implements TaskDecorator {
 
   @Override
   public Runnable decorate(Runnable runnable) {
+    log.info("ContextPropagatingTaskDecorator 동작 중, 현재 스레드 : {}", Thread.currentThread().getName());
+
     // 1. 현재 스레드에서 Context(MDC, SecurityContextHolder) 캡처
     Map<String, String> mdcContext = MDC.getCopyOfContextMap();
     SecurityContext securityContext = SecurityContextHolder.getContext();

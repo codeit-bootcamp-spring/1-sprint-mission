@@ -57,11 +57,11 @@ public class SecurityConfig {
             .anyRequest().hasRole(Role.USER.name())
         )
         .csrf(csrf ->
-            csrf
-                .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
+                csrf.disable()
+//                .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
+//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+//                .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
         )
         .logout(logout ->
             logout

@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.exception.user.UsernameAlreadyExistsExceptio
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.RoleRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -49,7 +48,6 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   //
   private final PasswordEncoder passwordEncoder;
-  private final RoleRepository roleRepository;
 
   @Transactional
   @Override
@@ -85,20 +83,22 @@ public class BasicUserService implements UserService {
 
                   MDC.put("traceId", String.valueOf(UUID.randomUUID()));
 
+                  log.info("프로필 이미지 저장소에 업로드 시도 : fileNmae={}, Id={}", content.getFileName(),
+                      content.getId());
                   binaryContentStorage.put(content.getId(), profileRequest.bytes());
                   return content;
                 })
             .orElse(null);
 
-    // 권한 생성
-    Role role = roleRepository.findByName("ROLE_USER")
-        .orElseThrow(() -> new RuntimeException("ROLE_USER 가 존재하지 않습니다."));
+//    log.info("프로필 이미지 여부 : {}", nullableProfile.getId());
+
     // 유저 생성 : User 도메인 객체 생성
     User user = User.builder()
         .username(userCreateRequest.username())
         .email(userCreateRequest.email())
         .password(passwordEncoder.encode(userCreateRequest.password()))
         .profile(nullableProfile)
+        .role(Role.USER)
         .build();
 
     user = userRepository.save(user);
