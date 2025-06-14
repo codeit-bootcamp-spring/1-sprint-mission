@@ -243,3 +243,86 @@ sequenceDiagram
 이후 비동기 업로드가 완료되면, BinaryContentService를 통해 DB에 상태를 업데이트한다.
 
 `@Timed` 어노테이션을 사용하여 실행시간 측정 분석
+
+## 2. 캐시 적용하기
+- 캐시 일관성을 어떻게 보장할 것인가
+- 캐시 갱신, 만료 정책은 어떻게 설계해야 하는가
+
+### 로컬 캐시 설정
+- 캐싱 활성화 (인메모리 캐시)
+- 만료 시간 설정
+  - expireAfterAccess : 마지막 접근 후 지정 시간 동안 캐시 유지
+  - expireAfterWrite : 캐시 생성 후 지정 시간 동안 유지
+
+사용되는 캐시 어노테이션
+- `@Cacheable` : 캐시 조회
+- `@CachePut` : 캐시 갱신
+- `@CacheEvict` : 캐시 삭제
+
+**@Cacheable 동작 시퀀스 (캐시 miss → 저장/ hit → 바로 반환)**
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant ServiceProxy
+    participant Cache
+    participant DB
+
+    Client->>Controller: GET /user/1
+    Controller->>ServiceProxy: getUser(1)
+    ServiceProxy->>Cache: get("1")
+    alt 캐시 hit
+        Cache-->>ServiceProxy: Cached User
+        ServiceProxy-->>Controller: return Cached User
+    else 캐시 miss
+        ServiceProxy->>DB: findById(1)
+        DB-->>ServiceProxy: User
+        ServiceProxy->>Cache: put("1", User)
+        ServiceProxy-->>Controller: return User
+    end
+```
+
+@CacheEvict 동작 (삭제 후 제거)
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant ServiceProxy
+    participant Cache
+    participant DB
+
+    Client->>Controller: DELETE /user/1
+    Controller->>ServiceProxy: deleteUser(1)
+    ServiceProxy->>DB: deleteById(1)
+    DB-->>ServiceProxy: OK
+    ServiceProxy->>Cache: evict("1")
+    ServiceProxy-->>Controller: return success
+```
+
+@CachePut 문제 흐름 (트랜잭션 실패 시 캐시 오염)
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Controller
+    participant ServiceProxy
+    participant Cache
+    participant DB
+
+    Client->>Controller: POST /user
+    Controller->>ServiceProxy: createUser(user)
+    ServiceProxy->>Cache: put(user.id, user)  %% 트랜잭션 전에 캐시 저장
+    ServiceProxy->>DB: save(user)
+    DB-->>ServiceProxy: EXCEPTION (rollback)
+    ServiceProxy-->>Controller: error
+```
+**⚠ 이 예시처럼 @CachePut은 DB에 실패해도 캐시에 값이 남는 문제가 생김.**
+
+캐싱 플로우
+```mermaid
+flowchart TD
+    A[요청 들어옴] --> B{캐시에 값 있음?}
+    B -- 예 --> C[캐시 값 반환]
+    B -- 아니오 --> D[DB 호출]
+    D --> E[결과 반환 + 캐시에 저장]
+    E --> F[결과 반환]
+```
