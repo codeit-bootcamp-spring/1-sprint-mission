@@ -5,17 +5,16 @@ import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.binarycontent.FileConversionException;
 import com.sprint.mission.discodeit.global.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +37,7 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentService binaryContentService;
     private final PasswordEncoder passwordEncoder;
     private final JwtSessionRepository jwtSessionRepository;
 
@@ -48,14 +48,7 @@ public class BasicUserService implements UserService {
         checkDuplicateEmail(request.getEmail());
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        BinaryContent newProfile = null;
-        if (userProfileImage != null && !userProfileImage.isEmpty()) {
-            newProfile = binaryContentRepository.save(BinaryContent.createBinaryContent(
-                userProfileImage.getOriginalFilename(),
-                userProfileImage.getSize(),
-                userProfileImage.getContentType()));
-            binaryContentStorage.put(newProfile.getId(), convertToBytes(userProfileImage));
-        }
+        BinaryContent newProfile = binaryContentService.save(userProfileImage);
 
         User newUser = userRepository.save(User.createUser(
             request.getUsername(), request.getEmail(), encodedPassword, newProfile));
@@ -102,18 +95,10 @@ public class BasicUserService implements UserService {
                 user.updateEmail(email);
             });
 
-        Optional.ofNullable(userProfileImage)
-            .ifPresent(profile -> {
-                if (!profile.isEmpty()) { // 파라미터는 있는데, 파일이 안 들어올 때
-                    BinaryContent binaryContent = binaryContentRepository.save(
-                        BinaryContent.createBinaryContent(
-                            profile.getOriginalFilename(),
-                            profile.getSize(),
-                            profile.getContentType()));
-                    binaryContentStorage.put(binaryContent.getId(), convertToBytes(profile));
-                    user.updateProfile(binaryContent);
-                }
-            });
+        BinaryContent newProfile = binaryContentService.save(userProfileImage);
+        if (newProfile != null) {
+            user.updateProfile(newProfile);
+        }
 
         log.info("Updated user - id: {}", user.getId());
         return userMapper.entityToDto(user);
@@ -145,14 +130,4 @@ public class BasicUserService implements UserService {
                 Map.of("email", email));
         }
     }
-
-    private byte[] convertToBytes(MultipartFile imageFile) {
-        try {
-            return imageFile.getBytes();
-        } catch (IOException e) {
-            throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR,
-                Map.of("fileName", imageFile.getOriginalFilename()));
-        }
-    }
-
 }

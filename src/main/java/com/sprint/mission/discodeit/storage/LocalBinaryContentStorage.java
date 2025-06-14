@@ -34,8 +34,8 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(value = "discodeit.storage.type", havingValue = "local", matchIfMissing = false)
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
+    private static final String TASK_NAME = "file-upload";
     private final Path root;
-    private final String TASK_NAME = "file-upload";
 
     public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path path) {
         this.root = path;
@@ -64,7 +64,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             FileOutputStream fileOutputStream = new FileOutputStream(resolvePath(id).toFile());
         ) {
             fileOutputStream.write(bytes);
-            return CompletableFuture.completedFuture(null);
+            log.info("File write operation completed for ID: {}", id);
+            CompletableFuture<Void> result = CompletableFuture.completedFuture(null);
+            log.info("Returning completed future: {}", result);
+            return result;
         } catch (IOException e) {
             log.warn("Upload failed for {}, will retry", id, e);
             throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
@@ -112,7 +115,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         AsyncTaskFailure failure = new AsyncTaskFailure(TASK_NAME, requestId, failureReason);
         log.error("Async task failed : {}", failure);
 
-        return CompletableFuture.completedFuture(null);
+        CompletableFuture<Void> failed = new CompletableFuture<>();
+        failed.completeExceptionally(e);
+        return failed;
     }
 
 }

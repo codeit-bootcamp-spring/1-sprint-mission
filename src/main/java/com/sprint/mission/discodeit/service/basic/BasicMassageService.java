@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
-import com.sprint.mission.discodeit.global.exception.binarycontent.FileConversionException;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
@@ -18,10 +17,10 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +42,7 @@ public class BasicMassageService implements MessageService {
     private final MessageMapper messageMapper;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final BinaryContentService binaryContentService;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
 
@@ -64,13 +64,8 @@ public class BasicMassageService implements MessageService {
         Message message = Message.createMessage(request.getContent(), channel, user);
         Optional.ofNullable(messageFiles).ifPresent(files ->
             files.forEach(file -> {
-                    BinaryContent binaryContent = binaryContentRepository.save(
-                        BinaryContent.createBinaryContent(
-                            file.getOriginalFilename(),
-                            file.getSize(),
-                            file.getContentType()));
-                    binaryContentStorage.put(binaryContent.getId(), convertToBytes(file));
-                    message.insertAttachments(binaryContent);
+                    BinaryContent newFile = binaryContentService.save(file);
+                    message.insertAttachments(newFile);
                 }
             )
         );
@@ -127,14 +122,5 @@ public class BasicMassageService implements MessageService {
         return messageRepository.findById(id)
             .orElseThrow(
                 () -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("id", id)));
-    }
-
-    private byte[] convertToBytes(MultipartFile imageFile) {
-        try {
-            return imageFile.getBytes();
-        } catch (IOException e) {
-            throw new FileConversionException(ErrorCode.INTERNAL_SERVER_ERROR,
-                Map.of("fileName", imageFile.getOriginalFilename()));
-        }
     }
 }
