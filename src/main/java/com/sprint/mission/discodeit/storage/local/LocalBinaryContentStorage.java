@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.io.InputStreamResource;
@@ -27,7 +28,6 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 @Slf4j
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -58,7 +58,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   )
   @Async
   @Override
-  public UUID put(UUID id, byte[] bytes) {
+  public CompletableFuture<UUID> put(UUID id, byte[] bytes) {
     log.info("파일 업로드 시작, traceId={}, fileId={}", MDC.get("traceId"), id);
 
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -78,7 +78,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
     log.info("파일 업로드 시도 성공");
     // 저장한 파일 UUID 반환
-    return id;
+    return CompletableFuture.completedFuture(id);
   }
 
   // 타켓 메서드랑 반환값 일치시켜야해?
