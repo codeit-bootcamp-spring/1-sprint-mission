@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -20,6 +21,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.NotificationService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
@@ -41,12 +43,18 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
-  private final ChannelRepository channelRepository;
-  private final UserRepository userRepository;
   private final MessageMapper messageMapper;
+
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
+
+  private final NotificationService notificationService;
+
+  private final ChannelRepository channelRepository;
+  private final UserRepository userRepository;
+
   private final PageResponseMapper pageResponseMapper;
+
 
   @Transactional
   @Override
@@ -110,6 +118,12 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.save(message);
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
+
+    notificationService.create(NotificationType.NEW_MESSAGE,
+        channel.getId(),
+        author.getUsername(),
+        messageCreateRequest.content());
+
     return messageMapper.toDto(message);
   }
 
