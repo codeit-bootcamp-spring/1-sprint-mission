@@ -23,7 +23,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -60,8 +59,7 @@ public class KafkaNotificationConsumer {
         @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
         @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
         @Header(KafkaHeaders.OFFSET) long offset,
-        ConsumerRecord<String, String> record,
-        Acknowledgment acknowledgment
+        ConsumerRecord<String, String> record
     ) {
         try {
             log.debug("새 메시지 Kafka 이벤트 처리 시작: topic={}, partition={}, offset={}", topic, partition,
@@ -100,7 +98,6 @@ public class KafkaNotificationConsumer {
             log.info("새 메시지 Kafka 이벤트 처리 완료: channelId={}, 알림 대상자 {}명",
                 event.channelId(), notificationTargetIds.size());
 
-            acknowledgment.acknowledge();
         } catch (Exception e) {
             log.error("새 메시지 Kafka 이벤트 처리 실패: topic={}, partition={}, offset={}", topic, partition,
                 offset, e);
@@ -123,8 +120,7 @@ public class KafkaNotificationConsumer {
         @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
         @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
         @Header(KafkaHeaders.OFFSET) long offset,
-        ConsumerRecord<String, String> record,
-        Acknowledgment acknowledgment
+        ConsumerRecord<String, String> record
     ) {
         try {
             log.debug("권한 변경 Kafka 이벤트 처리 시작: topic={}, partition={}, offset={}", topic, partition,
@@ -151,7 +147,6 @@ public class KafkaNotificationConsumer {
                     event.userId(), event.oldRole(), event.newRole());
             }
 
-            acknowledgment.acknowledge();
         } catch (Exception e) {
             log.error("권한 변경 Kafka 이벤트 처리 실패: topic={}, partition={}, offset={}", topic, partition,
                 offset, e);
@@ -174,8 +169,7 @@ public class KafkaNotificationConsumer {
         @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
         @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
         @Header(KafkaHeaders.OFFSET) long offset,
-        ConsumerRecord<String, String> record,
-        Acknowledgment acknowledgment
+        ConsumerRecord<String, String> record
     ) {
         try {
             log.debug("비동기 작업 실패 Kafka 이벤트 처리 시작: topic={}, partition={}, offset={}", topic,
@@ -202,7 +196,6 @@ public class KafkaNotificationConsumer {
                     event.userId(), event.taskName());
             }
 
-            acknowledgment.acknowledge();
         } catch (Exception e) {
             log.error("비동기 작업 실패 Kafka 이벤트 처리 실패: topic={}, partition={}, offset={}", topic,
                 partition, offset, e);
@@ -225,8 +218,7 @@ public class KafkaNotificationConsumer {
         @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
         @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
         @Header(KafkaHeaders.OFFSET) long offset,
-        ConsumerRecord<String, String> record,
-        Acknowledgment acknowledgment
+        ConsumerRecord<String, String> record
     ) {
         try {
             log.debug("일반 알림 Kafka 이벤트 처리 시작: topic={}, partition={}, offset={}", topic, partition,
@@ -249,7 +241,6 @@ public class KafkaNotificationConsumer {
                     event.receiverId(), event.type());
             }
 
-            acknowledgment.acknowledge();
         } catch (Exception e) {
             log.error("일반 알림 Kafka 이벤트 처리 실패: topic={}, partition={}, offset={}", topic, partition,
                 offset, e);
