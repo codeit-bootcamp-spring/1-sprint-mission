@@ -11,7 +11,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -100,7 +100,7 @@ public class JwtService {
       );
     } catch (ParseException e) {
       log.error(e.getMessage());
-      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, e);
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("token", token), e);
     }
 
   }
@@ -108,8 +108,7 @@ public class JwtService {
   @Transactional
   public JwtSession refreshJwtSession(String refreshToken) {
     if (!validate(refreshToken)) {
-      throw new DiscodeitException(ErrorCode.INVALID_TOKEN,
-          Map.of("refreshToken", refreshToken));
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("refreshToken", refreshToken));
     }
     JwtSession session = jwtSessionRepository.findByRefreshToken(refreshToken)
         .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
@@ -118,7 +117,7 @@ public class JwtService {
     UUID userId = parse(refreshToken).userDto().id();
     UserDto userDto = userRepository.findById(userId)
         .map(userMapper::toDto)
-        .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
     JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
     JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
@@ -145,7 +144,7 @@ public class JwtService {
 
   public JwtSession getJwtSession(String refreshToken) {
     return jwtSessionRepository.findByRefreshToken(refreshToken)
-        .orElseThrow(() -> new DiscodeitException(ErrorCode.JWT_SESSION_NOT_FOUND,
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
             Map.of("refreshToken", refreshToken)));
   }
 
