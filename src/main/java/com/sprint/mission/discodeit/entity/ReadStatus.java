@@ -15,10 +15,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(
-  name = "read_statuses",
-  uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"user_id", "channel_id"})
-  }
+    name = "read_statuses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    }
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

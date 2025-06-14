@@ -61,7 +61,7 @@ public class BasicAuthService implements AuthService {
   public UserDto updateRole(RoleUpdateRequest request) {
     UUID userId = request.userId();
     User user = userRepository.findById(userId)
-      .orElseThrow(() -> UserNotFoundException.withId(userId));
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
     Role newRole = request.newRole();
     user.updateRole(newRole);
     eventPublisher.publishEvent(new UserRoleUpdateEvent(userId, newRole));

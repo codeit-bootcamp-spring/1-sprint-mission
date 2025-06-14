@@ -15,7 +15,7 @@ public class SessionRegistryLogoutHandler implements LogoutHandler {
 
   @Override
   public void logout(HttpServletRequest request, HttpServletResponse response,
-    Authentication authentication) {
+      Authentication authentication) {
     HttpSession session = request.getSession(false);
     if (session != null) {
       sessionRegistry.getSessionInformation(session.getId()).expireNow();

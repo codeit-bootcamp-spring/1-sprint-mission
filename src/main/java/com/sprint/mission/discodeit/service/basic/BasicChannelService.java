@@ -61,8 +61,8 @@ public class BasicChannelService implements ChannelService {
     channelRepository.save(channel);
 
     List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
-      .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
-      .toList();
+        .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
+        .toList();
     readStatusRepository.saveAll(readStatuses);
 
     log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
@@ -73,8 +73,8 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelDto find(UUID channelId) {
     return channelRepository.findById(channelId)
-      .map(channelMapper::toDto)
-      .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
+        .map(channelMapper::toDto)
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
   }
 
   @Cacheable(cacheNames = "channelList", key = "#userId")
@@ -82,14 +82,14 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-      .map(ReadStatus::getChannel)
-      .map(Channel::getId)
-      .toList();
+        .map(ReadStatus::getChannel)
+        .map(Channel::getId)
+        .toList();
 
     return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
-      .stream()
-      .map(channelMapper::toDto)
-      .toList();
+        .stream()
+        .map(channelMapper::toDto)
+        .toList();
   }
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
@@ -101,7 +101,7 @@ public class BasicChannelService implements ChannelService {
     String newName = request.newName();
     String newDescription = request.newDescription();
     Channel channel = channelRepository.findById(channelId)
-      .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       throw PrivateChannelUpdateException.forChannel(channelId);
     }

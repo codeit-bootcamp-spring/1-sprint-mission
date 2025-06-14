@@ -19,9 +19,9 @@ public class BinaryContentStatusService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void updateBinaryStatus(UUID binaryContentId, BinaryContentUploadStatus status) {
     binaryContentRepository.findById(binaryContentId)
-      .ifPresent(binaryContent -> {
-        binaryContent.updateUploadSuccess(status);
-        log.info("바이너리 컨텐츠 업로드 상태 업데이트: id={}, status={}", binaryContent.getId(), status);
-      });
+        .ifPresent(binaryContent -> {
+          binaryContent.updateUploadSuccess(status);
+          log.info("바이너리 컨텐츠 업로드 상태 업데이트: id={}, status={}", binaryContent.getId(), status);
+        });
   }
 }

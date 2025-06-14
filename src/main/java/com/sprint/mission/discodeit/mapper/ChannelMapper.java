@@ -30,18 +30,18 @@ public abstract class ChannelMapper {
 
   protected Instant resolveLastMessageAt(Channel channel) {
     return messageRepository.findLastMessageAtByChannelId(
-        channel.getId())
-      .orElse(Instant.MIN);
+            channel.getId())
+        .orElse(Instant.MIN);
   }
 
   protected List<UserDto> resolveParticipants(Channel channel) {
     List<UserDto> participants = new ArrayList<>();
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       readStatusRepository.findAllByChannelIdWithUser(channel.getId())
-        .stream()
-        .map(ReadStatus::getUser)
-        .map(userMapper::toDto)
-        .forEach(participants::add);
+          .stream()
+          .map(ReadStatus::getUser)
+          .map(userMapper::toDto)
+          .forEach(participants::add);
     }
     return participants;
   }

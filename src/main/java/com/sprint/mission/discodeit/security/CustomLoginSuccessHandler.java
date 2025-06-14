@@ -17,7 +17,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-    Authentication authentication) throws IOException, ServletException {
+      Authentication authentication) throws IOException, ServletException {
     DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);

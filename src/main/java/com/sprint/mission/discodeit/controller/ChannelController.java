@@ -37,8 +37,8 @@ public class ChannelController implements ChannelApi {
     ChannelDto createdChannel = channelService.create(request);
     log.debug("공개 채널 생성 응답: {}", createdChannel);
     return ResponseEntity
-      .status(HttpStatus.CREATED)
-      .body(createdChannel);
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
   }
 
   @PostMapping(path = "private")
@@ -47,20 +47,20 @@ public class ChannelController implements ChannelApi {
     ChannelDto createdChannel = channelService.create(request);
     log.debug("비공개 채널 생성 응답: {}", createdChannel);
     return ResponseEntity
-      .status(HttpStatus.CREATED)
-      .body(createdChannel);
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
   }
 
   @PatchMapping(path = "{channelId}")
   public ResponseEntity<ChannelDto> update(
-    @PathVariable("channelId") UUID channelId,
-    @RequestBody @Valid PublicChannelUpdateRequest request) {
+      @PathVariable("channelId") UUID channelId,
+      @RequestBody @Valid PublicChannelUpdateRequest request) {
     log.info("채널 수정 요청: id={}, request={}", channelId, request);
     ChannelDto updatedChannel = channelService.update(channelId, request);
     log.debug("채널 수정 응답: {}", updatedChannel);
     return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(updatedChannel);
+        .status(HttpStatus.OK)
+        .body(updatedChannel);
   }
 
   @DeleteMapping(path = "{channelId}")
@@ -69,8 +69,8 @@ public class ChannelController implements ChannelApi {
     channelService.delete(channelId);
     log.debug("채널 삭제 완료");
     return ResponseEntity
-      .status(HttpStatus.NO_CONTENT)
-      .build();
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
   @GetMapping
@@ -79,7 +79,7 @@ public class ChannelController implements ChannelApi {
     List<ChannelDto> channels = channelService.findAllByUserId(userId);
     log.debug("사용자별 채널 목록 조회 응답: count={}", channels.size());
     return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(channels);
+        .status(HttpStatus.OK)
+        .body(channels);
   }
 }

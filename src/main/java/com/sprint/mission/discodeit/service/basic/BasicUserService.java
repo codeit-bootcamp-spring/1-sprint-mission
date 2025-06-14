@@ -45,7 +45,7 @@ public class BasicUserService implements UserService {
   @CacheEvict(cacheNames = "userList", allEntries = true)
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
-    Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     log.debug("사용자 생성 시작: {}", userCreateRequest);
 
     String username = userCreateRequest.username();
@@ -59,17 +59,17 @@ public class BasicUserService implements UserService {
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
-      .map(profileRequest -> {
-        String fileName = profileRequest.fileName();
-        String contentType = profileRequest.contentType();
-        byte[] bytes = profileRequest.bytes();
-        BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-          contentType);
-        binaryContentRepository.save(binaryContent);
-        binaryContentStorage.put(binaryContent.getId(), bytes);
-        return binaryContent;
-      })
-      .orElse(null);
+        .map(profileRequest -> {
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        })
+        .orElse(null);
     String password = userCreateRequest.password();
 
     String hashedPassword = passwordEncoder.encode(password);
@@ -85,8 +85,8 @@ public class BasicUserService implements UserService {
   public UserDto find(UUID userId) {
     log.debug("사용자 조회 시작: id={}", userId);
     UserDto userDto = userRepository.findById(userId)
-      .map(userMapper::toDto)
-      .orElseThrow(() -> UserNotFoundException.withId(userId));
+        .map(userMapper::toDto)
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
     log.info("사용자 조회 완료: id={}", userId);
     return userDto;
   }
@@ -96,13 +96,13 @@ public class BasicUserService implements UserService {
   public List<UserDto> findAll() {
     log.debug("모든 사용자 조회 시작");
     Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
-      .map(JwtSession::getUserId)
-      .collect(Collectors.toSet());
+        .map(JwtSession::getUserId)
+        .collect(Collectors.toSet());
 
     List<UserDto> userDtos = userRepository.findAllWithProfile()
-      .stream()
-      .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
-      .toList();
+        .stream()
+        .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
+        .toList();
     log.info("모든 사용자 조회 완료: 총 {}명", userDtos.size());
     return userDtos;
   }
@@ -112,14 +112,14 @@ public class BasicUserService implements UserService {
   @CacheEvict(cacheNames = "userList", allEntries = true)
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
-    Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
 
     User user = userRepository.findById(userId)
-      .orElseThrow(() -> {
-        UserNotFoundException exception = UserNotFoundException.withId(userId);
-        return exception;
-      });
+        .orElseThrow(() -> {
+          UserNotFoundException exception = UserNotFoundException.withId(userId);
+          return exception;
+        });
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
@@ -133,22 +133,22 @@ public class BasicUserService implements UserService {
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
-      .map(profileRequest -> {
+        .map(profileRequest -> {
 
-        String fileName = profileRequest.fileName();
-        String contentType = profileRequest.contentType();
-        byte[] bytes = profileRequest.bytes();
-        BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-          contentType);
-        binaryContentRepository.save(binaryContent);
-        binaryContentStorage.put(binaryContent.getId(), bytes);
-        return binaryContent;
-      })
-      .orElse(null);
+          String fileName = profileRequest.fileName();
+          String contentType = profileRequest.contentType();
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        })
+        .orElse(null);
 
     String newPassword = userUpdateRequest.newPassword();
     String hashedNewPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
-      .orElse(null);
+        .orElse(null);
     user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
     log.info("사용자 수정 완료: id={}", userId);

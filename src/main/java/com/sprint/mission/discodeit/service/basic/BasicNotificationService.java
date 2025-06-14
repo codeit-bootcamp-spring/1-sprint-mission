@@ -29,8 +29,8 @@ public class BasicNotificationService implements NotificationService {
   public List<NotificationDto> findAll(UUID userId) {
     log.debug("알림 조회 시작: userId={}", userId);
     return notificationRepository.findAllByReceiverId(userId).stream()
-      .map(notificationMapper::toDto)
-      .toList();
+        .map(notificationMapper::toDto)
+        .toList();
   }
 
   @Override
@@ -49,8 +49,8 @@ public class BasicNotificationService implements NotificationService {
   @Transactional(readOnly = true)
   public NotificationDto find(UUID notificationId) {
     return notificationRepository.findById(notificationId)
-      .map(notificationMapper::toDto)
-      .orElseThrow(() -> NotificationNotFoundException.withId(notificationId));
+        .map(notificationMapper::toDto)
+        .orElseThrow(() -> NotificationNotFoundException.withId(notificationId));
   }
 
 }

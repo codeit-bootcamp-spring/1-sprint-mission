@@ -37,7 +37,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   private final Path root;
 
   public LocalBinaryContentStorage(
-    @Value("${discodeit.storage.local.root-path}") Path root
+      @Value("${discodeit.storage.local.root-path}") Path root
   ) {
     this.root = root;
   }
@@ -56,10 +56,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Async
   @Retryable(
-    retryFor = {DiscodeitException.class},
-    noRetryFor = {IllegalArgumentException.class},
-    backoff = @Backoff(delay = 2000, multiplier = 2.0),
-    recover = "recoverUpload"
+      retryFor = {DiscodeitException.class},
+      noRetryFor = {IllegalArgumentException.class},
+      backoff = @Backoff(delay = 2000, multiplier = 2.0),
+      recover = "recoverUpload"
   )
   public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
     Path filePath = resolvePath(binaryContentId);
@@ -78,9 +78,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Recover
   public CompletableFuture<UUID> recoverUpload(DiscodeitException e, UUID binaryContentId) {
     AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure(
-      "LocalBinaryContentStorage#put",
-      MDC.get("requestId"),
-      "파일 업로드 실패: " + e.getMessage()
+        "LocalBinaryContentStorage#put",
+        MDC.get("requestId"),
+        "파일 업로드 실패: " + e.getMessage()
     );
     log.error("파일 업로드 실패: {}, 요청 ID: {}", asyncTaskFailure.failureReason(), asyncTaskFailure.requestId());
     return CompletableFuture.failedFuture(e);
@@ -109,11 +109,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     Resource resource = new InputStreamResource(inputStream);
 
     return ResponseEntity
-      .status(HttpStatus.OK)
-      .header(HttpHeaders.CONTENT_DISPOSITION,
-        "attachment; filename=\"" + metaData.fileName() + "\"")
-      .header(HttpHeaders.CONTENT_TYPE, metaData.contentType())
-      .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metaData.size()))
-      .body(resource);
+        .status(HttpStatus.OK)
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + metaData.fileName() + "\"")
+        .header(HttpHeaders.CONTENT_TYPE, metaData.contentType())
+        .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metaData.size()))
+        .body(resource);
   }
 }

@@ -38,12 +38,12 @@ public class AuthController implements AuthApi {
 
   @GetMapping("me")
   public ResponseEntity<String> me(
-    @CookieValue(value = JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
+      @CookieValue(value = JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
     log.info("내 정보 조회 요청");
     JwtSession jwtSession = jwtService.getJwtSession(refreshToken);
     return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(jwtSession.getAccessToken());
+        .status(HttpStatus.OK)
+        .body(jwtSession.getAccessToken());
   }
 
   @PutMapping("role")
@@ -52,26 +52,26 @@ public class AuthController implements AuthApi {
     UserDto userDto = authService.updateRole(request);
 
     return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(userDto);
+        .status(HttpStatus.OK)
+        .body(userDto);
   }
 
   @PostMapping("refresh")
   public ResponseEntity<String> refresh(
-    @CookieValue(JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
-    HttpServletResponse response
+      @CookieValue(JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
+      HttpServletResponse response
   ) {
     log.info("토큰 재발급 요청");
     JwtSession jwtSession = jwtService.refreshJwtSession(refreshToken);
 
     Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME,
-      jwtSession.getRefreshToken());
+        jwtSession.getRefreshToken());
     refreshTokenCookie.setHttpOnly(true);
     response.addCookie(refreshTokenCookie);
 
     return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(jwtSession.getAccessToken())
-      ;
+        .status(HttpStatus.OK)
+        .body(jwtSession.getAccessToken())
+        ;
   }
 }

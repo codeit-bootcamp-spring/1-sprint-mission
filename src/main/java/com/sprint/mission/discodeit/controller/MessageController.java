@@ -44,44 +44,44 @@ public class MessageController implements MessageApi {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
-    @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
-    @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
     log.info("메시지 생성 요청: request={}, attachmentCount={}",
-      messageCreateRequest, attachments != null ? attachments.size() : 0);
+        messageCreateRequest, attachments != null ? attachments.size() : 0);
 
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
-      .map(files -> files.stream()
-        .map(file -> {
-          try {
-            return new BinaryContentCreateRequest(
-              file.getOriginalFilename(),
-              file.getContentType(),
-              file.getBytes()
-            );
-          } catch (IOException e) {
-            throw new RuntimeException(e);
-          }
-        })
-        .toList())
-      .orElse(new ArrayList<>());
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
     MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
     log.debug("메시지 생성 응답: {}", createdMessage);
     return ResponseEntity
-      .status(HttpStatus.CREATED)
-      .body(createdMessage);
+        .status(HttpStatus.CREATED)
+        .body(createdMessage);
   }
 
   @PatchMapping(path = "{messageId}")
   public ResponseEntity<MessageDto> update(
-    @PathVariable("messageId") UUID messageId,
-    @RequestBody @Valid MessageUpdateRequest request) {
+      @PathVariable("messageId") UUID messageId,
+      @RequestBody @Valid MessageUpdateRequest request) {
     log.info("메시지 수정 요청: id={}, request={}", messageId, request);
     MessageDto updatedMessage = messageService.update(messageId, request);
     log.debug("메시지 수정 응답: {}", updatedMessage);
     return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(updatedMessage);
+        .status(HttpStatus.OK)
+        .body(updatedMessage);
   }
 
   @DeleteMapping(path = "{messageId}")
@@ -90,27 +90,27 @@ public class MessageController implements MessageApi {
     messageService.delete(messageId);
     log.debug("메시지 삭제 완료");
     return ResponseEntity
-      .status(HttpStatus.NO_CONTENT)
-      .build();
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
   @GetMapping
   public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
-    @RequestParam("channelId") UUID channelId,
-    @RequestParam(value = "cursor", required = false) Instant cursor,
-    @PageableDefault(
-      size = 50,
-      page = 0,
-      sort = "createdAt",
-      direction = Direction.DESC
-    ) Pageable pageable) {
+      @RequestParam("channelId") UUID channelId,
+      @RequestParam(value = "cursor", required = false) Instant cursor,
+      @PageableDefault(
+          size = 50,
+          page = 0,
+          sort = "createdAt",
+          direction = Direction.DESC
+      ) Pageable pageable) {
     log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}",
-      channelId, cursor, pageable);
+        channelId, cursor, pageable);
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
-      pageable);
+        pageable);
     log.debug("채널별 메시지 목록 조회 응답: totalElements={}", messages.totalElements());
     return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(messages);
+        .status(HttpStatus.OK)
+        .body(messages);
   }
 }

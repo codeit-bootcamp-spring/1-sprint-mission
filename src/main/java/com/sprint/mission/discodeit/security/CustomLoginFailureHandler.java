@@ -18,7 +18,7 @@ public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
 
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-    AuthenticationException exception) throws IOException, ServletException {
+      AuthenticationException exception) throws IOException, ServletException {
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     ErrorResponse errorResponse = new ErrorResponse(exception, HttpServletResponse.SC_UNAUTHORIZED);
