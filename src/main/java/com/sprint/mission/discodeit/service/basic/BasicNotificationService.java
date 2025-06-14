@@ -6,13 +6,13 @@ import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.event.NotificationCreateEvent;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -29,10 +29,12 @@ public class BasicNotificationService implements NotificationService {
   private final ApplicationEventPublisher eventPublisher;
 
   @Override
+  @CacheEvict(value = "notifications", key = "#userId")
   public void create(NotificationType type, UUID targetId, String title, String content) {
     eventPublisher.publishEvent(new NotificationCreateEvent(type, targetId, title, content));
   }
 
+  @Transactional(readOnly = true)
   @Override
   public NotificationDto find(UUID notificationId) {
     Notification notification = notificationRepository.findById(notificationId)
@@ -41,6 +43,8 @@ public class BasicNotificationService implements NotificationService {
     return notificationMapper.toDto(notification);
   }
 
+  @Transactional(readOnly = true)
+  @Cacheable(value = "notifications", key = "#userId")
   @Override
   public List<NotificationDto> findAllByUserId(UUID userId) {
     List<NotificationDto> notifications = notificationRepository.findAllByReceiverId(userId).stream()
@@ -51,6 +55,7 @@ public class BasicNotificationService implements NotificationService {
   }
 
   @PreAuthorize("principal.userDto.id == @basicNotificationService.find(#notificationId).receiverId()")
+  @CacheEvict(value = "notifications", key = "#userId")
   @Override
   @Transactional
   public void delete(UUID notificationId) {

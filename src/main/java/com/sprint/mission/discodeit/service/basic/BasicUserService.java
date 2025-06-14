@@ -25,6 +25,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,10 +49,9 @@ public class BasicUserService implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
 
-  private final NotificationService notificationService;
-
   @Transactional
   @Override
+  @CacheEvict(value = "users", allEntries = true)
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
@@ -125,6 +127,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Cacheable(value = "users")
   public List<UserDto> findAll() {
     log.debug("모든 사용자 조회 시작");
     Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
@@ -140,6 +143,7 @@ public class BasicUserService implements UserService {
   }
 
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
+  @CachePut(value = "users", key = "#result.id")
   @Transactional
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
@@ -194,6 +198,7 @@ public class BasicUserService implements UserService {
   }
 
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
+  @CacheEvict(value = "users", allEntries = true)
   @Transactional
   @Override
   public void delete(UUID userId) {
