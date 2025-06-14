@@ -209,6 +209,7 @@ sequenceDiagram
   S->>+D: save(BinaryContent)<br/>트랜잭션시작
   S->>AsyncUploader: put 비동기 시작
   D->>-S: commit 트랜잭션
+  S->>C: 200 OK
   AsyncUploader->>AsyncUploader: upload
   AsyncUploader->>DB: updateById<br/>commit❌
   DB->>AsyncUploader: EntityNotFound
