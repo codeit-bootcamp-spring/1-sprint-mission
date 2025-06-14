@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentOperationException;
+import com.sprint.mission.discodeit.global.monitoring.AsyncTaskFailure;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -22,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -32,6 +35,7 @@ import org.springframework.stereotype.Component;
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     private final Path root;
+    private final String TASK_NAME = "file-upload";
 
     public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path path) {
         this.root = path;
@@ -97,6 +101,18 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     private Path resolvePath(UUID uuid) {
         return root.resolve(uuid.toString());
+    }
+
+    @Recover
+    public CompletableFuture<Void> recover(BinaryContentOperationException e, UUID id,
+        byte[] bytes) {
+        String requestId = MDC.get("requestId");
+        String failureReason = e.getMessage();
+
+        AsyncTaskFailure failure = new AsyncTaskFailure(TASK_NAME, requestId, failureReason);
+        log.error("Async task failed : {}", failure);
+
+        return CompletableFuture.completedFuture(null);
     }
 
 }
