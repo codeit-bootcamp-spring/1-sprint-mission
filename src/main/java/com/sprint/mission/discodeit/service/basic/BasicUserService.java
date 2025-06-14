@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
@@ -22,6 +23,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -30,6 +32,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 //
 import java.util.UUID;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -78,14 +82,39 @@ public class BasicUserService implements UserService {
                       .fileName(profileRequest.fileName())
                       .size(profileRequest.size())
                       .contentType(profileRequest.contentType())
+                      .uploadStatus(BinaryContentUploadStatus.WAITING)
                       .build();
                   BinaryContent content = binaryContentRepository.save(binaryContent);
 
                   MDC.put("traceId", String.valueOf(UUID.randomUUID()));
 
-                  log.info("프로필 이미지 저장소에 업로드 시도 : fileNmae={}, Id={}", content.getFileName(),
+                  log.info("프로필 이미지 저장소에 업로드 시도 : fileName={}, Id={}", content.getFileName(),
                       content.getId());
-                  binaryContentStorage.put(content.getId(), profileRequest.bytes());
+                  TransactionSynchronizationManager.registerSynchronization(
+                      new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+
+                          CompletableFuture<UUID> future = binaryContentStorage.put(content.getId(),
+                              profileRequest.bytes());
+
+                          future.thenAccept(
+                                  fileId -> {
+                                    log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
+                                    binaryContentRepository.updateStatusById(content.getId(),
+                                        BinaryContentUploadStatus.SUCCESS);
+                                  })
+                              .exceptionally(ex -> {
+                                binaryContentRepository.updateStatusById(content.getId(),
+                                    BinaryContentUploadStatus.FAILED);
+                                log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}, message={}",
+                                    content.getId(),
+                                    ex.getMessage(), ex);
+                                return null;
+                              });
+                        }
+                      }
+                  );
                   return content;
                 })
             .orElse(null);

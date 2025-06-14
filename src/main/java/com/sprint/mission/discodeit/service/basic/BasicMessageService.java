@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.reponse.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -24,6 +25,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 //
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 //
 import java.util.*;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
@@ -72,6 +76,7 @@ public class BasicMessageService implements MessageService {
             .fileName(req.fileName())
             .size(req.size())
             .contentType(req.contentType())
+            .uploadStatus(BinaryContentUploadStatus.WAITING)
             .build();
 
         binaryContents.add(binaryContent);
@@ -79,7 +84,32 @@ public class BasicMessageService implements MessageService {
         BinaryContent content = binaryContentRepository.save(binaryContent);
         log.info("메세지 첨부 파일 DB에 저장, contentId={}", content.getId());
 
-        binaryContentStorage.put(content.getId(), req.bytes());
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+              @Override
+              public void afterCommit() {
+
+                CompletableFuture<UUID> future = binaryContentStorage.put(content.getId(),
+                    req.bytes());
+
+                future.thenAccept(
+                        fileId -> {
+                          log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
+                          binaryContentRepository.updateStatusById(content.getId(),
+                              BinaryContentUploadStatus.SUCCESS);
+                        })
+                    .exceptionally(ex -> {
+                      binaryContentRepository.updateStatusById(content.getId(),
+                          BinaryContentUploadStatus.FAILED);
+                      log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}, message={}",
+                          content.getId(),
+                          ex.getMessage(), ex);
+                      return null;
+                    });
+              }
+            }
+        );
+
       }
     }
 
