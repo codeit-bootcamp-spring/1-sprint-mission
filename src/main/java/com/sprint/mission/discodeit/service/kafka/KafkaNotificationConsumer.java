@@ -48,7 +48,7 @@ public class KafkaNotificationConsumer {
     /**
      * 새 미시지 이벤트
      */
-    @KafkaListener(topics = "{$discodeit.kafka.topics.new-message}")
+    @KafkaListener(topics = "${discodeit.kafka.topics.new-message}")
     @RetryableTopic(
         attempts = "3",
         backoff = @Backoff(delay = 1000, multiplier = 2.0),
