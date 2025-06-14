@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(value = "discodeit.storage.type", havingValue = "local", matchIfMissing = false)
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-    private static final String TASK_NAME = "file-upload";
+    private static final String TASK_NAME = "file-upload-local";
     private final Path root;
 
     public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path path) {

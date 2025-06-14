@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentOperationException;
 import com.sprint.mission.discodeit.global.exception.storage.StorageException;
+import com.sprint.mission.discodeit.global.monitoring.AsyncTaskFailure;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
@@ -10,10 +12,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -33,6 +39,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 @Component
 @ConditionalOnProperty(value = "discodeit.storage.type", havingValue = "s3")
 public class S3BinaryContentStorage implements BinaryContentStorage {
+
+    private static final String TASK_NAME = "file-upload-s3";
 
     private String accessKey;
     private String secretKey;
@@ -57,6 +65,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         this.s3Presigner = getS3Presigner();
     }
 
+    @Retryable(
+        value = {S3Exception.class, SdkClientException.class, Exception.class},
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
     @Override
     public CompletableFuture<Void> put(UUID id, byte[] bytes) {
         // PutObjectRequest
@@ -85,7 +98,26 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public void putSync(UUID id, byte[] bytes) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+            .bucket(bucket)
+            .key(id.toString())
+            .build();
 
+        try {
+            s3Client.putObject(putObjectRequest,
+                RequestBody.fromBytes(bytes));
+        } catch (S3Exception e) {
+            log.error("S3 예외 발생 - 코드: {}, 메시지: {}", e.awsErrorDetails().errorCode(),
+                e.awsErrorDetails().errorMessage());
+            throw new StorageException(ErrorCode.S3_UPLOAD_FAILED);
+
+        } catch (SdkClientException e) {
+            log.error("AWS SDK 예외 발생", e);
+            throw new StorageException(ErrorCode.SDK_ERROR);
+
+        } catch (Exception e) {
+            throw new RuntimeException("파일 업로드 중 예기치 않은 오류 발생하였습니다.", e);
+        }
     }
 
     @Override
@@ -176,6 +208,20 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
             log.error("Presigned URL 생성 중 알 수 없는 오류 발생", e);
             throw new RuntimeException(e);
         }
+    }
+
+    @Recover
+    public CompletableFuture<Void> recover(BinaryContentOperationException e, UUID id,
+        byte[] bytes) {
+        String requestId = MDC.get("requestId");
+        String failureReason = e.getMessage();
+
+        AsyncTaskFailure failure = new AsyncTaskFailure(TASK_NAME, requestId, failureReason);
+        log.error("Async task failed : {}", failure);
+
+        CompletableFuture<Void> failed = new CompletableFuture<>();
+        failed.completeExceptionally(e);
+        return failed;
     }
 
 }
