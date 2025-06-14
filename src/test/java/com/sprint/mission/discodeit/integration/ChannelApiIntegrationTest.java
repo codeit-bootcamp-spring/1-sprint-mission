@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.ChannelDto;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelPrivateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelPublicRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;

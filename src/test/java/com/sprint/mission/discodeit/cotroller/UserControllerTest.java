@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.controller.UserController;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
@@ -32,7 +32,6 @@ import static org.mockito.Mockito.eq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -72,7 +71,7 @@ public class UserControllerTest {
         "binaryContent",
         "profile.jpg",
         MediaType.IMAGE_JPEG_VALUE,
-        "dummy content" .getBytes()
+        "dummy content".getBytes()
     );
 
     // JSON 데이터를 위한 multipart 파일 생성
@@ -201,7 +200,7 @@ public class UserControllerTest {
         "binaryContent",
         "updated-profile.jpg",
         MediaType.IMAGE_JPEG_VALUE,
-        "dummy content" .getBytes()
+        "dummy content".getBytes()
     );
 
     UUID userId = UUID.randomUUID();

@@ -12,14 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -75,7 +74,7 @@ class UserApiIntegrationTest {
         "binaryContent",
         "profile.jpg",
         MediaType.IMAGE_JPEG_VALUE,
-        "test-image" .getBytes()
+        "test-image".getBytes()
     );
 
     // When & Then
@@ -177,7 +176,7 @@ class UserApiIntegrationTest {
         "profile",
         "updated-profile.jpg",
         MediaType.IMAGE_JPEG_VALUE,
-        "updated-image" .getBytes()
+        "updated-image".getBytes()
     );
 
     // When & Then

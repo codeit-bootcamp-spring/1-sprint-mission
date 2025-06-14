@@ -100,7 +100,7 @@ public class JwtService {
       );
     } catch (ParseException e) {
       log.error(e.getMessage());
-      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("token", token), e);
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("token", token));
     }
 
   }
@@ -117,7 +117,7 @@ public class JwtService {
     UUID userId = parse(refreshToken).userDto().id();
     UserDto userDto = userRepository.findById(userId)
         .map(userMapper::toDto)
-        .orElseThrow(() -> UserNotFoundException.withId(userId));
+        .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
     JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
     JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
