@@ -21,98 +21,98 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
-	@Autowired
-	private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-	@Autowired
-	private ObjectMapper objectMapper;
+  @Autowired
+  private ObjectMapper objectMapper;
 
-	@MockitoBean
-	private AuthService authService;
+  @MockitoBean
+  private AuthService authService;
 
-	@Test
-	@DisplayName("로그인 성공 테스트")
-	void login_Success() throws Exception {
-		// Given
-		LoginRequest loginRequest = new LoginRequest(
-			"testuser",
-			"Password1!"
-		);
+  @Test
+  @DisplayName("로그인 성공 테스트")
+  void login_Success() throws Exception {
+    // Given
+    LoginRequest loginRequest = new LoginRequest(
+        "testuser",
+        "Password1!"
+    );
 
-		UUID userId = UUID.randomUUID();
-		UserDto loggedInUser = new UserDto(
-			userId,
-			"testuser",
-			"test@example.com",
-			null,
-			true,
-			Role.USER
-		);
+    UUID userId = UUID.randomUUID();
+    UserDto loggedInUser = new UserDto(
+        userId,
+        "testuser",
+        "test@example.com",
+        null,
+        true,
+        Role.USER
+    );
 
-		//    given(authService.login(any(LoginRequest.class))).willReturn(loggedInUser);
+    //    given(authService.login(any(LoginRequest.class))).willReturn(loggedInUser);
 
-		// When & Then
-		mockMvc.perform(post("/api/auth/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(loginRequest)))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(userId.toString()))
-			.andExpect(jsonPath("$.username").value("testuser"))
-			.andExpect(jsonPath("$.email").value("test@example.com"))
-			.andExpect(jsonPath("$.online").value(true));
-	}
+    // When & Then
+    mockMvc.perform(post("/api/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(userId.toString()))
+        .andExpect(jsonPath("$.username").value("testuser"))
+        .andExpect(jsonPath("$.email").value("test@example.com"))
+        .andExpect(jsonPath("$.online").value(true));
+  }
 
-	@Test
-	@DisplayName("로그인 실패 테스트 - 존재하지 않는 사용자")
-	void login_Failure_UserNotFound() throws Exception {
-		// Given
-		LoginRequest loginRequest = new LoginRequest(
-			"nonexistentuser",
-			"Password1!"
-		);
+  @Test
+  @DisplayName("로그인 실패 테스트 - 존재하지 않는 사용자")
+  void login_Failure_UserNotFound() throws Exception {
+    // Given
+    LoginRequest loginRequest = new LoginRequest(
+        "nonexistentuser",
+        "Password1!"
+    );
 
-		//    given(authService.login(any(LoginRequest.class)))
-		//        .willThrow(UserNotFoundException.withUsername("nonexistentuser"));
+    //    given(authService.login(any(LoginRequest.class)))
+    //        .willThrow(UserNotFoundException.withUsername("nonexistentuser"));
 
-		// When & Then
-		mockMvc.perform(post("/api/auth/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(loginRequest)))
-			.andExpect(status().isNotFound());
-	}
+    // When & Then
+    mockMvc.perform(post("/api/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+        .andExpect(status().isNotFound());
+  }
 
-	@Test
-	@DisplayName("로그인 실패 테스트 - 잘못된 비밀번호")
-	void login_Failure_InvalidCredentials() throws Exception {
-		// Given
-		LoginRequest loginRequest = new LoginRequest(
-			"testuser",
-			"WrongPassword1!"
-		);
+  @Test
+  @DisplayName("로그인 실패 테스트 - 잘못된 비밀번호")
+  void login_Failure_InvalidCredentials() throws Exception {
+    // Given
+    LoginRequest loginRequest = new LoginRequest(
+        "testuser",
+        "WrongPassword1!"
+    );
 
-		//    given(authService.login(any(LoginRequest.class)))
-		//        .willThrow(InvalidCredentialsException.wrongPassword());
+    //    given(authService.login(any(LoginRequest.class)))
+    //        .willThrow(InvalidCredentialsException.wrongPassword());
 
-		// When & Then
-		mockMvc.perform(post("/api/auth/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(loginRequest)))
-			.andExpect(status().isUnauthorized());
-	}
+    // When & Then
+    mockMvc.perform(post("/api/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+        .andExpect(status().isUnauthorized());
+  }
 
-	@Test
-	@DisplayName("로그인 실패 테스트 - 유효하지 않은 요청")
-	void login_Failure_InvalidRequest() throws Exception {
-		// Given
-		LoginRequest invalidRequest = new LoginRequest(
-			"", // 사용자 이름 비어있음 (NotBlank 위반)
-			""  // 비밀번호 비어있음 (NotBlank 위반)
-		);
+  @Test
+  @DisplayName("로그인 실패 테스트 - 유효하지 않은 요청")
+  void login_Failure_InvalidRequest() throws Exception {
+    // Given
+    LoginRequest invalidRequest = new LoginRequest(
+        "", // 사용자 이름 비어있음 (NotBlank 위반)
+        ""  // 비밀번호 비어있음 (NotBlank 위반)
+    );
 
-		// When & Then
-		mockMvc.perform(post("/api/auth/login")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(invalidRequest)))
-			.andExpect(status().isBadRequest());
-	}
+    // When & Then
+    mockMvc.perform(post("/api/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(invalidRequest)))
+        .andExpect(status().isBadRequest());
+  }
 } 
