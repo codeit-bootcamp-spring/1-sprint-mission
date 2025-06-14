@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class AdminInitializer implements ApplicationRunner {
 
-  private final AuthService authService;
+    private final AuthService authService;
 
-  @Override
-  public void run(ApplicationArguments args) {
-    authService.initAdmin();
-  }
+    @Override
+    public void run(ApplicationArguments args) {
+        authService.initAdmin();
+    }
 }

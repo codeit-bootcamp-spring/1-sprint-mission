@@ -40,95 +40,95 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-  @Bean
-  public SecurityFilterChain filterChain(
-    HttpSecurity http,
-    ObjectMapper objectMapper,
-    DaoAuthenticationProvider daoAuthenticationProvider,
-    JwtService jwtService
-  )
-    throws Exception {
-    http
-      .authenticationProvider(daoAuthenticationProvider)
-      .authorizeHttpRequests(authorize -> authorize
-        .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
-        .anyRequest().hasRole(Role.USER.name())
-      )
-      .csrf(csrf ->
-        csrf
-          .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
-          .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-          .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-          .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
-      )
-      .logout(logout ->
-        logout
-          .logoutRequestMatcher(SecurityMatchers.LOGOUT)
-          .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-          .addLogoutHandler(new JwtLogoutHandler(jwtService))
-      )
-      .with(
-        new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
-        configurer ->
-          configurer
-            .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))
-            .failureHandler(new CustomLoginFailureHandler(objectMapper))
-      )
-      .sessionManagement(session ->
-        session
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-      )
-      .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
-        JsonUsernamePasswordAuthenticationFilter.class)
-    ;
+    @Bean
+    public SecurityFilterChain filterChain(
+      HttpSecurity http,
+      ObjectMapper objectMapper,
+      DaoAuthenticationProvider daoAuthenticationProvider,
+      JwtService jwtService
+    )
+      throws Exception {
+        http
+          .authenticationProvider(daoAuthenticationProvider)
+          .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
+            .anyRequest().hasRole(Role.USER.name())
+          )
+          .csrf(csrf ->
+            csrf
+              .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
+              .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+              .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+              .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
+          )
+          .logout(logout ->
+            logout
+              .logoutRequestMatcher(SecurityMatchers.LOGOUT)
+              .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+              .addLogoutHandler(new JwtLogoutHandler(jwtService))
+          )
+          .with(
+            new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+            configurer ->
+              configurer
+                .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))
+                .failureHandler(new CustomLoginFailureHandler(objectMapper))
+          )
+          .sessionManagement(session ->
+            session
+              .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+          )
+          .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
+            JsonUsernamePasswordAuthenticationFilter.class)
+        ;
 
-    return http.build();
-  }
+        return http.build();
+    }
 
-  @Bean
-  public String debugFilterChain(SecurityFilterChain chain) {
-    log.debug("Debug Filter Chain...");
-    int filterSize = chain.getFilters().size();
-    IntStream.range(0, filterSize)
-      .forEach(idx -> {
-        log.debug("[{}/{}] {}", idx + 1, filterSize, chain.getFilters().get(idx));
-      });
-    return "debugFilterChain";
-  }
+    @Bean
+    public String debugFilterChain(SecurityFilterChain chain) {
+        log.debug("Debug Filter Chain...");
+        int filterSize = chain.getFilters().size();
+        IntStream.range(0, filterSize)
+          .forEach(idx -> {
+              log.debug("[{}/{}] {}", idx + 1, filterSize, chain.getFilters().get(idx));
+          });
+        return "debugFilterChain";
+    }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-  @Bean
-  public DaoAuthenticationProvider daoAuthenticationProvider(
-    UserDetailsService userDetailsService,
-    PasswordEncoder passwordEncoder,
-    RoleHierarchy roleHierarchy
-  ) {
-    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-    provider.setUserDetailsService(userDetailsService);
-    provider.setPasswordEncoder(passwordEncoder);
-    provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
-    return provider;
-  }
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider(
+      UserDetailsService userDetailsService,
+      PasswordEncoder passwordEncoder,
+      RoleHierarchy roleHierarchy
+    ) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
+        return provider;
+    }
 
-  @Bean
-  public AuthenticationManager authenticationManager(
-    List<AuthenticationProvider> authenticationProviders) {
-    return new ProviderManager(authenticationProviders);
-  }
+    @Bean
+    public AuthenticationManager authenticationManager(
+      List<AuthenticationProvider> authenticationProviders) {
+        return new ProviderManager(authenticationProviders);
+    }
 
-  @Bean
-  public RoleHierarchy roleHierarchy() {
-    return RoleHierarchyImpl.withDefaultRolePrefix()
-      .role(Role.ADMIN.name())
-      .implies(Role.USER.name(), Role.CHANNEL_MANAGER.name())
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+          .role(Role.ADMIN.name())
+          .implies(Role.USER.name(), Role.CHANNEL_MANAGER.name())
 
-      .role(Role.CHANNEL_MANAGER.name())
-      .implies(Role.USER.name())
+          .role(Role.CHANNEL_MANAGER.name())
+          .implies(Role.USER.name())
 
-      .build();
-  }
+          .build();
+    }
 }

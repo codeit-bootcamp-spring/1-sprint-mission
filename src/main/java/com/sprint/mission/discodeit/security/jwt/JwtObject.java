@@ -10,7 +10,7 @@ public record JwtObject(
   String token
 ) {
 
-  public boolean isExpired() {
-    return expirationTime.isBefore(Instant.now());
-  }
+    public boolean isExpired() {
+        return expirationTime.isBefore(Instant.now());
+    }
 }

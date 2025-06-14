@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
-  @Query("select n from Notification n "
-    + "where n.receiverId = :receiverId")
-  List<Notification> findAllByReceiverId(UUID receiverId);
+    @Query("select n from Notification n "
+      + "where n.receiverId = :receiverId")
+    List<Notification> findAllByReceiverId(UUID receiverId);
 }

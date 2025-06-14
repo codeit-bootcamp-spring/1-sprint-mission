@@ -24,29 +24,29 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity {
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "user_id", columnDefinition = "uuid")
-  private User user;
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
-  private Channel channel;
-  @Column(columnDefinition = "timestamp with time zone", nullable = false)
-  private Instant lastReadAt;
-  @Column(nullable = false)
-  private boolean notificationEnabled;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", columnDefinition = "uuid")
+    private User user;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "channel_id", columnDefinition = "uuid")
+    private Channel channel;
+    @Column(columnDefinition = "timestamp with time zone", nullable = false)
+    private Instant lastReadAt;
+    @Column(nullable = false)
+    private boolean notificationEnabled;
 
-  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
-    this.user = user;
-    this.channel = channel;
-    this.lastReadAt = lastReadAt;
-    this.notificationEnabled = channel.getType() == ChannelType.PRIVATE;
-  }
-
-  public void update(Instant newLastReadAt, boolean newNotificationEnabled) {
-    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
-      this.lastReadAt = newLastReadAt;
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = lastReadAt;
+        this.notificationEnabled = channel.getType() == ChannelType.PRIVATE;
     }
-    this.notificationEnabled = newNotificationEnabled;
-  }
+
+    public void update(Instant newLastReadAt, boolean newNotificationEnabled) {
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+        }
+        this.notificationEnabled = newNotificationEnabled;
+    }
 
 }

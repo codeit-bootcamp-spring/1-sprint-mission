@@ -16,19 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/notifications")
 public class NotificationController {
 
-  private final NotificationService notificationService;
+    private final NotificationService notificationService;
 
-  // 알림 조회
-  @GetMapping
-  public ResponseEntity<NotificationDto> findAll() {
+    // 알림 조회
+    @GetMapping
+    public ResponseEntity<NotificationDto> findAll() {
 
-    return ResponseEntity.ok(null);
-  }
+        return ResponseEntity.ok(null);
+    }
 
-  // 알림 삭제 (확인)
-  @DeleteMapping("/{notificationId}")
-  public ResponseEntity<Void> deleteById(@PathVariable UUID notificationId) {
+    // 알림 삭제 (확인)
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<Void> deleteById(@PathVariable UUID notificationId) {
 
-    return ResponseEntity.notFound().build();
-  }
+        return ResponseEntity.notFound().build();
+    }
 }

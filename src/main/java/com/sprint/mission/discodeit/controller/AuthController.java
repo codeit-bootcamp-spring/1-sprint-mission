@@ -27,51 +27,51 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController implements AuthApi {
 
-  private final AuthService authService;
-  private final JwtService jwtService;
+    private final AuthService authService;
+    private final JwtService jwtService;
 
-  @GetMapping("csrf-token")
-  public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
-    log.debug("CSRF 토큰 요청");
-    return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
-  }
+    @GetMapping("csrf-token")
+    public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+        log.debug("CSRF 토큰 요청");
+        return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+    }
 
-  @GetMapping("me")
-  public ResponseEntity<String> me(
-    @CookieValue(value = JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
-    log.info("내 정보 조회 요청");
-    JwtSession jwtSession = jwtService.getJwtSession(refreshToken);
-    return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(jwtSession.getAccessToken());
-  }
+    @GetMapping("me")
+    public ResponseEntity<String> me(
+      @CookieValue(value = JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
+        log.info("내 정보 조회 요청");
+        JwtSession jwtSession = jwtService.getJwtSession(refreshToken);
+        return ResponseEntity
+          .status(HttpStatus.OK)
+          .body(jwtSession.getAccessToken());
+    }
 
-  @PutMapping("role")
-  public ResponseEntity<UserDto> role(@RequestBody RoleUpdateRequest request) {
-    log.info("권한 수정 요청");
-    UserDto userDto = authService.updateRole(request);
+    @PutMapping("role")
+    public ResponseEntity<UserDto> role(@RequestBody RoleUpdateRequest request) {
+        log.info("권한 수정 요청");
+        UserDto userDto = authService.updateRole(request);
 
-    return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(userDto);
-  }
+        return ResponseEntity
+          .status(HttpStatus.OK)
+          .body(userDto);
+    }
 
-  @PostMapping("refresh")
-  public ResponseEntity<String> refresh(
-    @CookieValue(JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
-    HttpServletResponse response
-  ) {
-    log.info("토큰 재발급 요청");
-    JwtSession jwtSession = jwtService.refreshJwtSession(refreshToken);
+    @PostMapping("refresh")
+    public ResponseEntity<String> refresh(
+      @CookieValue(JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
+      HttpServletResponse response
+    ) {
+        log.info("토큰 재발급 요청");
+        JwtSession jwtSession = jwtService.refreshJwtSession(refreshToken);
 
-    Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME,
-      jwtSession.getRefreshToken());
-    refreshTokenCookie.setHttpOnly(true);
-    response.addCookie(refreshTokenCookie);
+        Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME,
+          jwtSession.getRefreshToken());
+        refreshTokenCookie.setHttpOnly(true);
+        response.addCookie(refreshTokenCookie);
 
-    return ResponseEntity
-      .status(HttpStatus.OK)
-      .body(jwtSession.getAccessToken())
-      ;
-  }
+        return ResponseEntity
+          .status(HttpStatus.OK)
+          .body(jwtSession.getAccessToken())
+          ;
+    }
 }

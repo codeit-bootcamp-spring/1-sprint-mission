@@ -13,7 +13,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @MappedSuperclass
 public abstract class BaseUpdatableEntity extends BaseEntity {
 
-  @LastModifiedDate
-  @Column(columnDefinition = "timestamp with time zone")
-  private Instant updatedAt;
+    @LastModifiedDate
+    @Column(columnDefinition = "timestamp with time zone")
+    private Instant updatedAt;
 }

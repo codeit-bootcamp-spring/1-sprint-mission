@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface ReadStatusService {
 
-  ReadStatusDto create(ReadStatusCreateRequest request);
+    ReadStatusDto create(ReadStatusCreateRequest request);
 
-  ReadStatusDto find(UUID readStatusId);
+    ReadStatusDto find(UUID readStatusId);
 
-  List<ReadStatusDto> findAllByUserId(UUID userId);
+    List<ReadStatusDto> findAllByUserId(UUID userId);
 
-  ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request);
+    ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request);
 
-  void delete(UUID readStatusId);
+    void delete(UUID readStatusId);
 }
