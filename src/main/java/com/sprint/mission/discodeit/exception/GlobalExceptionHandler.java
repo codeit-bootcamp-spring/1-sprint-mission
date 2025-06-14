@@ -21,24 +21,24 @@ public class GlobalExceptionHandler {
     log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
     ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR.value());
     return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(errorResponse);
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .body(errorResponse);
   }
 
   @ExceptionHandler(DiscodeitException.class)
   public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException exception) {
     log.error("커스텀 예외 발생: code={}, message={}", exception.getErrorCode(), exception.getMessage(),
-        exception);
+      exception);
     HttpStatus status = determineHttpStatus(exception);
     ErrorResponse response = new ErrorResponse(exception, status.value());
     return ResponseEntity
-        .status(status)
-        .body(response);
+      .status(status)
+      .body(response);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidationExceptions(
-      MethodArgumentNotValidException ex) {
+    MethodArgumentNotValidException ex) {
     log.error("요청 유효성 검사 실패: {}", ex.getMessage());
 
     Map<String, Object> validationErrors = new HashMap<>();
@@ -49,26 +49,26 @@ public class GlobalExceptionHandler {
     });
 
     ErrorResponse response = new ErrorResponse(
-        Instant.now(),
-        "VALIDATION_ERROR",
-        "요청 데이터 유효성 검사에 실패했습니다",
-        validationErrors,
-        ex.getClass().getSimpleName(),
-        HttpStatus.BAD_REQUEST.value()
+      Instant.now(),
+      "VALIDATION_ERROR",
+      "요청 데이터 유효성 검사에 실패했습니다",
+      validationErrors,
+      ex.getClass().getSimpleName(),
+      HttpStatus.BAD_REQUEST.value()
     );
 
     return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
-        .body(response);
+      .status(HttpStatus.BAD_REQUEST)
+      .body(response);
   }
 
   @ExceptionHandler(AuthorizationDeniedException.class)
   public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(
-      AuthorizationDeniedException exception) {
+    AuthorizationDeniedException exception) {
     ErrorResponse errorResponse = new ErrorResponse(exception, HttpStatus.FORBIDDEN.value());
     return ResponseEntity
-        .status(errorResponse.getStatus())
-        .body(errorResponse);
+      .status(errorResponse.getStatus())
+      .body(errorResponse);
   }
 
   private HttpStatus determineHttpStatus(DiscodeitException exception) {

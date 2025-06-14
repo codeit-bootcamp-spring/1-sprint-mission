@@ -30,9 +30,9 @@ public class NotificationEventHandler {
 
   @Async
   @Retryable(
-      retryFor = RuntimeException.class,
-      maxAttempts = 3,
-      backoff = @Backoff(delay = 2000, multiplier = 2)
+    retryFor = RuntimeException.class,
+    maxAttempts = 3,
+    backoff = @Backoff(delay = 2000, multiplier = 2)
   )
   @CacheEvict(cacheNames = "notificationList", key = "#event.channelId()")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -42,15 +42,15 @@ public class NotificationEventHandler {
     String messageContent = event.messageContent();
     List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelIdWithUser(channelId);
     List<Notification> notifications = readStatuses.stream()
-        .filter(ReadStatus::isNotificationEnabled)
-        .map(readStatus -> Notification.builder()
-            .receiverId(readStatus.getUser().getId())
-            .notificationType(NotificationType.NEW_MESSAGE)
-            .targetId(channelId)
-            .title("새 메시지가 도착했습니다.")
-            .content(messageContent)
-            .build()
-        ).toList();
+      .filter(ReadStatus::isNotificationEnabled)
+      .map(readStatus -> Notification.builder()
+        .receiverId(readStatus.getUser().getId())
+        .notificationType(NotificationType.NEW_MESSAGE)
+        .targetId(channelId)
+        .title("새 메시지가 도착했습니다.")
+        .content(messageContent)
+        .build()
+      ).toList();
     notificationRepository.saveAll(notifications);
     log.info("알림 생성 완료.");
   }
@@ -62,9 +62,9 @@ public class NotificationEventHandler {
 
   @Async
   @Retryable(
-      retryFor = RuntimeException.class,
-      maxAttempts = 3,
-      backoff = @Backoff(delay = 2000, multiplier = 2)
+    retryFor = RuntimeException.class,
+    maxAttempts = 3,
+    backoff = @Backoff(delay = 2000, multiplier = 2)
   )
   @CacheEvict(cacheNames = "notificationList", key = "#event.receivedId()")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -74,12 +74,12 @@ public class NotificationEventHandler {
     String content = "당신의 권한이 " + event.role().name() + "으로 변경되었습니다.";
 
     Notification notification = Notification.builder()
-        .receiverId(event.receivedId())
-        .notificationType(NotificationType.ROLE_CHANGED)
-        .targetId(null)
-        .title(title)
-        .content(content)
-        .build();
+      .receiverId(event.receivedId())
+      .notificationType(NotificationType.ROLE_CHANGED)
+      .targetId(null)
+      .title(title)
+      .content(content)
+      .build();
     notificationRepository.save(notification);
     log.info("알림 생성 완료");
   }
@@ -87,6 +87,6 @@ public class NotificationEventHandler {
   @Recover
   public void recoverUserRoleNotification(RuntimeException e, UserRoleUpdateEvent event) {
     log.error("권한 변경 알림 생성 실패 - 재시도 모두 실패: userId={}, role={}",
-        event.receivedId(), event.role(), e);
+      event.receivedId(), event.role(), e);
   }
 }

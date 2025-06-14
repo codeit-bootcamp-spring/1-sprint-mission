@@ -28,20 +28,20 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request,
-      HttpServletResponse response) throws AuthenticationException {
+    HttpServletResponse response) throws AuthenticationException {
 
     if (!request.getMethod().equals("POST")) {
       throw new AuthenticationServiceException(
-          "Authentication method not supported: " + request.getMethod());
+        "Authentication method not supported: " + request.getMethod());
     }
 
     try {
       // JSON 요청 본문 파싱
       LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(),
-          LoginRequest.class);
+        LoginRequest.class);
 
       UsernamePasswordAuthenticationToken authRequest =
-          new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
+        new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
 
       setDetails(request, authRequest);
       return this.getAuthenticationManager().authenticate(authRequest);
@@ -52,13 +52,13 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
   }
 
   public static JsonUsernamePasswordAuthenticationFilter createDefault(
-      ObjectMapper objectMapper,
-      AuthenticationManager authenticationManager,
-      SessionAuthenticationStrategy sessionAuthenticationStrategy,
-      RememberMeServices rememberMeServices
+    ObjectMapper objectMapper,
+    AuthenticationManager authenticationManager,
+    SessionAuthenticationStrategy sessionAuthenticationStrategy,
+    RememberMeServices rememberMeServices
   ) {
     JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
-        objectMapper);
+      objectMapper);
     filter.setRequiresAuthenticationRequestMatcher(SecurityMatchers.LOGIN);
     filter.setAuthenticationManager(authenticationManager);
     filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper));
@@ -70,7 +70,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
   }
 
   public static class Configurer extends
-      AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, JsonUsernamePasswordAuthenticationFilter> {
+    AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, JsonUsernamePasswordAuthenticationFilter> {
 
     public Configurer(ObjectMapper objectMapper) {
       super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), SecurityMatchers.LOGIN_URL);

@@ -56,7 +56,7 @@ public class JwtService {
     JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
     JwtSession jwtSession = new JwtSession(userDto.id(), accessJwtObject.token(),
-        refreshJwtObject.token(), accessJwtObject.expirationTime());
+      refreshJwtObject.token(), accessJwtObject.expirationTime());
     jwtSessionRepository.save(jwtSession);
 
     return jwtSession;
@@ -93,10 +93,10 @@ public class JwtService {
       Payload payload = jwsObject.getPayload();
       Map<String, Object> jsonObject = payload.toJSONObject();
       return new JwtObject(
-          objectMapper.convertValue(jsonObject.get("iat"), Instant.class),
-          objectMapper.convertValue(jsonObject.get("exp"), Instant.class),
-          objectMapper.convertValue(jsonObject.get("userDto"), UserDto.class),
-          token
+        objectMapper.convertValue(jsonObject.get("iat"), Instant.class),
+        objectMapper.convertValue(jsonObject.get("exp"), Instant.class),
+        objectMapper.convertValue(jsonObject.get("userDto"), UserDto.class),
+        token
       );
     } catch (ParseException e) {
       log.error(e.getMessage());
@@ -111,20 +111,20 @@ public class JwtService {
       throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("refreshToken", refreshToken));
     }
     JwtSession session = jwtSessionRepository.findByRefreshToken(refreshToken)
-        .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
-            Map.of("refreshToken", refreshToken)));
+      .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
+        Map.of("refreshToken", refreshToken)));
 
     UUID userId = parse(refreshToken).userDto().id();
     UserDto userDto = userRepository.findById(userId)
-        .map(userMapper::toDto)
-        .orElseThrow(() -> UserNotFoundException.withId(userId));
+      .map(userMapper::toDto)
+      .orElseThrow(() -> UserNotFoundException.withId(userId));
     JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
     JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
     session.update(
-        accessJwtObject.token(),
-        refreshJwtObject.token(),
-        accessJwtObject.expirationTime()
+      accessJwtObject.token(),
+      refreshJwtObject.token(),
+      accessJwtObject.expirationTime()
     );
 
     return session;
@@ -133,19 +133,19 @@ public class JwtService {
   @Transactional
   public void invalidateJwtSession(String refreshToken) {
     jwtSessionRepository.findByRefreshToken(refreshToken)
-        .ifPresent(this::invalidate);
+      .ifPresent(this::invalidate);
   }
 
   @Transactional
   public void invalidateJwtSession(UUID userId) {
     jwtSessionRepository.findByUserId(userId)
-        .ifPresent(this::invalidate);
+      .ifPresent(this::invalidate);
   }
 
   public JwtSession getJwtSession(String refreshToken) {
     return jwtSessionRepository.findByRefreshToken(refreshToken)
-        .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
-            Map.of("refreshToken", refreshToken)));
+      .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
+        Map.of("refreshToken", refreshToken)));
   }
 
   public List<JwtSession> getActiveJwtSessions() {
@@ -157,11 +157,11 @@ public class JwtService {
     Instant expirationTime = issueTime.plus(Duration.ofSeconds(tokenValiditySeconds));
 
     JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-        .subject(userDto.username())
-        .claim("userDto", userDto)
-        .issueTime(new Date(issueTime.toEpochMilli()))
-        .expirationTime(new Date(expirationTime.toEpochMilli()))
-        .build();
+      .subject(userDto.username())
+      .claim("userDto", userDto)
+      .issueTime(new Date(issueTime.toEpochMilli()))
+      .expirationTime(new Date(expirationTime.toEpochMilli()))
+      .build();
 
     JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
     SignedJWT signedJWT = new SignedJWT(header, claimsSet);

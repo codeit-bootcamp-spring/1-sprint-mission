@@ -32,7 +32,7 @@ public class Notification extends BaseUpdatableEntity {
 
   @Builder
   public Notification(UUID receiverId, NotificationType notificationType, UUID targetId, String title,
-      String content) {
+    String content) {
     this.receiverId = receiverId;
     this.notificationType = notificationType;
     this.targetId = targetId;

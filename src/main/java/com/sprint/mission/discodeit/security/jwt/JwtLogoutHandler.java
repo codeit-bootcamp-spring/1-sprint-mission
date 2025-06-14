@@ -18,19 +18,19 @@ public class JwtLogoutHandler implements LogoutHandler {
   @SneakyThrows
   @Override
   public void logout(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) {
+    Authentication authentication) {
     resolveRefreshToken(request)
-        .ifPresent(refreshToken -> {
-          jwtService.invalidateJwtSession(refreshToken);
-          invalidateRefreshTokenCookie(response);
-        });
+      .ifPresent(refreshToken -> {
+        jwtService.invalidateJwtSession(refreshToken);
+        invalidateRefreshTokenCookie(response);
+      });
   }
 
   private Optional<String> resolveRefreshToken(HttpServletRequest request) {
     return Arrays.stream(request.getCookies())
-        .filter(cookie -> cookie.getName().equals(JwtService.REFRESH_TOKEN_COOKIE_NAME))
-        .findFirst()
-        .map(Cookie::getValue);
+      .filter(cookie -> cookie.getName().equals(JwtService.REFRESH_TOKEN_COOKIE_NAME))
+      .findFirst()
+      .map(Cookie::getValue);
   }
 
   private void invalidateRefreshTokenCookie(HttpServletResponse response) {
