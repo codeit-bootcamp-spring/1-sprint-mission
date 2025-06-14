@@ -1,5 +1,11 @@
 package com.sprint.mission.discodeit.storage.local;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.storage.AsyncTaskFailure;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,7 +14,7 @@ import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,100 +29,91 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.storage.AsyncTaskFailure;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-	private final Path root;
+  private final Path root;
 
-	public LocalBinaryContentStorage(
-		@Value("${discodeit.storage.local.root-path}") Path root
-	) {
-		this.root = root;
-	}
+  public LocalBinaryContentStorage(
+      @Value("${discodeit.storage.local.root-path}") Path root
+  ) {
+    this.root = root;
+  }
 
-	@PostConstruct
-	public void init() {
-		if (!Files.exists(root)) {
-			try {
-				Files.createDirectories(root);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
-		}
-	}
+  @PostConstruct
+  public void init() {
+    if (!Files.exists(root)) {
+      try {
+        Files.createDirectories(root);
+      } catch (IOException e) {
+        e.printStackTrace();
+        throw new RuntimeException(e);
+      }
+    }
+  }
 
-	@Async
-	@Retryable(
-		retryFor = {DiscodeitException.class},
-		noRetryFor = {IllegalArgumentException.class},
-		backoff = @Backoff(delay = 2000, multiplier = 2.0),
-		recover = "recoverUpload"
-	)
-	public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
-		Path filePath = resolvePath(binaryContentId);
-		if (Files.exists(filePath)) {
-			throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
-		}
-		try (OutputStream outputStream = Files.newOutputStream(filePath)) {
-			outputStream.write(bytes);
-			log.info("Local 파일 업로드 성공: {}", filePath);
-		} catch (IOException e) {
-			throw new DiscodeitException(ErrorCode.UPLOAD_FAILED);
-		}
-		return CompletableFuture.completedFuture(binaryContentId);
-	}
+  @Async
+  @Retryable(
+      retryFor = {DiscodeitException.class},
+      noRetryFor = {IllegalArgumentException.class},
+      backoff = @Backoff(delay = 2000, multiplier = 2.0),
+      recover = "recoverUpload"
+  )
+  public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
+    Path filePath = resolvePath(binaryContentId);
+    if (Files.exists(filePath)) {
+      throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
+    }
+    try (OutputStream outputStream = Files.newOutputStream(filePath)) {
+      outputStream.write(bytes);
+      log.info("Local 파일 업로드 성공: {}", filePath);
+    } catch (IOException e) {
+      throw new DiscodeitException(ErrorCode.UPLOAD_FAILED);
+    }
+    return CompletableFuture.completedFuture(binaryContentId);
+  }
 
-	@Recover
-	public CompletableFuture<UUID> recoverUpload(DiscodeitException e, UUID binaryContentId) {
-		AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure(
-			"LocalBinaryContentStorage#put",
-			MDC.get("requestId"),
-			"파일 업로드 실패: " + e.getMessage()
-		);
-		log.error("파일 업로드 실패: {}, 요청 ID: {}", asyncTaskFailure.failureReason(), asyncTaskFailure.requestId());
-		return CompletableFuture.failedFuture(e);
-	}
+  @Recover
+  public CompletableFuture<UUID> recoverUpload(DiscodeitException e, UUID binaryContentId) {
+    AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure(
+        "LocalBinaryContentStorage#put",
+        MDC.get("requestId"),
+        "파일 업로드 실패: " + e.getMessage()
+    );
+    log.error("파일 업로드 실패: {}, 요청 ID: {}", asyncTaskFailure.failureReason(), asyncTaskFailure.requestId());
+    return CompletableFuture.failedFuture(e);
+  }
 
-	public InputStream get(UUID binaryContentId) {
-		Path filePath = resolvePath(binaryContentId);
-		if (Files.notExists(filePath)) {
-			throw new NoSuchElementException("File with key " + binaryContentId + " does not exist");
-		}
-		try {
-			return Files.newInputStream(filePath);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
+  public InputStream get(UUID binaryContentId) {
+    Path filePath = resolvePath(binaryContentId);
+    if (Files.notExists(filePath)) {
+      throw new NoSuchElementException("File with key " + binaryContentId + " does not exist");
+    }
+    try {
+      return Files.newInputStream(filePath);
+    } catch (IOException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
+    }
+  }
 
-	private Path resolvePath(UUID key) {
-		return root.resolve(key.toString());
-	}
+  private Path resolvePath(UUID key) {
+    return root.resolve(key.toString());
+  }
 
-	@Override
-	public ResponseEntity<Resource> download(BinaryContentDto metaData) {
-		InputStream inputStream = get(metaData.id());
-		Resource resource = new InputStreamResource(inputStream);
+  @Override
+  public ResponseEntity<Resource> download(BinaryContentDto metaData) {
+    InputStream inputStream = get(metaData.id());
+    Resource resource = new InputStreamResource(inputStream);
 
-		return ResponseEntity
-			.status(HttpStatus.OK)
-			.header(HttpHeaders.CONTENT_DISPOSITION,
-				"attachment; filename=\"" + metaData.fileName() + "\"")
-			.header(HttpHeaders.CONTENT_TYPE, metaData.contentType())
-			.header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metaData.size()))
-			.body(resource);
-	}
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + metaData.fileName() + "\"")
+        .header(HttpHeaders.CONTENT_TYPE, metaData.contentType())
+        .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metaData.size()))
+        .body(resource);
+  }
 }
