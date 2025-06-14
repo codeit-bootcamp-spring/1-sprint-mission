@@ -22,14 +22,17 @@ import org.springframework.cache.CacheManager;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+/**
+ * 기존 Spring Event 기반 알림 이벤트 리스너 (비활성화됨)
+ * Kafka 기반 처리로 전환 - KafkaNotificationConsumer 참고
+ */
 @Slf4j
 @RequiredArgsConstructor
-@Component
+//@Component
 public class NotificationEventListener {
 
     private final NotificationRepository notificationRepository;
