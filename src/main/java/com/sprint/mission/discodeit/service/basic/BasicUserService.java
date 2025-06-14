@@ -100,6 +100,25 @@ public class BasicUserService implements UserService {
                           CompletableFuture<UUID> future = binaryContentStorage.put(content.getId(),
                               profileRequest.bytes());
 
+//                          UUID id = binaryContentStorage.put(content.getId(), profileRequest.bytes());
+
+//                          if (id == null) {
+//                            transactionTemplate.execute(status -> {
+//                              log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}",
+//                                  content.getId());
+//                              binaryContentRepository.updateStatusById(content.getId(),
+//                                  BinaryContentUploadStatus.FAILED);
+//                              return null;
+//                            });
+//                          } else {
+//                            transactionTemplate.execute(status -> {
+//                              log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
+//                              binaryContentRepository.updateStatusById(content.getId(),
+//                                  BinaryContentUploadStatus.SUCCESS);
+//                              return null; // execute 메서드 반환값
+//                            });
+//                          }
+
                           future.thenAccept(
                                   fileId -> {
 
@@ -141,7 +160,8 @@ public class BasicUserService implements UserService {
     user = userRepository.save(user);
 
     /* 중복이 없는 유저 이름과 만들어진 시각을 log.info에 담는다.*/
-    log.info("사용자 생성 시도 성공: username={}, createdAt={}", user.getUsername(), user.getCreatedAt());
+    log.info("사용자 생성 시도 성공: username={}, createdAt={}", user.getUsername(),
+        user.getCreatedAt());
     return userMapper.toDto(user);
   }
 
@@ -159,7 +179,6 @@ public class BasicUserService implements UserService {
         .orElseThrow(() -> new UserNotFoundException(Map.of("UserId", id)));
     return userMapper.toDto(user);
   }
-
 
   @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
   @Transactional

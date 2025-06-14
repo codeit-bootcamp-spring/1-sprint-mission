@@ -10,6 +10,7 @@ public interface BinaryContentStorage {
 
   // 저장 : UUID 키 정보를 바탕으로 byte[] 데이터를 저장합니다.
   CompletableFuture<UUID> put(UUID id, byte[] bytes);
+//  UUID put(UUID id, byte[] bytes);
 
   // 조회 : 키 정보를 바탕으로 byte[] 데이터를 읽어 InputStream 타입으로 반환
   InputStream get(UUID id);

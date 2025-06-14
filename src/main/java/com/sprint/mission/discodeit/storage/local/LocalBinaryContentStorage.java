@@ -59,6 +59,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Async
   @Override
   public CompletableFuture<UUID> put(UUID id, byte[] bytes) {
+//  public UUID put(UUID id, byte[] bytes) {
     log.info("파일 업로드 시작, traceId={}, fileId={}", MDC.get("traceId"), id);
 
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -83,12 +84,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
        **/
     } catch (InterruptedException e) {
       log.error("파일 업로드 중 오류 발생", e);
+//      return null;
       return CompletableFuture.failedFuture(e);
     }
 
     log.info("파일 업로드 시도 성공");
     // 저장한 파일 UUID 반환
     return CompletableFuture.completedFuture(id);
+//    return id;
   }
 
   // 타켓 메서드랑 반환값 일치시켜야해?
