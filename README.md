@@ -260,7 +260,7 @@ sequenceDiagram
 - `@CachePut` : 캐시 갱신
 - `@CacheEvict` : 캐시 삭제
 
-**@Cacheable 동작 시퀀스 (캐시 miss → 저장/ hit → 바로 반환)**
+### **@Cacheable 동작 시퀀스 (캐시 miss → 저장/ hit → 바로 반환)**
 ```mermaid
 sequenceDiagram
     participant Client
@@ -283,7 +283,7 @@ sequenceDiagram
     end
 ```
 
-@CacheEvict 동작 (삭제 후 제거)
+### **@CacheEvict 동작 (삭제 후 제거)**
 ```mermaid
 sequenceDiagram
     participant Client
@@ -300,7 +300,7 @@ sequenceDiagram
     ServiceProxy-->>Controller: return success
 ```
 
-@CachePut 문제 흐름 (트랜잭션 실패 시 캐시 오염)
+### **@CachePut 문제 흐름 (트랜잭션 실패 시 캐시 오염)**
 ```mermaid
 sequenceDiagram
     participant Client
@@ -318,7 +318,7 @@ sequenceDiagram
 ```
 **⚠ 이 예시처럼 @CachePut은 DB에 실패해도 캐시에 값이 남는 문제가 생김.**
 
-캐싱 플로우
+### **캐싱 플로우**
 ```mermaid
 flowchart TD
     A[요청 들어옴] --> B{캐시에 값 있음?}
