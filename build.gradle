@@ -46,6 +46,7 @@ dependencies {
     // Spring Actuator 의존성
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'org.springframework.security:spring-security-test'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
     // Lombok 의존성 (간결한 코드 작성)
     compileOnly 'org.projectlombok:lombok'             // 컴파일 타임에만 Lombok을 사용

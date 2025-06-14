@@ -50,6 +50,7 @@ management:
           - "info"
           - "metrics"
           - "loggers"
+          - "prometheus"
   endpoint:
     health:
       show-details: "ALWAYS"

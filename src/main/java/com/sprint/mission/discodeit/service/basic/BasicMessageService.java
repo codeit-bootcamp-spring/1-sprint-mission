@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
@@ -57,6 +58,9 @@ public class BasicMessageService implements MessageService {
   private final InputHandler inputHandler;
   private final PageResponseMapper<MessageDto> pageResponseMapper; // 제네릭 타입 명시 안해주면 Raw Type을 쓰고 있다고 경고를 준다.
   private final BinaryContentRepository binaryContentRepository;
+  //
+  private final TransactionTemplate transactionTemplate;
+
 
   @Transactional
   @Override
@@ -94,16 +98,25 @@ public class BasicMessageService implements MessageService {
 
                 future.thenAccept(
                         fileId -> {
-                          log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
-                          binaryContentRepository.updateStatusById(content.getId(),
-                              BinaryContentUploadStatus.SUCCESS);
+
+                          transactionTemplate.execute(status -> {
+                            log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
+                            binaryContentRepository.updateStatusById(content.getId(),
+                                BinaryContentUploadStatus.SUCCESS);
+                            return null;
+                          });
+
                         })
                     .exceptionally(ex -> {
-                      binaryContentRepository.updateStatusById(content.getId(),
-                          BinaryContentUploadStatus.FAILED);
-                      log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}, message={}",
-                          content.getId(),
-                          ex.getMessage(), ex);
+
+                      transactionTemplate.execute(status -> {
+                        binaryContentRepository.updateStatusById(content.getId(),
+                            BinaryContentUploadStatus.FAILED);
+                        log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}, message={}",
+                            content.getId(),
+                            ex.getMessage(), ex);
+                        return null;
+                      });
                       return null;
                     });
               }

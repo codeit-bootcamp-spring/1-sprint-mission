@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
 @Service
@@ -52,6 +53,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   //
   private final PasswordEncoder passwordEncoder;
+  private final TransactionTemplate transactionTemplate;
 
   @Transactional
   @Override
@@ -100,16 +102,22 @@ public class BasicUserService implements UserService {
 
                           future.thenAccept(
                                   fileId -> {
-                                    log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
-                                    binaryContentRepository.updateStatusById(content.getId(),
-                                        BinaryContentUploadStatus.SUCCESS);
+
+                                    transactionTemplate.execute(status -> {
+                                      log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
+                                      binaryContentRepository.updateStatusById(content.getId(),
+                                          BinaryContentUploadStatus.SUCCESS);
+                                      return null; // execute 메서드 반환값
+                                    });
                                   })
                               .exceptionally(ex -> {
-                                binaryContentRepository.updateStatusById(content.getId(),
-                                    BinaryContentUploadStatus.FAILED);
-                                log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}, message={}",
-                                    content.getId(),
-                                    ex.getMessage(), ex);
+                                transactionTemplate.execute(status -> {
+                                  log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}, message={}",
+                                      content.getId(), ex.getMessage(), ex);
+                                  binaryContentRepository.updateStatusById(content.getId(),
+                                      BinaryContentUploadStatus.FAILED);
+                                  return null;
+                                });
                                 return null;
                               });
                         }

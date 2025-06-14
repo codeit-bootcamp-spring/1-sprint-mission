@@ -68,14 +68,24 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     Path filePath = resolvePath(id);
     File file = filePath.toFile(); // Path 객체 -> File 객체
 
-    // 파일 저장 로직
-    try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-      fileOutputStream.write(bytes);
-      fileOutputStream.flush(); // flush() [스트림 강제 비우기] 모든 데이터를 디스크에 길고
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
+    try {
+
+      log.info("의도적 지연 . . .");
+      Thread.sleep(3000);
+
+      /**
+       // 파일 저장 로직
+       try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+
+       fileOutputStream.write(bytes);
+       fileOutputStream.flush(); // flush() [스트림 강제 비우기] 모든 데이터를 디스크에 길고
+       }
+       **/
+    } catch (InterruptedException e) {
+      log.error("파일 업로드 중 오류 발생", e);
+      return CompletableFuture.failedFuture(e);
     }
+
     log.info("파일 업로드 시도 성공");
     // 저장한 파일 UUID 반환
     return CompletableFuture.completedFuture(id);
