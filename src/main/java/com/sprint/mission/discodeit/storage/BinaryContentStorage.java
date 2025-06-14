@@ -10,6 +10,8 @@ public interface BinaryContentStorage {
 
     CompletableFuture<Void> put(UUID id, byte[] bytes);
 
+    void putSync(UUID id, byte[] bytes);
+
     InputStream get(UUID id);
 
     ResponseEntity<?> download(BinaryContentResponse binaryContentResponse);

@@ -63,12 +63,35 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try (
             FileOutputStream fileOutputStream = new FileOutputStream(resolvePath(id).toFile());
         ) {
+
+            Thread.sleep(3000); // 지연 추가
+
             fileOutputStream.write(bytes);
             log.info("File write operation completed for ID: {}", id);
             CompletableFuture<Void> result = CompletableFuture.completedFuture(null);
             log.info("Returning completed future: {}", result);
             return result;
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
+            log.warn("Upload failed for {}, will retry", id, e);
+            throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
+        }
+    }
+
+    @Retryable(
+        value = BinaryContentOperationException.class,
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
+    @Override
+    public void putSync(UUID id, byte[] bytes) {
+        try (
+            FileOutputStream fileOutputStream = new FileOutputStream(resolvePath(id).toFile());
+        ) {
+
+            Thread.sleep(3000); // 지연 추가
+
+            fileOutputStream.write(bytes);
+        } catch (IOException | InterruptedException e) {
             log.warn("Upload failed for {}, will retry", id, e);
             throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
         }

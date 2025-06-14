@@ -39,6 +39,8 @@ dependencies {
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
     // jwt
     implementation "io.jsonwebtoken:jjwt-api:0.12.5"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:0.12.5"

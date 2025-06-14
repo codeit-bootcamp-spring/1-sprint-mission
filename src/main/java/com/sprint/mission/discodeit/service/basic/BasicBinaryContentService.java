@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentStorage binaryContentStorage;
 
     @Override
+    @Timed("file.upload.async")
     public BinaryContent save(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return null;
@@ -52,6 +54,29 @@ public class BasicBinaryContentService implements BinaryContentService {
                 binaryContentRepository.save(newFile);
                 return null;
             });
+        return newFile;
+    }
+
+    @Override
+    @Timed("file.upload.sync")
+    public BinaryContent saveSync(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        BinaryContent newFile = binaryContentRepository.save(BinaryContent.createBinaryContent(
+            file.getOriginalFilename(),
+            file.getSize(),
+            file.getContentType()));
+
+        try {
+            binaryContentStorage.putSync(newFile.getId(), convertToBytes(file));
+            newFile.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
+        } catch (Exception ex) {
+            newFile.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+        }
+
+        binaryContentRepository.save(newFile);
         return newFile;
     }
 

@@ -10,6 +10,8 @@ public interface BinaryContentService {
 
     BinaryContent save(MultipartFile file);
 
+    BinaryContent saveSync(MultipartFile file);
+
     BinaryContentResponse findById(UUID id);
 
     List<BinaryContentResponse> findAllByIdIn(List<UUID> ids);

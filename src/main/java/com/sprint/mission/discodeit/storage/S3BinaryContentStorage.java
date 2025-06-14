@@ -84,6 +84,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
+    public void putSync(UUID id, byte[] bytes) {
+
+    }
+
+    @Override
     public InputStream get(UUID id) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
             .bucket(bucket)
