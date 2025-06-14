@@ -12,22 +12,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContextPropagatingTaskDecorator implements TaskDecorator {
 
-    @Override
-    public Runnable decorate(Runnable runnable) {
-        Map<String, String> mdcContext = MDC.getCopyOfContextMap();
-        SecurityContext securityContext = SecurityContextHolder.getContext();
+  @Override
+  public Runnable decorate(Runnable runnable) {
+    Map<String, String> mdcContext = MDC.getCopyOfContextMap();
+    SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        return () -> {
-            try {
-                if (mdcContext != null) {
-                    MDC.setContextMap(mdcContext);
-                }
-                SecurityContextHolder.setContext(securityContext);
-                runnable.run();
-            } finally {
-                MDC.clear();
-                SecurityContextHolder.clearContext();
-            }
-        };
-    }
+    return () -> {
+      try {
+        if (mdcContext != null) {
+          MDC.setContextMap(mdcContext);
+        }
+        SecurityContextHolder.setContext(securityContext);
+        runnable.run();
+      } finally {
+        MDC.clear();
+        SecurityContextHolder.clearContext();
+      }
+    };
+  }
 }

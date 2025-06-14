@@ -25,47 +25,47 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class BasicAuthService implements AuthService {
 
-    @Value("${discodeit.admin.username}")
-    private String username;
-    @Value("${discodeit.admin.password}")
-    private String password;
-    @Value("${discodeit.admin.email}")
-    private String email;
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final ApplicationEventPublisher eventPublisher;
+  @Value("${discodeit.admin.username}")
+  private String username;
+  @Value("${discodeit.admin.password}")
+  private String password;
+  @Value("${discodeit.admin.email}")
+  private String email;
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
+  private final ApplicationEventPublisher eventPublisher;
 
-    @Transactional
-    @Override
-    public UserDto initAdmin() {
-        if (userRepository.existsByEmail(email) || userRepository.existsByUsername(username)) {
-            log.warn("이미 어드민이 존재합니다.");
-            return null;
-        }
-
-        String encodedPassword = passwordEncoder.encode(password);
-        User admin = new User(username, email, encodedPassword, null);
-        admin.updateRole(Role.ADMIN);
-        userRepository.save(admin);
-
-        UserDto adminDto = userMapper.toDto(admin);
-        log.info("어드민이 초기화되었습니다. {}", adminDto);
-        return adminDto;
+  @Transactional
+  @Override
+  public UserDto initAdmin() {
+    if (userRepository.existsByEmail(email) || userRepository.existsByUsername(username)) {
+      log.warn("이미 어드민이 존재합니다.");
+      return null;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    @Override
-    public UserDto updateRole(RoleUpdateRequest request) {
-        UUID userId = request.userId();
-        User user = userRepository.findById(userId)
-          .orElseThrow(() -> UserNotFoundException.withId(userId));
-        Role newRole = request.newRole();
-        user.updateRole(newRole);
-        eventPublisher.publishEvent(new UserRoleUpdateEvent(userId, newRole));
-        jwtService.invalidateJwtSession(user.getId());
-        return userMapper.toDto(user);
-    }
+    String encodedPassword = passwordEncoder.encode(password);
+    User admin = new User(username, email, encodedPassword, null);
+    admin.updateRole(Role.ADMIN);
+    userRepository.save(admin);
+
+    UserDto adminDto = userMapper.toDto(admin);
+    log.info("어드민이 초기화되었습니다. {}", adminDto);
+    return adminDto;
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @Transactional
+  @Override
+  public UserDto updateRole(RoleUpdateRequest request) {
+    UUID userId = request.userId();
+    User user = userRepository.findById(userId)
+      .orElseThrow(() -> UserNotFoundException.withId(userId));
+    Role newRole = request.newRole();
+    user.updateRole(newRole);
+    eventPublisher.publishEvent(new UserRoleUpdateEvent(userId, newRole));
+    jwtService.invalidateJwtSession(user.getId());
+    return userMapper.toDto(user);
+  }
 }

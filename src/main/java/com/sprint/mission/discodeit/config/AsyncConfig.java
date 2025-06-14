@@ -15,29 +15,29 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @RequiredArgsConstructor
 public class AsyncConfig implements AsyncConfigurer {
 
-    private final ContextPropagatingTaskDecorator decorator;
+  private final ContextPropagatingTaskDecorator decorator;
 
-    @Override
-    public Executor getAsyncExecutor() {
-        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-        threadPoolTaskExecutor.setCorePoolSize(8);
-        threadPoolTaskExecutor.setMaxPoolSize(16);
-        threadPoolTaskExecutor.setQueueCapacity(500);
-        threadPoolTaskExecutor.setThreadNamePrefix("io-AsyncExecutor-");
-        threadPoolTaskExecutor.setKeepAliveSeconds(60);
-        threadPoolTaskExecutor.setTaskDecorator(decorator);
-        threadPoolTaskExecutor.initialize();
-        return threadPoolTaskExecutor;
-    }
+  @Override
+  public Executor getAsyncExecutor() {
+    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+    threadPoolTaskExecutor.setCorePoolSize(8);
+    threadPoolTaskExecutor.setMaxPoolSize(16);
+    threadPoolTaskExecutor.setQueueCapacity(500);
+    threadPoolTaskExecutor.setThreadNamePrefix("io-AsyncExecutor-");
+    threadPoolTaskExecutor.setKeepAliveSeconds(60);
+    threadPoolTaskExecutor.setTaskDecorator(decorator);
+    threadPoolTaskExecutor.initialize();
+    return threadPoolTaskExecutor;
+  }
 
-    @Override
-    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return (ex, method, params) -> {
-            log.error("Async method threw an exception: {}", ex.getMessage(), ex);
-            log.error("Method: {}", method.getName());
-            for (Object param : params) {
-                log.error("Param: {}", param);
-            }
-        };
-    }
+  @Override
+  public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+    return (ex, method, params) -> {
+      log.error("Async method threw an exception: {}", ex.getMessage(), ex);
+      log.error("Method: {}", method.getName());
+      for (Object param : params) {
+        log.error("Param: {}", param);
+      }
+    };
+  }
 }

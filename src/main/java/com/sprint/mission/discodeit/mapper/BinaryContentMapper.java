@@ -7,5 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface BinaryContentMapper {
 
-    BinaryContentDto toDto(BinaryContent binaryContent);
+  BinaryContentDto toDto(BinaryContent binaryContent);
 }

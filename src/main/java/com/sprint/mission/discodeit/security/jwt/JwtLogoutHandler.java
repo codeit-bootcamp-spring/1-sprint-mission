@@ -13,30 +13,30 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 @RequiredArgsConstructor
 public class JwtLogoutHandler implements LogoutHandler {
 
-    private final JwtService jwtService;
+  private final JwtService jwtService;
 
-    @SneakyThrows
-    @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) {
-        resolveRefreshToken(request)
-          .ifPresent(refreshToken -> {
-              jwtService.invalidateJwtSession(refreshToken);
-              invalidateRefreshTokenCookie(response);
-          });
-    }
+  @SneakyThrows
+  @Override
+  public void logout(HttpServletRequest request, HttpServletResponse response,
+    Authentication authentication) {
+    resolveRefreshToken(request)
+      .ifPresent(refreshToken -> {
+        jwtService.invalidateJwtSession(refreshToken);
+        invalidateRefreshTokenCookie(response);
+      });
+  }
 
-    private Optional<String> resolveRefreshToken(HttpServletRequest request) {
-        return Arrays.stream(request.getCookies())
-          .filter(cookie -> cookie.getName().equals(JwtService.REFRESH_TOKEN_COOKIE_NAME))
-          .findFirst()
-          .map(Cookie::getValue);
-    }
+  private Optional<String> resolveRefreshToken(HttpServletRequest request) {
+    return Arrays.stream(request.getCookies())
+      .filter(cookie -> cookie.getName().equals(JwtService.REFRESH_TOKEN_COOKIE_NAME))
+      .findFirst()
+      .map(Cookie::getValue);
+  }
 
-    private void invalidateRefreshTokenCookie(HttpServletResponse response) {
-        Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME, "");
-        refreshTokenCookie.setMaxAge(0);
-        refreshTokenCookie.setHttpOnly(true);
-        response.addCookie(refreshTokenCookie);
-    }
+  private void invalidateRefreshTokenCookie(HttpServletResponse response) {
+    Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME, "");
+    refreshTokenCookie.setMaxAge(0);
+    refreshTokenCookie.setHttpOnly(true);
+    response.addCookie(refreshTokenCookie);
+  }
 }

@@ -16,29 +16,29 @@ import lombok.NoArgsConstructor;
 @Entity
 public class JwtSession extends BaseUpdatableEntity {
 
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
-    private UUID userId;
-    @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
-    private String accessToken;
-    @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
-    private String refreshToken;
-    @Column(columnDefinition = "timestamp with time zone", nullable = false)
-    private Instant expirationTime;
+  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+  private UUID userId;
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
+  private String accessToken;
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
+  private String refreshToken;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant expirationTime;
 
-    public JwtSession(UUID userId, String accessToken, String refreshToken, Instant expirationTime) {
-        this.userId = userId;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.expirationTime = expirationTime;
-    }
+  public JwtSession(UUID userId, String accessToken, String refreshToken, Instant expirationTime) {
+    this.userId = userId;
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
+  }
 
-    public boolean isExpired() {
-        return this.expirationTime.isBefore(Instant.now());
-    }
+  public boolean isExpired() {
+    return this.expirationTime.isBefore(Instant.now());
+  }
 
-    public void update(String accessToken, String refreshToken, Instant expirationTime) {
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.expirationTime = expirationTime;
-    }
+  public void update(String accessToken, String refreshToken, Instant expirationTime) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
+  }
 }

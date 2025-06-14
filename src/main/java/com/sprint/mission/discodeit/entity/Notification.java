@@ -18,25 +18,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notification extends BaseUpdatableEntity {
 
-    @Column(name = "receiver_id", columnDefinition = "uuid", nullable = false)
-    private UUID receiverId;
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private NotificationType notificationType;
-    @Column(name = "target_id", columnDefinition = "uuid")
-    private UUID targetId;
-    @Column(length = 50)
-    private String title;
-    @Column(columnDefinition = "text")
-    private String content;
+  @Column(name = "receiver_id", columnDefinition = "uuid", nullable = false)
+  private UUID receiverId;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private NotificationType notificationType;
+  @Column(name = "target_id", columnDefinition = "uuid")
+  private UUID targetId;
+  @Column(length = 50)
+  private String title;
+  @Column(columnDefinition = "text")
+  private String content;
 
-    @Builder
-    public Notification(UUID receiverId, NotificationType notificationType, UUID targetId, String title,
-      String content) {
-        this.receiverId = receiverId;
-        this.notificationType = notificationType;
-        this.targetId = targetId;
-        this.title = title;
-        this.content = content;
-    }
+  @Builder
+  public Notification(UUID receiverId, NotificationType notificationType, UUID targetId, String title,
+    String content) {
+    this.receiverId = receiverId;
+    this.notificationType = notificationType;
+    this.targetId = targetId;
+    this.title = title;
+    this.content = content;
+  }
 }

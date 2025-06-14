@@ -13,15 +13,15 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @RequiredArgsConstructor
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final ObjectMapper objectMapper;
+  private final ObjectMapper objectMapper;
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) throws IOException, ServletException {
-        DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(objectMapper.writeValueAsString(principal.getUserDto()));
-    }
+  @Override
+  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+    Authentication authentication) throws IOException, ServletException {
+    DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
+    response.setStatus(HttpServletResponse.SC_OK);
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setCharacterEncoding("UTF-8");
+    response.getWriter().write(objectMapper.writeValueAsString(principal.getUserDto()));
+  }
 }

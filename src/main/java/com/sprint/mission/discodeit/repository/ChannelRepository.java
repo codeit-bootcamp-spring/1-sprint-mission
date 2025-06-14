@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-    List<Channel> findAllByTypeOrIdIn(ChannelType type, List<UUID> ids);
+  List<Channel> findAllByTypeOrIdIn(ChannelType type, List<UUID> ids);
 }
