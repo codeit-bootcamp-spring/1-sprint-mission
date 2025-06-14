@@ -2,12 +2,18 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.NotificationDto;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.reponse.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -19,14 +25,17 @@ import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 //
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +69,9 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   //
   private final TransactionTemplate transactionTemplate;
+  private final ReadStatusRepository readStatusRepository;
+  //
+  private final ApplicationEventPublisher eventPublisher;
 
 
   @Transactional
@@ -127,31 +139,48 @@ public class BasicMessageService implements MessageService {
     }
 
     // 메세지 생성
+
+    User user = userRepository.findById(messageCreateRequest.authorId())
+        .orElseThrow(() -> {
+          log.error("메세지 생성 단계에서 유저를 찾지 못함: userId={}", messageCreateRequest.authorId());
+          return new UserNotFoundException(
+              Map.of("UserId", messageCreateRequest.authorId()));
+        });
+    Channel channel = channelRepository.findById(messageCreateRequest.channelId())
+        .orElseThrow(() -> {
+          log.error("메세지 생성 단계에서 채널을 찾지 못함: channelId={}",
+              messageCreateRequest.channelId());
+          return new ChannelNotFoundException(
+              Map.of("channelId", messageCreateRequest.channelId()));
+        });
     Message message = Message.builder()
         .content(messageCreateRequest.content())
         .attachments(
             binaryContents
         )
-        .author(
-            userRepository.findById(messageCreateRequest.authorId())
-                .orElseThrow(() -> {
-                  log.error("메세지 생성 단계에서 유저를 찾지 못함: userId={}", messageCreateRequest.authorId());
-                  return new UserNotFoundException(
-                      Map.of("UserId", messageCreateRequest.authorId()));
-                })
-        )
-        .channel(
-            channelRepository.findById(messageCreateRequest.channelId())
-                .orElseThrow(() -> {
-                  log.error("메세지 생성 단계에서 채널을 찾지 못함: channelId={}",
-                      messageCreateRequest.channelId());
-                  return new ChannelNotFoundException(
-                      Map.of("channelId", messageCreateRequest.channelId()));
-                })
-        )
+        .author(user)
+        .channel(channel)
         .build();
 
     messageRepository.save(message);
+
+    // 알림 생성 (분리될 거 생각하고 우선 구현)
+    List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(channel.getId());
+    log.info("알림을 생성합니다. channelId={}", channel.getId());
+    for (ReadStatus r : readStatuses) {
+      if (r != null && r.isNotificationEnabled()) {
+        UUID receiverId = r.getUser().getId();
+        eventPublisher.publishEvent(
+            NotificationDto.builder()
+                .title(channel.getName())
+                .content(messageCreateRequest.content())
+                .type(NotificationType.NEW_MESSAGE)
+                .receiverId(receiverId)
+                .targetId(channel.getId())
+                .build()
+        );
+      }
+    }
 
     log.info("메세지 생성 시도 성공: messageContent={}, createdAt={}",
         message.getContent(),

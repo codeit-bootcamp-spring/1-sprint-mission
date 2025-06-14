@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.readStatus.ReadStatusAlreadyExistsException;
@@ -51,10 +52,16 @@ public class BasicReadStatusService implements ReadStatusService {
           "channelId", request.channel().getId()));
     }
 
+    boolean enabled = false;
+    if (request.channel().getType() == ChannelType.PUBLIC) {
+      enabled = true;
+    }
+
     ReadStatus readStatus = ReadStatus.builder()
         .lastReadAt(request.lastReadAt())
         .user(request.user())
         .channel(request.channel())
+        .notificationEnabled(enabled)
         .build();
 
     readStatusRepository.save(readStatus);
@@ -100,6 +107,12 @@ public class BasicReadStatusService implements ReadStatusService {
 
     ReadStatus readStatus = readStatusRepository.findById(id)
         .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("readStatusId", id)));
+
+    if (readStatusUpdateRequest.newNotificationEnabled()) { // 우선은 항상 t/f 값이 들어온다고 상정
+      readStatus.updateNotificationEnabled(true);
+    } else {
+      readStatus.updateNotificationEnabled(false);
+    }
 
     readStatus.updateLastMessageReadAt(readStatusUpdateRequest.lastReadAt());
     readStatus.refreshUpdateAt();

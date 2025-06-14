@@ -2,20 +2,31 @@ package com.sprint.mission.discodeit.storage.local;
 
 import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.NotificationDto;
+import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -28,11 +39,18 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
+@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
+@RequiredArgsConstructor
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-
+  private final UserRepository userRepository;
+  //
+  private final ApplicationEventPublisher eventPublisher;
+  //
   private Path root;
 
   @Value("${discodeit.storage.local.root-path}")
@@ -40,6 +58,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @PostConstruct // @PostConstruct 어노테이션을 사용하면 스프링이 빈 생성 후 초기화 작업을 위해 지정된 메서드를 자동으로 호출
   public void init() {
+
     this.root = Paths.get(rootPath); // rootPath 값을 Path로 변환
 
     // 루트 디렉토리 초기화 = 경로 확인, 존재 여부 확인
@@ -59,7 +78,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   @Async
   @Override
   public CompletableFuture<UUID> put(UUID id, byte[] bytes) {
-//  public UUID put(UUID id, byte[] bytes) {
     log.info("파일 업로드 시작, traceId={}, fileId={}", MDC.get("traceId"), id);
 
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -69,32 +87,35 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     Path filePath = resolvePath(id);
     File file = filePath.toFile(); // Path 객체 -> File 객체
 
-    try {
+    // 파일 저장 로직
+    try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
 
-      log.info("의도적 지연 . . .");
-      Thread.sleep(3000);
-
-      /**
-       // 파일 저장 로직
-       try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-
-       fileOutputStream.write(bytes);
-       fileOutputStream.flush(); // flush() [스트림 강제 비우기] 모든 데이터를 디스크에 길고
-       }
-       **/
-    } catch (InterruptedException e) {
+      fileOutputStream.write(bytes);
+      fileOutputStream.flush(); // flush() [스트림 강제 비우기] 모든 데이터를 디스크에 길고
+    } catch (IOException e) {
       log.error("파일 업로드 중 오류 발생", e);
-//      return null;
+
+      // 알림 생성
+      log.info("알림을 생성합니다. fileId={}", id);
+
+      User user = userRepository.findByUsername(auth.getName())
+          .orElseThrow(() -> new UserNotFoundException(Map.of("username", auth.getName())));
+      eventPublisher.publishEvent(
+          NotificationDto.builder()
+              .title("파일 업로드 중 실패")
+              .content(id.toString())
+              .type(NotificationType.ASYNC_FAILED)
+              .receiverId(user.getId())
+              .build()
+      );
+
       return CompletableFuture.failedFuture(e);
     }
 
     log.info("파일 업로드 시도 성공");
-    // 저장한 파일 UUID 반환
     return CompletableFuture.completedFuture(id);
-//    return id;
   }
 
-  // 타켓 메서드랑 반환값 일치시켜야해?
   @Recover
   public UUID recover(IOException e, UUID id, byte[] bytes) {
     String requestId = MDC.get("traceId");
