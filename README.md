@@ -212,8 +212,8 @@ sequenceDiagram
   AsyncUploader->>AsyncUploader: upload
   AsyncUploader->>DB: updateById<br/>commit❌
   D->>-S: commit 트랜잭션
-  DB->>AsyncUploader: EntityNotFound
   Note over AsyncUploader, DB: Entity가 아직 DB에 저장되지 않은 상태
+  DB->>AsyncUploader: EntityNotFound
 ```
 
 비동기로 업로드를 시작하는데, 이때 BinaryContent Entity가 아직 DB에 저장되지 않은 상태에서 업로드를 시도하면, EntityNotFound 예외가 발생한다.
