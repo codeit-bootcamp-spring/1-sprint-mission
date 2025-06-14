@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.event;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -36,6 +37,7 @@ public class NotificationEventHandler {
 		maxAttempts = 3,
 		backoff = @Backoff(delay = 2000, multiplier = 2)
 	)
+	@CacheEvict(cacheNames = "notificationList", key = "#event.channelId()")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleMessageCreatedEvent(MessageCreatedEvent event) {
 		log.info("알림 생성 시작: {}", event);
@@ -67,6 +69,7 @@ public class NotificationEventHandler {
 		maxAttempts = 3,
 		backoff = @Backoff(delay = 2000, multiplier = 2)
 	)
+	@CacheEvict(cacheNames = "notificationList", key = "#event.receivedId()")
 	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 	public void handleUserRoleUpdateEvent(UserRoleUpdateEvent event) {
 		log.info("알림 생성 시작 : {}", event);

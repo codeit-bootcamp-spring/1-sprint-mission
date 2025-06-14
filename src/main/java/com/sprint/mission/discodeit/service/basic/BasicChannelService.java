@@ -42,7 +42,7 @@ public class BasicChannelService implements ChannelService {
 
 	@PreAuthorize("hasRole('CHANNEL_MANAGER')")
 	@Transactional
-	@CacheEvict(cacheNames = "channelList", allEntries = true)
+	@CacheEvict(cacheNames = "channelList", key = "#request.userId()")
 	@Override
 	public ChannelDto create(PublicChannelCreateRequest request) {
 		log.debug("채널 생성 시작: {}", request);
@@ -56,7 +56,7 @@ public class BasicChannelService implements ChannelService {
 	}
 
 	@Transactional
-	@CacheEvict(cacheNames = "channelList", allEntries = true)
+	@CacheEvict(cacheNames = "channelList", key = "#request.participantIds()")
 	@Override
 	public ChannelDto create(PrivateChannelCreateRequest request) {
 		log.debug("채널 생성 시작: {}", request);

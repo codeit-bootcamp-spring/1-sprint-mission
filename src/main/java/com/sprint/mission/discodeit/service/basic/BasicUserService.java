@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,6 +45,7 @@ public class BasicUserService implements UserService {
 	private final JwtService jwtService;
 
 	@Transactional
+	@CacheEvict(cacheNames = "userList", allEntries = true)
 	@Override
 	public UserDto create(UserCreateRequest userCreateRequest,
 		Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -110,6 +112,7 @@ public class BasicUserService implements UserService {
 
 	@PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
 	@Transactional
+	@CacheEvict(cacheNames = "userList", allEntries = true)
 	@Override
 	public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
 		Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -157,6 +160,7 @@ public class BasicUserService implements UserService {
 
 	@PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
 	@Transactional
+	@CacheEvict(cacheNames = "userList", allEntries = true)
 	@Override
 	public void delete(UUID userId) {
 		log.debug("사용자 삭제 시작: id={}", userId);
