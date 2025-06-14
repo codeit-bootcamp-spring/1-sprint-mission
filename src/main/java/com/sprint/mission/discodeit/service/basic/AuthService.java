@@ -56,6 +56,16 @@ public class AuthService {
     admin.updateRole(Role.ADMIN);
     userRepository.save(admin);
 
+    String encodedPassword1 = passwordEncoder.encode("user123123");
+    User user1 = new User("user1", "user1@example.com", encodedPassword1, null);
+    user1.updateRole(Role.USER);
+    userRepository.save(user1);
+
+    String encodedPassword2 = passwordEncoder.encode("user234234");
+    User user2 = new User("user2", "user2@example.com", encodedPassword2, null);
+    user2.updateRole(Role.USER);
+    userRepository.save(user2);
+
     UserDto adminDto = userMapper.toDto(admin);
     log.info("어드민이 초기화되었습니다. {}", adminDto);
     return adminDto;
