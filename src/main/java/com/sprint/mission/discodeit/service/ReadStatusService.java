@@ -14,13 +14,7 @@ public interface ReadStatusService {
 
   List<ReadStatusDto> findAllByUserId(String userId);
 
-  List<ReadStatusDto> findAllByChannelId(String channelId);
-
   ReadStatusDto update(String id, UpdateReadStatusDto updateReadStatusDto);
-
-  List<ReadStatusDto> updateByUserId(String userId, UpdateReadStatusDto updateReadStatusDto);
-
-  List<ReadStatusDto> updateByChannelId(String channelId, UpdateReadStatusDto updateReadStatusDto);
-
+  
   boolean delete(String userStatusId);
 }

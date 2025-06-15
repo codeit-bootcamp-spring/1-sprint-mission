@@ -99,46 +99,6 @@ public class BasicReadStatusService implements ReadStatusService {
     return readStatusMapper.toDto(readStatus);
   }
 
-  @PreAuthorize("#userId == authentication.principal.userDto.id.toString()")
-  @Override
-  @Transactional
-  public List<ReadStatusDto> updateByUserId(String userId,
-      UpdateReadStatusDto updateReadStatusDto) {
-
-    List<ReadStatus> readStatuses = readStatusRepository.findByUserId(UUID.fromString(userId));
-
-    if (readStatuses == null || readStatuses.isEmpty()) {
-      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
-    }
-
-    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
-
-    //기능 미사용으로 임시 주석처리
-//    for (ReadStatus readStatus : readStatuses) {
-//      if (readStatus.isUpdated(updateReadStatusDto)) {
-//        readStatusResponseDtos.add(ReadStatusResponseDto.from(readStatusRepository.save(readStatus),
-//            isNewMessage(readStatus)));
-//      } else {
-//        readStatusResponseDtos.add(
-//            ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus)));
-//      }
-//    }
-    return readStatusDtos;
-  }
-
-  @Override
-  @Transactional
-  public List<ReadStatusDto> updateByChannelId(String channelId,
-      UpdateReadStatusDto updateReadStatusDto) {
-
-    Channel channel = channelRepository.findById(UUID.fromString(channelId))
-        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
-
-    List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(
-        UUID.fromString(channelId));
-    if (readStatuses == null || readStatuses.isEmpty()) {
-      throw new DiscodeitException(ErrorCode.READ_STATUS_NOT_FOUND);
-    }
 
     List<ReadStatusDto> readStatusDtos = new ArrayList<>();
     for (ReadStatus readStatus : readStatuses) {
@@ -163,13 +123,6 @@ public class BasicReadStatusService implements ReadStatusService {
       readStatusDtos.add(readStatusMapper.toDto(readStatus));
     }
     return readStatusDtos;
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<ReadStatusDto> findAllByChannelId(String channelId) {
-    return readStatusRepository.findByChannelId(UUID.fromString(channelId)).stream()
-        .map(readStatusMapper::toDto).toList();
   }
 
   @Override
