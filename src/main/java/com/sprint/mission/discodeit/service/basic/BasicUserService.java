@@ -135,17 +135,6 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
-  @Cacheable(value = "users", key = "#result.id")
-  @Override
-  @Transactional(readOnly = true)
-  public UserDto findByEmail(String email) throws DiscodeitException {
-    User user = userRepository.findAll().stream().filter(u -> u.getEmail().equals(email))
-        .findFirst().orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
-
-    return userMapper.toDto(user);
-  }
-
-
   @CachePut(value = "users", key = "#userId")
   @Override
   @Transactional
@@ -240,20 +229,6 @@ public class BasicUserService implements UserService {
     return true;
   }
 
-  @Cacheable(value = "users", key = "#result.id")
-  @Override
-  public UserDto findByUsername(String username) {
-    User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
-
-    return UserDto.builder()
-        .id(user.getId())
-        .username(user.getUsername())
-        .email(user.getEmail())
-        .role(user.getRole())
-        // 필요한 추가 정보
-        .build();
-  }
 
   @CachePut(value = "users", key = "#result.id")
   @Transactional
