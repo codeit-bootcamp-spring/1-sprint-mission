@@ -18,11 +18,15 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,7 +38,9 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
     private final ReadStatusService readStatusService;
     private final UserRepository userRepository;
+    private final CacheManager cacheManager;
 
+    @CacheEvict(cacheNames = "channels", allEntries = true)
     @Override
     @Transactional
     public ChannelResponse createPublicChannel(ChannelRequest.CreatePublic request) {
@@ -56,12 +62,16 @@ public class BasicChannelService implements ChannelService {
             readStatusService.create(
                 new ReadStatusRequest.Create(userId, newChannel.getId(),
                     newChannel.getCreatedAt()));
+
+            // 채팅 참여자에 한해 캐시 무효화
+            Objects.requireNonNull(cacheManager.getCache("channels")).evict(userId);
         }
 
         log.info("Created private channel - id: {}", newChannel.getId());
         return channelMapper.entityToDto(newChannel);
     }
 
+    @Cacheable(cacheNames = "channels", key = "#userId", unless = "#result.isEmpty()")
     @Override
     public List<ChannelResponse> findAllByUserId(UUID userId) { // N + 1;
         User user = userRepository.findById(userId).orElseThrow(() ->
@@ -77,6 +87,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.entityToDto(findByIdOrThrow(id));
     }
 
+    @CacheEvict(cacheNames = "channels", allEntries = true)
     @Override
     @Transactional
     public ChannelResponse update(UUID id, ChannelRequest.Update request) {

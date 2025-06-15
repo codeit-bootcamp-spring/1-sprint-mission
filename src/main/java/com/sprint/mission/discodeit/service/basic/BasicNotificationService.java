@@ -11,6 +11,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.TransientDataAccessException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -28,6 +30,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
+    @Cacheable(cacheNames = "notifications", key = "#receiverId", unless = "#result.isEmpty()")
     @Override
     public List<NotificationResponse> getMyNotifications(UUID receiverId) {
         return notificationRepository.getAllByReceiverId(receiverId).stream()
@@ -35,11 +38,13 @@ public class BasicNotificationService implements NotificationService {
             .collect(Collectors.toList());
     }
 
+    @CacheEvict(cacheNames = "notifications", key = "#receiverId")
     @Override
     public void readNotification(UUID id, UUID receiverId) {
         notificationRepository.deleteByIdAndReceiverId(id, receiverId);
     }
 
+    @CacheEvict(cacheNames = "notifications", key = "#receiverId")
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Retryable(

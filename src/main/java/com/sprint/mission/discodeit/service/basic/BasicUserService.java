@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,6 +41,7 @@ public class BasicUserService implements UserService {
     private final JwtSessionRepository jwtSessionRepository;
     private final NotificationRepository notificationRepository;
 
+    @CacheEvict(cacheNames = "users", allEntries = true)
     @Override
     @Transactional
     public UserResponse createUser(UserRequest.Create request, MultipartFile userProfileImage) {
@@ -58,6 +61,7 @@ public class BasicUserService implements UserService {
         return userMapper.entityToDto(newUser, false);
     }
 
+    @Cacheable(cacheNames = "users", key = "'all'", unless = "#result.isEmpty()")
     @Override
     public List<UserResponse> findAll() {
 
@@ -81,6 +85,7 @@ public class BasicUserService implements UserService {
         return userMapper.entityToDto(findByUsernameOrThrow(username));
     }
 
+    @CacheEvict(cacheNames = "users", allEntries = true)
     @Override
     @Transactional
     public UserResponse update(UUID id, UserRequest.Update request,
@@ -104,6 +109,7 @@ public class BasicUserService implements UserService {
         return userMapper.entityToDto(user);
     }
 
+    @CacheEvict(cacheNames = "users", allEntries = true)
     @Override
     @Transactional
     public void deleteById(UUID id) {
