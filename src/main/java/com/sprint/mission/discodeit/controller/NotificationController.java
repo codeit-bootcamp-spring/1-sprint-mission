@@ -37,6 +37,7 @@ public class NotificationController {
   public ResponseEntity<List<NotificationDto>> getNotifications(
       @AuthenticationPrincipal UserPrincipal userPrincipal
   ) {
+    log.info("userPrincipal={}", userPrincipal);
     String username = userPrincipal.getName();
 
     User user = userRepository.findByUsername(username)
