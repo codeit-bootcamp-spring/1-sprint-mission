@@ -123,7 +123,7 @@ public class BasicUserService implements UserService {
     return userRepository.findAll().stream().map(userMapper::toDto).toList();
   }
 
-  @Cacheable(value = "users", key = "#result.id")
+  @Cacheable(value = "users", key = "#userId")
   @Override
   @Transactional(readOnly = true)
   public UserDto findById(String userId) throws DiscodeitException {
@@ -230,7 +230,7 @@ public class BasicUserService implements UserService {
   }
 
 
-  @CachePut(value = "users", key = "#result.id")
+  @CacheEvict(value = "users", key = "#roleUpdateRequest.userId")
   @Transactional
   @Override
   public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
