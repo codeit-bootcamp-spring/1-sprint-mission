@@ -15,7 +15,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentException;
-import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageMissMatchException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -29,8 +28,10 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +50,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
+  private final CacheManager cacheManager;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
@@ -96,9 +98,16 @@ public class BasicMessageService implements MessageService {
           NewMessageNotificationEvent event = new NewMessageNotificationEvent(
               readStatus.getUser().getId(),
               createMessageDto.getChannelId(),
-              channel.getName()
+              (channel.getName() == null || channel.getName().isEmpty()) ? "개인 채널"
+                  : channel.getName(),
+              message.getContent().length() > 20 ? message.getContent().substring(0, 20) + "..."
+                  : message.getContent()
           );
           eventPublisher.publishEvent(event);
+          Objects.requireNonNull(cacheManager.getCache("userReadStatuses"))
+              .evictIfPresent(readStatus.getUser().getId());
+          Objects.requireNonNull(cacheManager.getCache("userChannels"))
+              .evictIfPresent(readStatus.getUser().getId());
         });
     log.info("메세지 생성 이후 알림 생성 이벤트 호출 완료: messageId = {}", saved.getId());
 

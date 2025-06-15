@@ -24,6 +24,10 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +50,7 @@ public class BasicUserService implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
 
+  @CachePut(value = "users", key = "#result.id")
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   //todo - 고민
@@ -84,6 +89,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @CachePut(value = "users", key = "#result.id")
   @Override
   @Transactional
   public UserDto create(CreateUserDto createUserDto, MultipartFile file)
@@ -117,6 +123,7 @@ public class BasicUserService implements UserService {
     return userRepository.findAll().stream().map(userMapper::toDto).toList();
   }
 
+  @Cacheable(value = "users", key = "#result.id")
   @Override
   @Transactional(readOnly = true)
   public UserDto findById(String userId) throws DiscodeitException {
@@ -128,6 +135,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @Cacheable(value = "users", key = "#result.id")
   @Override
   @Transactional(readOnly = true)
   public UserDto findByEmail(String email) throws DiscodeitException {
@@ -138,6 +146,7 @@ public class BasicUserService implements UserService {
   }
 
 
+  @CachePut(value = "users", key = "#userId")
   @Override
   @Transactional
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto)
@@ -172,6 +181,7 @@ public class BasicUserService implements UserService {
   }
 
   // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
+  @CachePut(value = "users", key = "#userId")
   @Override
   @Transactional
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
@@ -211,6 +221,12 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @Caching(evict = {
+      @CacheEvict(value = "users", key = "#userId"),
+      @CacheEvict(value = "userChannels", key = "#userId"),
+      @CacheEvict(value = "userNotifications", key = "#userId"),
+      @CacheEvict(value = "channelParticipants", allEntries = true)
+  })
   @Override
   @Transactional
   public boolean deleteUser(String userId) throws DiscodeitException {
@@ -224,6 +240,7 @@ public class BasicUserService implements UserService {
     return true;
   }
 
+  @Cacheable(value = "users", key = "#result.id")
   @Override
   public UserDto findByUsername(String username) {
     User user = userRepository.findByUsername(username)
@@ -238,6 +255,7 @@ public class BasicUserService implements UserService {
         .build();
   }
 
+  @CachePut(value = "users", key = "#result.id")
   @Transactional
   @Override
   public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
