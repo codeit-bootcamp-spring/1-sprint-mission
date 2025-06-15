@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +28,14 @@ public class BasicNotificationService implements NotificationService {
   private final NotificationMapper notificationMapper;
 
   private final ApplicationEventPublisher eventPublisher;
+  private final KafkaTemplate<String, NotificationCreateEvent> kafkaTemplate;
 
   @Override
-  @CacheEvict(value = "notifications", key = "#userId")
   public void create(NotificationType type, UUID targetId, String title, String content) {
-    eventPublisher.publishEvent(new NotificationCreateEvent(type, targetId, title, content));
+    NotificationCreateEvent event = new NotificationCreateEvent(type, targetId, title, content);
+
+    eventPublisher.publishEvent(event);
+    kafkaTemplate.send("notification-events", event);
   }
 
   @Transactional(readOnly = true)

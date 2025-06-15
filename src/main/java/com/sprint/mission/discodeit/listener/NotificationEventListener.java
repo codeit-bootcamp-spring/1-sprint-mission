@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
@@ -27,13 +30,15 @@ public class NotificationEventListener {
   private final UserRepository userRepository;
   private final ReadStatusRepository readStatusRepository;
 
+  private final CacheManager cacheManager;
+
   @Async
   @Retryable(
       value = { RuntimeException.class },
       maxAttempts = 3,
       backoff = @Backoff(delay = 2000)
   )
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @KafkaListener(topics = "notification-events", groupId = "discodeit-group")
   public void handleNotificationCreate(NotificationCreateEvent event) {
     log.info("알림 이벤트 수신: {}", event);
 
@@ -53,6 +58,11 @@ public class NotificationEventListener {
           event.content(),
           event.type(),
           event.targetId());
+
+      Cache cache = cacheManager.getCache("notifications");
+      if (cache != null) {
+        cache.evict(userId);
+      }
     }
   }
 
@@ -65,6 +75,11 @@ public class NotificationEventListener {
         event.content(),
         event.type(),
         event.targetId());
+
+    Cache cache = cacheManager.getCache("notifications");
+    if (cache != null) {
+      cache.evict(event.targetId());
+    }
   }
 
   private void handleAsyncFailed(NotificationCreateEvent event) {
@@ -76,6 +91,11 @@ public class NotificationEventListener {
         event.content(),
         event.type(),
         null);
+
+    Cache cache = cacheManager.getCache("notifications");
+    if (cache != null) {
+      cache.evict(event.targetId());
+    }
   }
 
   private void saveNotification(UUID userId, String title, String content, NotificationType type, UUID targetId) {
