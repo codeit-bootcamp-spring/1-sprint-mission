@@ -1,13 +1,23 @@
 package com.sprint.mission.discodeit.config;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Slf4j
 @Configuration
@@ -20,99 +30,98 @@ public class CacheConfig {
     public static final String USER_DETAIL = "userDetail";
     public static final String CHANNEL_DETAIL = "channelDetail";
 
+    @Value("${discodeit.cache.redis.ttl.user-channels:60}")
+    private int userChannelsTtl;
+
+    @Value("${discodeit.cache.redis.ttl.user-notifications:5}")
+    private int userNotificationsTtl;
+
+    @Value("${discodeit.cache.redis.ttl.all-users:10}")
+    private int allUsersTtl;
+
+    @Value("${discodeit.cache.redis.ttl.user-detail:30}")
+    private int userDetailTtl;
+
+    @Value("${discodeit.cache.redis.ttl.channel-detail:60}")
+    private int channelDetailTtl;
+
     @Bean
-    public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory,
+        ObjectMapper objectMapper) {
+        ObjectMapper cacheObjectMapper = objectMapper.copy();
+        cacheObjectMapper.findAndRegisterModules();
 
-        //기본 캐시 설정
-        cacheManager.setCaffeine(caffeineCacheBuilder());
+        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofMinutes(30))
+            .disableCachingNullValues()
+            .serializeKeysWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new StringRedisSerializer()))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair
+                .fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
-        //캐시별 설정
-        cacheManager.registerCustomCache(USER_CHANNELS, userChannelsCacheBuilder().build());
-        cacheManager.registerCustomCache(USER_NOTIFICATIONS,
-            userNotificationsCacheBuilder().build());
-        cacheManager.registerCustomCache(ALL_USERS, allUsersCacheBuilder().build());
-        cacheManager.registerCustomCache(USER_DETAIL, userDetailCacheBuilder().build());
-        cacheManager.registerCustomCache(CHANNEL_DETAIL, channelDetailCacheBuilder().build());
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
-        return cacheManager;
+        cacheConfigurations.put(USER_CHANNELS, defaultConfig
+            .entryTtl(Duration.ofMinutes(userChannelsTtl)));
+        log.debug("사용자 채널 캐시 설정: TTL={}분", userChannelsTtl);
+
+        cacheConfigurations.put(USER_NOTIFICATIONS, defaultConfig
+            .entryTtl(Duration.ofMinutes(userNotificationsTtl)));
+        log.debug("사용자 알림 캐시 설정: TTL={}분", userNotificationsTtl);
+
+        cacheConfigurations.put(ALL_USERS, defaultConfig
+            .entryTtl(Duration.ofMinutes(allUsersTtl)));
+        log.debug("전체 사용자 캐시 설정: TTL={}분", allUsersTtl);
+
+        cacheConfigurations.put(USER_DETAIL, defaultConfig
+            .entryTtl(Duration.ofMinutes(userDetailTtl)));
+        log.debug("사용자 상세 캐시 설정: TTL={}분", userDetailTtl);
+
+        cacheConfigurations.put(CHANNEL_DETAIL, defaultConfig
+            .entryTtl(Duration.ofMinutes(channelDetailTtl)));
+        log.debug("채널 상세 캐시 설정: TTL={}분", channelDetailTtl);
+
+        return RedisCacheManager.builder(redisConnectionFactory)
+            .cacheDefaults(defaultConfig)
+            .withInitialCacheConfigurations(cacheConfigurations)
+            .build();
     }
 
     /**
-     * 기본 캐시 설정
+     * 커스텀 키 생성기 - 복합 키를 위한 설정
      */
-    private Caffeine<Object, Object> caffeineCacheBuilder() {
-        return Caffeine.newBuilder()
-            .initialCapacity(100)
-            .maximumSize(1000)
-            .expireAfterWrite(30, TimeUnit.MINUTES)
-            .recordStats();
+    @Bean("customKeyGenerator")
+    public KeyGenerator customKeyGenerator() {
+        return (target, method, params) -> {
+            StringBuilder keyBuilder = new StringBuilder();
+            keyBuilder.append(target.getClass().getSimpleName())
+                .append(".")
+                .append(method.getName());
+
+            for (Object param : params) {
+                keyBuilder.append(":").append(param);
+            }
+            return keyBuilder.toString();
+        };
     }
 
-    /**
-     * 사용자별 채널 목록 캐시 설정 - 자주 조회되므로 긴 TTL 설정 - 채널 변경이 빈번하지 않음
-     */
-    private Caffeine<Object, Object> userChannelsCacheBuilder() {
-        return Caffeine.newBuilder()
-            .initialCapacity(50)
-            .maximumSize(500)
-            .expireAfterWrite(1, TimeUnit.HOURS)
-            .recordStats()
-            .evictionListener((key, value, cause) ->
-                log.debug("사용자 채널 캐시 제거: key={}, cause={}", key, cause));
-    }
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(
+        RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory);
 
+        ObjectMapper redisObjectMapper = objectMapper.copy();
+        redisObjectMapper.findAndRegisterModules();
 
-    /**
-     * 사용자별 알림 목록 캐시 설정 - 실시간성 중요하므로 짧은 TTL 설정
-     */
-    private Caffeine<Object, Object> userNotificationsCacheBuilder() {
-        return Caffeine.newBuilder()
-            .initialCapacity(50)
-            .maximumSize(300)
-            .expireAfterWrite(5, TimeUnit.MINUTES)
-            .recordStats()
-            .evictionListener((key, value, cause) ->
-                log.debug("사용자 알림 캐시 제거: key={}, cause={}", key, cause));
-    }
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(redisObjectMapper));
 
-    /**
-     * 사용자 목록 캐시 설정 - 전체 목록이므로 적당한 TTL 설정
-     */
-    private Caffeine<Object, Object> allUsersCacheBuilder() {
-        return Caffeine.newBuilder()
-            .initialCapacity(10)
-            .maximumSize(20)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .recordStats()
-            .evictionListener((key, value, cause) ->
-                log.debug("전체 사용자 캐시 제거: key={}, cause={}", key, cause));
-    }
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer(redisObjectMapper));
 
-    /**
-     * 사용자 상세 정보 캐시 설정
-     */
-    private Caffeine<Object, Object> userDetailCacheBuilder() {
-        return Caffeine.newBuilder()
-            .initialCapacity(100)
-            .maximumSize(1000)
-            .expireAfterWrite(30, TimeUnit.MINUTES)
-            .recordStats()
-            .evictionListener((key, value, cause) ->
-                log.debug("사용자 상세 캐시 제거: key={}, cause={}", key, cause));
-    }
-
-
-    /**
-     * 채널 상세 정보 캐시 설정
-     */
-    private Caffeine<Object, Object> channelDetailCacheBuilder() {
-        return Caffeine.newBuilder()
-            .initialCapacity(50)
-            .maximumSize(500)
-            .expireAfterWrite(1, TimeUnit.HOURS)
-            .recordStats()
-            .evictionListener((key, value, cause) ->
-                log.debug("채널 상세 캐시 제거: key={}, cause={}", key, cause));
+        template.afterPropertiesSet();
+        log.debug("RedisTemplate 빈 생성 완료");
+        return template;
     }
 }

@@ -1,16 +1,19 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.sprint.mission.discodeit.config.CacheConfig;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.data.redis.cache.RedisCache;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CacheMetricsController {
 
     private final CacheManager cacheManager;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisConnectionFactory redisConnectionFactory;
 
     @Operation(summary = "전체 캐시 통계 조회")
     @GetMapping("/stats")
@@ -42,6 +47,8 @@ public class CacheMetricsController {
         stats.put("allUsers", getCacheStatistics(CacheConfig.ALL_USERS));
         stats.put("userDetail", getCacheStatistics(CacheConfig.USER_DETAIL));
         stats.put("channelDetail", getCacheStatistics(CacheConfig.CHANNEL_DETAIL));
+
+        stats.put("redisInfo", getRedisInfo());
 
         log.info("캐시 통계 조회 완료");
         return ResponseEntity.ok(stats);
@@ -102,15 +109,34 @@ public class CacheMetricsController {
         }
 
         Map<String, Object> result = new HashMap<>();
-        if (springCache instanceof CaffeineCache caffeineCache) {
-            com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache =
-                caffeineCache.getNativeCache();
+        if (springCache instanceof RedisCache) {
+            String keyPattern = "discodeit:cache:" + cacheName + ":*";
+            Set<String> keys = redisTemplate.keys(keyPattern);
+
             result.put("cacheName", cacheName);
-            result.put("keys", nativeCache.asMap().keySet());
-            result.put("size", nativeCache.estimatedSize());
+            result.put("keys", keys);
+            result.put("size", keys != null ? keys.size() : 0);
+            result.put("keyPattern", keyPattern);
         }
 
         log.info("캐시 키 목록 조회 완료: {}", cacheName);
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Redis 서버 정보 조회")
+    @GetMapping("/redis/info")
+    public ResponseEntity<Map<String, Object>> getRedisServerInfo() {
+        Map<String, Object> result = new HashMap<>();
+
+        try (RedisConnection connection = redisConnectionFactory.getConnection()) {
+            result.put("redisInfo", connection.info().toString());
+            result.put("dbSize", connection.dbSize());
+            result.put("lastSave", connection.lastSave());
+        } catch (Exception e) {
+            log.error("Redis 정보 조회 실패", e);
+            result.put("error", "Redis 정보 조회 실패: " + e.getMessage());
+        }
+
         return ResponseEntity.ok(result);
     }
 
@@ -121,33 +147,15 @@ public class CacheMetricsController {
         Map<String, Object> stats = new HashMap<>();
         Cache springCache = cacheManager.getCache(cacheName);
 
-        if (springCache instanceof CaffeineCache caffeineCache) {
-            com.github.benmanes.caffeine.cache.Cache<Object, Object> nativeCache =
-                caffeineCache.getNativeCache();
-            CacheStats cacheStats = nativeCache.stats();
-
-            long requestCount = cacheStats.requestCount();
+        if (springCache instanceof RedisCache) {
+            String keyPattern = "discodeit:cache:" + cacheName + ":*";
+            Set<String> keys = redisTemplate.keys(keyPattern);
+            long cacheSize = keys != null ? keys.size() : 0;
 
             stats.put("cacheName", cacheName);
-            stats.put("estimatedSize", nativeCache.estimatedSize());
-            stats.put("requestCount", requestCount);
-            stats.put("hitCount", cacheStats.hitCount());
-
-            if (requestCount == 0) {
-                stats.put("hitRate", "N/A (요청 없음)");
-                stats.put("missRate", "N/A (요청 없음)");
-                stats.put("status", "UNUSED");
-            } else {
-                double hitRate = (double) cacheStats.hitCount() / requestCount * 100;
-                double missRate = (double) cacheStats.missCount() / requestCount * 100;
-                stats.put("hitRate", String.format("%.2f%%", hitRate));
-                stats.put("missRate", String.format("%.2f%%", missRate));
-                stats.put("status", "ACTIVE");
-            }
-
-            stats.put("missCount", cacheStats.missCount());
-            stats.put("loadCount", cacheStats.loadCount());
-            stats.put("evictionCount", cacheStats.evictionCount());
+            stats.put("size", cacheSize);
+            stats.put("status", cacheSize > 0 ? "ACTIVE" : "EMPTY");
+            stats.put("keyPattern", keyPattern);
         }
 
         return stats;
@@ -160,5 +168,28 @@ public class CacheMetricsController {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Redis 기본 정보 조회
+     */
+    private Map<String, Object> getRedisInfo() {
+        Map<String, Object> redisInfo = new HashMap<>();
+
+        try (RedisConnection connection = redisConnectionFactory.getConnection()) {
+            redisInfo.put("dbSize", connection.dbSize());
+            redisInfo.put("connected", true);
+
+            // 전체 캐시 키 패턴으로 캐시된 항목 수 조회
+            Set<String> allCacheKeys = redisTemplate.keys("discodeit:cache:*");
+            redisInfo.put("totalCacheKeys", allCacheKeys != null ? allCacheKeys.size() : 0);
+
+        } catch (Exception e) {
+            log.error("Redis 정보 조회 실패", e);
+            redisInfo.put("connected", false);
+            redisInfo.put("error", e.getMessage());
+        }
+
+        return redisInfo;
     }
 }
