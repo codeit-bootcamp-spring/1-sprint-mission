@@ -22,9 +22,12 @@ services:
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
       - AWS_S3_PRESIGNED_URL_EXPIRATION=600
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=broker:29092
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
     depends_on:
       - db
       - broker
+      - redis
     volumes:
       - binary-content-storage:/app/.discodeit/storage
     networks:
@@ -72,9 +75,20 @@ services:
     networks:
       - discodeit-network
 
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - discodeit-network
 volumes:
   postgres-data:
   binary-content-storage:
+  redis-data:
 
 networks:
   discodeit-network:
