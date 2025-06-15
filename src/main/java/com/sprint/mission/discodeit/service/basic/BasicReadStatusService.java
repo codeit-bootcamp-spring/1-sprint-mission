@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
@@ -49,8 +50,18 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new ReadStatusAlreadyExistsException(ErrorCode.READ_IS_ALREADY_EXIST,
                 Map.of("userId", userId, "channelId", channelId));
         }
-        ReadStatus newReadStatus = ReadStatus.createReadStatus(user, channel,
-            request.getLastReadAt());
+
+        ReadStatus newReadStatus;
+
+        if (channel.getType() == ChannelType.PUBLIC) {
+            newReadStatus = ReadStatus.createReadStatus(user, channel,
+                request.getLastReadAt(), false);
+        } else if (channel.getType() == ChannelType.PRIVATE) {
+            newReadStatus = ReadStatus.createReadStatus(user, channel,
+                request.getLastReadAt(), true);
+        } else {
+            throw new IllegalArgumentException("지원하지 않는 채널 타입입니다.");
+        }
 
         readStatusRepository.save(newReadStatus);
         log.info("Create Read Status : {}", newReadStatus);

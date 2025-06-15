@@ -5,21 +5,23 @@ import com.sprint.mission.discodeit.dto.response.MessageResponse;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Notification.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
@@ -28,6 +30,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -43,8 +47,8 @@ public class BasicMassageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentService binaryContentService;
-    private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
+    private final ReadStatusRepository readStatusRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -53,6 +57,7 @@ public class BasicMassageService implements MessageService {
 
         UUID userId = request.getAuthorId();
         UUID channelId = request.getChannelId();
+        UUID requestId = UUID.fromString(MDC.get("requestId"));
 
         User user = userRepository.findById(userId).orElseThrow(() ->
             new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
@@ -64,12 +69,37 @@ public class BasicMassageService implements MessageService {
         Message message = Message.createMessage(request.getContent(), channel, user);
         Optional.ofNullable(messageFiles).ifPresent(files ->
             files.forEach(file -> {
-                    BinaryContent newFile = binaryContentService.save(file);
+                    BinaryContent newFile = binaryContentService.save(file, userId, requestId);
                     message.insertAttachments(newFile);
                 }
             )
         );
         messageRepository.save(message);
+
+        // 유저 ID만 필요하니까
+        List<UUID> receiverIds = readStatusRepository.findReceiverIdsByChannelIdAndNotificationEnabledTrue(
+            channelId);
+
+        String title;
+        if (channel.getType() == ChannelType.PRIVATE) {
+            title = userId + "님의 새로운 메시지가 있습니다.";
+        } else {
+            title = "채널 " + channel.getName() + "에 새로운 메시지가 있습니다.";
+        }
+
+        for (UUID receiverId : receiverIds) {
+            if (receiverId.equals(userId)) {
+                continue;
+            }
+            NotificationEvent event = NotificationEvent.builder()
+                .receiverId(receiverId)
+                .type(NotificationType.NEW_MESSAGE)
+                .targetId(channelId)
+                .title(title)
+                .content(message.getContent())
+                .build();
+            eventPublisher.publishEvent(event);
+        }
 
         log.info("Created message - id: {}", message.getId());
         return messageMapper.entityToDto(message);

@@ -8,7 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface BinaryContentService {
 
-    BinaryContent save(MultipartFile file);
+//    BinaryContent save(MultipartFile file);
+
+    BinaryContent save(MultipartFile file, UUID userId, UUID requestId);
 
     BinaryContent saveSync(MultipartFile file);
 

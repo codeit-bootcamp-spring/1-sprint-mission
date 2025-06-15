@@ -2,18 +2,16 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.UserRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.List;
@@ -24,6 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,23 +34,25 @@ public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentService binaryContentService;
     private final PasswordEncoder passwordEncoder;
     private final JwtSessionRepository jwtSessionRepository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     @Transactional
     public UserResponse createUser(UserRequest.Create request, MultipartFile userProfileImage) {
 
+        UUID requestId = UUID.fromString(MDC.get("requestId"));
+
         checkDuplicateEmail(request.getEmail());
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        BinaryContent newProfile = binaryContentService.save(userProfileImage);
+        User newUser = userRepository.save(User.createUserWithoutProfile(
+            request.getUsername(), request.getEmail(), encodedPassword));
 
-        User newUser = userRepository.save(User.createUser(
-            request.getUsername(), request.getEmail(), encodedPassword, newProfile));
+        binaryContentService.save(userProfileImage, newUser.getId(),
+            requestId);
 
         log.info("Created user - id: {}", newUser.getId());
         return userMapper.entityToDto(newUser, false);
@@ -84,6 +85,8 @@ public class BasicUserService implements UserService {
     @Transactional
     public UserResponse update(UUID id, UserRequest.Update request,
         MultipartFile userProfileImage) {
+
+        UUID requestId = UUID.fromString(MDC.get("requestId"));
         User user = findByIdOrThrow(id);
 
         Optional.ofNullable(request.getNewUsername()).ifPresent(user::updateName);
@@ -95,19 +98,18 @@ public class BasicUserService implements UserService {
                 user.updateEmail(email);
             });
 
-        BinaryContent newProfile = binaryContentService.save(userProfileImage);
-        if (newProfile != null) {
-            user.updateProfile(newProfile);
-        }
+        binaryContentService.save(userProfileImage, user.getId(), requestId);
 
         log.info("Updated user - id: {}", user.getId());
         return userMapper.entityToDto(user);
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
         findByIdOrThrow(id);
         userRepository.deleteById(id);
+        notificationRepository.deleteAllByReceiverId(id);
         log.info("Deleted user - id: {}", id);
     }
 

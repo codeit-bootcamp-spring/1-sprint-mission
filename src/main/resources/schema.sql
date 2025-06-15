@@ -74,12 +74,13 @@ alter table messages
 -- read_statuses
 create table read_statuses
 (
-    id           uuid primary key,
-    created_at   timestamp with time zone not null,
-    updated_at   timestamp with time zone,
-    user_id      uuid,
-    channel_id   uuid,
-    last_read_at timestamp with time zone not null
+    id                   uuid primary key,
+    created_at           timestamp with time zone not null,
+    updated_at           timestamp with time zone,
+    user_id              uuid,
+    channel_id           uuid,
+    last_read_at         timestamp with time zone not null,
+    notification_enabled boolean                  not null
 );
 alter table read_statuses
     add unique (user_id, channel_id);
@@ -111,3 +112,15 @@ CREATE TABLE persistent_logins
     token     varchar(64)              not null,
     last_used timestamp with time zone not null
 );
+
+-- notification
+create table notifications
+(
+    id          uuid primary key,
+    created_at  timestamp with time zone not null,
+    receiver_id uuid                     not null,
+    title       varchar(150)             not null,
+    content     varchar(1000)            not null,
+    type        varchar(20)              not null,
+    target_id   uuid
+)

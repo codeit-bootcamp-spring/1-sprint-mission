@@ -39,6 +39,9 @@ class BasicBinaryContentServiceTest {
     @Test
     void 파일_업로드_실패_시_uploadStatus_FAILED() {
         // given
+        UUID userId = UUID.randomUUID();
+        UUID requestId = UUID.randomUUID();
+
         MockMultipartFile mockFile = new MockMultipartFile(
             "file", "test.jpg", MediaType.IMAGE_JPEG_VALUE,
             "test image content".getBytes()
@@ -51,7 +54,7 @@ class BasicBinaryContentServiceTest {
             .thenReturn(failedFuture);
 
         // when
-        BinaryContent result = binaryContentService.save(mockFile);
+        BinaryContent result = binaryContentService.save(mockFile, userId, requestId);
 
         // then - await()를 사용해서 handle 비동기 작업 완료 대기하기 -> 실행 환경이 느린 경우 타임아웃 시간 넉넉히
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {

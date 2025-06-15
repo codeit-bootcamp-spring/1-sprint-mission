@@ -3,14 +3,18 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContent.BinaryContentUploadStatus;
+import com.sprint.mission.discodeit.entity.Notification.NotificationType;
+import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.global.exception.binarycontent.FileConversionException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.micrometer.core.annotation.Timed;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,10 +34,13 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentStorage binaryContentStorage;
+    private final ApplicationEventPublisher eventPublisher;
+    private final UserRepository userRepository;
 
-    @Override
     @Timed("file.upload.async")
-    public BinaryContent save(MultipartFile file) {
+    @Override
+    @Transactional
+    public BinaryContent save(MultipartFile file, UUID userId, UUID requestId) {
         if (file == null || file.isEmpty()) {
             return null;
         }
@@ -47,9 +55,23 @@ public class BasicBinaryContentService implements BinaryContentService {
                 if (ex == null) {
                     newFile.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
                     log.info("File upload success: {}", newFile.getId());
+
+                    userRepository.findById(userId).ifPresent(user -> {
+                        user.updateProfile(newFile);
+                        userRepository.save(user);
+                    });
                 } else {
                     newFile.updateUploadStatus(BinaryContentUploadStatus.FAILED);
                     log.error("File upload failed: {}", newFile.getId());
+
+                    NotificationEvent event = NotificationEvent.builder()
+                        .receiverId(userId)
+                        .type(NotificationType.ASYNC_FAILED)
+                        .targetId(requestId)
+                        .title("프로필 파일 저장에 실패하였습니다.")
+                        .content("실패")
+                        .build();
+                    eventPublisher.publishEvent(event);
                 }
                 binaryContentRepository.save(newFile);
                 return null;

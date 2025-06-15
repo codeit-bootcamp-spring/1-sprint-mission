@@ -214,6 +214,7 @@ public class JwtService {
         jwtSessionRepository.save(jwtSession);
     }
 
+    @Transactional
     public void revokeAllUserSessions(UUID userId) {
         jwtSessionRepository.revokeAllSessionsByUserId(userId);
     }

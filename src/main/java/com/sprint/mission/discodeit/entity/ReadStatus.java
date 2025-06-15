@@ -1,16 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
-
-import java.time.Instant;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -21,30 +19,41 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity {
 
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
 
-  @ManyToOne
-  @JoinColumn(name = "channel_id")
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  private Channel channel;
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Channel channel;
 
-  @Column(columnDefinition = "timestamp with time zone", nullable = false)
-  private Instant lastReadAt;
+    @Column(columnDefinition = "timestamp with time zone", nullable = false)
+    private Instant lastReadAt;
 
-  public static ReadStatus createReadStatus(User user, Channel channel, Instant lastReadAt) {
-    return new ReadStatus(user, channel, lastReadAt);
-  }
+    @Column(nullable = false)
+    private boolean notificationEnabled;
 
-  private ReadStatus(User user, Channel channel, Instant lastReadAt) {
-    this.user = user;
-    this.channel = channel;
-    this.lastReadAt = lastReadAt;
-  }
+    public static ReadStatus createReadStatus(User user, Channel channel,
+        Instant lastReadAt,
+        boolean notificationEnabled) {
+        return new ReadStatus(user, channel, lastReadAt, notificationEnabled);
+    }
 
-  public void updateLastReadAt(Instant lastReadAt) {
-    this.lastReadAt = lastReadAt;
-  }
+    private ReadStatus(User user, Channel channel, Instant lastReadAt,
+        Boolean notificationEnabled) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = lastReadAt;
+        this.notificationEnabled = notificationEnabled;
+    }
+
+    public void updateLastReadAt(Instant lastReadAt) {
+        this.lastReadAt = lastReadAt;
+    }
+
+    public void updateNotificationEnabled(boolean notificationEnabled) {
+        this.notificationEnabled = notificationEnabled;
+    }
 }

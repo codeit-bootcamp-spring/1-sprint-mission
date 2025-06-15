@@ -64,14 +64,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             FileOutputStream fileOutputStream = new FileOutputStream(resolvePath(id).toFile());
         ) {
 
-            Thread.sleep(3000); // 지연 추가
-
             fileOutputStream.write(bytes);
             log.info("File write operation completed for ID: {}", id);
             CompletableFuture<Void> result = CompletableFuture.completedFuture(null);
             log.info("Returning completed future: {}", result);
             return result;
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             log.warn("Upload failed for {}, will retry", id, e);
             throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
         }
@@ -88,10 +86,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             FileOutputStream fileOutputStream = new FileOutputStream(resolvePath(id).toFile());
         ) {
 
-            Thread.sleep(3000); // 지연 추가
+            //Thread.sleep(3000); // 지연 추가
 
             fileOutputStream.write(bytes);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             log.warn("Upload failed for {}, will retry", id, e);
             throw new BinaryContentOperationException(ErrorCode.BINARY_SAVE_FAILED);
         }

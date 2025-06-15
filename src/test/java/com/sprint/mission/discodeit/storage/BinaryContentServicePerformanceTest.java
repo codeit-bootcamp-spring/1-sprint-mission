@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.storage;
 
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +24,16 @@ public class BinaryContentServicePerformanceTest {
     @Autowired
     private MeterRegistry meterRegistry;
 
+    @Autowired
+    private UserRepository userRepository;
+
+
     @Test
     public void 파일_저장_시_동기_비동기_성능_차이_확인() {
+
+        User user = userRepository.saveAndFlush(
+            User.createUserWithoutProfile("test", "email", "pw"));
+        UUID requestId = UUID.randomUUID();
 
         MockMultipartFile testFile = new MockMultipartFile(
             "testFile",
@@ -33,7 +44,7 @@ public class BinaryContentServicePerformanceTest {
 
         int iterations = 5;
         for (int i = 0; i < iterations; i++) {
-            binaryContentService.save(testFile);
+            binaryContentService.save(testFile, user.getId(), requestId);
 
             try {
                 Thread.sleep(5000);

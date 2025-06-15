@@ -23,7 +23,7 @@ public class MDCLoggingInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
         Object handler) {
         // 요청 ID 생성 (UUID)
-        String requestId = UUID.randomUUID().toString().replaceAll("-", "");
+        String requestId = UUID.randomUUID().toString();
 
         // MDC에 컨텍스트 정보 추가
         MDC.put(REQUEST_ID, requestId);
