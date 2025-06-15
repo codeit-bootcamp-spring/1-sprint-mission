@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.NotificationType;
 import java.time.Instant;
 import java.util.UUID;
 
-public record NotificationDto(
+public record NotificationDto (
     UUID id,
     Instant createdAt,
     UUID receiverId,
