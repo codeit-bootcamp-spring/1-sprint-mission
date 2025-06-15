@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
@@ -13,12 +13,17 @@ import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.service.NotificationService;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -31,10 +36,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicNotificationService implements NotificationService {
 
+  private final CacheManager cacheManager;
   private final NotificationRepository notificationRepository;
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
 
+  @CacheEvict(value = "userNotifications", key = "#event.receiverId")
   @Override
   @Transactional
   public void create(NotificationEvent event) {
@@ -67,6 +74,7 @@ public class BasicNotificationService implements NotificationService {
     log.info("알림 생성 완료: 수신 사용자 ID = {}, 제목: {}", receiver.getId(), event.getTitle());
   }
 
+  @Cacheable(value = "userNotifications", key = "#userId")
   @PreAuthorize("#userId.equals(authentication.principal.userDto.id)")
   @Override
   @Transactional(readOnly = true)
@@ -104,6 +112,9 @@ public class BasicNotificationService implements NotificationService {
     if (!notification.getReceiver().getId().equals(currentUserId)) {
       throw new AccessDeniedException("권한이 없습니다");
     }
+
+    Objects.requireNonNull(cacheManager.getCache("userNotifications"))
+        .evict(notification.getReceiver().getId());
 
     notificationRepository.deleteById(notificationId);
     log.debug("알림 삭제 완료");
