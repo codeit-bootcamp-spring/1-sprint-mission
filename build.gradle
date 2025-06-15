@@ -30,6 +30,10 @@ repositories {
 }
 
 dependencies {
+    // 캐시
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.1'
+
     // JUnit 5 의존성
     testImplementation platform('org.junit:junit-bom:5.10.0')  // JUnit BOM 사용 (버전 관리)
     testImplementation 'org.junit.jupiter:junit-jupiter'      // JUnit Jupiter API

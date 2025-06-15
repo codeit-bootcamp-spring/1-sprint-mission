@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.event;
 import com.sprint.mission.discodeit.dto.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
+import com.sprint.mission.discodeit.service.basic.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
@@ -18,6 +19,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class NotificationEventListner {
 
   private final NotificationRepository notificationRepository;
+  private final NotificationService notificationService;
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   @Async
@@ -30,16 +32,9 @@ public class NotificationEventListner {
 
     try {
 
-      Notification notification = Notification.builder()
-          .title(notificationDto.getTitle())
-          .content(notificationDto.getContent())
-          .type(notificationDto.getType())
-          .targetId(notificationDto.getTargetId())
-          .receiverId(notificationDto.getReceiverId())
-          .build();
+      notificationService.create(notificationDto);
 
-      notification = notificationRepository.save(notification);
-      log.info("알림 생성 및 저장 성공. notification={}", notification.getId());
+      log.info("알림 생성 및 저장 성공");
     } catch (Exception e) {
       log.error("알림 생성 중 최대 재시도 횟수 초과 or 오류 발생 : type={}", notificationDto.getType(), e);
       throw e;

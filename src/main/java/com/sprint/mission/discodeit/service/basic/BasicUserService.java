@@ -27,6 +27,8 @@ import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,7 @@ public class BasicUserService implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final TransactionTemplate transactionTemplate;
 
+  @CacheEvict(value = "users", allEntries = true)
   @Transactional
   @Override
   public UserDto createUser(UserCreateRequest userCreateRequest,
@@ -165,6 +168,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @Cacheable("users")
   @Override
   public List<UserDto> showAllUsers() {
     // TODO : 예외 처리
