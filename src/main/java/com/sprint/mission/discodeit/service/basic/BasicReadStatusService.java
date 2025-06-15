@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusAlreadyExistException;
 import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
@@ -17,25 +18,32 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 
+  private final CacheManager cacheManager;
   private final ReadStatusRepository readStatusRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final ReadStatusMapper readStatusMapper;
 
+  @CacheEvict(value = "userReadStatuses", key = "#createReadStatusDto.userId")
   @Override
   @Transactional
   public ReadStatusDto create(CreateReadStatusDto createReadStatusDto)
@@ -56,7 +64,7 @@ public class BasicReadStatusService implements ReadStatusService {
         UUID.fromString(createReadStatusDto.userId())).orElse(null);
 
     if (readStatus != null) {
-      throw new DiscodeitException(ErrorCode.READ_STATUS_ALREADY_EXIST);
+      throw new ReadStatusAlreadyExistException(ErrorCode.READ_STATUS_ALREADY_EXIST);
     }
 
     if (channel.getType() == ChannelType.PRIVATE) {
@@ -73,18 +81,15 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional(readOnly = true)
   public ReadStatusDto findById(String readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
-        .orElse(null);
-    if (readStatus == null) {
-      throw new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND);
-    }
+        .orElseThrow(() -> new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
     return readStatusMapper.toDto(readStatus);
   }
 
+  @CacheEvict(value = "userReadStatuses", key = "#result.userId.toString()", beforeInvocation = false)
   @PostAuthorize("authentication.principal.userDto.id == returnObject.userId()")
   @Override
   @Transactional
-  public ReadStatusDto update(String readStatusId,
-      UpdateReadStatusDto updateReadStatusDto) {
+  public ReadStatusDto update(String readStatusId, UpdateReadStatusDto updateReadStatusDto) {
 
     if (updateReadStatusDto == null) {
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
@@ -93,21 +98,20 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
         .orElseThrow(() -> new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
 
-    readStatus.setLastReadAt(updateReadStatusDto.newLastReadAt());
-    readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
-
-    return readStatusMapper.toDto(readStatus);
-  }
-
-
-    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
-    for (ReadStatus readStatus : readStatuses) {
-      readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
-      readStatusDtos.add(readStatusMapper.toDto(readStatus));
+    if (updateReadStatusDto.newLastReadAt() != null) {
+      readStatus.setLastReadAt(updateReadStatusDto.newLastReadAt());
     }
-    return readStatusDtos;
+    if (updateReadStatusDto.newNotificationEnabled() != null) {
+      readStatus.setNotificationEnabled(updateReadStatusDto.newNotificationEnabled());
+    }
+
+    ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
+
+    return readStatusMapper.toDto(savedReadStatus);
   }
 
+
+  @Cacheable(value = "userReadStatuses", key = "#userId")
   public List<ReadStatusDto> findAllByUserId(String userId) {
 
     List<ReadStatus> allReadStatusByUserId = readStatusRepository.findByUserId(
@@ -128,10 +132,19 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional
   public boolean delete(String readStatusId) {
+    log.info("readStatus 삭제 시작: readStatusId = {}", readStatusId);
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
         .orElseThrow(() -> new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
 
+    log.debug("해당 readStatusId를 가진 유저의 캐시 무효화");
+    Objects.requireNonNull(cacheManager.getCache("userReadStatuses"))
+        .evictIfPresent(readStatus.getUser().getId());
+
+    //cacheManager.getCache()는 Cache 객체를 반환하는데, 만약 해당 캐시 이름이 존재하지 않으면 null을 반환할 수 있다.
+    // 따라서 null 체크가 필요하다.
+
     readStatusRepository.delete(readStatus);
+    log.info("readStatus 삭제 완료");
     return true;
   }
 }
