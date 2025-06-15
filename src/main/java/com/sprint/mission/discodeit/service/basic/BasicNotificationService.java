@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,16 @@ public class BasicNotificationService implements NotificationService {
 
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
+  @Autowired
+  private CacheManager cacheManager;
 
+  public static UUID getCurrentUserId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
+    return userDetails.getUserDto().id();
+  }
+
+  @Cacheable(cacheNames = "userNotifications", key = "#receiverId")
   @Override
   public List<NotificationDto> findAllByReceiverId(UUID receiverId) {
     List<Notification> notifications = notificationRepository.findAllByReceiverId(receiverId);
@@ -52,6 +64,7 @@ public class BasicNotificationService implements NotificationService {
     };
 
     notificationRepository.save(notification);
+    cacheManager.getCache("userNotifications").evict(receiverId);
 
     return null;
   }
@@ -63,11 +76,5 @@ public class BasicNotificationService implements NotificationService {
     notificationRepository.deleteById(id);
     log.info("알림 삭제 완료: id={}", id);
     return notificationMapper.toDto(notification);
-  }
-
-  private UUID getCurrentUserId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
-    return userDetails.getUserDto().id();
   }
 }

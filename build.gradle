@@ -42,6 +42,8 @@ dependencies {
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
     implementation 'org.scala-lang:scala-library:2.13.10'
     implementation 'org.springframework:spring-aop:7.0.0-M5'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
     gatlingImplementation 'io.gatling:gatling-core:3.9.5'
     gatlingImplementation 'io.gatling:gatling-http:3.9.5'
