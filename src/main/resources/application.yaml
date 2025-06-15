@@ -17,9 +17,22 @@ spring:
   config:
     import: optional:file:.env[.properties]
   cache:
-    type: caffeine
-    caffeine:
-      spec: initialCapacity=100,maximumSize=1000,expireAfterWrite=30m,recordStats
+    type: redis
+    redis:
+      time-to-live: 30m
+      cache-null-values: true
+      key-prefix: "discodeit:cache:"
+      use-key-prefix: true
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      connect-timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 1
+          time-between-eviction-runs: 30s
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
@@ -66,9 +79,12 @@ info:
       max-request-size: ${spring.servlet.multipart.maxRequestSize}
     cache:
       type: ${spring.cache.type}
-      caffeine-spec: ${spring.cache.caffeine.spec}
+      redis-ttl: ${spring.cache.redis.time-to-live}
     kafka:
       bootstrap-servers: ${spring.kafka.bootstrap-servers}
+    redis:
+      host: ${spring.data.redis.host}
+      port: ${spring.data.redis.port}
 
 discodeit:
   storage:
@@ -91,13 +107,20 @@ discodeit:
       role-changed: discodeit.role-changed
       async-task-failed: discodeit.async-task-failed
       notification: discodeit.notification
-
+  cache:
+    redis:
+      ttl:
+        user-channels: 60
+        user-notifications: 5
+        all-users: 10
+        user-detail: 30
+        channel-detail: 60
 
 logging:
   level:
     root: info
     org.springframework.cache: debug
-    com.github.benmanes.caffeine: debug
+    org.springframework.data.redis: debug
 
 security:
   remember-me:
