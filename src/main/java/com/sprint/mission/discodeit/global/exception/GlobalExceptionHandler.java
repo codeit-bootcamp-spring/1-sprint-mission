@@ -21,7 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice(basePackages = {"com.sprint.mission.discodeit.controller.api"})
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    // 인증 실패 > 사용자 이름 혹은 비밀번호가 잘못된 경우
+    // 인증 실패
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
 

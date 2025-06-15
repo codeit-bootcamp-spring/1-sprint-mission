@@ -2,18 +2,17 @@ package com.sprint.mission.discodeit.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,9 +20,7 @@ import org.springframework.stereotype.Component;
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
-    private final UserMapper userMapper;
-    private final SecurityContextRepository securityContextRepository;
-    private final SessionRegistry sessionRegistry;
+    private final JwtService jwtService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -33,21 +30,18 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
         UserResponse userDto = principal.getUserResponse();
 
-        // SecurityContext에 인증 정보 설정하고 세션에 저장 (ThreadLocal 기반)
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context); // 인증 정보 저장
+        JwtSession jwtSession = jwtService.saveJwtSession(principal, userDto);
 
-        // 세션과 사용자 연결
-        sessionRegistry.registerNewSession(
-            request.getSession().getId(),
-            authentication.getPrincipal());
+        // 쿠키에 저장
+        String refreshToken = jwtSession.getRefreshToken();
+        Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME, refreshToken);
+        refreshTokenCookie.setHttpOnly(true);
+        response.addCookie(refreshTokenCookie);
 
-        // SecurityContext를 세션에 저장하기 !!!!!
-        securityContextRepository.saveContext(context, request, response);
-
-        response.setContentType("application/json");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_OK);
-        objectMapper.writeValue(response.getWriter(), userDto);
+
+        //response.getWriter().write(objectMapper.writeValueAsString(jwtSession.getAccessToken()));
+        objectMapper.writeValue(response.getWriter(), jwtSession.getAccessToken());
     }
 }

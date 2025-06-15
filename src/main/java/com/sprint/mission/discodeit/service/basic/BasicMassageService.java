@@ -82,7 +82,7 @@ public class BasicMassageService implements MessageService {
 
         String title;
         if (channel.getType() == ChannelType.PRIVATE) {
-            title = userId + "님의 새로운 메시지가 있습니다.";
+            title = user.getUsername() + "님의 새로운 메시지가 있습니다.";
         } else {
             title = "채널 " + channel.getName() + "에 새로운 메시지가 있습니다.";
         }

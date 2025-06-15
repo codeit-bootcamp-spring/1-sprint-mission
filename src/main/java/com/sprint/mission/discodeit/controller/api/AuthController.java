@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.AuthApiDocs;
-import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.security.CustomUserDetailService;
@@ -12,14 +11,11 @@ import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -43,46 +39,6 @@ public class AuthController implements AuthApiDocs {
     private final JwtProperties jwtProperties;
     private final CustomUserDetailService customUserDetailService;
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(
-        @Valid @RequestBody LoginRequest request,
-        HttpServletResponse response
-    ) {
-
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getUsername(),
-                request.getPassword())
-        );
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        UserResponse userResponse = userService.findByUsername(userDetails.getUsername());
-
-        String accessToken = jwtService.generateAccessToken(userDetails, userResponse);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
-        jwtService.saveJwtSession(userResponse, accessToken, refreshToken);
-
-        addRefreshTokenCookie(response, refreshToken);
-
-        return ResponseEntity.ok(accessToken);
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
-        @CookieValue(value = "refresh_token", required = false) String cookieRefreshToken,
-        HttpServletResponse response
-    ) {
-        if (cookieRefreshToken != null && !cookieRefreshToken.isEmpty()) {
-            jwtService.revokeRefreshToken(cookieRefreshToken);
-        }
-
-        Cookie cookie = new Cookie("refresh_token", null);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/csrf-token")
     public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
         // spring security가 자동으로 주입
@@ -91,13 +47,12 @@ public class AuthController implements AuthApiDocs {
 
     @GetMapping("/me")
     public ResponseEntity<String> getCurrentUser(
-        @CookieValue(value = "refresh_token", required = false) String cookieRefreshToken
+        @CookieValue(value = JwtService.REFRESH_TOKEN_COOKIE_NAME, required = false) String cookieRefreshToken
     ) {
         if (cookieRefreshToken == null || cookieRefreshToken.isEmpty()) {
             throw new BadCredentialsException("인증 정보가 없습니다");
         }
 
-        jwtService.validateToken(cookieRefreshToken);
         JwtSession jwtSession = jwtService.findJwtSessionByRefreshToken(cookieRefreshToken);
 
         return ResponseEntity.ok(jwtSession.getAccessToken());
@@ -105,7 +60,7 @@ public class AuthController implements AuthApiDocs {
 
     @PostMapping("/refresh")
     public ResponseEntity<String> getAccessTokenByRefreshToken(
-        @CookieValue(value = "refresh_token", required = false) String cookieRefreshToken,
+        @CookieValue(value = JwtService.REFRESH_TOKEN_COOKIE_NAME, required = false) String cookieRefreshToken,
         HttpServletResponse response
     ) {
         if (cookieRefreshToken == null || cookieRefreshToken.isEmpty()) {

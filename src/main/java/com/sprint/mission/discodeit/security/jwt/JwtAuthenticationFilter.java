@@ -11,7 +11,7 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 요청마
 
         log.info("JwtAuthenticationFilter active: {}", request.getRequestURI());
 
-        // Authorization 헤더에서 JWT 토큰 추출
+        // Authorization 헤더에서 액세스 토큰 추출
         String token = extractTokenFromRequest(request);
 
         try {
@@ -42,17 +42,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 요청마
                 String username = jwtService.getUsernameFromToken(token);
                 UserDetails userDetails = customUserDetailService.loadUserByUsername(username);
 
-                // 인증 객체 생성
-                Authentication authentication = jwtService.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(userDetails, null,
+                        userDetails.getAuthorities());
 
-                log.debug("JWT 인증 성공: {}", authentication.getName());
+                // 인증 객체 생성
+                SecurityContextHolder.getContext().setAuthentication(auth);
+                log.debug("JWT 인증 성공: {}", userDetails.getUsername());
+
             } else {
                 // 무효한 토큰이면 예외 정보를 Request Attribute에 저장
                 request.setAttribute(JWT_EXCEPTION_ATTRIBUTE, JwtErrorType.INVALID_TOKEN);
                 log.debug("JWT 토큰 검증 실패");
-            }
 
+            }
         } catch (ExpiredJwtException e) {
             request.setAttribute(JWT_EXCEPTION_ATTRIBUTE, JwtErrorType.EXPIRED_TOKEN);
             log.debug("JWT 토큰 만료: {}", e.getMessage());
@@ -87,7 +90,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { // 요청마
         if (bearerToken != null && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(BEARER_PREFIX.length());
         }
-
         return null;
     }
 

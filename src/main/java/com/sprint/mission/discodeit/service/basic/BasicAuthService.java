@@ -70,6 +70,7 @@ public class BasicAuthService implements AuthService {
         return userMapper.entityToDto(targetUser);
     }
 
+    // TODO: 수정 필요
     private void forceLogoutUser(UUID targetUserId) {
 
         for (Object principal : sessionRegistry.getAllPrincipals()) {

@@ -10,6 +10,7 @@ import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             .message(errorCode.getMessage())
             .build();
 
-        response.setContentType("application/json");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         objectMapper.writeValue(response.getWriter(), errorResponse);
     }

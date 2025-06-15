@@ -21,9 +21,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     // json 요청을 LoginDto로 변환
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public JsonUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JsonUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager,
+        ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         super.setAuthenticationManager(authenticationManager);
         setFilterProcessesUrl("/api/auth/login"); // 필터가 작동할 url 지정
     }
@@ -36,8 +38,6 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
         try {
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(),
                 LoginRequest.class);
-
-//            String rememberMeValue = request.getParameter("remember-me");
 
             // 이름과 비밀번호로 인증 토큰 생성
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
