@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +51,9 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory,
         ObjectMapper objectMapper) {
-        ObjectMapper cacheObjectMapper = objectMapper.copy();
-        cacheObjectMapper.findAndRegisterModules();
+        ObjectMapper cacheObjectMapper = createRedisObjectMapper(objectMapper);
+        GenericJackson2JsonRedisSerializer jsonSerializer =
+            new GenericJackson2JsonRedisSerializer(cacheObjectMapper);
 
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(30))
@@ -57,7 +61,7 @@ public class CacheConfig {
             .serializeKeysWith(RedisSerializationContext.SerializationPair
                 .fromSerializer(new StringRedisSerializer()))
             .serializeValuesWith(RedisSerializationContext.SerializationPair
-                .fromSerializer(new GenericJackson2JsonRedisSerializer()));
+                .fromSerializer(jsonSerializer));
 
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
@@ -88,6 +92,34 @@ public class CacheConfig {
     }
 
     /**
+     * Redis 캐시용 ObjectMapper 생성
+     * 애플리케이션의 기본 ObjectMapper와 분리하여 캐시 설정 적용
+     */
+    private ObjectMapper createRedisObjectMapper(ObjectMapper baseObjectMapper) {
+        ObjectMapper redisMapper = baseObjectMapper.copy();
+
+        // 기본 모듈 등록
+        redisMapper.findAndRegisterModules();
+
+        // 빈 컬렉션 처리
+        redisMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, false);
+        redisMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+
+        // 알 수 없는 속성 무시
+        redisMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // 타입 정보 검증가 설정 - 모든 서브타입 허용
+        LaissezFaireSubTypeValidator validator = LaissezFaireSubTypeValidator.instance;
+        redisMapper.activateDefaultTyping(validator, ObjectMapper.DefaultTyping.NON_FINAL);
+
+        // 날짜/시간 처리
+        redisMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        log.debug("Redis용 ObjectMapper 설정 완료");
+        return redisMapper;
+    }
+
+    /**
      * 커스텀 키 생성기 - 복합 키를 위한 설정
      */
     @Bean("customKeyGenerator")
@@ -111,14 +143,14 @@ public class CacheConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
 
-        ObjectMapper redisObjectMapper = objectMapper.copy();
-        redisObjectMapper.findAndRegisterModules();
+        ObjectMapper redisObjectMapper = createRedisObjectMapper(objectMapper);
+        GenericJackson2JsonRedisSerializer jsonSerializer =
+            new GenericJackson2JsonRedisSerializer(redisObjectMapper);
 
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(redisObjectMapper));
-
+        template.setValueSerializer(jsonSerializer);
         template.setHashKeySerializer(new StringRedisSerializer());
-        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer(redisObjectMapper));
+        template.setHashValueSerializer(jsonSerializer);
 
         template.afterPropertiesSet();
         log.debug("RedisTemplate 빈 생성 완료");
