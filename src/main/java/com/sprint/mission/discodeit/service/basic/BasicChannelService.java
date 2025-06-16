@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -112,19 +113,28 @@ public class BasicChannelService implements ChannelService {
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
         log.debug("사용자별 채널 목록 조회: userId={} - 캐시 확인", userId);
-        List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-            .map(ReadStatus::getChannel)
-            .map(Channel::getId)
-            .toList();
 
-        List<ChannelDto> channels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
-                mySubscribedChannelIds)
-            .stream()
-            .map(channelMapper::toDto)
-            .toList();
+        try {
+            List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId)
+                .stream()
+                .map(ReadStatus::getChannel)
+                .map(Channel::getId)
+                .toList();
 
-        log.info("사용자별 채널 목록 조회 완료: userId={}, 채널 수={} - DB 조회", userId, channels.size());
-        return channels;
+            List<ChannelDto> channels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
+                    mySubscribedChannelIds)
+                .stream()
+                .map(channelMapper::toDto)
+                .toList();
+
+            List<ChannelDto> result = new ArrayList<>(channels);
+
+            log.info("사용자별 채널 목록 조회 완료: userId={}, 채널 수={} - DB 조회", userId, channels.size());
+            return result;
+        } catch (Exception e) {
+            log.error("사용자별 채널 목록 조회 실패: userId={}", userId, e);
+            return new ArrayList<>();
+        }
     }
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")

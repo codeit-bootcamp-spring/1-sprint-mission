@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AsyncUploadService;
 import com.sprint.mission.discodeit.service.UserService;
 import io.micrometer.core.annotation.Timed;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -134,8 +135,10 @@ public class BasicUserService implements UserService {
             .stream()
             .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
             .toList();
-        log.info("모든 사용자 조회 완료: 총 {}명", userDtos.size());
-        return userDtos;
+
+        List<UserDto> result = new ArrayList<>(userDtos);
+        log.info("모든 사용자 조회 완료: 총 {}명", result.size());
+        return result;
     }
 
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")

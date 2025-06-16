@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,9 @@ public class BasicNotificationService implements NotificationService {
             .map(notificationMapper::toDto)
             .toList();
 
-        log.info("사용자별 알림 목록 조회 완료: receiverId={}, 알림 수={}", receiverId, notifications.size());
-        return notifications;
+        List<NotificationDto> result = new ArrayList<>(notifications);
+        log.info("사용자별 알림 목록 조회 완료: receiverId={}, 알림 수={}", receiverId, result.size());
+        return result;
     }
 
     @Transactional

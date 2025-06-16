@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -96,8 +97,10 @@ public class BasicReadStatusService implements ReadStatusService {
         List<ReadStatusDto> dtos = readStatusRepository.findAllByUserId(userId).stream()
             .map(readStatusMapper::toDto)
             .toList();
-        log.info("사용자별 읽음 상태 목록 조회 완료: userId={}, 조회된 항목 수={}", userId, dtos.size());
-        return dtos;
+
+        List<ReadStatusDto> result = new ArrayList<>(dtos);
+        log.info("사용자별 읽음 상태 목록 조회 완료: userId={}, 조회된 항목 수={}", userId, result.size());
+        return result;
     }
 
     @PostAuthorize("principal.userDto.id == returnObject.userId()")
