@@ -94,7 +94,6 @@ public class BasicMessageService implements MessageService {
    * @Description: 알림 발송
    **/
   private void sendNotification(MessageCreateRequest request, Message message) {
-        request.authorId(), request.channelId(), message.getContent());
 
     eventPublisher.publishEvent(
         new NotiMessageEvent(request.authorId(), request.channelId(), message.getContent()));

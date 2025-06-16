@@ -99,6 +99,7 @@ public class SecurityConfig {
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/api/users", "POST"))
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/api/auth/login", "POST"))
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/api/auth/logout", "POST"))
+                .ignoringRequestMatchers("/ws/**")
         )
         .authorizeHttpRequests(request ->
             request
@@ -114,7 +115,8 @@ public class SecurityConfig {
                     "/assets/**",
                     "/static/index.html",
                     "/static/favicon.ico").permitAll()
-                .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me")
+                .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me",
+                    "/ws/**")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
