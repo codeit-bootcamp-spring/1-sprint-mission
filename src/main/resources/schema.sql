@@ -3,7 +3,8 @@ create table binary_contents(
 	created_at timestamp not null,
 	file_name varchar(255) not null,
 	size bigint not null,
-	content_type varchar(100) not null
+	content_type varchar(100) not null,
+    upload_status varchar(20) not null default 'WAITING'
 );
 
 create table users(
@@ -15,14 +16,6 @@ create table users(
 	password varchar(255) not null,
     role varchar(30) not null default 'ROLE_USER',
 	profile_id uuid references binary_contents(id) on delete set null
-);
-
-create table user_statuses(
-	id uuid primary key,
-	created_at timestamp not null,
-	updated_at timestamp,
-	user_id uuid not null unique references users(id) on delete cascade,
-	last_active_at timestamp not null
 );
 
 create type channel_type as enum('PRIVATE', 'PUBLIC');

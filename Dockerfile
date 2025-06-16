@@ -21,7 +21,7 @@ WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar /app
 
-EXPOSE 80
+EXPOSE 8080
 
 ENV PROJECT_NAME=discodeit \
     PROJECT_VERSION=2.3-M11 \

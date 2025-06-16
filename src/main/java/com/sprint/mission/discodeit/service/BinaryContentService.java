@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -35,11 +34,13 @@ public class BinaryContentService {
 
     BinaryContent content = binaryContentRepository
         .save(BinaryContent.create(size, fileName, contentType));
+    byte[] data;
     try {
-      binaryContentStorage.put(content.getId(), file.getBytes());
+      data = file.getBytes();
     } catch (IOException e) {
-      throw new FileCreateException(Map.of());
+      throw new RuntimeException(e);
     }
+    binaryContentStorage.put(content, data);
 
     return content;
   }

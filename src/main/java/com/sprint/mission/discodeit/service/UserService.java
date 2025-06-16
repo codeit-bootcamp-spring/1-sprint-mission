@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
@@ -28,6 +29,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -142,12 +145,26 @@ public class UserService {
     BinaryContent content = binaryContentRepository
         .save(BinaryContent.create(size, fileName, contentType));
     log.info("BinaryContent 생성. id: {}", content.getId());
+    byte[] data;
     try {
-      binaryContentStorage.put(content.getId(), profile.getBytes());
+      data = profile.getBytes();
     } catch (IOException e) {
-      log.error("파일 생성 실패");
       throw new FileCreateException(Map.of());
     }
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            binaryContentStorage.put(content.getId(), data)
+                .thenAccept(id ->
+                    binaryContentRepository.updateStatus(id, UploadStatus.SUCCESS))
+                .exceptionally(e -> {
+                  binaryContentRepository.updateStatus(content.getId(), UploadStatus.FAILED);
+                  return null;
+                });
+          }
+        });
 
     return content;
   }

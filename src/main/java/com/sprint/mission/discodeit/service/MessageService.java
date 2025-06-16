@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent.UploadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -33,6 +34,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -68,30 +71,50 @@ public class MessageService {
       }
     }
 
-    List<BinaryContent> contents = new ArrayList<>();
-    if (!(attachments == null || attachments.isEmpty())) {
-      contents = attachments.stream()
-          .map(attachment -> {
-            long size = attachment.getSize();
-            String fileName = attachment.getOriginalFilename();
-            String contentType = fileName.substring(fileName.lastIndexOf('.'));
-
-            BinaryContent content = binaryContentRepository
-                .save(BinaryContent.create(size, fileName, contentType));
-            try {
-              binaryContentStorage.put(content.getId(), attachment.getBytes());
-            } catch (IOException e) {
-              throw new FileCreateException(Map.of());
-            }
-            return content;
-          })
-          .toList();
-    }
-
+    List<BinaryContent> contents = createAttachments(attachments);
     Message message = messageRepository
         .save(Message.create(user, messageCreateRequest.content(), channel, contents));
     log.info("Message 생성. id: {}", message.getId());
+
     return messageMapper.toDto(message);
+  }
+
+  private List<BinaryContent> createAttachments(List<MultipartFile> attachments) {
+    List<BinaryContent> contents = new ArrayList<>();
+    if (attachments == null || attachments.isEmpty()) {
+      return contents;
+    }
+
+    for (MultipartFile attachment : attachments) {
+      long size = attachment.getSize();
+      String fileName = attachment.getOriginalFilename();
+      String contentType = fileName.substring(fileName.lastIndexOf('.'));
+
+      BinaryContent content = binaryContentRepository
+          .save(BinaryContent.create(size, fileName, contentType));
+      contents.add(content);
+      byte[] data;
+      try {
+        data = attachment.getBytes();
+      } catch (IOException e) {
+        throw new FileCreateException(Map.of());
+      }
+
+      TransactionSynchronizationManager.registerSynchronization(
+          new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+              binaryContentStorage.put(content.getId(), data)
+                  .thenAccept(id ->
+                      binaryContentRepository.updateStatus(id, UploadStatus.SUCCESS))
+                  .exceptionally(e -> {
+                    binaryContentRepository.updateStatus(content.getId(), UploadStatus.FAILED);
+                    return null;
+                  });
+            }
+          });
+    }
+    return contents;
   }
 
   public MessageDto find(UUID id) {
