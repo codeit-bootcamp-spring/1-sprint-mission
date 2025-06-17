@@ -21,7 +21,7 @@ public class BinaryContentEventListener {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentStatusService binaryContentStatusService;
 
-  @Async
+  @Async("binaryContentTaskExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handleBinaryContentCreated(BinaryContentCreatedEvent event) {
     CompletableFuture<UUID> uploadFuture = binaryContentStorage.asyncPut(

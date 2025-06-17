@@ -83,16 +83,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  @Transactional
-  @Timed(value = "file.upload.sync", description = "동기 파일 업로드")
   public UUID put(UUID id, byte[] content) {
-
-    // 의도적인 지연 추가
-//    try {
-//      Thread.sleep(2000);
-//    } catch (InterruptedException e) {
-//      Thread.currentThread().interrupt();
-//    }
 
     log.info("파일 저장: id = {}", id);
     try {
@@ -107,7 +98,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
 
-  @Async //일반 타입으로 반환하면 @Async가 무시되고 동기 실행된다!
+  @Async("binaryContentTaskExecutor")
+  //일반 타입으로 반환하면 @Async가 무시되고 동기 실행된다!
   // CompletableFuture<T> - 비동기 + 결과 추적 (권장: 결과가 필요한 경우)
   @Override
   @Retryable(
@@ -125,28 +117,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   )
   @Timed(value = "file.upload.async", description = "비동기 파일 업로드")
   public CompletableFuture<UUID> asyncPut(UUID id, byte[] file) {
-
-    // 의도적인 지연 추가
-//    try {
-//      Thread.sleep(2000);
-//    } catch (InterruptedException e) {
-//      Thread.currentThread().interrupt();
-//    }
-
-    log.info("파일 저장 시작: id = {}, 스레드 = {}, 사용자 = {}",
-        id,
-        Thread.currentThread().getName(),
-        getCurrentUser().id()
-    );
-    try {
-      Path filePath = resolvePath(id);
-      Files.write(filePath, file);
-      log.info("파일 저장 완료: id = {}", id);
-      return CompletableFuture.completedFuture(id);
-    } catch (IOException e) {
-      log.error("파일 저장 실패: id = {}, 오류 = {}", id, e.getMessage());
-      throw new BinaryContentUploadException(ErrorCode.FILE_NOT_SAVED, e);
-    }
+    return CompletableFuture.completedFuture(put(id, file));
   }
 
   // 재시도 실패 시 처리 - 무조건 맨 첫번째 매개변수는 예외여야함

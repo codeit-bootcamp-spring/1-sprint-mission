@@ -17,7 +17,7 @@ public class NotificationEventListener {
 
   private final NotificationService notificationService;
 
-  @Async
+  @Async("eventTaskExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   @Retryable(
       retryFor = {Exception.class},

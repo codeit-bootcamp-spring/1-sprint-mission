@@ -24,8 +24,8 @@ public class AsyncConfig {
 
 
   // I/O 집약적 작업용 (API 호출, DB 쿼리 등)
-  @Bean
-  public ThreadPoolTaskExecutor ioIntensiveExecutor() {
+  @Bean("binaryContentTaskExecutor")
+  public ThreadPoolTaskExecutor binaryContentTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
     // I/O 대기가 많으므로 스레드 수를 늘림
@@ -34,12 +34,32 @@ public class AsyncConfig {
     executor.setQueueCapacity(1000);
     executor.setKeepAliveSeconds(60); // 사용되지 않은지 60초 후 제거
     executor.setAllowCoreThreadTimeOut(true);  // 유휴 시 코어 스레드도 정리
-    executor.setThreadNamePrefix("io-");
+    executor.setThreadNamePrefix("binary-");
 
     executor.setRejectedExecutionHandler(      // 거부 정책
         new ThreadPoolExecutor.CallerRunsPolicy() // 호출 스레드에서 직접 실행
     );
     executor.setTaskDecorator(new ContextPropagatingTaskDecorator()); // 컨텍스트 전파를 위한 데코레이터 설정
+    executor.initialize();
+
+    return executor;
+  }
+
+  @Bean("eventTaskExecutor")
+  public ThreadPoolTaskExecutor eventTaskExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+    executor.setCorePoolSize(2);
+    executor.setMaxPoolSize(4);
+    executor.setQueueCapacity(100);
+    executor.setKeepAliveSeconds(60);
+    executor.setAllowCoreThreadTimeOut(true);
+    executor.setThreadNamePrefix("event-");
+
+    executor.setRejectedExecutionHandler(
+        new ThreadPoolExecutor.CallerRunsPolicy()
+    );
+    executor.setTaskDecorator(new ContextPropagatingTaskDecorator());
     executor.initialize();
 
     return executor;

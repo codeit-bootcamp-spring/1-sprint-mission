@@ -83,7 +83,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     return id;
   }
 
-  @Async
+  @Async("binaryContentTaskExecutor")
   @Override
   @Retryable(
       retryFor = {
