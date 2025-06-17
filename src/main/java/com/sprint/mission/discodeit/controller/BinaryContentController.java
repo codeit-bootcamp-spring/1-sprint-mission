@@ -53,7 +53,7 @@ public class BinaryContentController implements BinaryContentApi {
     log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
     ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
-    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}",
+    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}", 
         response.getHeaders().getContentType(), response.getHeaders().getContentLength());
     return response;
   }

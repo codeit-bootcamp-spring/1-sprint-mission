@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,8 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Transactional
   @Override
-  public BinaryContentDto create(BinaryContentCreateRequest request) {
-    log.debug("바이너리 컨텐츠 생성 시작: fileName={}, size={}, contentType={}",
+  public BinaryContentDto create(BinaryContentCreateRequest request) throws IOException {
+    log.debug("바이너리 컨텐츠 생성 시작: fileName={}, size={}, contentType={}", 
         request.fileName(), request.bytes().length, request.contentType());
 
     String fileName = request.fileName();
@@ -38,10 +40,11 @@ public class BasicBinaryContentService implements BinaryContentService {
         (long) bytes.length,
         contentType
     );
+    binaryContent.setUploadStatus(UploadStatus.WAITING);
     binaryContentRepository.save(binaryContent);
     binaryContentStorage.put(binaryContent.getId(), bytes);
 
-    log.info("바이너리 컨텐츠 생성 완료: id={}, fileName={}, size={}",
+    log.info("바이너리 컨텐츠 생성 완료: id={}, fileName={}, size={}", 
         binaryContent.getId(), fileName, bytes.length);
     return binaryContentMapper.toDto(binaryContent);
   }
@@ -52,7 +55,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     BinaryContentDto dto = binaryContentRepository.findById(binaryContentId)
         .map(binaryContentMapper::toDto)
         .orElseThrow(() -> BinaryContentNotFoundException.withId(binaryContentId));
-    log.info("바이너리 컨텐츠 조회 완료: id={}, fileName={}",
+    log.info("바이너리 컨텐츠 조회 완료: id={}, fileName={}", 
         dto.id(), dto.fileName());
     return dto;
   }

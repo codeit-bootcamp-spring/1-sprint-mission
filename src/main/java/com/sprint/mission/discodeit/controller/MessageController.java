@@ -47,9 +47,9 @@ public class MessageController implements MessageApi {
       @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    log.info("메시지 생성 요청: request={}, attachmentCount={}",
+    log.info("메시지 생성 요청: request={}, attachmentCount={}", 
         messageCreateRequest, attachments != null ? attachments.size() : 0);
-
+    
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
@@ -104,7 +104,7 @@ public class MessageController implements MessageApi {
           sort = "createdAt",
           direction = Direction.DESC
       ) Pageable pageable) {
-    log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}",
+    log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}", 
         channelId, cursor, pageable);
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);

@@ -8,7 +8,12 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.notification.NotificationEvent;
+import com.sprint.mission.discodeit.event.notification.NotificationEventPublisher;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -17,19 +22,27 @@ import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.NotificationRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -43,6 +56,9 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
+  private final ReadStatusRepository readStatusRepository;
+  private final NotificationRepository notificationRepository;
+  private final NotificationEventPublisher notificationEventPublisher;
 
   @Transactional
   @Override
@@ -66,7 +82,11 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+          try {
+            binaryContentStorage.put(binaryContent.getId(), bytes);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
           return binaryContent;
         })
         .toList();
@@ -80,10 +100,28 @@ public class BasicMessageService implements MessageService {
     );
 
     messageRepository.save(message);
+    List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+
+    for (ReadStatus readStatus : readStatuses) {
+      if (readStatus.isNotificationEnabled()) {
+        notificationEventPublisher.publish(
+            new NotificationEvent(
+                readStatus.getUser().getId(),
+                "새 메시지가 도착했습니다",
+                "채널 [" + channel.getName() + "]에 새 메시지가 있습니다.",
+                NotificationType.NEW_MESSAGE,
+                channelId
+            )
+        );
+      }
+    }
+
+
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
     return messageMapper.toDto(message);
   }
 
+  @Cacheable(cacheNames = "messageById", key = "#messageId")
   @Transactional(readOnly = true)
   @Override
   public MessageDto find(UUID messageId) {
@@ -110,6 +148,8 @@ public class BasicMessageService implements MessageService {
     return pageResponseMapper.fromSlice(slice, nextCursor);
   }
 
+  @CachePut(cacheNames = "messageById", key = "#messageId")
+  @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id")
   @Transactional
   @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
@@ -122,6 +162,8 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
+  @CacheEvict(cacheNames = "messageById", key = "#messageId")
+  @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author.id")
   @Transactional
   @Override
   public void delete(UUID messageId) {

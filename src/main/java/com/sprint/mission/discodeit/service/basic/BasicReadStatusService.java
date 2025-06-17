@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -19,6 +22,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +38,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
   private final ReadStatusMapper readStatusMapper;
 
+  @PreAuthorize("principal.userDto.id == #request.userId()")
   @Transactional
   @Override
   public ReadStatusDto create(ReadStatusCreateRequest request) {
@@ -51,7 +57,13 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     Instant lastReadAt = request.lastReadAt();
-    ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
+    ReadStatus readStatus;
+
+    if (channel.getType() == ChannelType.PRIVATE) {
+      readStatus = new ReadStatus(user, channel, lastReadAt, true);
+    } else {
+      readStatus = new ReadStatus(user, channel, lastReadAt, false);
+    }
     readStatusRepository.save(readStatus);
 
     log.info("읽음 상태 생성 완료: id={}, userId={}, channelId={}",
@@ -79,6 +91,7 @@ public class BasicReadStatusService implements ReadStatusService {
     return dtos;
   }
 
+  @PostAuthorize("principal.userDto.id == returnObject.userId()")
   @Transactional
   @Override
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
@@ -87,6 +100,7 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> ReadStatusNotFoundException.withId(readStatusId));
     readStatus.update(request.newLastReadAt());
+    readStatus.setNotificationEnabled(request.newNotificationEnabled());
 
     log.info("읽음 상태 수정 완료: id={}", readStatusId);
     return readStatusMapper.toDto(readStatus);
@@ -102,4 +116,5 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatusRepository.deleteById(readStatusId);
     log.info("읽음 상태 삭제 완료: id={}", readStatusId);
   }
+
 }

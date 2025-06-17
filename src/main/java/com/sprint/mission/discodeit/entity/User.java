@@ -5,14 +5,12 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,29 +31,20 @@ public class User extends BaseUpdatableEntity {
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "profile_id", columnDefinition = "uuid")
   private BinaryContent profile;
-  @JsonManagedReference
-  @Setter(AccessLevel.PROTECTED)
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private UserStatus status;
-
-  @ManyToMany(fetch = FetchType.EAGER)
-  @Setter
-  @JoinTable(
-      name = "user_roles",
-      joinColumns = @JoinColumn(name = "user_id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id")
-  )
-  private Set<Role> roles = new HashSet<>();
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Role role;
 
   public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
     this.password = password;
     this.profile = profile;
+    this.role = Role.USER;
   }
 
   public void update(String newUsername, String newEmail, String newPassword,
-      BinaryContent newProfile, Set<Role> newRole) {
+      BinaryContent newProfile) {
     if (newUsername != null && !newUsername.equals(this.username)) {
       this.username = newUsername;
     }
@@ -68,9 +57,11 @@ public class User extends BaseUpdatableEntity {
     if (newProfile != null) {
       this.profile = newProfile;
     }
-    if (newRole != null) {
-      this.roles = new HashSet<>();
-      this.roles.addAll(newRole);
+  }
+
+  public void updateRole(Role newRole) {
+    if (this.role != newRole) {
+      this.role = newRole;
     }
   }
 }

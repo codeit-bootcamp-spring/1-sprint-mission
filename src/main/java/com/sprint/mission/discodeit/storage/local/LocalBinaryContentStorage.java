@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
@@ -23,12 +23,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
+  private final AsyncBinaryContentWriter asyncWriter;
   private final Path root;
 
   public LocalBinaryContentStorage(
-      @Value("${discodeit.storage.local.root-path}") Path root
+      @Value("${discodeit.storage.local.root-path}") Path root,
+      AsyncBinaryContentWriter asyncWriter
   ) {
     this.root = root;
+    this.asyncWriter = asyncWriter;
   }
 
   @PostConstruct
@@ -42,8 +45,19 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       }
     }
   }
+  @Override
+  public UUID put(UUID binaryContentId, byte[] bytes) throws IOException {
+    Path filePath = resolvePath(binaryContentId);
+    if (Files.exists(filePath)) {
+      throw new FileAlreadyExistsException("File already exists: " + binaryContentId);
+    }
 
-  public UUID put(UUID binaryContentId, byte[] bytes) {
+    // 비동기 저장 위임
+    asyncWriter.write(binaryContentId, bytes, filePath);
+
+    return binaryContentId;
+  }
+  /*public UUID put(UUID binaryContentId, byte[] bytes) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.exists(filePath)) {
       throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
@@ -54,7 +68,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       throw new RuntimeException(e);
     }
     return binaryContentId;
-  }
+  }*/
 
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
