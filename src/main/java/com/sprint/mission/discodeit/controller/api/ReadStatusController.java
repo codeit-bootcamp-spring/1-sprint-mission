@@ -40,6 +40,7 @@ public class ReadStatusController implements ReadStatusApiDocs {
             .body(readStatusService.create(readStatusRequest));
     }
 
+    @PreAuthorize("#readStatusRequest.userId == authentication.principal.id")
     @PatchMapping("/{readStatusId}")
     @Override
     public ResponseEntity<ReadStatusResponse> updateReadStatus(

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtBuilder;
@@ -35,6 +36,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class JwtService {
 
+    public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+
     private final JwtSessionRepository jwtSessionRepository;
     private final JwtProperties jwtProperties;
     private final Clock clock;
@@ -58,16 +61,44 @@ public class JwtService {
         // validateSecretKey();
     }
 
-    public String generateAccessToken(UserDetails user, UserResponse userResponse) {
-        return generateTokenWithClaims(user, Map.of("userDto", userResponse));
-    }
-
+    // 토큰 생성부터 JwtSession 저장까지
     @Transactional
-    public void saveJwtSession(UserResponse userResponse, String accessToken, String refreshToken) {
+    public JwtSession saveJwtSession(CustomUserDetails userDetails, UserResponse userResponse) {
 
         // 동시 로그인 제한
         List<JwtSession> activeSessions = jwtSessionRepository.findActiveSessionsByUserId(
-            userResponse.id());
+            userResponse.id(), Instant.now());
+        if (!activeSessions.isEmpty()) {
+            activeSessions.forEach(JwtSession::revoke);
+        }
+
+        // 토큰 생성
+        String accessToken = generateAccessToken(userDetails, userResponse);
+        String refreshToken = generateRefreshToken(userDetails);
+
+        // 만료 시간
+        Date accessTokenExpiration = getExpiration(accessToken);
+        Date refreshTokenExpiration = getExpiration(refreshToken);
+
+        JwtSession jwtSession = JwtSession.builder()
+            .userId(userResponse.id())
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .accessTokenExpiresAt(accessTokenExpiration.toInstant())
+            .refreshTokenExpiresAt(refreshTokenExpiration.toInstant())
+            .refreshCount(0)
+            .build();
+
+        return jwtSessionRepository.save(jwtSession);
+    }
+
+    @Transactional
+    public JwtSession saveJwtSession(UserResponse userResponse, String accessToken,
+        String refreshToken) {
+
+        // 동시 로그인 제한
+        List<JwtSession> activeSessions = jwtSessionRepository.findActiveSessionsByUserId(
+            userResponse.id(), Instant.now());
         if (!activeSessions.isEmpty()) {
             activeSessions.forEach(JwtSession::revoke);
         }
@@ -84,11 +115,12 @@ public class JwtService {
             .refreshCount(0)
             .build();
 
-        jwtSessionRepository.save(jwtSession);
+        return jwtSessionRepository.save(jwtSession);
     }
 
     @Transactional
-    public void updateJwtSession(JwtSession jwtSession, String accessToken, String refreshToken) {
+    public JwtSession updateJwtSession(JwtSession jwtSession, String accessToken,
+        String refreshToken) {
         Date accessTokenExpiration = getExpiration(accessToken);
         Date refreshTokenExpiration = getExpiration(refreshToken);
 
@@ -99,7 +131,12 @@ public class JwtService {
         getJwtSession.updateAccessTokenExpiresAt(accessTokenExpiration.toInstant());
         getJwtSession.updateAccessTokenExpiresAt(refreshTokenExpiration.toInstant());
         getJwtSession.incrementRefreshCount();
-        jwtSessionRepository.save(getJwtSession);
+
+        return jwtSessionRepository.save(getJwtSession);
+    }
+
+    public String generateAccessToken(UserDetails user, UserResponse userResponse) {
+        return generateTokenWithClaims(user, Map.of("userDto", userResponse));
     }
 
     // 액세스 토큰 생성
@@ -173,11 +210,11 @@ public class JwtService {
             return true;
 
         } catch (ExpiredJwtException e) {
-            log.info("토큰이 만료되었습니다: {}", e.getMessage());
+//            log.info("토큰이 만료되었습니다: {}", e.getMessage());
             throw new BadCredentialsException("유효하지 않은 토큰입니다");
 
         } catch (JwtException e) {
-            log.info("유효하지 않은 토큰입니다: {}", e.getMessage());
+//            log.info("유효하지 않은 토큰입니다: {}", e.getMessage());
             throw new BadCredentialsException("유효하지 않은 토큰입니다");
         }
     }
@@ -214,6 +251,7 @@ public class JwtService {
         jwtSessionRepository.save(jwtSession);
     }
 
+    @Transactional
     public void revokeAllUserSessions(UUID userId) {
         jwtSessionRepository.revokeAllSessionsByUserId(userId);
     }

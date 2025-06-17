@@ -21,4 +21,8 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
     @Query("SELECT count(r) > 0 FROM ReadStatus r WHERE r.id = :id AND r.id = :userId")
     boolean existsByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
+
+    @Query("SELECT rs.user.id FROM ReadStatus rs WHERE rs.channel.id = :channelId AND rs.notificationEnabled = true")
+    List<UUID> findReceiverIdsByChannelIdAndNotificationEnabledTrue(
+        @Param("channelId") UUID channelId);
 }

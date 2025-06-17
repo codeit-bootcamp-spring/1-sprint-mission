@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.2-M10'
+version = 'v2.3-M11'
 
 java {
     toolchain {
@@ -33,7 +33,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework:spring-aspects'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // 캐시
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    // 모니터링
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     // jwt
     implementation "io.jsonwebtoken:jjwt-api:0.12.5"
@@ -52,7 +63,7 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.testcontainers:localstack:1.20.6'
-    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'com.h2database:h2'
 
     // db

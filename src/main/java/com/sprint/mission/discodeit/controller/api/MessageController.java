@@ -17,6 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -52,6 +53,7 @@ public class MessageController implements MessageApiDocs {
     @Override
     @PatchMapping(value = "/{messageId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
         MediaType.APPLICATION_JSON_VALUE})
+    @PreAuthorize("hasPermission(#messageId, 'Message', 'UPDATE')")
     public ResponseEntity<MessageResponse> updateMessage(
         @PathVariable UUID messageId,
         @Valid @RequestBody MessageRequest.Update messageRequest
@@ -62,6 +64,7 @@ public class MessageController implements MessageApiDocs {
 
     @Override
     @DeleteMapping("/{messageId}")
+    @PreAuthorize("hasRole('ADMIN') or hasPermission(#messageId, 'Message', 'DELETE')")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
 
         messageService.deleteById(messageId);

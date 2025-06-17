@@ -53,11 +53,10 @@ public class AdminInitializer implements ApplicationRunner {
             return;
         }
 
-        User admin = User.createUser(
+        User admin = User.createUserWithoutProfile(
             adminUsername,
             adminEmail,
-            passwordEncoder.encode(adminPassword),
-            null
+            passwordEncoder.encode(adminPassword)
         );
         admin.updateRole(Role.ADMIN);
         userRepository.save(admin);

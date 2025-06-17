@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.CustomAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.CustomUserDetailService;
+import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.evaluator.CustomPermissionEvaluator;
+import com.sprint.mission.discodeit.security.handler.CustomAuthenticationFailureHandler;
+import com.sprint.mission.discodeit.security.handler.CustomAuthenticationSuccessHandler;
 import com.sprint.mission.discodeit.security.handler.CustomLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtProperties;
@@ -31,11 +35,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -51,28 +54,31 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain chain(
         HttpSecurity http,
-        SecurityContextRepository securityContextRepository,
+        JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter,
         CustomLogoutHandler customLogoutHandler,
-        RememberMeServices rememberMeServices) throws Exception {
+        AuthenticationEntryPoint authenticationEntryPoint) throws Exception {
 
         http
             .csrf(AbstractHttpConfigurer::disable)  // JWT 사용시 CSRF 불필요
+
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안함
 
-            .securityContext(
-                context -> context.securityContextRepository(securityContextRepository))
+            .logout(logout ->
+                logout
+                    .logoutUrl("/api/auth/logout")
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                    .addLogoutHandler(customLogoutHandler)
+            )
 
             .authorizeHttpRequests(this::configureAuthorization)
 
-            .rememberMe(r -> r
-                .rememberMeServices(rememberMeServices)
-            )
-
             .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(customAuthenticationEntryPoint()))
+                .authenticationEntryPoint(authenticationEntryPoint))
 
-            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+            .addFilterAt(jsonUsernamePasswordAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -83,7 +89,6 @@ public class SecurityConfig {
         auth
 
             // 허용
-
             .requestMatchers("/", "/index.html", "/error").permitAll()
             .requestMatchers("/.well-known/**", "/favicon.ico").permitAll()
             .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()  // 로그인 관련은 모두 허용
@@ -103,15 +108,6 @@ public class SecurityConfig {
             // anyRequest
             .anyRequest().permitAll();
     }
-
-    // csrf
-//    private CookieCsrfTokenRepository csrfTokenRepository() {
-//        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-//        repository.setCookieName("XSRF-TOKEN");
-//        repository.setHeaderName("X-XSRF-TOKEN");
-//        repository.setCookiePath("/");
-//        return repository;
-//    }
 
     @Bean
     public AuthenticationManager authenticationManager(PasswordEncoder passwordEncoder) {
@@ -165,7 +161,23 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationEntryPoint customAuthenticationEntryPoint() {
-        return new CustomAuthenticationEntryPoint();
+    public AuthenticationEntryPoint customAuthenticationEntryPoint(ObjectMapper objectMapper) {
+        return new CustomAuthenticationEntryPoint(objectMapper);
     }
+
+    // 로그인 필터 Bean
+    @Bean
+    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
+        AuthenticationManager authManager,
+        CustomAuthenticationSuccessHandler successHandler,
+        CustomAuthenticationFailureHandler failureHandler,
+        ObjectMapper objectMapper
+    ) {
+        JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
+            authManager, objectMapper);
+        filter.setAuthenticationSuccessHandler(successHandler);
+        filter.setAuthenticationFailureHandler(failureHandler);
+        return filter;
+    }
+
 }

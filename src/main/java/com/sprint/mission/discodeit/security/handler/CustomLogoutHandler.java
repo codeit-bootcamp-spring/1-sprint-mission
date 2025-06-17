@@ -1,45 +1,44 @@
 package com.sprint.mission.discodeit.security.handler;
 
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class CustomLogoutHandler implements LogoutHandler {
 
-    private final PersistentTokenRepository tokenRepository;
+    private final JwtService jwtService;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) {
 
-        // 세션 무효화
-        HttpSession session = request.getSession();
-        if (session != null) {
-            session.invalidate();
-        }
+        resolveRefreshToken(request)
+            .ifPresent(refreshToken -> {
+                jwtService.revokeRefreshToken(refreshToken);
+                invalidateRefreshTokenCookie(response);
+            });
+    }
 
-        // 컨텍스트 초기화
-        SecurityContextHolder.clearContext();
+    private Optional<String> resolveRefreshToken(HttpServletRequest request) {
+        return Arrays.stream(request.getCookies())
+            .filter(cookie -> cookie.getName().equals(JwtService.REFRESH_TOKEN_COOKIE_NAME))
+            .findFirst()
+            .map(Cookie::getValue);
+    }
 
-        // remember-me 토큰 제거
-        if (authentication != null && authentication.getName() != null) {
-            tokenRepository.removeUserTokens(authentication.getName());
-        }
-
-        // remember-me 쿠키 삭제
-        Cookie cookie = new Cookie("remember-me", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-
+    private void invalidateRefreshTokenCookie(HttpServletResponse response) {
+        Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME, "");
+        refreshTokenCookie.setMaxAge(0);
+        refreshTokenCookie.setHttpOnly(true);
+        response.addCookie(refreshTokenCookie);
     }
 }
