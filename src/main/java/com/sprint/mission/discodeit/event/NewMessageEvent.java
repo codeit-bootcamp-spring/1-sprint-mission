@@ -5,9 +5,9 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class NewMessageNotificationEvent extends NotificationEvent {
+public class NewMessageEvent extends NotificationEvent {
 
-  public NewMessageNotificationEvent(UUID receiver, UUID channelId, String channelName,
+  public NewMessageEvent(UUID receiver, UUID channelId, String channelName,
       String message) {
     super(receiver, NotificationType.NEW_MESSAGE, channelId,
         channelName + "에 새 메시지가 있습니다.", message);

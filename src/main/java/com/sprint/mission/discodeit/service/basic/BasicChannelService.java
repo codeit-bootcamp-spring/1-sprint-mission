@@ -85,6 +85,7 @@ public class BasicChannelService implements ChannelService {
 
     List<UUID> userIds = createPrivateChannelDTo.participantIds().stream().map(UUID::fromString)
         .toList();
+    log.info("참여자 수: {} ", userIds.size());
 
     List<ReadStatus> readStatuses = userRepository.findAllById(userIds).stream()
         .map(user -> new ReadStatus(channel, user, channel.getCreatedAt(), true))

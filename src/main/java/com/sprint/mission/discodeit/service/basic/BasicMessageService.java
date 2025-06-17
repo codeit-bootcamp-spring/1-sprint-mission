@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
-import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
+import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
@@ -94,8 +94,12 @@ public class BasicMessageService implements MessageService {
     subscribers.stream()
         .filter(ReadStatus::isNotificationEnabled) // 구독한 사용자들
         .filter(readStatus -> !readStatus.getUser().getId().equals(authorId)) // 보낸사람 제외
+        .peek(readStatus -> log.info("알림 대상자: {}", readStatus.getUser().getId())) // 추가
         .forEach(readStatus -> {
-          NewMessageNotificationEvent event = new NewMessageNotificationEvent(
+          log.info("구독자: {}, 알림활성화: {}, 작성자여부: {}",
+              readStatus.getUser().getId(), readStatus.isNotificationEnabled(),
+              readStatus.getUser().getId().equals(authorId));
+          NewMessageEvent event = new NewMessageEvent(
               readStatus.getUser().getId(),
               createMessageDto.getChannelId(),
               (channel.getName() == null || channel.getName().isEmpty()) ? "개인 채널"
@@ -104,6 +108,7 @@ public class BasicMessageService implements MessageService {
                   : message.getContent()
           );
           eventPublisher.publishEvent(event);
+          log.info("이벤트 발행 완료: {}", event.getClass().getSimpleName()); // 추가
           Objects.requireNonNull(cacheManager.getCache("userReadStatuses"))
               .evictIfPresent(readStatus.getUser().getId());
           Objects.requireNonNull(cacheManager.getCache("userChannels"))

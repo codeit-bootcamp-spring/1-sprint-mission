@@ -32,7 +32,7 @@ WORKDIR /app
 # 프로젝트 정보와 JVM 옵션 설정
 ENV PROJECT_NAME=discodeit
 ENV PROJECT_VERSION=1.2-M8
-ENV JVM_OPTS="Xmx384m -Xms256m -XX:MaxMetaspaceSize=64m -XX:+UseSerialGC"
+ENV JVM_OPTS="-Xmx512m -Xms256m -XX:MaxMetaspaceSize=512m -XX:+UseSerialGC"
 
 # 빌드 스테이지에서 생성된 JAR 파일만 복사
 COPY --from=build /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar /app
@@ -41,9 +41,8 @@ COPY --from=build /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar /app
 EXPOSE 80
 
 # 애플리케이션 실행 명령어 설정
-ENTRYPOINT ["java", "-Xmx384m", "-Xms256m", "-XX:MaxMetaspaceSize=128m", "-XX:+UseSerialGC", "-jar", "discodeit-1.2-M8.jar"]
+ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
 
-## Amazon Corretto 17 이미지를 베이스 이미지로 사용
 #FROM amazoncorretto:17
 #
 ## 작업 디렉토리 설정

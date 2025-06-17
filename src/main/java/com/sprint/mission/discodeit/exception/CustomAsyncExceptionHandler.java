@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.event.AsyncFailedNotificationEvent;
+import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -29,7 +29,7 @@ public class CustomAsyncExceptionHandler implements AsyncUncaughtExceptionHandle
     UUID userId = getCurrentUserId();
 
     if (userId != null) {
-      AsyncFailedNotificationEvent event = new AsyncFailedNotificationEvent(
+      AsyncTaskFailedEvent event = new AsyncTaskFailedEvent(
           userId,
           ex.getMessage()
       );

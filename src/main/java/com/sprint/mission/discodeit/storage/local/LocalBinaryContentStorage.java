@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.storage.local;
 import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.event.AsyncFailedNotificationEvent;
-import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentUploadException;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -132,7 +131,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     log.error("파일 저장 최종 실패: AsyncTaskFailure = {}", asyncTaskFailure.toString());
 
     UUID userId = getCurrentUser().id();
-    AsyncFailedNotificationEvent event = new AsyncFailedNotificationEvent(userId, ex.getMessage());
+    AsyncTaskFailedEvent event = new AsyncTaskFailedEvent(userId, ex.getMessage());
     eventPublisher.publishEvent(event);
 
     CompletableFuture<UUID> future = new CompletableFuture<>();

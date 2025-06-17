@@ -62,14 +62,21 @@ dependencies {
     // Spring Retry 의존성
     implementation 'org.springframework.retry:spring-retry'
 
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
     // AOP 지원
     implementation 'org.springframework.boot:spring-boot-starter-aop'
-    
+
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
 
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // 웹소켓
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 
 }
 

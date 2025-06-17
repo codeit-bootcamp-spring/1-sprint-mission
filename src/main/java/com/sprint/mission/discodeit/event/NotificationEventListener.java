@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
+
 
 @Slf4j
 @Component
@@ -16,16 +18,49 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class NotificationEventListener {
 
   private final NotificationService notificationService;
+  private final ObjectMapper objectMapper;
 
   @Async("eventTaskExecutor")
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @KafkaListener(topics = "discodeit.new_message")
   @Retryable(
       retryFor = {Exception.class},
       noRetryFor = {IllegalArgumentException.class},
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
-  public void handle(NotificationEvent event) {
+  public void handleNewMessageEvent(String kafkaEvent) throws JsonProcessingException {
+    NewMessageEvent event = objectMapper.readValue(kafkaEvent, NewMessageEvent.class);
+    handle(event);
+  }
+
+  @Async("eventTaskExecutor")
+  @KafkaListener(topics = "discodeit.async_task_failed")
+  @Retryable(
+      retryFor = {Exception.class},
+      noRetryFor = {IllegalArgumentException.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000, multiplier = 2)
+  )
+  public void handleAsyncTaskFailedEvent(String kafkaEvent) throws JsonProcessingException {
+    AsyncTaskFailedEvent event = objectMapper.readValue(kafkaEvent, AsyncTaskFailedEvent.class);
+    handle(event);
+
+  }
+
+  @Async("eventTaskExecutor")
+  @KafkaListener(topics = "discodeit.role_changed")
+  @Retryable(
+      retryFor = {Exception.class},
+      noRetryFor = {IllegalArgumentException.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000, multiplier = 2)
+  )
+  public void handleRoleChangedEvent(String kafkaEvent) throws JsonProcessingException {
+    UserRoleChangedEvent event = objectMapper.readValue(kafkaEvent, UserRoleChangedEvent.class);
+    handle(event);
+  }
+
+  private void handle(NotificationEvent event) {
     try {
       log.info("알림 생성 이벤트 발생: {}", event);
       notificationService.create(event);
@@ -35,4 +70,5 @@ public class NotificationEventListener {
       throw e; // 재시도를 위해 예외를 다시 던진다
     }
   }
+
 }

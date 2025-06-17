@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.Instant;
@@ -33,6 +34,7 @@ public class MessageController {
   private final MessageService messageService;
 
   //특정 채널 메세지 생성
+  @Timed("message.create.async")
   @PostMapping
   public ResponseEntity<MessageDto> createMessage(
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments,

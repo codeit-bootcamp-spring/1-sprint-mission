@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.config;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 @Slf4j
 @Configuration
@@ -15,28 +19,24 @@ import org.springframework.context.annotation.Configuration;
 public class CacheConfig {
 
   @Bean
-  public Caffeine<Object, Object> caffeineSpec() {
-    return Caffeine.newBuilder()
-        .expireAfterAccess(10, TimeUnit.MINUTES)      // 무사용 10분 후 만료 (TTI)
-        .expireAfterWrite(30, TimeUnit.MINUTES)       // 쓰기 후 30분 후 만료 (TTL)
-        //.refreshAfterWrite(5, TimeUnit.MINUTES)       // 5분마다 백그라운드 갱신
-        .maximumSize(5000)                            // 최대 5,000개 엔트리 유지 (LRU)
-        .recordStats()                                // 통계 수집 활성화 (모니터링용)
-        .removalListener((key, value, cause) ->       // 제거 이벤트 리스너
-            log.info("Cache removed: key={}, cause={}", key, cause)
-        );
-  }
+  public RedisCacheConfiguration redisCacheConfiguration(ObjectMapper objectMapper) {
+    ObjectMapper redisObjectMapper = objectMapper.copy(); //Jackson ObjectMapper를 복사해서 Redis 전용으로 사용
+    redisObjectMapper.activateDefaultTyping( //객체 타입 정보를 JSON에 포함시켜 역직렬화시 원본 타입으로 복원 가능
+        LaissezFaireSubTypeValidator.instance, //Jackson 라이브러리의 타입 검증자
+        DefaultTyping.EVERYTHING,
+        As.PROPERTY
+    );
 
-  @Bean
-  public CacheManager cacheManager(Caffeine<Object, Object> spec) {
-    CaffeineCacheManager manager = new CaffeineCacheManager(
-        "users",   // 유저 개개인의 정보를 담을 캐시
-        "userChannels",         // 유저별 참여 채널 목록
-        "userNotifications",    // 유저별 알림 목록
-        "userReadStatuses",     // 유저별 읽음 상태 목록
-        "channelParticipants"); // 채널별 참여자 목록
-    manager.setCaffeine(spec);  // Caffeine 설정 적용
-    return manager;
+    return RedisCacheConfiguration.defaultCacheConfig()
+        .serializeValuesWith(
+            RedisSerializationContext.SerializationPair.fromSerializer(
+                // GenericJackson2JsonRedisSerializer로 JSON 형태로 저장(직렬화)
+                new GenericJackson2JsonRedisSerializer(redisObjectMapper)
+            )
+        )
+        .prefixCacheNameWith("discodeit:") // 모든 캐시 키에 "discodeit:" 접두사 추가
+        .entryTtl(Duration.ofSeconds(600)) // 600초(10분) 후 자동 만료
+        .disableCachingNullValues(); //null 값은 캐싱하지 않음
   }
 }
 
