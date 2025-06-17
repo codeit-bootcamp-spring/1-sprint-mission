@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.event.RoleChangedNotificationEvent;
 import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
@@ -17,6 +16,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
@@ -29,7 +29,6 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -48,6 +47,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
   private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
 
   @CachePut(value = "users", key = "#result.id")
@@ -252,12 +252,11 @@ public class BasicUserService implements UserService {
     log.info("사용자 권한 변경 완료: userId = {}, role = {}", user.getId(), user.getRole());
 
     log.debug("사용자 권한 변경 후 세션 종료를 위한 이벤트 호출");
-    eventPublisher.publishEvent(
-        new UserRoleChangedEvent(user.getId(), previousRole, roleUpdateRequest.getNewRole()));
+    jwtService.invalidateJwtSession(user.getId());
 
     log.debug("사용자 권한 변경 후 알림 발행을 위한 이벤트 호출");
     eventPublisher.publishEvent(
-        new RoleChangedNotificationEvent(
+        new UserRoleChangedEvent(
             user.getId(), user.getId(), roleUpdateRequest.getNewRole().toString()));
 
     return userMapper.toDto(user);
