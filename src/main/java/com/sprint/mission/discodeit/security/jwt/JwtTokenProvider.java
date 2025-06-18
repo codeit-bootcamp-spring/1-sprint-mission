@@ -40,9 +40,15 @@ public class JwtTokenProvider {
 
   private final Clock clock = Clock.systemUTC(); // 현재 시각 제공 객체 > 테스트 시 모킹 가능
 
+  private SecretKey signingKey;
+
   @PostConstruct
   private void init() {
-    validateSecretKey();  // 초기화 로직
+    validateSecretKey();
+    // 애플리케이션 시작 시 한 번만 키 생성
+    byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
+    this.signingKey = Keys.hmacShaKeyFor(keyBytes);
+    log.info("JWT signing key initialized");
   }
 
   /**
@@ -78,7 +84,6 @@ public class JwtTokenProvider {
 
     JwtBuilder builder = Jwts.builder()
         .header()
-        .add("typ", "JWT")
         .and()
         .issuer(jwtProperties.getIssuer())
         .subject(user.getUsername())
@@ -127,8 +132,10 @@ public class JwtTokenProvider {
    * 토큰에서 클레임(내용부) 추출
    */
   public Claims getClaims(String token) {
+
+    SecretKey key = getSigningKey();
     return Jwts.parser()
-        .verifyWith(getSigningKey())
+        .verifyWith(key)
         .clockSkewSeconds(60) // 시간오차 60초 허용
         .build()
         .parseSignedClaims(token)
@@ -186,8 +193,7 @@ public class JwtTokenProvider {
 
   // 설정된 비밀 키를 HMAC 서명 키로 변환
   private SecretKey getSigningKey() {
-    byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
-    return Keys.hmacShaKeyFor(keyBytes);
+    return this.signingKey;
   }
 
   // UserDetails 에서 권한 문자열 목록 추출

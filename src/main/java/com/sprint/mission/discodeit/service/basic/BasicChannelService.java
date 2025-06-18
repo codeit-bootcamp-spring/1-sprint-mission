@@ -24,6 +24,9 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,6 +49,7 @@ public class BasicChannelService implements ChannelService {
   private final MessageMapper messageMapper;
   private final UserMapper userMapper;
 
+  @CacheEvict(value = "userChannels", allEntries = true)
   @Override
   @Transactional
   public ChannelDto create(CreatePublicChannelDto createPublicChannelDto)
@@ -64,9 +68,9 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
   }
 
+  @CacheEvict(value = "userChannels", allEntries = true)
   @Override
   @Transactional //channel create 동작 중, readStatus 생성 오류시 롤백 되도록 해야되는데?
-  //todo - 고민: 읽기용 메서드인 경우에도 트랜젝션이 적용되나?
   public ChannelDto create(CreatePrivateChannelDTo createPrivateChannelDTo) {
 
     log.info("Private 채널 생성 시작: {}", createPrivateChannelDTo);
@@ -83,7 +87,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
 
     List<ReadStatus> readStatuses = userRepository.findAllById(userIds).stream()
-        .map(user -> new ReadStatus(channel, user, channel.getCreatedAt()))
+        .map(user -> new ReadStatus(channel, user, channel.getCreatedAt(), true))
         .toList();
     readStatusRepository.saveAll(readStatuses);
 
@@ -91,6 +95,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
   }
 
+  @Cacheable(value = "userChannels", key = "#userId")
   @Override
   @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(String userId) {
@@ -134,20 +139,27 @@ public class BasicChannelService implements ChannelService {
 
     List<UserDto> participants = List.of();
     if (channel.getType() == ChannelType.PRIVATE) {
-      participants = readStatusRepository.findByChannelId(channel.getId()).stream().map(
-          r -> userMapper.toDto(r.getUser())).toList();
+      participants = getPrivateChannelParticipants(channelId);
     }
 
     return channelMapper.toDto(channel);
   }
 
+  @Cacheable(value = "channelParticipants", key = "#channelId")
+  public List<UserDto> getPrivateChannelParticipants(String channelId) {
+    return readStatusRepository.findByChannelId(UUID.fromString(channelId))
+        .stream()
+        .map(r -> userMapper.toDto(r.getUser()))
+        .toList();
+  }
 
+  @CacheEvict(value = "userChannels", allEntries = true)
   @Override
   @Transactional
   public ChannelDto updateChannel(String channelId, UpdateChannelDto updateChannelDto)
       throws DiscodeitException {
 
-    log.info("체널 수정 시작: channelId = {}", channelId);
+    log.info("채널 수정 시작: channelId = {}", channelId);
 
     //dto가 비어있는 경우, 채널 조회를 수행하지 않도록 수정
     if (updateChannelDto == null) {
@@ -173,10 +185,14 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(updatedChannel);
   }
 
+  @Caching(evict = {
+      @CacheEvict(value = "userChannels", allEntries = true),
+      @CacheEvict(value = "channelParticipants", key = "#channelId")
+  })
   @Override
   @Transactional
   public boolean delete(String channelId) throws DiscodeitException {
-    log.info("체널 삭제 시작: channelId = {}", channelId);
+    log.info("채널 삭제 시작: channelId = {}", channelId);
     Channel channel = channelRepository.findById(UUID.fromString(channelId))
         .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 

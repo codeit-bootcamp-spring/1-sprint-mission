@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.auth.TokenPair;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.UserService;
@@ -48,14 +48,6 @@ public class AuthController {
 
     // 토큰 재발급
     TokenPair tokens = jwtService.reissueAccessTokens(refreshToken);
-
-    // 새 리프레시 토큰으로 쿠키 업데이트
-    Cookie refreshTokenCookie = new Cookie("refresh_token", tokens.refreshToken());
-    refreshTokenCookie.setHttpOnly(true);
-    refreshTokenCookie.setSecure(false); // 운영 환경에서는 true
-    refreshTokenCookie.setPath("/");
-    refreshTokenCookie.setMaxAge(60 * 60 * 24 * 30); // 30일
-    response.addCookie(refreshTokenCookie);
 
     // 액세스 토큰 반환
     return ResponseEntity.ok(tokens.accessToken());

@@ -32,7 +32,7 @@ public abstract class ChannelMapper {
   protected Instant resolveLastMessageAt(Channel channel) {
     return messageRepository.findLastMessageAtByChannelId(
             channel.getId())
-        .orElse(Instant.MIN);
+        .orElse(channel.getCreatedAt());
   }
 
   protected List<UserDto> resolveParticipants(Channel channel) {

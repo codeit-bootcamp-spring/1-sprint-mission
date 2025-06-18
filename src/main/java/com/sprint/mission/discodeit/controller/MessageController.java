@@ -57,7 +57,7 @@ public class MessageController {
 
   //특정 채널 메세지 수정
   //@PreAuthorize("hasRole('ADMIN') or #updateMessageDto.userId() == authentication.principal.user.id")
-  @PreAuthorize("hasPermission(#messageId, 'Message', 'WRITE')")
+  @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id")
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(@PathVariable String messageId,
       @Valid @RequestBody UpdateMessageDto updateMessageDto) {
@@ -94,7 +94,7 @@ public class MessageController {
   }
 
   //메세지 삭제
-  @PreAuthorize("hasPermission(#messageId, 'Message', 'DELETE')")
+  @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id or hasRole('ADMIN')")
   @DeleteMapping("/{messageId}")
   public ResponseEntity<String> deleteMessage(@PathVariable String messageId,
       @RequestParam String userId) {

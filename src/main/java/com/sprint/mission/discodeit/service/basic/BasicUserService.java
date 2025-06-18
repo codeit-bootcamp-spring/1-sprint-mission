@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.event.RoleChangedNotificationEvent;
 import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
@@ -23,6 +24,10 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +50,7 @@ public class BasicUserService implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
 
+  @CachePut(value = "users", key = "#result.id")
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   //todo - 고민
@@ -83,6 +89,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @CachePut(value = "users", key = "#result.id")
   @Override
   @Transactional
   public UserDto create(CreateUserDto createUserDto, MultipartFile file)
@@ -116,6 +123,7 @@ public class BasicUserService implements UserService {
     return userRepository.findAll().stream().map(userMapper::toDto).toList();
   }
 
+  @Cacheable(value = "users", key = "#userId")
   @Override
   @Transactional(readOnly = true)
   public UserDto findById(String userId) throws DiscodeitException {
@@ -127,16 +135,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public UserDto findByEmail(String email) throws DiscodeitException {
-    User user = userRepository.findAll().stream().filter(u -> u.getEmail().equals(email))
-        .findFirst().orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
-
-    return userMapper.toDto(user);
-  }
-
-
+  @CachePut(value = "users", key = "#userId")
   @Override
   @Transactional
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto)
@@ -165,14 +164,13 @@ public class BasicUserService implements UserService {
     User savedUser = userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", savedUser.getId());
 
-    log.debug("사용자 상태 객체 연결");
-
     userRepository.save(user);
 
     return userMapper.toDto(savedUser);
   }
 
   // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
+  @CachePut(value = "users", key = "#userId")
   @Override
   @Transactional
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
@@ -212,6 +210,12 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @Caching(evict = {
+      @CacheEvict(value = "users", key = "#userId"),
+      @CacheEvict(value = "userChannels", key = "#userId"),
+      @CacheEvict(value = "userNotifications", key = "#userId"),
+      @CacheEvict(value = "channelParticipants", allEntries = true)
+  })
   @Override
   @Transactional
   public boolean deleteUser(String userId) throws DiscodeitException {
@@ -225,20 +229,8 @@ public class BasicUserService implements UserService {
     return true;
   }
 
-  @Override
-  public UserDto findByUsername(String username) {
-    User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + username));
 
-    return UserDto.builder()
-        .id(user.getId())
-        .username(user.getUsername())
-        .email(user.getEmail())
-        .role(user.getRole())
-        // 필요한 추가 정보
-        .build();
-  }
-
+  @CacheEvict(value = "users", key = "#roleUpdateRequest.userId")
   @Transactional
   @Override
   public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
@@ -259,8 +251,14 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
     log.info("사용자 권한 변경 완료: userId = {}, role = {}", user.getId(), user.getRole());
 
+    log.debug("사용자 권한 변경 후 세션 종료를 위한 이벤트 호출");
     eventPublisher.publishEvent(
-        new UserRoleChangedEvent(user.getUsername(), previousRole, roleUpdateRequest.getNewRole()));
+        new UserRoleChangedEvent(user.getId(), previousRole, roleUpdateRequest.getNewRole()));
+
+    log.debug("사용자 권한 변경 후 알림 발행을 위한 이벤트 호출");
+    eventPublisher.publishEvent(
+        new RoleChangedNotificationEvent(
+            user.getId(), user.getId(), roleUpdateRequest.getNewRole().toString()));
 
     return userMapper.toDto(user);
   }

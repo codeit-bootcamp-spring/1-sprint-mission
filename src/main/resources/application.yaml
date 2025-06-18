@@ -80,14 +80,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers
-  endpoint:
-    health:
-      show-details: ALWAYS
-  info:
-    env:
-      enabled: true
-
+        include: health,info,metrics,prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 info:
   application:

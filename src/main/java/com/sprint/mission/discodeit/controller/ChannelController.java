@@ -28,7 +28,7 @@ public class ChannelController {
 
   //공개 채널 생성
   @PostMapping("/public")
-  @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   public ResponseEntity<ChannelDto> creatPublicChannel(
       @Valid @RequestBody CreatePublicChannelDto createPublicChannelDto) {
     log.info("Public 채널 생성 요청: newName = {}", createPublicChannelDto.name());
@@ -56,6 +56,7 @@ public class ChannelController {
   }
 
   //공개 채널 정보 수정
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> updatePublicChannel(@PathVariable String channelId,
       @Valid @RequestBody UpdateChannelDto updateChannelDto) {
@@ -70,6 +71,7 @@ public class ChannelController {
   }
 
   //채널 삭제
+  @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @DeleteMapping("/{channelId}")
   public ResponseEntity<String> deleteChannel(@PathVariable String channelId) {
     log.info("채널 삭제 요청: channelId = {}", channelId);

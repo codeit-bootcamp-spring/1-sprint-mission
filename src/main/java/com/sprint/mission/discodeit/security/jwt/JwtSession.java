@@ -35,10 +35,10 @@ public class JwtSession {
   @JoinColumn(name = "user_id", nullable = false, updatable = false)
   private User user;  // User 엔티티와 연관관계
 
-  @Column(name = "access_token", nullable = false, unique = true)
+  @Column(name = "access_token", nullable = false, unique = true, length = 1000)
   private String accessToken;
 
-  @Column(name = "refresh_token", nullable = false, unique = true)
+  @Column(name = "refresh_token", nullable = false, unique = true, length = 1000)
   private String refreshToken;
 
   @Column(nullable = false)

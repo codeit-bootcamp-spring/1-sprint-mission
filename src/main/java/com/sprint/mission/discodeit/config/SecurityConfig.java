@@ -4,22 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
-import com.sprint.mission.discodeit.security.CustomPermissionEvaluator;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.JwtAuthFilter;
 
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.jwt.JwtBlacklist;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtTokenProvider;
 
-import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -36,23 +33,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-  @Bean
-  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
-      CustomPermissionEvaluator permissionEvaluator) {
-    DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
-    handler.setPermissionEvaluator(permissionEvaluator);
-    handler.setRoleHierarchy(roleHierarchy());
-    return handler;
-  }
 
   //비밀번호 암호화를 위한 빈
   @Bean
@@ -104,17 +90,6 @@ public class SecurityConfig {
 
 
   @Bean
-  public String debugFilterChain(SecurityFilterChain chain) {
-    log.debug("Debug Filter Chain...");
-    int filterSize = chain.getFilters().size();
-    IntStream.range(0, filterSize)
-        .forEach(idx -> {
-          log.debug("[{}/{}] {}", idx + 1, filterSize, chain.getFilters().get(idx));
-        });
-    return "debugFilterChain";
-  }
-
-  @Bean
   public SecurityFilterChain chain(
       HttpSecurity http,
       JwtTokenProvider jwtTokenProvider,
@@ -129,18 +104,9 @@ public class SecurityConfig {
         // : roleHierarchy 때문!
         .authenticationProvider(daoAuthenticationProvider)
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers(
-                SecurityMatchers.NON_API,
-                SecurityMatchers.GET_CSRF_TOKEN,
-                SecurityMatchers.SIGN_UP,
-                SecurityMatchers.ME
-            ).permitAll()
-            .anyRequest().authenticated()
+            .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
+            .anyRequest().permitAll()
         )
-
-        .httpBasic(AbstractHttpConfigurer::disable) // HTTP Basic 인증 비활성화
-
-        .formLogin(AbstractHttpConfigurer::disable)//디스코드잇은 CSR 방식이기 때문에 formLogin은 사용하지 않는다.
 
         // JwtAuthFilter를 UsernamePasswordAuthenticationFilter 앞에 추가
         // 앞에 추가함을 통해 Spring Security 보다 JWT 검증이 먼저 이루어짐
@@ -152,6 +118,7 @@ public class SecurityConfig {
             logout
                 .logoutRequestMatcher(SecurityMatchers.LOGOUT)
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                .addLogoutHandler(new JwtLogoutHandler(jwtService))
         )
 
         //.addFilter() - Spring Security 필터 체인에 커스텀 필터 추가
@@ -159,7 +126,7 @@ public class SecurityConfig {
         //authenticationManager() - AuthenticationManager 객체 생성/반환
         //http.getSharedObject(AuthenticationConfiguration.class) - Spring이 관리하는 인증 설정 객체 가져오기
 
-        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
+        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             configure ->
                 configure
                     .successHandler(new CustomLoginSuccessHandler(objectMapper, jwtService))
@@ -169,11 +136,7 @@ public class SecurityConfig {
         //DSL 스타일: Spring Security의 fluent API 패턴을 따름
         //유연한 설정: 런타임에 동적으로 필터를 구성할 수 있다.
 
-        .csrf(csrf -> csrf
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-            .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
-        )
+        .csrf(AbstractHttpConfigurer::disable)
 
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

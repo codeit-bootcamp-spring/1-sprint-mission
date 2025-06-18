@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import jakarta.servlet.ServletException;
@@ -24,7 +23,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
       Authentication authentication) throws IOException, ServletException {
     DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
     jwtService.invalidateJwtSession(principal.getUserDto().id());
-    JwtSession jwtSession = jwtService.generateTokens(principal.getUserDto());
+    JwtSession jwtSession = jwtService.generateJwtSession(principal.getUserDto());
 
     Cookie refreshTokenCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
     refreshTokenCookie.setHttpOnly(true); //xss 방지

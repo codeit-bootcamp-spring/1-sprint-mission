@@ -32,11 +32,15 @@ public enum ErrorCode {
   //UserStatus 에러
   USER_STATUS_NOT_FOUND("해당 유저의 UserStatus가 없습니다."),
 
+  //파일 관련 에러
   CONTENT_NOT_FOUND("해당 파일이 없습니다."),
+  FILE_NOT_CREATED("파일 생성 중 오류가 발생했습니다."),
+  FILE_NOT_SAVED("파일 저장 중 오류가 발생했습니다."),
 
-  NOT_DELETED("연관관계 주인이 지워지지 않았습니다."),
+  //알림 에러
+  NOTIFICATION_NOT_FOUND("해당 알림을 찾을 수 없습니다."),
 
-  FILE_NOT_CREATED("파일 생성 중 오류가 발생했습니다.");
+  NOT_DELETED("연관관계 주인이 지워지지 않았습니다.");
 
   private final String message;
 

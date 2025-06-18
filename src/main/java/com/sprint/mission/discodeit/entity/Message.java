@@ -42,14 +42,12 @@ public class Message extends BaseUpdatableEntity {
   //첨부 이미지 목록
   //다대다 -> 다:1 1:다 로 중간 테이블을 놓아서 풀어사용해야한다.
   //일대다 단방향은 사용하지 않는 편이 좋고, 일대다 양방향으로 사용하거나, 다대일 단방향으로 사용하자!!!
-  @JoinTable(
-      name = "message_attachments",
-      joinColumns = @JoinColumn(name = "message_id"),
-      inverseJoinColumns = @JoinColumn(name = "attachment_id")
-  )
-  @BatchSize(size = 100)
-  @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
-  private List<BinaryContent> attachments = new ArrayList<>();
+  @OneToMany(mappedBy = "message", fetch = FetchType.LAZY,
+      orphanRemoval = true, cascade = CascadeType.ALL)
+  private List<MessageAttachments> messageAttachments = new ArrayList<>();
+  //기존에 JPA가 자동으로 중간테이블을 관리하도록 하는 방식은 단순 매핑만 함.
+  // 따라서 id 컬럼이 자동으로 생성되지 않는 문제가 발생.
+  // -> 중간 테이블을 명시적 엔티티로 관리하여, BaseEntity의 @Id가 정상 작동하도록 함
 
   public Message(User author, String content, Channel channel) {
     this.author = author;
@@ -59,8 +57,17 @@ public class Message extends BaseUpdatableEntity {
 
   public void addFile(BinaryContent binaryContent) {
     if (binaryContent != null) {
-      attachments.add(binaryContent);
+      MessageAttachments attachment = new MessageAttachments();
+      attachment.setMessage(this);
+      attachment.setContent(binaryContent);
+      messageAttachments.add(attachment);
     }
+  }
+
+  public List<BinaryContent> getAttachments() {
+    return messageAttachments.stream()
+        .map(MessageAttachments::getContent)
+        .toList();
   }
   //추후에 추가할 것
   //멘션, 답장(reply)
