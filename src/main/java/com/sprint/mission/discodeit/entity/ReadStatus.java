@@ -9,44 +9,46 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Getter
-@Table(name = "read_statuses",
+@Table(
+    name = "read_statuses",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "channel_id"})
-    })
+    }
+)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity {
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "user_id", columnDefinition = "uuid")
   private User user;
-
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "channel_id", nullable = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
   private Channel channel;
-
-  @Column(nullable = false)
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastReadAt;
+  @Column(nullable = false)
+  private boolean notificationEnabled;
 
   public ReadStatus(User user, Channel channel, Instant lastReadAt) {
     this.user = user;
     this.channel = channel;
     this.lastReadAt = lastReadAt;
+    this.notificationEnabled = channel.getType() == ChannelType.PRIVATE;
   }
 
-  public void update(Instant lastReadAt) {
-    if (!lastReadAt.equals(this.lastReadAt)) {
-      this.lastReadAt = lastReadAt;
+  public void update(Instant newLastReadAt, boolean newNotificationEnabled) {
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
     }
-  }
 
-  public boolean isSameChannelById(UUID channelId) {
-    return this.channel.getId().equals(channelId);
+    if (newNotificationEnabled != notificationEnabled) {
+      this.notificationEnabled = newNotificationEnabled;
+    }
   }
 }
