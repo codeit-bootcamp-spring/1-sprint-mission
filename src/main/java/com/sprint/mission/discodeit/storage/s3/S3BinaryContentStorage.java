@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import com.sprint.mission.discodeit.ASync.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.ByteArrayInputStream;
@@ -7,7 +8,14 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.slf4j.MDC;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
@@ -51,8 +59,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     this.bucket = bucket;
   }
 
-  @Override
-  public UUID put(UUID binaryContentId, byte[] bytes) {
+  public UUID putting(UUID binaryContentId, byte[] bytes) {
     String key = binaryContentId.toString();
     try {
       S3Client s3Client = getS3Client();
@@ -148,4 +155,28 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         )
         .build();
   }
-} 
+
+  @Async("asyncExecutor")
+  @Retryable(
+      value = { S3Exception.class, RuntimeException.class },
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 2000)
+  )
+  @Override
+  public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
+     return CompletableFuture.completedFuture(putting(binaryContentId, bytes));
+  }
+
+  @Recover
+  @Override
+  public void recoverPut(RuntimeException e, UUID binaryContentId, byte[] bytes) {
+    String requestId = MDC.get("requestId");
+    AsyncTaskFailure failure = new AsyncTaskFailure(
+        "putAsync",
+        requestId,
+        e.getMessage()
+    );
+    log.error("Put failed after retries: {}", failure);
+  }
+
+}

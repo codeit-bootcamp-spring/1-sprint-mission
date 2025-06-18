@@ -1,4 +1,21 @@
 spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        acks: all
+
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    listener:
+      ack-mode: batch
   application:
     name: discodeit
   servlet:
@@ -16,7 +33,6 @@ spring:
       - dev
   config:
     import: optional:file:.env[.properties]
-
 
 management:
   endpoints:
@@ -58,10 +74,20 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+  admin:
+    username: asdasd
+    email: tmdcks1234@naver.com
+    password: tmdcks1234
 
 logging:
   level:
-    org.springframework.security: TRACE
-jwt:
-  secret: tmdcks1234sdssd.skksldka[pdlaljlkajl;fdka;lkfpo;qlf;lk[apkaskd;alkfa;
+    root: info
 
+security:
+  remember-me:
+    key: tmdcks1234akdskjglfkadj;fk;kd;w;lkaf[skflgka;sgk;akd;lka;glkw[go[fboa[pgro[fksfljsfa[gaf[pol
+    token-validity-seconds: 1209600
+  jwt:
+    secret: tmdcks1234akdskjglfkadj;fk;kd;w;lkaf[skflgka;sgk;akd;lka;glkw[go[fboa[pgro[fksfljsfa[gaf[pol
+    access-token-validity-seconds: 1209600
+    refresh-token-validity-seconds: 1209600
