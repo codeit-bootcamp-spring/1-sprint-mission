@@ -21,6 +21,8 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 //
 import java.util.*;
@@ -42,6 +44,7 @@ public class BasicChannelService implements ChannelService {
   private final InputHandler inputHandler;
 
 
+  @CacheEvict(value = "userChannel", allEntries = true)
   @Override
   public ChannelDto createPublicChannel(ChannelPublicRequest request) {
     log.info("공개 채널 생성 시도: channelName={}, channelDescription={} ",
@@ -92,6 +95,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(savedChannel);
   }
 
+  @Cacheable(value = "userChannel", key = "#userId")
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     userRepository.findById(userId).orElseThrow(() -> {

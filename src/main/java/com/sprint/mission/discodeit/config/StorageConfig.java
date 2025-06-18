@@ -25,9 +25,9 @@ public class StorageConfig {
     );
   }
 
-  @Bean
-  @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
-  public BinaryContentStorage localBinaryContentStorage() {
-    return new LocalBinaryContentStorage();
-  }
+//  @Bean
+//  @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
+//  public BinaryContentStorage localBinaryContentStorage() {
+//    return new LocalBinaryContentStorage();
+//  }
 }

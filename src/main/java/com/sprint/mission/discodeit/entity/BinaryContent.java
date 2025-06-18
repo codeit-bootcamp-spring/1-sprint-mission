@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +26,10 @@ public class BinaryContent extends BaseEntity {
 
   @Column(nullable = false, length = 100)
   private String contentType;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private BinaryContentUploadStatus uploadStatus;
 
   // JPA용 기본 생성자, JPA만 접근할 수 있도록 protected 접근자 설정
   protected BinaryContent() {

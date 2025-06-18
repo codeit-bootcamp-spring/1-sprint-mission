@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.readStatus.ReadStatusAlreadyExistsException;
@@ -15,11 +16,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
@@ -32,6 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusMapper readStatusMapper;
 
 
+  @CacheEvict(value = "userChannel", key = "#request.user().id")
   @PreAuthorize("#request.user.id == authentication.principal.id")
   @Transactional
   @Override
@@ -51,10 +56,16 @@ public class BasicReadStatusService implements ReadStatusService {
           "channelId", request.channel().getId()));
     }
 
+    boolean enabled = false;
+    if (request.channel().getType() == ChannelType.PUBLIC) {
+      enabled = true;
+    }
+
     ReadStatus readStatus = ReadStatus.builder()
         .lastReadAt(request.lastReadAt())
         .user(request.user())
         .channel(request.channel())
+        .notificationEnabled(enabled)
         .build();
 
     readStatusRepository.save(readStatus);
@@ -101,6 +112,12 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus readStatus = readStatusRepository.findById(id)
         .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("readStatusId", id)));
 
+    if (readStatusUpdateRequest.newNotificationEnabled()) { // 우선은 항상 t/f 값이 들어온다고 상정
+      readStatus.updateNotificationEnabled(true);
+    } else {
+      readStatus.updateNotificationEnabled(false);
+    }
+
     readStatus.updateLastMessageReadAt(readStatusUpdateRequest.lastReadAt());
     readStatus.refreshUpdateAt();
 
@@ -113,5 +130,15 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   public void deleteReadStatusById(UUID id) {
     readStatusRepository.deleteById(id);
+
+    ReadStatus readStatus = readStatusRepository.findById(id)
+        .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("id", id)));
+
+    evictUserChannelCache(readStatus.getUser().getId());
+  }
+
+  @CacheEvict(value = "userChannel", key = "#userId")
+  public void evictUserChannelCache(UUID userId) {
+    log.info("readStatus 삭제로 인한 userChannel Cache 삭제 전파 : userId={}", userId);
   }
 }

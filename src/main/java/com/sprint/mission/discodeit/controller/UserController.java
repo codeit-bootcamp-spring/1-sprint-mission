@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.service.UserService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -27,6 +28,10 @@ public class UserController implements UserApi {
 
   private final UserService userService;
 
+  @Timed(
+      value = "api.user.signup",
+      description = "사용자 회원가입 API 응답 시간 -> 프로필 이미지 업로드 시간 체킹"
+  )
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> createUser(
       @Valid @RequestPart(value = "userCreateRequest") UserCreateRequest userCreateRequest,

@@ -41,11 +41,18 @@ public class ReadStatus extends BaseUpdatableEntity {
   @JoinColumn(name = "channel_id")
   private Channel channel;
 
+  @Column(nullable = false)
+  private boolean notificationEnabled;
+
   // JPA용 기본 생성자, JPA만 접근할 수 있도록 protected 접근자 설정
   protected ReadStatus() {
   }
 
   public void updateLastMessageReadAt(Instant lastReadAt) {
     this.lastReadAt = lastReadAt;
+  }
+
+  public void updateNotificationEnabled(boolean notificationEnabled) {
+    this.notificationEnabled = notificationEnabled;
   }
 }

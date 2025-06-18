@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
@@ -13,7 +14,6 @@ import com.sprint.mission.discodeit.exception.user.UsernameAlreadyExistsExceptio
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.RoleRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -23,14 +23,20 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 //
 import java.util.UUID;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
 @Service
@@ -48,9 +54,10 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   //
-  private final BCryptPasswordEncoder passwordEncoder;
-  private final RoleRepository roleRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final TransactionTemplate transactionTemplate;
 
+  @CacheEvict(value = "users", allEntries = true)
   @Transactional
   @Override
   public UserDto createUser(UserCreateRequest userCreateRequest,
@@ -60,7 +67,6 @@ public class BasicUserService implements UserService {
     log.debug("사용자 생성 시도: userCreateRequest={}, optionalProfileCreateRequest={}", userCreateRequest,
         optionalProfileCreateRequest);
 
-    // username과 email이 다른 유저와 같이 겹치는지 검증
     if (userRepository.existsByUsername(userCreateRequest.username())) {
       log.warn("이미 존재하는 유저 이름: username={}", userCreateRequest.username());
       throw new UsernameAlreadyExistsException(Map.of("username", userCreateRequest.username()));
@@ -71,9 +77,6 @@ public class BasicUserService implements UserService {
           Map.of("email", userCreateRequest.email()));
     }
 
-    // 프로필 이미지 생성 : BinaryContent 도메인 객체 생성
-    // binaryContentService.createBinaryContent() 를 호출하는 대신
-    // 로직을 참고해 작성
     BinaryContent nullableProfile =
         optionalProfileCreateRequest.map(
                 profileRequest -> {
@@ -84,32 +87,88 @@ public class BasicUserService implements UserService {
                       .fileName(profileRequest.fileName())
                       .size(profileRequest.size())
                       .contentType(profileRequest.contentType())
+                      .uploadStatus(BinaryContentUploadStatus.WAITING)
                       .build();
                   BinaryContent content = binaryContentRepository.save(binaryContent);
-                  binaryContentStorage.put(content.getId(), profileRequest.bytes());
+
+                  MDC.put("traceId", String.valueOf(UUID.randomUUID()));
+
+                  log.info("프로필 이미지 저장소에 업로드 시도 : fileName={}, Id={}", content.getFileName(),
+                      content.getId());
+                  TransactionSynchronizationManager.registerSynchronization(
+                      new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+
+                          CompletableFuture<UUID> future = binaryContentStorage.put(content.getId(),
+                              profileRequest.bytes());
+
+//                          UUID id = binaryContentStorage.put(content.getId(), profileRequest.bytes());
+
+//                          if (id == null) {
+//                            transactionTemplate.execute(status -> {
+//                              log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}",
+//                                  content.getId());
+//                              binaryContentRepository.updateStatusById(content.getId(),
+//                                  BinaryContentUploadStatus.FAILED);
+//                              return null;
+//                            });
+//                          } else {
+//                            transactionTemplate.execute(status -> {
+//                              log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
+//                              binaryContentRepository.updateStatusById(content.getId(),
+//                                  BinaryContentUploadStatus.SUCCESS);
+//                              return null; // execute 메서드 반환값
+//                            });
+//                          }
+
+                          future.thenAccept(
+                                  fileId -> {
+
+                                    transactionTemplate.execute(status -> {
+                                      log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
+                                      binaryContentRepository.updateStatusById(content.getId(),
+                                          BinaryContentUploadStatus.SUCCESS);
+                                      return null; // execute 메서드 반환값
+                                    });
+                                  })
+                              .exceptionally(ex -> {
+                                transactionTemplate.execute(status -> {
+                                  log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}, message={}",
+                                      content.getId(), ex.getMessage(), ex);
+                                  binaryContentRepository.updateStatusById(content.getId(),
+                                      BinaryContentUploadStatus.FAILED);
+                                  return null;
+                                });
+                                return null;
+                              });
+                        }
+                      }
+                  );
                   return content;
                 })
             .orElse(null);
 
-    // 권한 생성
-    Role role = roleRepository.findByName("ROLE_USER")
-        .orElseThrow(() -> new RuntimeException("ROLE_USER 가 존재하지 않습니다."));
+//    log.info("프로필 이미지 여부 : {}", nullableProfile.getId());
+
     // 유저 생성 : User 도메인 객체 생성
     User user = User.builder()
         .username(userCreateRequest.username())
         .email(userCreateRequest.email())
         .password(passwordEncoder.encode(userCreateRequest.password()))
         .profile(nullableProfile)
-        .roles(Set.of(role))
+        .role(Role.USER)
         .build();
 
     user = userRepository.save(user);
 
     /* 중복이 없는 유저 이름과 만들어진 시각을 log.info에 담는다.*/
-    log.info("사용자 생성 시도 성공: username={}, createdAt={}", user.getUsername(), user.getCreatedAt());
+    log.info("사용자 생성 시도 성공: username={}, createdAt={}", user.getUsername(),
+        user.getCreatedAt());
     return userMapper.toDto(user);
   }
 
+  @Cacheable("users")
   @Override
   public List<UserDto> showAllUsers() {
     // TODO : 예외 처리
@@ -124,7 +183,6 @@ public class BasicUserService implements UserService {
         .orElseThrow(() -> new UserNotFoundException(Map.of("UserId", id)));
     return userMapper.toDto(user);
   }
-
 
   @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
   @Transactional

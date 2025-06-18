@@ -17,6 +17,14 @@ public enum ErrorCode {
   // 유저 인증, 인가
   USER_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증되지 않은 유저입니다."), // 401
 
+  // JWT
+  MISSING_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "리프레시 토큰이 필요합니다."),
+  INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다."),
+  JWT_SESSION_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT 세션을 찾을 수 없습니다."),
+  INVALID_TOKEN_SECRET(HttpStatus.UNAUTHORIZED, "유효하지 않은 시크릿입니다."),
+  TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다."),
+
+
   // 채널
   CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾을 수 없습니다."), // 404
   CHANNEL_MODIFICATION_NOT_ALLOWED(HttpStatus.FORBIDDEN, "채널의 수정을 허용하지 않습니다."), // 403
@@ -32,7 +40,10 @@ public enum ErrorCode {
   USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "유저 상태를 찾을 수 없습니다."),
 
   // 파일
-  FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다.");
+  FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다."),
+
+  // 알림
+  NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다.");
 
   private final HttpStatus status;
   private final String message;

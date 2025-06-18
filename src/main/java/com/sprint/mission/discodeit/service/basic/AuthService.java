@@ -1,29 +1,33 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.NotificationDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelPublicRequest;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
-import com.sprint.mission.discodeit.dto.user.UserLoginRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.security.UserUnauthorizedException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.RoleRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.transaction.Transactional;
-import java.util.List;
+import java.time.Instant;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,80 +38,87 @@ public class AuthService {
 
   private final UserRepository userRepository;
   //
-  private final UserDetailsService userDetailsService;
+  private final JwtService jwtService;
+  private final PasswordEncoder passwordEncoder;
   //
   private final UserMapper userMapper;
-  private final BCryptPasswordEncoder passwordEncoder;
-  private final RoleRepository roleRepository;
-  private final SessionRegistry sessionRegistry;
+  //
+  private final ApplicationEventPublisher eventPublisher;
+  //
+  private final ChannelService channelService;
+  private final ReadStatusService readStatusService;
+  private final ChannelMapper channelMapper;
+  private final ChannelRepository channelRepository;
 
-  public UserDto getUserBySession() {
-    log.info("세션 활용 사용자 정보 조회 시작");
 
-    // SecurityContextHolder 로 Authentication 객체 들고오기
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    // authentication 유효성 검증
-    if (authentication == null || !authentication.isAuthenticated()
-        || !(authentication.getPrincipal() instanceof UserDetails)) {
-      throw new UserUnauthorizedException(Map.of(
-          "isNull", authentication == null,
-          "isAuthenticated", authentication != null && authentication.isAuthenticated(),
-          "principal", authentication != null ? authentication.getPrincipal().toString() : "null"
-      ));
-    }
-
-    Object principal = authentication.getPrincipal();
-    String username = ((UserDetails) principal).getUsername();
-    User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new UserNotFoundException(Map.of("username", username)));
-
-    log.info("세션 활용 사용자 정보 조회 성공");
-    return userMapper.toDto(user);
-  }
+  @Value("${discodeit.admin.username}")
+  private String username;
+  @Value("${discodeit.admin.password}")
+  private String password;
+  @Value("${discodeit.admin.email}")
+  private String email;
 
   @Transactional
-  public UserDto changeRole(RoleUpdateRequest request) {
-    log.info("사용자 권한 변경");
-    log.debug("사용자 ID {}의 권한 {}로 변경합니다.", request.userId(), request.newRole());
-
-    User user = userRepository.findById(request.userId())
-        .orElseThrow(() -> new UserNotFoundException(Map.of("userId", request.userId())));
-
-    Role role = roleRepository.findByName(request.newRole().getName())
-        .orElseThrow(() ->
-            new NoSuchElementException("Role이 존재하지 않습니다 : " + request.newRole().getName())
-        );
-    Set<Role> newRoles = Set.of(role);
-
-    user.updateRole(newRoles);
-    User updatedUser = userRepository.saveAndFlush(user);
-
-    // 세션 무효화 (로그아웃)
-    String userName = updatedUser.getUsername();
-    if (userName != null && !userName.isEmpty()) {
-      // 만료된 세션 제외
-      UserDetails userDetailsPrincipal =
-          userDetailsService.loadUserByUsername(userName);
-
-      List<SessionInformation> sessions = sessionRegistry.getAllSessions(
-          userDetailsPrincipal,
-          false);
-
-      if (sessions != null && !sessions.isEmpty()) {
-        log.debug("사용자 {} 활성 세션 {} 개 무효화", userName, sessions.size());
-        for (SessionInformation sessionInformation : sessions) {
-          sessionInformation.expireNow();
-          log.debug("세션 ID {} 만료", sessionInformation.getSessionId());
-        }
-      } else {
-        log.info("사용자 {} 의 활성 세션이 없습니다.", userName);
-      }
-    } else {
-      log.warn("사용자 ID {}의 principal 정보가 없어 세션을 무효화시킬 수 없습니다.", userName);
+  public UserDto initAdmin() {
+    if (userRepository.existsByEmail(email) || userRepository.existsByUsername(username)) {
+      log.warn("이미 어드민이 존재합니다.");
+      return null;
     }
 
-    log.info("사용자 권한 변경 완료");
-    return userMapper.toDto(updatedUser);
+    String encodedPassword = passwordEncoder.encode(password);
+    User admin = new User(username, email, encodedPassword, null);
+    admin.updateRole(Role.ADMIN);
+    userRepository.save(admin);
+
+    String encodedPassword1 = passwordEncoder.encode("user123123");
+    User user1 = new User("user1", "user1@example.com", encodedPassword1, null);
+    user1.updateRole(Role.USER);
+    user1 = userRepository.save(user1);
+
+    log.info("user1Id={}", user1.getId());
+
+    String encodedPassword2 = passwordEncoder.encode("user234234");
+    User user2 = new User("user2", "user2@example.com", encodedPassword2, null);
+    user2.updateRole(Role.USER);
+    userRepository.save(user2);
+
+    ChannelDto channelDto1 = channelService.createPublicChannel(
+        new ChannelPublicRequest("cacheTest1", "@CacheableTest"));
+    Channel channel1 = channelRepository.findById(channelDto1.id()).get();
+    ChannelDto channelDto2 = channelService.createPublicChannel(
+        new ChannelPublicRequest("cacheTest2", "@CacheableTest"));
+    Channel channel2 = channelRepository.findById(channelDto2.id()).get();
+
+    readStatusService.createReadStatus(new ReadStatusCreateRequest(user1, channel2, Instant.now()));
+    readStatusService.createReadStatus(new ReadStatusCreateRequest(user1, channel1, Instant.now()));
+
+    UserDto adminDto = userMapper.toDto(admin);
+    log.info("어드민이 초기화되었습니다. {}", adminDto);
+    return adminDto;
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @Transactional
+  public UserDto changeRole(RoleUpdateRequest request) {
+    UUID userId = request.userId();
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
+    user.updateRole(request.newRole());
+
+    // 알림 생성
+    log.info("알림을 생성합니다. role={}, userId={}", request.newRole(), userId);
+
+    eventPublisher.publishEvent(
+        NotificationDto.builder()
+            .title("권한 변경")
+            .content(request.newRole().toString())
+            .type(NotificationType.ROLE_CHANGED)
+            .receiverId(userId)
+            .targetId(userId)
+            .build()
+    );
+
+    jwtService.invalidateJwtSession(user.getId());
+    return userMapper.toDto(user);
   }
 }
