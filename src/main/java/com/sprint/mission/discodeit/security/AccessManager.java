@@ -76,4 +76,9 @@ public class AccessManager {
         }
         return null;
     }
+
+ /*   public boolean isAuthenticated(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        return principal instanceof UserDto;
+    }*/
 }

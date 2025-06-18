@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +29,14 @@ public class BinaryContent extends BaseEntity {
 
   @Column(name = "file_name", nullable = false)
   private String fileName;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private BinaryContentUploadStatus uploadStatus = BinaryContentUploadStatus.WAITING;
+
+  public void updateUploadStatus(BinaryContentUploadStatus uploadStatus) {
+    this.uploadStatus = uploadStatus;
+  }
 
 
   public BinaryContent(String fileName, String contentType, Long size) {

@@ -1,16 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.async.BinaryContentUploadExecutor;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 
 import com.sprint.mission.discodeit.exception.user.UserDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.notification.NotificationEvent;
+import com.sprint.mission.discodeit.notification.NotificationEventPublisher;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.jpa.UserRepository;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
@@ -22,6 +23,9 @@ import java.time.Instant;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +33,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -43,7 +49,12 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtSessionRepository jwtSessionRepository;
+  private final BinaryContentUploadExecutor uploadExecutor;
 
+  private final NotificationEventPublisher notificationEventPublisher;
+
+
+  @CacheEvict(cacheNames = "allUsers", allEntries = true)
   @Override
   @Transactional
   public UserDto create(UserCreateDTO dto,
@@ -78,6 +89,8 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(findUser, isUserOnline(findUser));
   }
 
+
+  @Cacheable(cacheNames = "allUsers")
   @Override
   @Transactional(readOnly = true)
   public List<UserDto> findAll() {
@@ -86,6 +99,7 @@ public class BasicUserService implements UserService {
         .toList();
   }
 
+  @CacheEvict(cacheNames = "allUsers", allEntries = true)
   @Override
   @Transactional
   public UserDto update(UUID id, UserUpdateDTO dto,
@@ -110,6 +124,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(findUser, isUserOnline(findUser));
   }
 
+  @CacheEvict(cacheNames = "allUsers", allEntries = true)
   @Override
   @Transactional
   public void delete(UUID id) {
@@ -120,7 +135,7 @@ public class BasicUserService implements UserService {
     log.info("사용자 삭제 완료 id: {}", id);
   }
 
-  @Transactional
+/*  @Transactional
   public BinaryContent saveBinaryFile(
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     return optionalProfileCreateRequest
@@ -136,13 +151,55 @@ public class BasicUserService implements UserService {
           return binaryContent;
         })
         .orElse(null);
+  }*/
+
+  @Transactional
+  public BinaryContent saveBinaryFile(
+          Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+
+    return optionalProfileCreateRequest
+            .map(profileRequest -> {
+              String fileName = profileRequest.getFileName();
+              String contentType = profileRequest.getContentType();
+              byte[] bytes = profileRequest.getBytes();
+
+              BinaryContent binaryContent = new BinaryContent(fileName, contentType, (long) bytes.length);
+              binaryContent.updateUploadStatus(BinaryContentUploadStatus.WAITING);
+              BinaryContent saved = binaryContentRepository.save(binaryContent);
+
+              //비동기 업로드 등록 -> 트랜잭션 커밋 이후 실행
+              TransactionSynchronizationManager.registerSynchronization(
+                      new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                          String requestId = MDC.get("requestId"); //null 방지 필요 시 대체 처리
+                          uploadExecutor.uploadAsync(saved.getId(), bytes, requestId);
+                        }
+                      }
+              );
+
+              return saved;
+            })
+            .orElse(null);
   }
+
+
 
   @Transactional
   public UserDto updateRole(UUID userId, Role newRole) {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
     user.updateRole(newRole);
+
+    //알림 이벤트 발행 (트랜잭션 안에서 호출 → AFTER_COMMIT 리스너에서 처리됨)
+    notificationEventPublisher.publish(new NotificationEvent(
+            userId,
+            "권한이 변경되었어요",
+            "새로운 권한: " + newRole.name(),
+            NotificationType.ROLE_CHANGED,
+            userId
+    ));
+
 
     // Jwt 기반 강제 로그아웃 처리
     jwtSessionRepository.findAllByUserId(userId).forEach(JwtSession::revoke);

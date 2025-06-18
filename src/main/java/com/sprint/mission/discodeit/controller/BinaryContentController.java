@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,11 +41,24 @@ public class BinaryContentController implements BinaryContentApi {
         .body(binaryContentService.findAllByIdIn(binaryContentIds));
   }
 
+  //@PreAuthorize("@accessManager.isAuthenticated(authentication)")
   @GetMapping("{binaryContentId}/download")
   public ResponseEntity<?> fileDownload(
       @PathVariable("binaryContentId") UUID binaryContentId) {
-    log.info("⬇파일 다운로드 요청 - id: {}", binaryContentId);
+    log.info("파일 다운로드 요청 - id: {}", binaryContentId);
     return binaryContentStorage.download(binaryContentService.find(binaryContentId));
   }
 
+
+  // BinaryContentController.java
+/*  @GetMapping("{binaryContentId}/download")
+  public ResponseEntity<?> fileDownload(
+          @PathVariable("binaryContentId") UUID binaryContentId) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    log.info("SecurityContext 인증: {}", auth);
+    log.info("권한 목록: {}", auth.getAuthorities());
+
+    log.info("파일 다운로드 요청 - id: {}", binaryContentId);
+    return binaryContentStorage.download(binaryContentService.find(binaryContentId));
+  }*/
 }

@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "read_statuses",
     uniqueConstraints = {
@@ -39,10 +38,29 @@ public class ReadStatus extends BaseUpdatableEntity {
   @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
 
+  @Column(name = "notification_enabled", nullable = false)
+  private boolean notificationEnabled;
 
   //lastReadAt 시간 수정.
   public void updateLastReadAt(Instant time) {
     lastReadAt = time;
   }
 
+  public void updateNotificationEnabled(boolean newValue) {
+    this.notificationEnabled = newValue;
+  }
+
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
+    this.lastReadAt = lastReadAt;
+    this.notificationEnabled = (channel.getChannelType() == ChannelType.PRIVATE); // 기본값 설정
+  }
+
+  public ReadStatus(User user, Channel channel, Instant lastReadAt, boolean notificationEnabled) {
+    this.user = user;
+    this.channel = channel;
+    this.lastReadAt = lastReadAt;
+    this.notificationEnabled = notificationEnabled;
+  }
 }

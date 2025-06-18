@@ -1,28 +1,26 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.async.BinaryContentUploadExecutor;
 import com.sprint.mission.discodeit.dto.PageResponse;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.jpa.ChannelRepository;
-import com.sprint.mission.discodeit.repository.jpa.MessageRepository;
-import com.sprint.mission.discodeit.repository.jpa.UserRepository;
+import com.sprint.mission.discodeit.notification.NotificationEvent;
+import com.sprint.mission.discodeit.notification.NotificationEventPublisher;
+import com.sprint.mission.discodeit.repository.jpa.*;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +28,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -38,12 +38,15 @@ public class BasicMessageService implements MessageService {
 
 
   private final MessageRepository messageRepository;
-
+  private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final MessageMapper messageMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentUploadExecutor uploadExecutor;
+  private final NotificationEventPublisher notificationEventPublisher;
+
 
   @Override
   @Transactional
@@ -65,17 +68,55 @@ public class BasicMessageService implements MessageService {
               (long) attachmentRequest.getBytes().length
           );
 
+//          BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+//          binaryContentStorage.put(savedBinaryContent.getId(), attachmentRequest.getBytes());
+//          return savedBinaryContent;
+
+          binaryContent.updateUploadStatus(BinaryContentUploadStatus.WAITING);
           BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(savedBinaryContent.getId(), attachmentRequest.getBytes());
+
+          // 트랜잭션 커밋 이후 비동기 업로드 실행
+          TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                      String requestId = MDC.get("requestId");
+                      uploadExecutor.uploadAsync(savedBinaryContent.getId(), attachmentRequest.getBytes(), requestId);
+                    }
+                  }
+          );
           return savedBinaryContent;
+
+
         })
         .forEach(message::addAttachments);
 
     messageRepository.save(message);
 
+    //여기서 커밋 이후 알림 발행 등록
+    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+      @Override
+      public void afterCommit() {
+        List<UUID> receivers = readStatusRepository
+                .findUserIdsByChannelIdAndNotificationEnabledTrue(dto.getChannelId());
+
+        for (UUID receiverId : receivers) {
+          notificationEventPublisher.publish(new NotificationEvent(
+                  receiverId,
+                  "새 메시지가 도착했어요!",
+                  message.getContent(),
+                  NotificationType.NEW_MESSAGE,
+                  dto.getChannelId()
+          ));
+        }
+      }
+    });
+
+
     log.info("메시지 생성 완료 id: {}", message.getId());
     return messageMapper.toDto(message);
   }
+
+
 
 
   //no use

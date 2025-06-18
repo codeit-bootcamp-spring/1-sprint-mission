@@ -17,6 +17,8 @@ import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,7 @@ public class BasicChannelService implements ChannelService {
   private final JwtSessionRepository jwtSessionRepository;
 
 
+  @CacheEvict(cacheNames = "channelsByUser", allEntries = true)
   @Override
   public ChannelDto create(ChannelCreatePublicDTO dto) {
     Channel channel = new Channel(dto.getName(), dto.getDescription(), ChannelType.PUBLIC);
@@ -48,17 +51,20 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel, List.of(), Instant.MIN);
   }
 
+  @CacheEvict(cacheNames = "channelsByUser", allEntries = true)
   @Override
   @Transactional
   public ChannelDto create(ChannelCreatePrivateDTO dto) {
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
 
+    boolean notificationEnabled = channel.getChannelType().equals(ChannelType.PRIVATE);
+
     List<UserDto> participants = dto.getParticipantIds().stream()
             .map(userId -> {
               User user = userRepository.findById(userId)
                       .orElseThrow(() -> new UserNotFoundException(userId));
-              readStatusRepository.save(new ReadStatus(user, channel, Instant.EPOCH));
+              readStatusRepository.save(new ReadStatus(user, channel, Instant.EPOCH, notificationEnabled));
               return userMapper.toDto(user, isUserOnline(user));
             })
             .toList();
@@ -87,6 +93,8 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(findChannel, participants, lastMessageAt);
   }
 
+
+  @Cacheable(cacheNames = "channelsByUser", key = "#userId")
   @Override
   @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(UUID userId) {
@@ -109,6 +117,7 @@ public class BasicChannelService implements ChannelService {
             .toList();
   }
 
+  @CacheEvict(cacheNames = "channelsByUser", allEntries = true)
   @Override
   @Transactional
   public ChannelDto update(UUID id, ChannelUpdateDTO dto) {
@@ -125,6 +134,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(findChannel, List.of(), lastMessageAt);
   }
 
+  @CacheEvict(cacheNames = "channelsByUser", allEntries = true)
   @Override
   public void delete(UUID id) {
     if (!channelRepository.existsById(id)) {
