@@ -8,6 +8,4 @@ public interface AuthService {
   UserDto initAdmin();
 
   UserDto updateRole(RoleUpdateRequest request);
-
-  UserDto authenticate(String username, String password);
 }
