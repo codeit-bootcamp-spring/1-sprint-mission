@@ -9,10 +9,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Auth", description = "인증 API")
 public interface AuthApi {
@@ -26,26 +25,39 @@ public interface AuthApi {
   })
   ResponseEntity<CsrfToken> getCsrfToken(@Parameter(hidden = true) CsrfToken csrfToken);
 
-
-  @Operation(summary = "Refresh Token 기반 Access Token 조회")
+  @Operation(summary = "리프레시 토큰을 활용한 엑세스 토큰 조회")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "조회 성공",
-          content = @Content(schema = @Schema(type = "string", format = "JWT"))
+          content = @Content(schema = @Schema(implementation = String.class))
       ),
       @ApiResponse(
-          responseCode = "401", description = "리프레시 토큰이 유효하지 않음"
+          responseCode = "401", description = "유효하지 않은 리프레시 토큰"
       )
   })
-  ResponseEntity<String> me(@CookieValue("refreshToken") String refreshToken);
+  ResponseEntity<String> me(@Parameter(hidden = true) String refreshToken);
 
-
-  @Operation(summary = "사용자 권한 수정 및 세션 강제 로그아웃")
+  @Operation(summary = "사용자 권한 수정")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "권한 변경 성공",
           content = @Content(schema = @Schema(implementation = UserDto.class))
       )
   })
-  ResponseEntity<UserDto> role(@RequestBody RoleUpdateRequest request);
-}
+  ResponseEntity<UserDto> role(@Parameter(description = "권한 수정 요청 정보") RoleUpdateRequest request);
+
+  @Operation(summary = "리프레시 토큰을 활용한 엑세스 토큰 재발급")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200", description = "재발급 성공",
+          content = @Content(schema = @Schema(implementation = String.class))
+      ),
+      @ApiResponse(
+          responseCode = "401", description = "유효하지 않은 리프레시 토큰"
+      )
+  })
+  ResponseEntity<String> refresh(
+      @Parameter(hidden = true) String refreshToken,
+      @Parameter(hidden = true) HttpServletResponse response
+  );
+} 

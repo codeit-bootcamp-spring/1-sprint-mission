@@ -8,5 +8,4 @@ public interface AuthService {
   UserDto initAdmin();
 
   UserDto updateRole(RoleUpdateRequest request);
-
 }

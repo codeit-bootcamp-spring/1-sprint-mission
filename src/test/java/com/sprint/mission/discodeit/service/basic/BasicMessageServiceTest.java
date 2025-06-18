@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -109,7 +110,7 @@ class BasicMessageServiceTest {
         Instant.now(),
         content,
         channelId,
-        new UserDto(authorId, "testUser", "test@example.com", null, true),
+        new UserDto(authorId, "testUser", "test@example.com", null, true, Role.USER),
         List.of(attachmentDto)
     );
   }
@@ -119,16 +120,17 @@ class BasicMessageServiceTest {
   void createMessage_Success() {
     // given
     MessageCreateRequest request = new MessageCreateRequest(content, channelId, authorId);
-    BinaryContentCreateRequest attachmentRequest = new BinaryContentCreateRequest("test.txt", "text/plain", new byte[100]);
+    BinaryContentCreateRequest attachmentRequest = new BinaryContentCreateRequest("test.txt",
+        "text/plain", new byte[100]);
     List<BinaryContentCreateRequest> attachmentRequests = List.of(attachmentRequest);
 
     given(channelRepository.findById(eq(channelId))).willReturn(Optional.of(channel));
     given(userRepository.findById(eq(authorId))).willReturn(Optional.of(author));
     given(binaryContentRepository.save(any(BinaryContent.class))).will(invocation -> {
-        BinaryContent binaryContent = invocation.getArgument(0);
-        ReflectionTestUtils.setField(binaryContent, "id", attachment.getId());
-        return attachment;
-      });
+      BinaryContent binaryContent = invocation.getArgument(0);
+      ReflectionTestUtils.setField(binaryContent, "id", attachment.getId());
+      return attachment;
+    });
     given(messageRepository.save(any(Message.class))).willReturn(message);
     given(messageMapper.toDto(any(Message.class))).willReturn(messageDto);
 
@@ -203,44 +205,44 @@ class BasicMessageServiceTest {
     Message message1 = new Message(content + "1", channel, author, List.of(attachment));
     Message message2 = new Message(content + "2", channel, author, List.of(attachment));
     Message message3 = new Message(content + "3", channel, author, List.of(attachment));
-    
+
     ReflectionTestUtils.setField(message1, "id", UUID.randomUUID());
     ReflectionTestUtils.setField(message2, "id", UUID.randomUUID());
     ReflectionTestUtils.setField(message3, "id", UUID.randomUUID());
-    
+
     // 각 메시지에 해당하는 DTO 생성
     Instant message1CreatedAt = Instant.now().minusSeconds(30);
     Instant message2CreatedAt = Instant.now().minusSeconds(20);
     Instant message3CreatedAt = Instant.now().minusSeconds(10);
-    
+
     ReflectionTestUtils.setField(message1, "createdAt", message1CreatedAt);
     ReflectionTestUtils.setField(message2, "createdAt", message2CreatedAt);
     ReflectionTestUtils.setField(message3, "createdAt", message3CreatedAt);
-    
+
     MessageDto messageDto1 = new MessageDto(
         message1.getId(),
         message1CreatedAt,
         message1CreatedAt,
         content + "1",
         channelId,
-        new UserDto(authorId, "testUser", "test@example.com", null, true),
+        new UserDto(authorId, "testUser", "test@example.com", null, true, Role.USER),
         List.of(attachmentDto)
     );
-    
+
     MessageDto messageDto2 = new MessageDto(
         message2.getId(),
         message2CreatedAt,
         message2CreatedAt,
         content + "2",
         channelId,
-        new UserDto(authorId, "testUser", "test@example.com", null, true),
+        new UserDto(authorId, "testUser", "test@example.com", null, true, Role.USER),
         List.of(attachmentDto)
     );
-    
+
     // 첫 페이지 결과 세팅 (2개 메시지)
     List<Message> firstPageMessages = List.of(message1, message2);
     List<MessageDto> firstPageDtos = List.of(messageDto1, messageDto2);
-    
+
     // 첫 페이지는 다음 페이지가 있고, 커서는 message2의 생성 시간이어야 함
     SliceImpl<Message> firstPageSlice = new SliceImpl<>(firstPageMessages, pageable, true);
     PageResponse<MessageDto> firstPageResponse = new PageResponse<>(
@@ -250,9 +252,10 @@ class BasicMessageServiceTest {
         true,
         null
     );
-    
+
     // 모의 객체 설정
-    given(messageRepository.findAllByChannelIdWithAuthor(eq(channelId), eq(createdAt), eq(pageable)))
+    given(
+        messageRepository.findAllByChannelIdWithAuthor(eq(channelId), eq(createdAt), eq(pageable)))
         .willReturn(firstPageSlice);
     given(messageMapper.toDto(eq(message1))).willReturn(messageDto1);
     given(messageMapper.toDto(eq(message2))).willReturn(messageDto2);
@@ -268,7 +271,7 @@ class BasicMessageServiceTest {
     assertThat(result.content()).hasSize(pageSize);
     assertThat(result.hasNext()).isTrue();
     assertThat(result.nextCursor()).isEqualTo(message2CreatedAt);
-    
+
     // 두 번째 페이지 테스트
     // given
     List<Message> secondPageMessages = List.of(message3);
@@ -278,11 +281,11 @@ class BasicMessageServiceTest {
         message3CreatedAt,
         content + "3",
         channelId,
-        new UserDto(authorId, "testUser", "test@example.com", null, true),
+        new UserDto(authorId, "testUser", "test@example.com", null, true, Role.USER),
         List.of(attachmentDto)
     );
     List<MessageDto> secondPageDtos = List.of(messageDto3);
-    
+
     // 두 번째 페이지는 다음 페이지가 없음
     SliceImpl<Message> secondPageSlice = new SliceImpl<>(secondPageMessages, pageable, false);
     PageResponse<MessageDto> secondPageResponse = new PageResponse<>(
@@ -292,18 +295,20 @@ class BasicMessageServiceTest {
         false,
         null
     );
-    
+
     // 두 번째 페이지 모의 객체 설정
-    given(messageRepository.findAllByChannelIdWithAuthor(eq(channelId), eq(message2CreatedAt), eq(pageable)))
+    given(messageRepository.findAllByChannelIdWithAuthor(eq(channelId), eq(message2CreatedAt),
+        eq(pageable)))
         .willReturn(secondPageSlice);
     given(messageMapper.toDto(eq(message3))).willReturn(messageDto3);
     given(pageResponseMapper.<MessageDto>fromSlice(any(), eq(message3CreatedAt)))
         .willReturn(secondPageResponse);
-        
+
     // when - 두 번째 페이지 요청 (첫 페이지의 커서 사용)
-    PageResponse<MessageDto> secondResult = messageService.findAllByChannelId(channelId, message2CreatedAt,
+    PageResponse<MessageDto> secondResult = messageService.findAllByChannelId(channelId,
+        message2CreatedAt,
         pageable);
-        
+
     // then - 두 번째 페이지 검증
     assertThat(secondResult).isEqualTo(secondPageResponse);
     assertThat(secondResult.content()).hasSize(1); // 마지막 페이지는 항목 1개만 있음

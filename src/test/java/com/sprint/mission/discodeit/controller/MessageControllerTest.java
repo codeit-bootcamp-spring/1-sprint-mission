@@ -16,10 +16,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
@@ -78,15 +78,16 @@ class MessageControllerTest {
 
     UUID messageId = UUID.randomUUID();
     Instant now = Instant.now();
-    
+
     UserDto author = new UserDto(
         authorId,
         "testuser",
         "test@example.com",
         null,
-        true
+        true,
+        Role.USER
     );
-    
+
     BinaryContentDto attachmentDto = new BinaryContentDto(
         UUID.randomUUID(),
         "test.jpg",
@@ -151,19 +152,20 @@ class MessageControllerTest {
     UUID messageId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
     UUID authorId = UUID.randomUUID();
-    
+
     MessageUpdateRequest updateRequest = new MessageUpdateRequest(
         "수정된 메시지 내용입니다."
     );
 
     Instant now = Instant.now();
-    
+
     UserDto author = new UserDto(
         authorId,
         "testuser",
         "test@example.com",
         null,
-        true
+        true,
+        Role.USER
     );
 
     MessageDto updatedMessage = new MessageDto(
@@ -195,7 +197,7 @@ class MessageControllerTest {
   void updateMessage_Failure_MessageNotFound() throws Exception {
     // Given
     UUID nonExistentMessageId = UUID.randomUUID();
-    
+
     MessageUpdateRequest updateRequest = new MessageUpdateRequest(
         "수정된 메시지 내용입니다."
     );
@@ -245,15 +247,16 @@ class MessageControllerTest {
     UUID authorId = UUID.randomUUID();
     Instant cursor = Instant.now();
     Pageable pageable = PageRequest.of(0, 50, Sort.Direction.DESC, "createdAt");
-    
+
     UserDto author = new UserDto(
         authorId,
         "testuser",
         "test@example.com",
         null,
-        true
+        true,
+        Role.USER
     );
-    
+
     List<MessageDto> messages = List.of(
         new MessageDto(
             UUID.randomUUID(),
@@ -274,7 +277,7 @@ class MessageControllerTest {
             new ArrayList<>()
         )
     );
-    
+
     PageResponse<MessageDto> pageResponse = new PageResponse<>(
         messages,
         cursor.minusSeconds(30), // nextCursor 값

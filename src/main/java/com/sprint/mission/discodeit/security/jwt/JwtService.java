@@ -1,27 +1,32 @@
 package com.sprint.mission.discodeit.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.user.InvalidRefreshTokenException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Date;
-import java.util.Optional;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,148 +35,153 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class JwtService {
 
-  @Value("${jwt.secret-key}")
-  private String jwtSecret;
-  @Value("${jwt.access-token-validity}")
-  private Duration accessTokenValidity;
-  @Value("${jwt.refresh-token-validity}")
-  private Duration refreshTokenValidity;
+  public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
-  private final UserMapper userMapper;
+  @Value("${security.jwt.secret}")
+  private String secret;
+  @Value("${security.jwt.access-token-validity-seconds}")
+  private long accessTokenValiditySeconds;
+  @Value("${security.jwt.refresh-token-validity-seconds}")
+  private long refreshTokenValiditySeconds;
+
   private final JwtSessionRepository jwtSessionRepository;
   private final UserRepository userRepository;
-
-  protected SecretKey getSecretKey() {
-    return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-  }
-
-  public String generateAccessToken(UserDto userDto) {
-    Date now = new Date();
-    Date expiry = new Date(now.getTime() + accessTokenValidity.toMillis());
-
-    return Jwts.builder()
-        .setSubject("accessToken")
-        .claim("userDto", userDto)
-        .setIssuedAt(now)
-        .setExpiration(expiry)
-        .signWith(getSecretKey(), SignatureAlgorithm.HS256)
-        .compact();
-  }
-
-  public String generateRefreshToken(UserDto userDto) {
-    Date now = new Date();
-    Date expiry = new Date(now.getTime() + refreshTokenValidity.toMillis());
-
-    return Jwts.builder()
-        .setSubject("refreshToken")
-        .claim("userId", userDto.id())
-        .setIssuedAt(new Date())
-        .setExpiration(expiry)
-        .signWith(getSecretKey(), SignatureAlgorithm.HS256)
-        .compact();
-  }
+  private final UserMapper userMapper;
+  private final ObjectMapper objectMapper;
+  private final JwtBlacklist jwtBlacklist;
 
   @Transactional
-  public void saveJwtSession(UserDto userDto, String refreshToken) {
-    User user = userRepository.findById(userDto.id())
-        .orElseThrow(() -> new RuntimeException("User not found"));
+  public JwtSession registerJwtSession(UserDto userDto) {
+    JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
+    JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
-    JwtSession jwtSession = new JwtSession();
-    jwtSession.setUser(user);
-    jwtSession.setRefreshToken(refreshToken);
-    jwtSession.setRevoked(false);
-    jwtSession.setExpiresAt(LocalDateTime.now().plus(refreshTokenValidity));
+    JwtSession jwtSession = new JwtSession(userDto.id(), accessJwtObject.token(),
+        refreshJwtObject.token(), accessJwtObject.expirationTime());
     jwtSessionRepository.save(jwtSession);
+
+    return jwtSession;
   }
 
-  public boolean isValidRefreshToken(String token) {
+  public boolean validate(String token) {
+    boolean verified;
+
     try {
-      Claims claims = parseClaims(token);
-      return "refreshToken".equals(claims.getSubject());
-    } catch (Exception e) {
-      return false;
+      JWSVerifier verifier = new MACVerifier(secret);
+      JWSObject jwsObject = JWSObject.parse(token);
+      verified = jwsObject.verify(verifier);
+
+      if (verified) {
+        JwtObject jwtObject = parse(token);
+        verified = !jwtObject.isExpired();
+      }
+
+      if (verified) {
+        verified = !jwtBlacklist.contains(token);
+      }
+
+    } catch (JOSEException | ParseException e) {
+      log.error(e.getMessage());
+      verified = false;
     }
+
+    return verified;
   }
 
-
-  public boolean isValidAccessToken(String token) {
+  public JwtObject parse(String token) {
     try {
-      Claims claims = parseClaims(token);
-      return claims.getSubject().equals("accessToken");
-    } catch (Exception e) {
-      return false;
+      JWSObject jwsObject = JWSObject.parse(token);
+      Payload payload = jwsObject.getPayload();
+      Map<String, Object> jsonObject = payload.toJSONObject();
+      return new JwtObject(
+          objectMapper.convertValue(jsonObject.get("iat"), Instant.class),
+          objectMapper.convertValue(jsonObject.get("exp"), Instant.class),
+          objectMapper.convertValue(jsonObject.get("userDto"), UserDto.class),
+          token
+      );
+    } catch (ParseException e) {
+      log.error(e.getMessage());
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("token", token), e);
     }
-  }
 
-  public Claims parseClaims(String token) {
-    return Jwts.parserBuilder()
-        .setSigningKey(getSecretKey())
-        .build()
-        .parseClaimsJws(token)
-        .getBody();
-  }
-
-
-  @Transactional
-  public String refreshAccessToken(String refreshToken) {
-    JwtSession session = getSessionByRefresh(refreshToken)
-        .orElseThrow(InvalidRefreshTokenException::expiredOrInvalid);
-
-    UserDto userDto = userMapper.toDto(session.getUser());
-    return generateAccessToken(userDto);
-  }
-
-
-  public Optional<JwtSession> getSessionByRefresh(String refreshToken) {
-    return jwtSessionRepository.findByRefreshTokenAndRevokedFalse(refreshToken);
-  }
-
-
-  public void revokeRefreshToken(String refreshToken) {
-    Optional<JwtSession> session = jwtSessionRepository.findByRefreshToken(refreshToken);
-    session.ifPresent(jwtSession -> {
-      jwtSession.setRevoked(true);
-      jwtSessionRepository.save(jwtSession);
-    });
   }
 
   @Transactional
-  public void forceLogoutByUserId(UUID userId) {
-    jwtSessionRepository.deleteAllByUserId(userId);
+  public JwtSession refreshJwtSession(String refreshToken) {
+    if (!validate(refreshToken)) {
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("refreshToken", refreshToken));
+    }
+    JwtSession session = jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
+            Map.of("refreshToken", refreshToken)));
+
+    UUID userId = parse(refreshToken).userDto().id();
+    UserDto userDto = userRepository.findById(userId)
+        .map(userMapper::toDto)
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
+    JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
+    JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
+
+    session.update(
+        accessJwtObject.token(),
+        refreshJwtObject.token(),
+        accessJwtObject.expirationTime()
+    );
+
+    return session;
   }
 
-  public void removeTokenCookies(HttpServletResponse response) {
-    deleteCookie(response, "refreshToken");
-    deleteCookie(response, "accessToken");
+  @Transactional
+  public void invalidateJwtSession(String refreshToken) {
+    jwtSessionRepository.findByRefreshToken(refreshToken)
+        .ifPresent(this::invalidate);
   }
 
-  private void deleteCookie(HttpServletResponse response, String name) {
-    ResponseCookie cookie = ResponseCookie.from(name, null)
-        .httpOnly(false)
-        .secure(false)
-        .path("/")
-        .maxAge(Duration.ZERO)
+  @Transactional
+  public void invalidateJwtSession(UUID userId) {
+    jwtSessionRepository.findByUserId(userId)
+        .ifPresent(this::invalidate);
+  }
+
+  public JwtSession getJwtSession(String refreshToken) {
+    return jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
+            Map.of("refreshToken", refreshToken)));
+  }
+
+  public List<JwtSession> getActiveJwtSessions() {
+    return jwtSessionRepository.findAllByExpirationTimeAfter(Instant.now());
+  }
+
+  private JwtObject generateJwtObject(UserDto userDto, long tokenValiditySeconds) {
+    Instant issueTime = Instant.now();
+    Instant expirationTime = issueTime.plus(Duration.ofSeconds(tokenValiditySeconds));
+
+    JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+        .subject(userDto.username())
+        .claim("userDto", userDto)
+        .issueTime(new Date(issueTime.toEpochMilli()))
+        .expirationTime(new Date(expirationTime.toEpochMilli()))
         .build();
-    response.addHeader("Set-Cookie", cookie.toString());
-  }
-  public void handleLoginSuccess(UserDto userDto, HttpServletResponse response) throws IOException {
-    String accessToken = generateAccessToken(userDto);
-    String refreshToken = generateRefreshToken(userDto);
-    saveJwtSession(userDto, refreshToken);
 
-    ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
-        .httpOnly(true)
-        .secure(false)
-        .path("/")
-        .maxAge(refreshTokenValidity)
-        .build();
-    response.addHeader("Set-Cookie", refreshCookie.toString());
+    JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
+    SignedJWT signedJWT = new SignedJWT(header, claimsSet);
 
-    // Optional: 응답 바디 설정
-    response.setStatus(HttpServletResponse.SC_OK);
-    response.setContentType("application/json;charset=UTF-8");
-    response.getWriter().write(accessToken);
+    try {
+      signedJWT.sign(new MACSigner(secret));
+    } catch (JOSEException e) {
+      log.error(e.getMessage());
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN_SECRET, e);
+    }
+
+    String token = signedJWT.serialize();
+
+    return new JwtObject(issueTime, expirationTime, userDto, token);
   }
 
+  private void invalidate(JwtSession session) {
+    jwtSessionRepository.delete(session);
+    if (!session.isExpired()) {
+      jwtBlacklist.put(session.getAccessToken(), session.getExpirationTime());
+    }
+  }
 }
-

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,10 @@ public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
+
+  @Timed(value = "binaryContent.upload",
+      description = "Time taken to upload binary content")
+
 
   @GetMapping(path = "{binaryContentId}")
   public ResponseEntity<BinaryContentDto> find(

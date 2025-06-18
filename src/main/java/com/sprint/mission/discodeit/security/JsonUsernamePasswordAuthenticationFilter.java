@@ -2,8 +2,6 @@ package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
-import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -57,14 +55,13 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
       ObjectMapper objectMapper,
       AuthenticationManager authenticationManager,
       SessionAuthenticationStrategy sessionAuthenticationStrategy,
-      RememberMeServices rememberMeServices,
-      JwtService jwtService,
-      UserMapper userMapper
+      RememberMeServices rememberMeServices
   ) {
-    JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(objectMapper);
+    JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
+        objectMapper);
     filter.setRequiresAuthenticationRequestMatcher(SecurityMatchers.LOGIN);
     filter.setAuthenticationManager(authenticationManager);
-    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(jwtService));
+    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper));
     filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
     filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
     filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
@@ -75,15 +72,8 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
   public static class Configurer extends
       AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, JsonUsernamePasswordAuthenticationFilter> {
 
-    private final ObjectMapper objectMapper;
-    private final JwtService jwtService;
-    private final UserMapper userMapper;
-
-    public Configurer(ObjectMapper objectMapper, JwtService jwtService, UserMapper userMapper) {
+    public Configurer(ObjectMapper objectMapper) {
       super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), SecurityMatchers.LOGIN_URL);
-      this.objectMapper = objectMapper;
-      this.jwtService = jwtService;
-      this.userMapper = userMapper;
     }
 
     @Override
@@ -94,8 +84,6 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     @Override
     public void init(HttpSecurity http) throws Exception {
       loginProcessingUrl(SecurityMatchers.LOGIN_URL);
-      successHandler(new CustomLoginSuccessHandler(jwtService));
-      failureHandler(new CustomLoginFailureHandler(objectMapper));
     }
   }
 }

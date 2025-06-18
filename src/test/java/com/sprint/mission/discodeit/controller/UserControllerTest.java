@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
@@ -47,8 +48,6 @@ class UserControllerTest {
   @MockitoBean
   private UserService userService;
 
-  @MockitoBean
-  private UserStatusService userStatusService;
 
   @Test
   @DisplayName("사용자 생성 성공 테스트")
@@ -87,7 +86,8 @@ class UserControllerTest {
         "testuser",
         "test@example.com",
         profileDto,
-        false
+        false,
+        Role.USER
     );
 
     given(userService.create(any(UserCreateRequest.class), any(Optional.class)))
@@ -142,7 +142,8 @@ class UserControllerTest {
         "user1",
         "user1@example.com",
         null,
-        true
+        true,
+        Role.USER
     );
 
     UserDto user2 = new UserDto(
@@ -150,7 +151,8 @@ class UserControllerTest {
         "user2",
         "user2@example.com",
         null,
-        false
+        false,
+        Role.USER
     );
 
     List<UserDto> users = List.of(user1, user2);
@@ -206,7 +208,8 @@ class UserControllerTest {
         "updateduser",
         "updated@example.com",
         profileDto,
-        true
+        true,
+        Role.USER
     );
 
     given(userService.update(eq(userId), any(UserUpdateRequest.class), any(Optional.class)))
@@ -308,9 +311,6 @@ class UserControllerTest {
     UserStatusUpdateRequest updateRequest = new UserStatusUpdateRequest(lastActiveAt);
     UserStatusDto updatedStatus = new UserStatusDto(statusId, userId, lastActiveAt);
 
-    given(userStatusService.updateByUserId(eq(userId), any(UserStatusUpdateRequest.class)))
-        .willReturn(updatedStatus);
-
     // When & Then
     mockMvc.perform(patch("/api/users/{userId}/userStatus", userId)
             .contentType(MediaType.APPLICATION_JSON)
@@ -329,9 +329,6 @@ class UserControllerTest {
     Instant lastActiveAt = Instant.now();
 
     UserStatusUpdateRequest updateRequest = new UserStatusUpdateRequest(lastActiveAt);
-
-    given(userStatusService.updateByUserId(eq(userId), any(UserStatusUpdateRequest.class)))
-        .willThrow(UserNotFoundException.withId(userId));
 
     // When & Then
     mockMvc.perform(patch("/api/users/{userId}/userStatus", userId)

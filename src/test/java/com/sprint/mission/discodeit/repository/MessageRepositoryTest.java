@@ -51,8 +51,6 @@ class MessageRepositoryTest {
   private User createTestUser(String username, String email) {
     BinaryContent profile = new BinaryContent("profile.jpg", 1024L, "image/jpeg");
     User user = new User(username, email, "password123!@#", profile);
-    // UserStatus 생성 및 연결
-    UserStatus status = new UserStatus(user, Instant.now());
     return userRepository.save(user);
   }
 
@@ -122,7 +120,6 @@ class MessageRepositoryTest {
     // 저자 정보가 함께 로드되었는지 확인 (FETCH JOIN)
     Message firstMessage = content.get(0);
     assertThat(Hibernate.isInitialized(firstMessage.getAuthor())).isTrue();
-    assertThat(Hibernate.isInitialized(firstMessage.getAuthor().getStatus())).isTrue();
     assertThat(Hibernate.isInitialized(firstMessage.getAuthor().getProfile())).isTrue();
   }
 

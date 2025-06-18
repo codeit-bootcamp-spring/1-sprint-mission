@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -17,6 +18,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
@@ -54,6 +58,18 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       throw new RuntimeException(e);
     }
     return binaryContentId;
+  }
+
+  @Override
+  @Async
+  @Retryable(
+      value = {Exception.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000, multiplier = 2)
+  )
+  public CompletableFuture<Void> putAsync(UUID id, byte[] content) {
+    this.put(id, content);
+    return CompletableFuture.completedFuture(null);
   }
 
   public InputStream get(UUID binaryContentId) {

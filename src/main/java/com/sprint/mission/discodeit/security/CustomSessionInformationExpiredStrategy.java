@@ -28,7 +28,7 @@ public class CustomSessionInformationExpiredStrategy implements SessionInformati
         status
     );
     errorResponse.getDetails().put("sessionId", event.getSessionInformation().getSessionId());
-    
+    response.setCharacterEncoding("UTF-8");
     response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
   }
 }
