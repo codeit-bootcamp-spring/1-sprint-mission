@@ -9,13 +9,13 @@ import java.util.UUID;
 
 public interface ReadStatusRepository {
 
-  ReadStatus saveReadStatus(ReadStatus readStatus);
+    ReadStatus saveReadStatus(ReadStatus readStatus);
 
-  Optional<ReadStatus> findReadStatusById(UUID readStatusId);
+    Optional<ReadStatus> findReadStatusById(UUID readStatusId);
 
-  List<ReadStatus> findAllReadStatusByUser(User user);
+    List<ReadStatus> findAllReadStatusByUser(User user);
 
-  List<ReadStatus> findAllReadStatusByChannel(Channel channel);
+    List<ReadStatus> findAllReadStatusByChannel(Channel channel);
 
-  void removeReadStatus(UUID readStatusId);
+    void removeReadStatus(UUID readStatusId);
 }

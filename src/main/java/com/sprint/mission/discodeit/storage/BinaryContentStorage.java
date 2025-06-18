@@ -3,13 +3,16 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import java.io.InputStream;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.http.ResponseEntity;
 
 public interface BinaryContentStorage {
 
-  UUID put(UUID id, byte[] content);
+    CompletableFuture<UUID> putAsync(UUID id, byte[] content) throws InterruptedException;
 
-  InputStream get(UUID id);
+    void put(UUID id, byte[] content) throws InterruptedException;
 
-  ResponseEntity<?> download(BinaryContentDto binaryContentDto);
+    InputStream get(UUID id);
+
+    ResponseEntity<?> download(BinaryContentDto binaryContentDto);
 }

@@ -36,6 +36,13 @@ public class AdminAccountInitializer implements CommandLineRunner {
         );
         admin.updateRole(Role.ADMIN);
         userRepository.saveUser(admin);
+
+        User user = User.of(
+            "test",
+            "test@test.com",
+            passwordEncoder.encode("12345678")
+        );
+        userRepository.saveUser(user);
     }
 }
 

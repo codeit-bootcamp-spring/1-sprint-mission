@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.security.filter;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.security.handler.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.handler.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
@@ -66,12 +65,12 @@ public class CustomUsernamePasswordAuthenticationFilter extends
             String username = credentials.get("username");
             String password = credentials.get("password");
 
-            User user = userValidator.validateUserExistsByUserName(username);
-            jwtSessionRepository.findByUserId(user.getId()).ifPresent(
-                value -> {
-                    throw new RuntimeException("이미 로그인한 사용자입니다.");
-                }
-            );
+//            User user = userValidator.validateUserExistsByUserName(username);
+//            jwtSessionRepository.findByUserId(user.getId()).ifPresent(
+//                value -> {
+//                    throw new RuntimeException("이미 로그인한 사용자입니다.");
+//                }
+//            ); 미완성 로직
 
             UsernamePasswordAuthenticationToken authRequest =
                 new UsernamePasswordAuthenticationToken(username, password);

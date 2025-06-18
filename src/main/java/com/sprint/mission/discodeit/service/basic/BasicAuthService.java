@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.common.util.LoginStatusChecker;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.request.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.UpdateUserRoleEvent;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
@@ -12,6 +14,7 @@ import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +26,7 @@ public class BasicAuthService implements AuthService {
     private final LoginStatusChecker loginStatusChecker;
     private final JwtSessionRepository jwtSessionRepository;
     private final JwtService jwtService;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     @Transactional
@@ -35,6 +39,8 @@ public class BasicAuthService implements AuthService {
                 .get(); // 이미 getOnline에서 체크
             jwtService.invalidateRefreshToken(jwtSession.getRefreshToken());
         }
+
+        publisher.publishEvent(new UpdateUserRoleEvent(NotificationType.ROLE_CHANGED, user));
 
         return userMapper.toUserDto(user, false);
     }

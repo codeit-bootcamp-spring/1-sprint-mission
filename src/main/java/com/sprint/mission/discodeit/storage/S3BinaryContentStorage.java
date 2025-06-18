@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatusCode;
@@ -23,88 +24,93 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
 public class S3BinaryContentStorage implements BinaryContentStorage {
 
-  @Value("${discodeit.storage.s3.access-key}")
-  private String accessKey;
+    @Value("${discodeit.storage.s3.access-key}")
+    private String accessKey;
 
-  @Value("${discodeit.storage.s3.secret-key}")
-  private String secretKey;
+    @Value("${discodeit.storage.s3.secret-key}")
+    private String secretKey;
 
-  @Value("${discodeit.storage.s3.bucket}")
-  private String bucket;
+    @Value("${discodeit.storage.s3.bucket}")
+    private String bucket;
 
-  @Value("${discodeit.storage.s3.region}")
-  private String region;
+    @Value("${discodeit.storage.s3.region}")
+    private String region;
 
-  @Value("${discodeit.storage.s3.presigned-url-expiration:}")
-  private int presignedUrlExpiration;
+    @Value("${discodeit.storage.s3.presigned-url-expiration:}")
+    private int presignedUrlExpiration;
 
-  @Override
-  public UUID put(UUID id, byte[] content) {
-    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-        .bucket(bucket)
-        .key(id.toString())
-        .build();
+    @Override
+    public CompletableFuture<UUID> putAsync(UUID id, byte[] content) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+            .bucket(bucket)
+            .key(id.toString())
+            .build();
 
-    S3Client s3Client = getS3Client();
-    s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
+        S3Client s3Client = getS3Client();
+        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
 
-    return id;
-  }
+        return CompletableFuture.completedFuture(id);
+    }
 
-  @Override
-  public InputStream get(UUID id) {
-    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-        .bucket(bucket)
-        .key(id.toString())
-        .build();
+    @Override
+    public void put(UUID id, byte[] content) throws InterruptedException {
 
-    S3Client s3Client = getS3Client();
-    return s3Client.getObject(getObjectRequest);
-  }
+    }
 
-  @Override
-  public ResponseEntity<?> download(BinaryContentDto binaryContentDto) {
-    String presignedUrl =
-        generatePresignedUrl(binaryContentDto.id().toString(), binaryContentDto.contentType());
-    return ResponseEntity.status(HttpStatusCode.valueOf(302))
-        .body(presignedUrl);
-  }
+    @Override
+    public InputStream get(UUID id) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucket)
+            .key(id.toString())
+            .build();
 
-  public S3Client getS3Client() {
-    return S3Client.builder()
-        .region(Region.of(region))
-        .credentialsProvider(
-            StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(
-                    accessKey,
-                    secretKey
+        S3Client s3Client = getS3Client();
+        return s3Client.getObject(getObjectRequest);
+    }
+
+    @Override
+    public ResponseEntity<?> download(BinaryContentDto binaryContentDto) {
+        String presignedUrl =
+            generatePresignedUrl(binaryContentDto.id().toString(), binaryContentDto.contentType());
+        return ResponseEntity.status(HttpStatusCode.valueOf(302))
+            .body(presignedUrl);
+    }
+
+    public S3Client getS3Client() {
+        return S3Client.builder()
+            .region(Region.of(region))
+            .credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(
+                        accessKey,
+                        secretKey
+                    )
                 )
-            )
-        ).build();
-  }
+            ).build();
+    }
 
-  public String generatePresignedUrl(String key, String contentType) {
-    S3Presigner s3Presigner = S3Presigner.builder()
-        .region(Region.of(region))
-        .credentialsProvider(
-            StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(
-                    accessKey,
-                    secretKey
+    public String generatePresignedUrl(String key, String contentType) {
+        S3Presigner s3Presigner = S3Presigner.builder()
+            .region(Region.of(region))
+            .credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(
+                        accessKey,
+                        secretKey
+                    )
                 )
-            )
-        ).build();
+            ).build();
 
-    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-        .bucket(bucket)
-        .key(key)
-        .build();
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucket)
+            .key(key)
+            .build();
 
-    GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-        .signatureDuration(Duration.ofSeconds(presignedUrlExpiration))
-        .getObjectRequest(getObjectRequest)
-        .build();
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofSeconds(presignedUrlExpiration))
+            .getObjectRequest(getObjectRequest)
+            .build();
 
-    return s3Presigner.presignGetObject(presignRequest).url().toString();
-  }
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
 }

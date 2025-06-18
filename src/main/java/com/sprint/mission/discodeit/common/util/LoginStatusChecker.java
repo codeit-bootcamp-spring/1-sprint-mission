@@ -16,7 +16,11 @@ public class LoginStatusChecker {
 
     public boolean getOnline(User user) {
         JwtSession jwtSession = jwtSessionRepository.findByUserId(user.getId())
-            .orElseThrow(() -> new RuntimeException("jwt session이 존재하지 않습니다."));
+            .orElse(null);
+
+        if (jwtSession == null) {
+            return false;
+        }
 
         String accessToken = jwtSession.getAccessToken();
         return jwtService.validate(accessToken);

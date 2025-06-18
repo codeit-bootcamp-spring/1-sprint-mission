@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -16,11 +17,15 @@ import com.sprint.mission.discodeit.validator.UserValidator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -55,7 +60,7 @@ public class BasicUserService implements UserService {
         updateProfileImage(user, profileImageFile);
         User savedUser = userRepository.saveUser(user);
 
-        return userMapper.toUserDto(savedUser, loginStatusChecker.getOnline(user));
+        return userMapper.toUserDto(savedUser, false);
     }
 
     @Override
@@ -66,6 +71,7 @@ public class BasicUserService implements UserService {
         return userMapper.toUserDto(foundUser, loginStatusChecker.getOnline(foundUser));
     }
 
+    @Cacheable(cacheNames = "users", sync = true)
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> findAllUsers() {
@@ -74,6 +80,7 @@ public class BasicUserService implements UserService {
             .collect(Collectors.toList());
     }
 
+    //    @CacheEvict(cacheNames = "users", allEntries = true)
     @Override
     @Transactional
     public UserDto updateUser(UUID userId, UpdateUserRequest updateUserRequest,
@@ -107,8 +114,34 @@ public class BasicUserService implements UserService {
                     BinaryContent.of(file.getOriginalFilename(), file.getSize(),
                         file.getContentType()));
 
-                binaryContentStorage.put(binaryContent.getId(),
-                    multipartFileConverter.toByteArray(file));
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            CompletableFuture<UUID> uuidCompletableFuture =
+                                null;
+                            try {
+                                uuidCompletableFuture = binaryContentStorage.putAsync(
+                                    binaryContent.getId(),
+                                    multipartFileConverter.toByteArray(file));
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            uuidCompletableFuture.whenComplete((uuid, throwable) -> {
+                                if (throwable != null) {
+                                    binaryContent.updateBinaryContentUploadStatus(
+                                        BinaryContentUploadStatus.FAILED);
+                                } else {
+                                    binaryContent.updateBinaryContentUploadStatus(
+                                        BinaryContentUploadStatus.SUCCESS);
+                                }
+                                binaryContentRepository.saveBinaryContent(binaryContent);
+                            });
+                        }
+                    }
+                );
+
                 user.updateProfileImage(binaryContent);
             });
     }

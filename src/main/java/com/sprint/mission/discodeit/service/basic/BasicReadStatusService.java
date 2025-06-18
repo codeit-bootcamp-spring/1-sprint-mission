@@ -40,7 +40,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         return readStatusMapper.toReadStatusDto(
             readStatusRepository.saveReadStatus(
-                ReadStatus.of(user, channel, createReadStatusRequest.lastReadAt())));
+                ReadStatus.of(user, channel, createReadStatusRequest.lastReadAt(), false)));
     }
 
     @Override
@@ -69,6 +69,7 @@ public class BasicReadStatusService implements ReadStatusService {
         }
 
         readStatus.updateLastReadAt(updateReadStatusRequest.newLastReadAt());
+        readStatus.updateNotificationEnabled(updateReadStatusRequest.newNotificationEnabled());
 
         return readStatusMapper.toReadStatusDto(readStatus);
     }

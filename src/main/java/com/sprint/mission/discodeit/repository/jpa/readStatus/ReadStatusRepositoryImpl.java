@@ -14,30 +14,30 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class ReadStatusRepositoryImpl implements ReadStatusRepository {
 
-  private final ReadStatusJpaRepository readStatusRepository;
+    private final ReadStatusJpaRepository readStatusRepository;
 
-  @Override
-  public ReadStatus saveReadStatus(ReadStatus readStatus) {
-    return readStatusRepository.save(readStatus);
-  }
+    @Override
+    public ReadStatus saveReadStatus(ReadStatus readStatus) {
+        return readStatusRepository.save(readStatus);
+    }
 
-  @Override
-  public Optional<ReadStatus> findReadStatusById(UUID readStatusId) {
-    return readStatusRepository.findById(readStatusId);
-  }
+    @Override
+    public Optional<ReadStatus> findReadStatusById(UUID readStatusId) {
+        return readStatusRepository.findById(readStatusId);
+    }
 
-  @Override
-  public List<ReadStatus> findAllReadStatusByUser(User user) {
-    return readStatusRepository.findAllByUser(user);
-  }
+    @Override
+    public List<ReadStatus> findAllReadStatusByUser(User user) {
+        return readStatusRepository.findAllByUser(user);
+    }
 
-  @Override
-  public List<ReadStatus> findAllReadStatusByChannel(Channel channel) {
-    return readStatusRepository.findAllByChannel(channel);
-  }
+    @Override
+    public List<ReadStatus> findAllReadStatusByChannel(Channel channel) {
+        return readStatusRepository.findAllByChannel(channel);
+    }
 
-  @Override
-  public void removeReadStatus(UUID readStatusId) {
-    readStatusRepository.deleteById(readStatusId);
-  }
+    @Override
+    public void removeReadStatus(UUID readStatusId) {
+        readStatusRepository.deleteById(readStatusId);
+    }
 }
