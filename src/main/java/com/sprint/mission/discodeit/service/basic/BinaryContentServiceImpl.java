@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
+import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.file.FileException;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -39,6 +41,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public ResponseEntity<Resource> download(String id) {
     ResponseEntity<?> response = null;
+
     BinaryContent targetContent = binaryContentRepository.findById(UUID.fromString(id))
         .orElseThrow(() -> new DiscodeitException(ErrorCode.IMAGE_NOT_FOUND));
 
@@ -72,13 +75,13 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   @Override
   public BinaryContent save(BinaryContent content, byte[] bytes) {
-
+    content.changeUploadStatus(UploadStatus.WAITING);
     BinaryContent savedContent = binaryContentRepository.save(content);
     //binaryContentRepository.flush();
 
     log.debug("[SAVED BINARY METADATA] : [ID: {}]", savedContent.getId());
-    binaryContentStorage.put(savedContent.getId(), bytes);
-    log.debug("[SAVED IMAGE TO STORAGE] : [ID: {}]", savedContent.getId());
+//    binaryContentStorage.put(savedContent.getId(), bytes);
+//    log.debug("[SAVED IMAGE TO STORAGE] : [ID: {}]", savedContent.getId());
 
     return savedContent;
   }
@@ -96,20 +99,26 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     //binaryContentRepository.flush();
 
     log.debug("[SAVED METADATA FOR FILES]");
-    log.debug("[WRITING FILE...]");
-    for (MultipartFile file : files) {
-      try {
-        BinaryContent content = contents.stream()
-            .filter(c -> Objects.equals(c.getFileName(), file.getOriginalFilename())).findFirst()
-            .orElseThrow();
-        binaryContentStorage.put(content.getId(), file.getBytes());
-      } catch (IOException e) {
-        log.warn("[ERROR WHILE WRITING FILE] : [FILE_NAME : {}]", file.getOriginalFilename());
-        throw new FileException(ErrorCode.FILE_ERROR,
-            Map.of("fileName", file.getOriginalFilename()));
-      }
-    }
+//    log.debug("[WRITING FILE...]");
+//    for (MultipartFile file : files) {
+//      try {
+//        BinaryContent content = contents.stream()
+//            .filter(c -> Objects.equals(c.getFileName(), file.getOriginalFilename())).findFirst()
+//            .orElseThrow();
+//        binaryContentStorage.put(content.getId(), file.getBytes());
+//      } catch (IOException e) {
+//        log.warn("[ERROR WHILE WRITING FILE] : [FILE_NAME : {}]", file.getOriginalFilename());
+//        throw new FileException(ErrorCode.FILE_ERROR,
+//            Map.of("fileName", file.getOriginalFilename()));
+//      }
+//    }
     return savedContents;
+  }
+
+  @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public BinaryContent update(BinaryContent content) {
+    return binaryContentRepository.save(content);
   }
 
 

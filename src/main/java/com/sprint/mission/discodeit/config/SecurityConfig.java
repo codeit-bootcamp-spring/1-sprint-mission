@@ -66,9 +66,6 @@ public class SecurityConfig {
 
     http
         .rememberMe(rm -> rm.rememberMeServices(rememberMeServices))
-//        .sessionManagement(
-//            session -> session
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .sessionManagement(session -> session.sessionFixation().migrateSession())
         .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository()).csrfTokenRequestHandler(plain)
             .ignoringRequestMatchers("/api/users", "/api/auth/check-session"))

@@ -85,3 +85,29 @@ CREATE TABLE jwt_session (
     access_token VARCHAR(512) NOT NULL UNIQUE,
     refresh_token VARCHAR(512) NOT NULL UNIQUE
 )
+
+
+ALTER TABLE binary_contents
+    ADD COLUMN upload_status VARCHAR(20) NOT NULL DEFAULT 'WAITING';
+
+CREATE TABLE async_task_failure (
+                                    id UUID PRIMARY KEY,
+                                    task_name VARCHAR(255) NOT NULL,
+                                    request_id VARCHAR(255) NOT NULL,
+                                    failure_reason TEXT NOT NULL
+);
+
+ALTER TABLE read_statuses ADD COLUMN notification_enabled BOOLEAN NOT NULL DEFAULT false;
+
+CREATE TABLE notification (
+                              id UUID PRIMARY KEY,
+                              created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                              updated_at TIMESTAMP WITH TIME ZONE,
+                              receiver_id UUID NOT NULL,
+                              type VARCHAR(255) NOT NULL,
+                              target_id UUID,
+                              title VARCHAR(255),
+                              content TEXT,
+                              CONSTRAINT fk_notification_receiver
+                                  FOREIGN KEY (receiver_id) REFERENCES users (id) ON DELETE CASCADE
+);

@@ -16,10 +16,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,6 +54,7 @@ public class MessageController {
     log.debug("[SEND MESSAGE REQUEST] : [CHANNEL_ID: {}][AUTHOR_ID: {}]",
         messageCreateRequest.channelId(),
         messageCreateRequest.authorId());
+
     MessageResponseDto message = messageFacade.createMessage(messageCreateRequest, files);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(message);

@@ -3,14 +3,13 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
 public interface BinaryContentMapper {
@@ -18,11 +17,13 @@ public interface BinaryContentMapper {
   @Mapping(source = "file.originalFilename", target = "fileName")
   @Mapping(source = "file.contentType", target = "contentType")
   @Mapping(source = "file.size", target = "size")
+  @Mapping(target = "uploadStatus", ignore = true)
   BinaryContent toMessageBinaryContent(MultipartFile file);
 
   @Mapping(source = "file.originalFilename", target = "fileName")
   @Mapping(source = "file.contentType", target = "contentType")
   @Mapping(source = "file.size", target = "size")
+  @Mapping(target = "uploadStatus", ignore = true)
   BinaryContent toProfileBinaryContent(MultipartFile file);
 
   @Mapping(target = "id", source = "attachment.id")
@@ -42,8 +43,8 @@ public interface BinaryContentMapper {
   default List<BinaryContent> fromMessageFiles(List<MultipartFile> files) {
     return files == null || files.isEmpty() ? Collections.emptyList()
         : files.stream()
-        .map(file -> toMessageBinaryContent(file))
-        .collect(Collectors.toList());
+            .map(file -> toMessageBinaryContent(file))
+            .collect(Collectors.toList());
   }
 
 //  @AfterMapping

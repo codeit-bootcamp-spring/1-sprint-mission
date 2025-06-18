@@ -8,7 +8,7 @@ app:
 
 discodeit:
   storage:
-    type: ${STORAGE_TYPE:local}
+    type: local
     local:
       root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
     s3:
@@ -30,7 +30,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         generate_statistics: false

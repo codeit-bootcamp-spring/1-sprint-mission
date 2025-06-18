@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class UserFacadeImpl implements UserFacade {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "userListCache", key = "'ALL_USERS'")
   public UserDto createUser(CreateUserRequest request, MultipartFile profile) {
     User user = userMapper.toEntity(request, encoder);
     User createdUser = userManagementService.createUser(user, profile);
@@ -51,7 +54,7 @@ public class UserFacadeImpl implements UserFacade {
 
   @Override
   @Transactional
-
+  @CacheEvict(cacheNames = "userListCache", key = "'ALL_USERS'")
   public UserDto updateUser(String userId, MultipartFile profile,
       UserUpdateDto updateDto, UserDetails userDetails) {
     log.debug("[UPDATE USER REQUEST] : [ID: {}]", userId);
@@ -67,14 +70,15 @@ public class UserFacadeImpl implements UserFacade {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(cacheNames = "userListCache", key = "'ALL_USERS'")
   public List<UserDto> findAllUsers() {
     List<User> users = userManagementService.findAllUsers();
     return userMapper.toDtoList(users, onlineStatusService);
-
   }
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "userListCache", key = "'ALL_USERS'")
   public void deleteUser(String id) {
     userManagementService.deleteUser(id);
   }

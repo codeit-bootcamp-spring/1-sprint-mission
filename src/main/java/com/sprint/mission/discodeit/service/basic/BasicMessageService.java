@@ -32,7 +32,8 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message createMessage(Message message) {
-    return messageRepository.save(message);
+    Message m = messageRepository.save(message);
+    return m;
   }
 
   @Override

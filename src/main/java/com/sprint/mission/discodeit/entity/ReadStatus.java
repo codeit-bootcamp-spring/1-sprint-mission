@@ -10,12 +10,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.time.Instant;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-import java.util.Objects;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,37 +36,53 @@ public class ReadStatus extends BaseUpdatableEntity {
   @Column(name = "last_read_at")
   private Instant lastReadAt;
 
+  @Column
+  private boolean notificationEnabled;
+
   @PrePersist
-  private void before(){
+  private void before() {
     lastReadAt = Instant.now();
   }
 
-  public ReadStatus(Channel channel, User user){
+  public ReadStatus(Channel channel, User user) {
     this.channel = channel;
     this.user = user;
   }
 
-  public void updateLastReadAtToCurrentTime(){
+  public void updateLastReadAtToCurrentTime() {
     lastReadAt = Instant.now();
   }
 
-  public void updateLastReadAt(Instant time){
+  public void updateLastReadAt(Instant time) {
     lastReadAt = time;
   }
 
-  public void addChannel(Channel channel){
+  public void addChannel(Channel channel) {
     this.channel = channel;
   }
 
-  public void addUser(User user){
+  public void enableNotification() {
+    notificationEnabled = true;
+
+  }
+
+  public void disableNotification() {
+    notificationEnabled = false;
+  }
+
+  public void addUser(User user) {
     this.user = user;
 
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     ReadStatus status = (ReadStatus) o;
 
     return Objects.equals(getId(), status.getId());

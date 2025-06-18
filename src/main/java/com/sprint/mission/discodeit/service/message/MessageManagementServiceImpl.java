@@ -1,13 +1,20 @@
 package com.sprint.mission.discodeit.service.message;
 
+import com.sprint.mission.discodeit.async.binary_content.BinaryContentStorageWrapperService;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.event_entity.BinaryContentUploadEvent;
+import com.sprint.mission.discodeit.event.event_entity.NotificationEvent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.user.UserService;
 import java.time.Instant;
@@ -16,6 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +43,10 @@ public class MessageManagementServiceImpl implements MessageManagementService {
   private final MessageMapper messageMapper;
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorageWrapperService binaryContentStorageWrapperService;
+
+  private final ReadStatusService readStatusService;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   @Transactional
@@ -55,10 +67,30 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
     if (files != null && !files.isEmpty()) {
       log.debug("[ATTACHMENTS FOUND] : [CHANNEL_ID : {}]", channelId);
-      withFiles(files, message);
+      withFiles(author, files, message);
     }
 
-    return messageService.createMessage(message);
+    Message sentMessage = messageService.createMessage(message);
+    // TODO : 분리
+    List<User> usersOfChannelNotificationOn = readStatusService.findAllByChannelId(channelId)
+        .stream()
+        .filter(status -> status.getUser().getId() != UUID.fromString(authorId))
+        .filter(ReadStatus::isNotificationEnabled)
+        .map(ReadStatus::getUser)
+        .collect(Collectors.toList());
+
+    NotificationEvent event = new NotificationEvent(
+        usersOfChannelNotificationOn,
+        NotificationType.NEW_MESSAGE,
+        UUID.fromString(channelId),
+        "새로운 메시지",
+        message.getContent() != null
+            ? message.getContent().substring(0, Math.min(10, message.getContent().length()))
+            : ""
+    );
+
+    eventPublisher.publishEvent(event);
+    return sentMessage;
   }
 
   @Override
@@ -99,18 +131,21 @@ public class MessageManagementServiceImpl implements MessageManagementService {
     messageService.deleteMessage(messageId);
   }
 
-  private void withFiles(List<MultipartFile> files, Message message) {
+  private void withFiles(User author, List<MultipartFile> files, Message message) {
     List<BinaryContent> contents = binaryContentMapper.fromMessageFiles(files);
+    contents.forEach(content -> content.changeUploadStatus(UploadStatus.WAITING));
 
-    binaryContentService.saveBinaryContents(contents, files);
+    List<BinaryContent> savedContents = binaryContentService.saveBinaryContents(contents, files);
 
-    List<MessageAttachment> attachments = contents.stream()
+    List<MessageAttachment> attachments = savedContents.stream()
         .map(content -> new MessageAttachment(message, content))
         .toList();
 
     message.getAttachments().addAll(attachments);
 
     log.debug("[ATTACHMENTS SAVED]");
+
+    eventPublisher.publishEvent(new BinaryContentUploadEvent(savedContents, files, author));
 
   }
 }

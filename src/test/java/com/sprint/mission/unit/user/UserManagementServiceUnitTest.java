@@ -9,6 +9,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.file.FileException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -16,7 +17,6 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapperImpl;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.user.UserManagementService;
-import com.sprint.mission.discodeit.service.user.UserManagementServiceImpl;
 import com.sprint.mission.discodeit.service.user.UserService;
 import java.io.IOException;
 import java.util.List;
@@ -45,8 +45,8 @@ public class UserManagementServiceUnitTest {
   @BeforeEach
   void setUp() {
     binaryContentMapper = new BinaryContentMapperImpl();
-    userManagementService = new UserManagementServiceImpl(userService, binaryContentService,
-        binaryContentMapper);
+//    userManagementService = new UserManagementServiceImpl(userService, binaryContentService,
+//        binaryContentMapper);
 
     user = new User("testUser", "test@example.com", "pw", null, null);
     ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
@@ -242,7 +242,8 @@ public class UserManagementServiceUnitTest {
       // given
       String userId = user.getId().toString();
 
-      BinaryContent profileBinaryContent = new BinaryContent("testProfile", 1L, "image/jpg");
+      BinaryContent profileBinaryContent = new BinaryContent("testProfile", 1L, "image/jpg",
+          UploadStatus.SUCCESS);
 
       ReflectionTestUtils.setField(profileBinaryContent, "id", UUID.randomUUID());
 

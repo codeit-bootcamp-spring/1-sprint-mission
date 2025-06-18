@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "userChannelList", allEntries = true)
   public ReadStatus create(CreateReadStatusDto dto, UserDetails details) {
 
     if (!permissionService.checkIsMe(UUID.fromString(dto.userId()), details)) {
@@ -54,6 +57,13 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     );
 
     ReadStatus status = new ReadStatus(channel, user);
+
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
+      status.enableNotification();
+    } else {
+      status.disableNotification();
+    }
+
     status.updateLastReadAt(dto.lastReadAt());
     return readStatusRepository.save(status);
   }
@@ -74,7 +84,8 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   userId 로 user 의 read status -> 불러온 read status 에 있는 channel ID 로 다른 유저의 read status
   쿼리 2번
    */
-  @Override //TODO: 리펙토
+  @Override
+//  @Cacheable(cacheNames = "userReadStatus", key = "#userId")
   public List<ReadStatus> findAllByUserId(String userId) {
     List<ReadStatus> userStatuses = readStatusRepository.findAllByUser_Id(UUID.fromString(userId));
     List<UUID> channelIds = userStatuses.stream().map(status -> status.getChannel().getId())
@@ -85,11 +96,6 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     Set<ReadStatus> merged = new HashSet<>();
     merged.addAll(userStatuses);
     merged.addAll(userStatuses2);
-
-//    merged.stream().filter(s -> !s.getUser().getId().equals(UUID.fromString(userId))).forEach(
-//        merged::remove);
-
-//    return new ArrayList<>(merged);
 
     return userStatuses;
   }

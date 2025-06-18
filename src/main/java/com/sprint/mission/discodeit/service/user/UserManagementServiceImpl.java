@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.service.user;
 
+import com.sprint.mission.discodeit.async.binary_content.BinaryContentStorageWrapperService;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.file.FileException;
+import com.sprint.mission.discodeit.event.event_entity.BinaryContentUploadEvent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +26,8 @@ public class UserManagementServiceImpl implements UserManagementService {
   private final UserService userService;
   private final BinaryContentService binaryContentService;
   private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorageWrapperService binaryContentStorageAsyncService;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   @Transactional
@@ -75,17 +79,22 @@ public class UserManagementServiceImpl implements UserManagementService {
 
 
   private void withProfile(User user, MultipartFile file) {
+
     try {
       log.debug("[SAVING USER PROFILE] : [USERNAME: {}]", user.getUsername());
       BinaryContent profile = binaryContentMapper.toProfileBinaryContent(file);
+      profile.changeUploadStatus(UploadStatus.WAITING);
       user.updateProfileImage(profile);
-      binaryContentService.save(profile, file.getBytes());
-      log.debug("[PROFILE SAVED] : [USERNAME: {}]", user.getUsername());
+
+      BinaryContent savedProfile = binaryContentService.save(profile, file.getBytes());
+
+      eventPublisher.publishEvent(
+          new BinaryContentUploadEvent(new ArrayList<>(List.of(savedProfile)),
+              new ArrayList<>(List.of(file)), user));
+
     } catch (IOException e) {
-      // TODO : 저장된 파일 삭제
-      log.warn("[ERROR DURING PROFILE SAVE] : [USERNAME: {}]", user.getUsername());
-      throw new FileException(ErrorCode.FILE_ERROR,
-          Map.of("username", user.getUsername(), "fileName", file.getOriginalFilename()));
+      log.warn("[ERROR WHILE SAVING PROFILE] : {}", e.getMessage());
     }
+
   }
 }
