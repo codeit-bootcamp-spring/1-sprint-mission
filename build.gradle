@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.2-M10'
+version = '3.0-M12'
 
 
 java {
@@ -33,6 +33,9 @@ dependencies {
     // 캐시
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.2.1'
+
+    // 웹소켓
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // JUnit 5 의존성
     testImplementation platform('org.junit:junit-bom:5.10.0')  // JUnit BOM 사용 (버전 관리)

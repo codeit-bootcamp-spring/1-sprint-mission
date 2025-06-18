@@ -37,7 +37,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
   @CacheEvict(value = "userChannel", key = "#request.user().id")
-  @PreAuthorize("#request.user.id == authentication.principal.id")
+//  @PreAuthorize("#request.user.id == authentication.principal.id")
   @Transactional
   @Override
   public ReadStatusDto createReadStatus(ReadStatusCreateRequest request) {
