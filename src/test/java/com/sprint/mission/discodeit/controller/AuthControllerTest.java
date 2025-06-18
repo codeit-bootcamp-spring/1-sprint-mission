@@ -49,7 +49,7 @@ class AuthControllerTest {
         Role.USER
     );
 
-//    given(authService.login(any(LoginRequest.class))).willReturn(loggedInUser);
+    //    given(authService.login(any(LoginRequest.class))).willReturn(loggedInUser);
 
     // When & Then
     mockMvc.perform(post("/api/auth/login")
@@ -71,8 +71,8 @@ class AuthControllerTest {
         "Password1!"
     );
 
-//    given(authService.login(any(LoginRequest.class)))
-//        .willThrow(UserNotFoundException.withUsername("nonexistentuser"));
+    //    given(authService.login(any(LoginRequest.class)))
+    //        .willThrow(UserNotFoundException.withUsername("nonexistentuser"));
 
     // When & Then
     mockMvc.perform(post("/api/auth/login")
@@ -90,8 +90,8 @@ class AuthControllerTest {
         "WrongPassword1!"
     );
 
-//    given(authService.login(any(LoginRequest.class)))
-//        .willThrow(InvalidCredentialsException.wrongPassword());
+    //    given(authService.login(any(LoginRequest.class)))
+    //        .willThrow(InvalidCredentialsException.wrongPassword());
 
     // When & Then
     mockMvc.perform(post("/api/auth/login")

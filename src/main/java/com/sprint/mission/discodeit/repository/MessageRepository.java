@@ -20,7 +20,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
       @Param("createdAt") Instant createdAt,
       Pageable pageable);
 
-
   @Query("SELECT m.createdAt "
       + "FROM Message m "
       + "WHERE m.channel.id = :channelId "

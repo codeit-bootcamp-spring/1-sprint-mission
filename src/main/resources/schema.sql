@@ -15,11 +15,12 @@ CREATE TABLE users
 -- BinaryContent
 CREATE TABLE binary_contents
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    varchar(255)             NOT NULL,
-    size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
+    id                           uuid PRIMARY KEY,
+    created_at                   timestamp with time zone NOT NULL,
+    file_name                    varchar(255)             NOT NULL,
+    size                         bigint                   NOT NULL,
+    content_type                 varchar(100)             NOT NULL,
+    binary_content_upload_status varchar(20)              NOT NULL
 --     ,bytes        bytea        NOT NULL
 );
 
@@ -57,12 +58,13 @@ CREATE TABLE message_attachments
 -- ReadStatus
 CREATE TABLE read_statuses
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    updated_at   timestamp with time zone,
-    user_id      uuid                     NOT NULL,
-    channel_id   uuid                     NOT NULL,
-    last_read_at timestamp with time zone NOT NULL,
+    id                  uuid PRIMARY KEY,
+    created_at          timestamp with time zone NOT NULL,
+    updated_at          timestamp with time zone,
+    user_id             uuid                     NOT NULL,
+    channel_id          uuid                     NOT NULL,
+    last_read_at        timestamp with time zone NOT NULL,
+    notificationEnabled boolean                  NOT NULL,
     UNIQUE (user_id, channel_id)
 );
 
@@ -130,3 +132,14 @@ CREATE TABLE jwt_sessions
     expiration_time timestamp with time zone NOT NULL
 );
 
+CREATE TABLE notifications
+(
+    id                uuid PRIMARY KEY,
+    created_at        timestamp with time zone NOT NULL,
+    updated_at        timestamp with time zone,
+    receiver_id       uuid                     NOT NULL,
+    target_id         uuid                     NOT NULL,
+    title             varchar(50),
+    content           text,
+    notification_type varchar(50)                  NOT NULL
+);

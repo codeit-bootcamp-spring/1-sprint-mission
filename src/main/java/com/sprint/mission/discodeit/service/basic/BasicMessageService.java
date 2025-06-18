@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -19,18 +21,23 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -44,7 +51,10 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
+  private final BinaryContentStatusService binaryContentStatusService;
+  private final ApplicationEventPublisher eventPublisher;
 
+  @Timed(value = "message.create", description = "메시지 생성 시간")
   @Transactional
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
@@ -67,7 +77,25 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+          TransactionSynchronizationManager.registerSynchronization(
+              new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                  binaryContentStorage.put(binaryContent.getId(), bytes)
+                      .handle((uuid, ex) -> {
+                        if (ex != null) {
+                          binaryContentStatusService.updateBinaryStatus(binaryContent.getId(),
+                              BinaryContentUploadStatus.FAILED);
+                          log.error("업로드 실패", ex);
+                        } else {
+                          binaryContentStatusService.updateBinaryStatus(uuid,
+                              BinaryContentUploadStatus.SUCCESS);
+                        }
+                        return null;
+                      });
+                }
+              }
+          );
           return binaryContent;
         })
         .toList();
@@ -79,8 +107,8 @@ public class BasicMessageService implements MessageService {
         author,
         attachments
     );
-
     messageRepository.save(message);
+    eventPublisher.publishEvent(new MessageCreatedEvent(channelId, content));
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
     return messageMapper.toDto(message);
   }

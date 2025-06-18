@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -91,12 +93,12 @@ class S3BinaryContentStorageTest {
 
   @Test
   @DisplayName("S3에 파일 업로드 성공 테스트")
-  void put_success() {
+  void put_success() throws ExecutionException, InterruptedException {
     // when
-    UUID resultId = s3BinaryContentStorage.put(testId, testData);
+    CompletableFuture<UUID> resultId = s3BinaryContentStorage.put(testId, testData);
 
     // then
-    assertThat(resultId).isEqualTo(testId);
+    assertThat(resultId.get()).isEqualTo(testId);
   }
 
   @Test

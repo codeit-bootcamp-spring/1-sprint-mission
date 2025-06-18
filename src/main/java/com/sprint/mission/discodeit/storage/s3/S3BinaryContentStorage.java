@@ -7,12 +7,14 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -52,7 +54,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  public UUID put(UUID binaryContentId, byte[] bytes) {
+  @Async
+  public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
     String key = binaryContentId.toString();
     try {
       S3Client s3Client = getS3Client();
@@ -65,10 +68,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
       s3Client.putObject(request, RequestBody.fromBytes(bytes));
       log.info("S3에 파일 업로드 성공: {}", key);
 
-      return binaryContentId;
+      return CompletableFuture.completedFuture(binaryContentId);
     } catch (S3Exception e) {
       log.error("S3에 파일 업로드 실패: {}", e.getMessage());
-      throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
+      return CompletableFuture.failedFuture(new RuntimeException("S3에 파일 업로드 실패: " + key, e));
+      // throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
     }
   }
 

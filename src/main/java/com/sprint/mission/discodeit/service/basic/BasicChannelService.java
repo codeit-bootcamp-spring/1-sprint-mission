@@ -18,10 +18,12 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -37,6 +39,7 @@ public class BasicChannelService implements ChannelService {
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
+  @CacheEvict(cacheNames = "channelList", key = "#request.userId()")
   @Override
   public ChannelDto create(PublicChannelCreateRequest request) {
     log.debug("채널 생성 시작: {}", request);
@@ -50,6 +53,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Transactional
+  @CacheEvict(cacheNames = "channelList", key = "#request.participantIds()")
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
     log.debug("채널 생성 시작: {}", request);
@@ -73,6 +77,7 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
   }
 
+  @Cacheable(cacheNames = "channelList", key = "#userId")
   @Transactional(readOnly = true)
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
@@ -89,6 +94,7 @@ public class BasicChannelService implements ChannelService {
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
+  @CacheEvict(cacheNames = "channelList", allEntries = true)
   @Override
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     log.debug("채널 수정 시작: id={}, request={}", channelId, request);
@@ -106,6 +112,7 @@ public class BasicChannelService implements ChannelService {
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
+  @CacheEvict(cacheNames = "channelList", allEntries = true)
   @Override
   public void delete(UUID channelId) {
     log.debug("채널 삭제 시작: id={}", channelId);
