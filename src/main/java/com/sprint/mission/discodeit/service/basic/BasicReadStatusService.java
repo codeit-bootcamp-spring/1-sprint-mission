@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.ReadStatusRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusRequest.Create;
+import com.sprint.mission.discodeit.dto.request.ReadStatusRequest.Update;
 import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
@@ -35,7 +35,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatusResponse create(ReadStatusRequest.Create request) {
+    public ReadStatusResponse create(Create request) {
         UUID userId = request.getUserId();
         UUID channelId = request.getChannelId();
 
@@ -51,19 +51,19 @@ public class BasicReadStatusService implements ReadStatusService {
                 Map.of("userId", userId, "channelId", channelId));
         }
 
-        ReadStatus newReadStatus;
+        boolean notificationEnabled;
 
-        if (channel.getType() == ChannelType.PUBLIC) {
-            newReadStatus = ReadStatus.createReadStatus(user, channel,
-                request.getLastReadAt(), false);
-        } else if (channel.getType() == ChannelType.PRIVATE) {
-            newReadStatus = ReadStatus.createReadStatus(user, channel,
-                request.getLastReadAt(), true);
-        } else {
-            throw new IllegalArgumentException("지원하지 않는 채널 타입입니다.");
+        switch (channel.getType()) {
+            case PUBLIC -> notificationEnabled = false;
+            case PRIVATE -> notificationEnabled = true;
+            default -> throw new IllegalArgumentException("지원하지 않는 채널 타입입니다.");
         }
 
+        ReadStatus newReadStatus = ReadStatus.createReadStatus(user, channel,
+            request.getLastReadAt(), notificationEnabled);
+
         readStatusRepository.save(newReadStatus);
+
         log.info("Create Read Status : {}", newReadStatus);
         return readStatusMapper.entityToDto(newReadStatus);
     }
@@ -88,7 +88,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponse update(UUID id, ReadStatusRequest.Update request) {
+    public ReadStatusResponse update(UUID id, Update request) {
         ReadStatus readStatus = findByIdOrThrow(id);
         readStatus.updateLastReadAt(request.getNewLastReadAt());
         return readStatusMapper.entityToDto(readStatusRepository.save(readStatus));
