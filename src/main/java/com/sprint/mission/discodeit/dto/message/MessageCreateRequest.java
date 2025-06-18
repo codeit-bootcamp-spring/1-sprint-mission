@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.dto.message;
 import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 
-public record CreateMessageDto(
+public record MessageCreateRequest(
     @NotBlank
     String content,
     @NotBlank

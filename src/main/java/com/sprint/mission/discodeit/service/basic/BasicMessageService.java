@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -63,25 +63,25 @@ public class BasicMessageService implements MessageService {
   //텍스트만 있는 메세지
   @Override
   @Transactional
-  public MessageDto create(CreateMessageDto createMessageDto) throws DiscodeitException {
+  public MessageDto create(MessageCreateRequest messageCreateRequest) throws DiscodeitException {
     log.info("메세지 생성 시작: userId = {}, channelId = {}, messageContent = {}",
-        createMessageDto.getAuthorId(), createMessageDto.getChannelId(),
-        createMessageDto.content());
+        messageCreateRequest.getAuthorId(), messageCreateRequest.getChannelId(),
+        messageCreateRequest.content());
 
-    if (createMessageDto.content() == null) {
+    if (messageCreateRequest.content() == null) {
       log.warn("메세지 생성 정보 누락");
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    UUID channelId = createMessageDto.getChannelId();
-    UUID authorId = createMessageDto.getAuthorId();
+    UUID channelId = messageCreateRequest.getChannelId();
+    UUID authorId = messageCreateRequest.getAuthorId();
 
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
     User author = userRepository.findById(authorId)
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    Message message = new Message(author, createMessageDto.content(), channel);
+    Message message = new Message(author, messageCreateRequest.content(), channel);
     Message saved = messageRepository.save(message);
 
     log.info("메세지 생성 완료: messageId = {}", saved.getId());
@@ -101,7 +101,7 @@ public class BasicMessageService implements MessageService {
               readStatus.getUser().getId().equals(authorId));
           NewMessageEvent event = new NewMessageEvent(
               readStatus.getUser().getId(),
-              createMessageDto.getChannelId(),
+              messageCreateRequest.getChannelId(),
               (channel.getName() == null || channel.getName().isEmpty()) ? "개인 채널"
                   : channel.getName(),
               message.getContent().length() > 20 ? message.getContent().substring(0, 20) + "..."
@@ -122,9 +122,9 @@ public class BasicMessageService implements MessageService {
   //텍스트 + 파일 메세지
   @Override
   @Transactional
-  public MessageDto create(CreateMessageDto createMessageDto, List<MultipartFile> files)
+  public MessageDto create(MessageCreateRequest messageCreateRequest, List<MultipartFile> files)
       throws DiscodeitException {
-    MessageDto messageDto = create(createMessageDto);
+    MessageDto messageDto = create(messageCreateRequest);
 
     log.info("메세지 파일 첨부 시작: messageId = {}", messageDto.id());
 
