@@ -3,14 +3,20 @@ package com.sprint.mission.discodeit.dto.response;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public record ReadStatusDto(
-    UUID id,
-    UUID userId,
-    UUID channelId,
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReadStatusDto {
 
-    @NotNull
-    Instant lastReadAt
-) {
+  UUID id;
+  UUID userId;
+  UUID channelId;
+  boolean notificationEnabled;
 
+  @NotNull
+  Instant lastReadAt;
 }

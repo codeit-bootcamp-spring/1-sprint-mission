@@ -65,6 +65,7 @@ public class UserController {
   @Operation(summary = "전체 유저 목록 조회")
   @GetMapping
   public List<UserCreateResponse> findUsers() {
+
     return userService.findAll();
   }
 

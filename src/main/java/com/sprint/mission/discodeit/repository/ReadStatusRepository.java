@@ -29,4 +29,12 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
   void deleteAllByuser_id(UUID userId);
 
   boolean existsByIdAndUser_id(UUID id, UUID userId);
+
+  List<ReadStatus> findAllByChannel_IdAndNotificationEnabled(UUID channelId,
+      boolean notificationEnabled);
+
+  List<ReadStatus> findByChannel_IdAndUser_Id(UUID channelId, UUID userId);
+
+  List<ReadStatus> findByChannel_IdAndUser_IdAndNotificationEnabled(UUID channelId, UUID userId,
+      boolean notificationEnabled);
 }

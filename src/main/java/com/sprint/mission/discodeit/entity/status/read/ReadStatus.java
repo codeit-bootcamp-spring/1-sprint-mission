@@ -31,14 +31,20 @@ public class ReadStatus extends BaseUpdatableEntity {
   private Channel channel;
 
   private Instant lastReadAt;
+  
+  private boolean notificationEnabled;
 
-  public static ReadStatus create(User user, Channel channel) {
-    return new ReadStatus(user, channel, Instant.now());
+  public static ReadStatus create(User user, Channel channel, boolean notificationEnabled) {
+    return new ReadStatus(user, channel, Instant.now(), notificationEnabled);
   }
 
   public ReadStatus changeLastReadAt(Instant lastReadAt) {
     this.lastReadAt = lastReadAt;
 
     return this;
+  }
+
+  public void updateNotificationEnabled(boolean enabled) {
+    this.notificationEnabled = enabled;
   }
 }

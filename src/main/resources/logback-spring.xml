@@ -12,13 +12,7 @@
     <withJansi>true</withJansi>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <pattern>
-        <![CDATA[
-        %clr(%d{yy-MM-dd HH:mm:ss.SSS}){faint}
-        %clr([%thread]){faint}
-        %highlight(%-5level)
-        %clr(%logger{36}){cyan}
-        [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n
-        ]]>
+        <![CDATA[%clr(%d{yy-MM-dd HH:mm:ss.SSS}){faint} %clr([%thread]){faint} %highlight(%-5level) %clr(%logger{36}){cyan} [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n]]>
       </pattern>
     </encoder>
   </appender>
@@ -43,7 +37,10 @@
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
     </root>
-    <logger name="com.sprint.mission.discodeit" level="INFO"/>
+    <logger name="com.sprint.mission.discodeit" level="INFO" additivity="false">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </logger>
   </springProfile>
 
   <springProfile name="dev">
@@ -51,7 +48,10 @@
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
     </root>
-    <logger name="com.sprint.mission.discodeit" level="TRACE"/>
+    <logger name="com.sprint.mission.discodeit" level="TRACE" additivity="false">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </logger>
   </springProfile>
 
   <!-- 기본 로깅 레벨 설정 -->

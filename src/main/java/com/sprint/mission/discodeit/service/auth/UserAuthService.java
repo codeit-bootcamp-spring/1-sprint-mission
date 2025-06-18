@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.role.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.events.ChangeRoleEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.jwt.JwtTokenNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContext;
@@ -43,6 +45,7 @@ public class UserAuthService implements com.sprint.mission.discodeit.service.aut
   private final UserRepository userRepository;
   private final FindByIndexNameSessionRepository<? extends Session> sessionRepository;
   private final UserSessionService userSessionService;
+  private final ApplicationEventPublisher eventPublisher;
 
 
   /**
@@ -58,6 +61,10 @@ public class UserAuthService implements com.sprint.mission.discodeit.service.aut
     User user = userRepository.findById(request.userId()).orElseThrow(
         () -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
             Map.of(ErrorCode.USER_NOT_FOUND.getCode(), ErrorCode.USER_NOT_FOUND.getMessage())));
+
+    eventPublisher.publishEvent(
+        new ChangeRoleEvent(request.userId(), user.getRole().toString(),
+            request.newRole().toString()));
 
     user.changeRole(request.newRole());
 

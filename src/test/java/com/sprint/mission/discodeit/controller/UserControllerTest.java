@@ -162,7 +162,7 @@ class UserControllerTest {
         request.newEmail(),
         null, true);
 
-    when(userService.update(any(UUID.class), any(UserUpdateRequest.class), isNull()))
+    when(userService.update(any(UUID.class), any(UserUpdateRequest.class), isNull(), null))
         .thenReturn(response);
 
     MockPart mockFile = new MockPart("userUpdateRequest", null, requestJson.getBytes());
@@ -175,7 +175,7 @@ class UserControllerTest {
         .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(response)));
 
-    verify(userService).update(userId, request, null);
+    verify(userService).update(userId, request, null, null);
   }
 
   @Test
@@ -191,7 +191,7 @@ class UserControllerTest {
         Map.of("user", ErrorCode.USER_NOT_FOUND.getMessage())
     );
 
-    when(userService.update(any(UUID.class), any(UserUpdateRequest.class), isNull()))
+    when(userService.update(any(UUID.class), any(UserUpdateRequest.class), isNull(), null))
         .thenThrow(exception);
 
     MockPart mockFile = new MockPart("userUpdateRequest", null, requestJson.getBytes());
@@ -204,6 +204,6 @@ class UserControllerTest {
         .andExpect(status().isNotFound());
 
     verify(userService).update(any(UUID.class), any(UserUpdateRequest.class),
-        any());
+        any(), isNull());
   }
 }

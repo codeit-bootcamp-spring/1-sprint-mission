@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.exception.binary.AWSException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -49,12 +50,16 @@ class S3BinaryContentStorageTest {
   @Mock
   private S3TransferManager s3TransferManager;
 
+  @Mock
+  private BinaryContentRepository binaryContentRepository;
+
   private S3BinaryContentStorage S3storage;
 
   @BeforeEach
   void setUp() {
     // 직접 의존성을 주입하여 인스턴스 생성
-    S3storage = new S3BinaryContentStorage(s3AsyncClient, s3TransferManager);
+    S3storage = new S3BinaryContentStorage(binaryContentRepository, s3AsyncClient,
+        s3TransferManager);
 
     ReflectionTestUtils.setField(S3storage, "accessKey", "test-access-key");
     ReflectionTestUtils.setField(S3storage, "secretKey", "test-secret-key");
@@ -155,7 +160,7 @@ class S3BinaryContentStorageTest {
           .thenReturn("\"test\"");
 
       // When
-      UUID result = S3storage.put(fileId, fileContent);
+      CompletableFuture<UUID> result = S3storage.put(fileId, fileContent);
 
       // Then
       assertEquals(fileId, result);

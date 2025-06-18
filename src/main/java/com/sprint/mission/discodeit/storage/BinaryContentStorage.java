@@ -4,11 +4,12 @@ import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.http.ResponseEntity;
 
 public interface BinaryContentStorage {
-
-  UUID put(UUID fileId, byte[] bytes);
+  
+  CompletableFuture<UUID> put(UUID fileId, byte[] bytes);
 
   InputStream get(UUID fileId);
 
@@ -18,4 +19,6 @@ public interface BinaryContentStorage {
     return null;
   }
 
+//  AsyncTaskFailure recover(NotSavedBinaryContentException e, UUID fileId, byte[] bytes,
+//      Path filePath);
 }

@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -64,6 +66,7 @@ public class BasicUserService implements UserService {
    * 유저 생성
    */
   @Override
+  @CacheEvict(cacheNames = "users", allEntries = true, beforeInvocation = true)
   public UserCreateResponse join(UserCreateRequest request, MultipartFile file)
       throws IOException {
     User findUser = userRepository.findUserByUsername(request.getUsername());
@@ -132,6 +135,7 @@ public class BasicUserService implements UserService {
    */
   @Override
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  @Cacheable(cacheNames = "users", key = "#root.methodName", sync = true)
   public List<UserCreateResponse> findAll() {
     List<User> users = userRepository.findUsers();
 
@@ -145,6 +149,7 @@ public class BasicUserService implements UserService {
   /**
    * 유저 삭제
    */
+  @CacheEvict(cacheNames = "users", allEntries = true, beforeInvocation = true)
   @Override
   public UUID delete(UUID userId) {
     if (!userRepository.existsById(userId)) {
@@ -165,6 +170,7 @@ public class BasicUserService implements UserService {
   /**
    * 유저 업데이트
    */
+  @CacheEvict(cacheNames = "users", allEntries = true, beforeInvocation = true)
   @Override
   public UserUpdateResponse update(UUID userId, UserUpdateRequest request,
       MultipartFile profile, String refreshToken) throws IOException {

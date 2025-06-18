@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateResponse;
@@ -35,6 +36,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -114,8 +116,9 @@ class BasicUserServiceTest {
     when(mockProfile.getName()).thenReturn("test.txt");
 
     BinaryContent binaryContent = new BinaryContent(mockProfile.getName(), mockProfile.getSize(),
-        mockProfile.getContentType());
-    when(binaryContentStorage.put(any(), any())).thenReturn(binaryContent.getId());
+        mockProfile.getContentType(), BinaryContentUploadStatus.WATING);
+    when(binaryContentStorage.put(any(), any())).thenReturn(
+        CompletableFuture.completedFuture(binaryContent.getId()));
 
     User user = new User("test", "test@mail.com", "1234", binaryContent, null);
     setUserId(user, UUID.randomUUID());
@@ -222,7 +225,7 @@ class BasicUserServiceTest {
 
     when(userRepository.findById(findUser.getId())).thenReturn(Optional.of(findUser));
 
-    UserUpdateResponse updatedUser = userService.update(findUser.getId(), request, null);
+    UserUpdateResponse updatedUser = userService.update(findUser.getId(), request, null, null);
 
     assertNotNull(updatedUser);
     assertEquals("newName", updatedUser.username());
@@ -247,7 +250,7 @@ class BasicUserServiceTest {
         .when(entityManager).flush();
 
     assertThrows(ConstraintViolationException.class, () -> {
-      userService.update(oldUser.getId(), request, null);
+      userService.update(oldUser.getId(), request, null, null);
     });
 
     verify(entityManager).flush();

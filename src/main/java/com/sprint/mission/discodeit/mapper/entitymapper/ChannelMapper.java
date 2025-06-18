@@ -31,14 +31,8 @@ public class ChannelMapper {
     List<UserDto> users = readStatusRepository.findAllByChannel(channel).stream()
         .map(st -> userMapper.toDto(st.getUser())).toList();
 
-    return ChannelDto.builder()
-        .id(channel.getId())
-        .type(channel.getType())
-        .name(channel.getName())
-        .description(channel.getDescription())
-        .participants(users)
-        .lastMessageAt(
-            readStatusRepository.findFirstByChannelOrderByLastReadAtDesc(channel).getLastReadAt())
-        .build();
+    return new ChannelDto(channel.getId(), channel.getType(), channel.getName(),
+        channel.getDescription(), users,
+        readStatusRepository.findFirstByChannelOrderByLastReadAtDesc(channel).getLastReadAt());
   }
 }

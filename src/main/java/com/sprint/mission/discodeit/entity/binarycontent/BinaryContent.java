@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity.binarycontent;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,4 +24,10 @@ public class BinaryContent extends BaseEntity {
 
   private String contentType;
 
+  @Enumerated(EnumType.STRING)
+  BinaryContentUploadStatus uploadStatus;
+
+  public void updateUploadStatus(BinaryContentUploadStatus status) {
+    this.uploadStatus = status;
+  }
 }

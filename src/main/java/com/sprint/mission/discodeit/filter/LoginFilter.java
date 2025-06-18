@@ -89,12 +89,10 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     if (profile == null) {
       binaryContentDto = null;
     } else {
-      binaryContentDto = BinaryContentDto.builder()
-          .id(user.getId())
-          .fileName(profile.getFileName())
-          .size(profile.getSize())
-          .contentType(profile.getContentType())
-          .build();
+
+      binaryContentDto = new BinaryContentDto(user.getId(), profile.getFileName(),
+          profile.getSize(),
+          profile.getContentType());
     }
 
     return UserDto.builder()

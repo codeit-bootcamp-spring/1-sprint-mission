@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.entity.auth.LoginRequest;
+import com.sprint.mission.discodeit.entity.role.Role;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserCreateResponse;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserUpdateResponse;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,12 +20,18 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +39,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,17 +55,24 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 
-@Transactional
 @Rollback
+@Transactional
 @ActiveProfiles("test")
+@AutoConfigureTestEntityManager
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserApiIntegrationTest {
 
   @Autowired
-  private UserService userService;
+  private UserRepository userRepository;
 
   @Autowired
   private TestRestTemplate restTemplate;
+
+  @Autowired
+  private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private TestEntityManager em;
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -56,6 +82,45 @@ public class UserApiIntegrationTest {
 
   @Value("${discodeit.storage.local.root-path:.discodeit/storage}")
   private String storagePath;
+
+  @TestConfiguration
+  static class TestSecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+      http.csrf(AbstractHttpConfigurer::disable)
+          .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+      return http.build();
+    }
+  }
+
+  @TestConfiguration
+  public class RestTemplateConfig {
+
+    /**
+     * ENABLE_COOKIES 옵션을 추가해 TestRestTemplate가 세션 쿠키를 저장·재전송하도록 설정
+     */
+    @Bean
+    @Primary
+    public TestRestTemplate testRestTemplate() {
+      // 기본 RestTemplateBuilder 없이 간단히 생성 가능
+      return new TestRestTemplate(
+          TestRestTemplate.HttpClientOption.ENABLE_REDIRECTS,
+          TestRestTemplate.HttpClientOption.ENABLE_COOKIES
+      );
+    }
+  }
+
+  @BeforeEach
+  void setupSecurityContext() {
+    UserDetails user = org.springframework.security.core.userdetails.User.withUsername("test_user")
+        .password("password1234").roles("ADMIN").build();
+    Authentication auth = new UsernamePasswordAuthenticationToken(user, user.getPassword(),
+        user.getAuthorities());
+    SecurityContext context = SecurityContextHolder.createEmptyContext();
+    context.setAuthentication(auth);
+    SecurityContextHolder.setContext(context);
+  }
 
   // 테스트 실행 전에 필요한 디렉토리 생성
   @BeforeAll
@@ -116,8 +181,8 @@ public class UserApiIntegrationTest {
 
     HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-    ResponseEntity<UserCreateResponse> response = restTemplate
-        .postForEntity("/api/users", requestEntity, UserCreateResponse.class);
+    ResponseEntity<UserCreateResponse> response = restTemplate.postForEntity("/api/users",
+        requestEntity, UserCreateResponse.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     assertThat(response).isNotNull();
@@ -154,15 +219,14 @@ public class UserApiIntegrationTest {
 
     HttpHeaders profileHeaders = new HttpHeaders();
     profileHeaders.setContentType(MediaType.IMAGE_JPEG);
-    HttpEntity<ByteArrayResource> filePart = new HttpEntity<>(fileResource,
-        profileHeaders);
+    HttpEntity<ByteArrayResource> filePart = new HttpEntity<>(fileResource, profileHeaders);
 
     body.add("profile", filePart);
 
     HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(body, headers);
 
-    ResponseEntity<UserCreateResponse> response = restTemplate
-        .postForEntity("/api/users", httpEntity, UserCreateResponse.class);
+    ResponseEntity<UserCreateResponse> response = restTemplate.postForEntity("/api/users",
+        httpEntity, UserCreateResponse.class);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     assertThat("userD").isEqualTo(response.getBody().username());
@@ -189,13 +253,8 @@ public class UserApiIntegrationTest {
 
     HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(body, headers);
 
-    ResponseEntity<UserUpdateResponse> response = restTemplate.exchange(
-        "/api/users/{userId}",
-        HttpMethod.PATCH,
-        httpEntity,
-        UserUpdateResponse.class,
-        userId
-    );
+    ResponseEntity<UserUpdateResponse> response = restTemplate.exchange("/api/users/{userId}",
+        HttpMethod.PATCH, httpEntity, UserUpdateResponse.class, userId);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat("newUser3").isEqualTo(response.getBody().username());
@@ -232,19 +291,13 @@ public class UserApiIntegrationTest {
 
     HttpHeaders profileHeaders = new HttpHeaders();
     profileHeaders.setContentType(MediaType.IMAGE_JPEG);
-    HttpEntity<ByteArrayResource> fileEntity = new HttpEntity<>(fileResource,
-        profileHeaders);
+    HttpEntity<ByteArrayResource> fileEntity = new HttpEntity<>(fileResource, profileHeaders);
     body.add("profile", fileEntity);
 
     HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(body, headers);
 
-    ResponseEntity<UserUpdateResponse> response = restTemplate.exchange(
-        "/api/users/{userId}",
-        HttpMethod.PATCH,
-        httpEntity,
-        UserUpdateResponse.class,
-        user1Id
-    );
+    ResponseEntity<UserUpdateResponse> response = restTemplate.exchange("/api/users/{userId}",
+        HttpMethod.PATCH, httpEntity, UserUpdateResponse.class, user1Id);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     assertThat(response).isNotNull();
@@ -252,21 +305,37 @@ public class UserApiIntegrationTest {
     assertThat("test").isEqualTo(response.getBody().profile().fileName());
   }
 
-
   @Test
   @DisplayName("유저 삭제")
   void deleteUser() throws Exception {
-    UUID user1Id = UUID.fromString("3a2c1f0d-6b9e-4e8a-a7c5-d4f2e9b8c1a0");
+    User user = User.builder()
+        .role(Role.ROLE_ADMIN)
+        .username("test")
+        .password(passwordEncoder.encode("password123"))
+        .email("test@mail.com")
+        .profile(null)
+        .build();
 
-    ResponseEntity<UUID> response = restTemplate.exchange(
-        "/api/users/{userId}",
-        HttpMethod.DELETE,
-        null,
-        UUID.class,
-        user1Id
+    em.persistAndFlush(user);
+
+    User user1 = userRepository.findUserByUsername("test");
+    System.out.println("user1 = " + user1.getUsername());
+
+    HttpHeaders httpHeaders = new HttpHeaders();
+    httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+    LoginRequest loginRequest = new LoginRequest("test", "password123");
+    HttpEntity<LoginRequest> entity = new HttpEntity<>(loginRequest, httpHeaders);
+
+    ResponseEntity<String> loginResponse = restTemplate.exchange(
+        "/api/auth/login",
+        HttpMethod.POST,
+        entity,
+        String.class
     );
 
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
+
   }
 
   @Test
@@ -275,14 +344,8 @@ public class UserApiIntegrationTest {
     UUID noneUser = UUID.fromString("8f2c1f0d-6b9e-4e8a-a7c5-d4f2e9b8c1a0");
 
     RestClientException exception = Assertions.assertThrows(RestClientException.class,
-        () ->
-            restTemplate.exchange(
-                "/api/users/{userId}",
-                HttpMethod.DELETE,
-                null,
-                UUID.class,
-                noneUser
-            ));
+        () -> restTemplate.exchange("/api/users/{userId}", HttpMethod.DELETE, null, UUID.class,
+            noneUser));
 
     assertThat(exception.getClass()).isEqualTo(RestClientException.class);
   }

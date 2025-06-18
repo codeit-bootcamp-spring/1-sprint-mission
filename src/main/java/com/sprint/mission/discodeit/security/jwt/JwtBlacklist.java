@@ -17,7 +17,7 @@ public class JwtBlacklist {
 
   public JwtBlacklist() {
     log.info("토큰 삭제 스케줄링 실행");
-    scheduler.scheduleAtFixedRate(() -> removeAllExpireToken(), 10, 10, TimeUnit.MINUTES);
+    scheduler.scheduleAtFixedRate(() -> removeAllExpireToken(), 0, 30, TimeUnit.MINUTES);
   }
 
   public void put(String token, LocalDateTime expiration) {
@@ -58,7 +58,7 @@ public class JwtBlacklist {
   }
 
   private void removeAllExpireToken() {
-
+    log.info("만료 토큰 삭제 시도");
     LocalDateTime now = LocalDateTime.now();
 
     blackList.forEach((key, value) -> {

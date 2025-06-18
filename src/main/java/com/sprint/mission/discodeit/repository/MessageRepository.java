@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.message.Message;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -25,4 +27,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID>, Message
   void deleteAllByauthor_id(UUID authorId);
 
   boolean existsByidAndAuthor_Id(UUID id, UUID authorId);
+
+  List<Message> findAllByAuthor_IdAndChannel_IdIn(UUID authorId, Collection<UUID> channelIds);
 }
