@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentOperationException;
 import com.sprint.mission.discodeit.global.exception.storage.StorageException;
-import com.sprint.mission.discodeit.global.monitoring.AsyncTaskFailure;
+import com.sprint.mission.discodeit.global.interceptor.MDCLoggingInterceptor;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
@@ -213,7 +214,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     @Recover
     public CompletableFuture<Void> recover(BinaryContentOperationException e, UUID id,
         byte[] bytes) {
-        String requestId = MDC.get("requestId");
+        UUID requestId = UUID.fromString(MDC.get(MDCLoggingInterceptor.REQUEST_ID));
         String failureReason = e.getMessage();
 
         AsyncTaskFailure failure = new AsyncTaskFailure(TASK_NAME, requestId, failureReason);

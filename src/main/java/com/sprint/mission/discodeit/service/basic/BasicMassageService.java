@@ -5,15 +5,14 @@ import com.sprint.mission.discodeit.dto.response.MessageResponse;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Notification.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.global.interceptor.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -57,7 +56,7 @@ public class BasicMassageService implements MessageService {
 
         UUID userId = request.getAuthorId();
         UUID channelId = request.getChannelId();
-        UUID requestId = UUID.fromString(MDC.get("requestId"));
+        UUID requestId = UUID.fromString(MDC.get(MDCLoggingInterceptor.REQUEST_ID));
 
         User user = userRepository.findById(userId).orElseThrow(() ->
             new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
@@ -80,26 +79,16 @@ public class BasicMassageService implements MessageService {
         List<UUID> receiverIds = readStatusRepository.findReceiverIdsByChannelIdAndNotificationEnabledTrue(
             channelId);
 
-        String title;
-        if (channel.getType() == ChannelType.PRIVATE) {
-            title = user.getUsername() + "님의 새로운 메시지가 있습니다.";
-        } else {
-            title = "채널 " + channel.getName() + "에 새로운 메시지가 있습니다.";
-        }
-
-        for (UUID receiverId : receiverIds) {
-            if (receiverId.equals(userId)) {
-                continue;
-            }
-            NotificationEvent event = NotificationEvent.builder()
-                .receiverId(receiverId)
-                .type(NotificationType.NEW_MESSAGE)
-                .targetId(channelId)
-                .title(title)
-                .content(message.getContent())
-                .build();
-            eventPublisher.publishEvent(event);
-        }
+        NewMessageEvent event = NewMessageEvent.builder()
+            .authorId(userId)
+            .authorName(user.getUsername())
+            .channelId(channelId)
+            .channelName(channel.getName())
+            .channelType(channel.getType())
+            .receiverIds(receiverIds)
+            .content(request.getContent())
+            .build();
+        eventPublisher.publishEvent(event);
 
         log.info("Created message - id: {}", message.getId());
         return messageMapper.entityToDto(message);

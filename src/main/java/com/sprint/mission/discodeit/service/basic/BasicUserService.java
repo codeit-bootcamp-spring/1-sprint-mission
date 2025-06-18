@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.global.interceptor.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -46,7 +47,7 @@ public class BasicUserService implements UserService {
     @Transactional
     public UserResponse createUser(UserRequest.Create request, MultipartFile userProfileImage) {
 
-        UUID requestId = UUID.fromString(MDC.get("requestId"));
+        UUID requestId = UUID.fromString(MDC.get(MDCLoggingInterceptor.REQUEST_ID));
 
         checkDuplicateEmail(request.getEmail());
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -91,7 +92,7 @@ public class BasicUserService implements UserService {
     public UserResponse update(UUID id, UserRequest.Update request,
         MultipartFile userProfileImage) {
 
-        UUID requestId = UUID.fromString(MDC.get("requestId"));
+        UUID requestId = UUID.fromString(MDC.get(MDCLoggingInterceptor.REQUEST_ID));
         User user = findByIdOrThrow(id);
 
         Optional.ofNullable(request.getNewUsername()).ifPresent(user::updateName);
