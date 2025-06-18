@@ -59,7 +59,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(newChannel);
 
         for (UUID userId : request.getParticipantIds()) {
-            readStatusService.create(
+            readStatusService.create(userId,
                 new ReadStatusRequest.Create(userId, newChannel.getId(),
                     newChannel.getCreatedAt()));
 

@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,8 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatusResponse create(Create request) {
-        UUID userId = request.getUserId();
+    public ReadStatusResponse create(UUID userId, Create request) {
         UUID channelId = request.getChannelId();
 
         User user = userRepository.findById(userId).orElseThrow(
@@ -88,9 +88,25 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusResponse update(UUID id, Update request) {
+    public ReadStatusResponse update(UUID userId, UUID id, Update request) {
         ReadStatus readStatus = findByIdOrThrow(id);
-        readStatus.updateLastReadAt(request.getNewLastReadAt());
+
+        boolean hasLastReadAt = request.getNewLastReadAt() != null;
+        boolean hasNotificationEnabled = request.getNewNotificationEnabled() != null;
+
+        if (hasLastReadAt == hasNotificationEnabled) {
+            throw new IllegalArgumentException("하나의 필드만 업데이트할 수 있습니다.");
+        }
+
+        if (hasLastReadAt) {
+            if (!readStatus.getUser().getId().equals(userId)) {
+                throw new AccessDeniedException("읽음 상태를 수정할 권한이 없습니다.");
+            }
+            readStatus.updateLastReadAt(request.getNewLastReadAt());
+        } else {
+            readStatus.updateNotificationEnabled(request.getNewNotificationEnabled());
+        }
+
         return readStatusMapper.entityToDto(readStatusRepository.save(readStatus));
     }
 
