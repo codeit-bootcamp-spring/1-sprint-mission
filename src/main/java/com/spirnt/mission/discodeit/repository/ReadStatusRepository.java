@@ -10,12 +10,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-  @Query("SELECT distinct rs from ReadStatus rs where rs.user.id=:userId")
-  List<ReadStatus> findAllByUserId(UUID userId);
+    @Query("SELECT distinct rs from ReadStatus rs where rs.user.id=:userId")
+    List<ReadStatus> findAllByUserId(UUID userId);
 
-  List<ReadStatus> findAllByChannelId(UUID channelId);
+    List<ReadStatus> findAllByChannelId(UUID channelId);
 
-  boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
+    boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
 
-  void deleteByChannelId(UUID channelId);
+    @Query("SELECT rs FROM ReadStatus rs WHERE rs.channel.id = :channelId AND rs.notificationEnabled = true")
+    List<ReadStatus> findAllByChannelIdAndNotificationEnabledTrue(UUID channelId);
 }

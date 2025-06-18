@@ -6,6 +6,7 @@ import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import com.spirnt.mission.discodeit.service.UserService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +43,7 @@ public class UserController implements UserApiDocs {
 
 
     // 사용자 등록
+    @Timed(value = "upload", description = "Upload timing")
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> createUser(
         @Valid @RequestPart UserCreateRequest userCreateRequest,

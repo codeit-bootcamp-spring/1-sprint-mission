@@ -3,11 +3,9 @@ package com.spirnt.mission.discodeit.dto.message;
 
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.dto.user.UserDto;
-import com.spirnt.mission.discodeit.entity.Message;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -32,18 +30,5 @@ public class MessageDto {
         this.channelId = channelId;
         this.author = author;
         this.attachments = attachments;
-    }
-
-    public static MessageDto from(Message message, boolean isOnline) {
-        return MessageDto.builder()
-            .id(message.getId())
-            .createdAt(message.getCreatedAt())
-            .updatedAt(message.getUpdatedAt())
-            .content(message.getContent())
-            .channelId(message.getChannel().getId())
-            .author(UserDto.from(message.getAuthor(), isOnline))
-            .attachments(message.getAttachments().stream().map(BinaryContentDto::from).collect(
-                Collectors.toList()))
-            .build();
     }
 }

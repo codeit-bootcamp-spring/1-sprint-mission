@@ -1,5 +1,6 @@
 package com.spirnt.mission.discodeit.service.basic;
 
+import com.spirnt.mission.discodeit.async.notification.NotificationCreateEvent;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.dto.message.MessageCreateRequest;
@@ -8,7 +9,10 @@ import com.spirnt.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.spirnt.mission.discodeit.dto.response.PageResponse;
 import com.spirnt.mission.discodeit.entity.BinaryContent;
 import com.spirnt.mission.discodeit.entity.Channel;
+import com.spirnt.mission.discodeit.entity.ChannelType;
 import com.spirnt.mission.discodeit.entity.Message;
+import com.spirnt.mission.discodeit.entity.NotificationType;
+import com.spirnt.mission.discodeit.entity.ReadStatus;
 import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.Message.MessageNotFoundException;
@@ -17,8 +21,8 @@ import com.spirnt.mission.discodeit.mapper.MessageMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.MessageRepository;
+import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
-import com.spirnt.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
 import com.spirnt.mission.discodeit.service.MessageService;
 import java.time.Instant;
@@ -28,8 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -48,7 +54,8 @@ public class BasicMessageService implements MessageService {
 
     private final BinaryContentService binaryContentService;
     private final BinaryContentRepository binaryContentRepository;
-    private final JwtSessionRepository jwtSessionRepository;
+    private final ApplicationEventPublisher eventPublisher; // 스프링 이벤트 발행
+    private final ReadStatusRepository readStatusRepository;
 
     @Transactional
     @Override
@@ -85,6 +92,24 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.save(new Message(messageCreateRequest.content(),
             user, channel, attachedFiles));
 
+        /**
+         *  알림 생성 이벤트 발행
+         *  사용자가 알림을 활성화한 채널인 경우
+         */
+        List<User> notificationReceivers = readStatusRepository.findAllByChannelIdAndNotificationEnabledTrue(
+                channelId)
+            .stream()
+            .map(ReadStatus::getUser)
+            .filter(rsUser -> !rsUser.equals(user))
+            .collect(Collectors.toList());
+        eventPublisher.publishEvent(new NotificationCreateEvent(
+            notificationReceivers,
+            "새로운 메시지",
+            (channel.getType().equals(ChannelType.PUBLIC)) ? channel.getName()
+                : "프라이빗 채널" + "에 새로운 메시지가 도착했습니다.",
+            NotificationType.NEW_MESSAGE,
+            channelId
+        ));
         return messageMapper.toDto(message);
     }
 

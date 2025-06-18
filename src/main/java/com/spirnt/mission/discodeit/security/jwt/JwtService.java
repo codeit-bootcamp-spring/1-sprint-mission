@@ -18,6 +18,7 @@ import com.spirnt.mission.discodeit.exception.ErrorCode;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
 import com.spirnt.mission.discodeit.exception.auth.InvalidJwtTokenException;
 import com.spirnt.mission.discodeit.exception.auth.JwtSessionNotFoundException;
+import com.spirnt.mission.discodeit.mapper.UserMapper;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import java.sql.Date;
 import java.text.ParseException;
@@ -40,6 +41,7 @@ public class JwtService {
     private final UserRepository userRepository;
     private final JwtBlacklist jwtBlacklist;
     private final ObjectMapper objectMapper;
+    private final UserMapper userMapper;
 
     public enum TokenType {
         ACCESS,
@@ -101,7 +103,7 @@ public class JwtService {
         UUID userId = jwtSession.getUserId();
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
-        UserDto userDto = UserDto.from(user, true);
+        UserDto userDto = userMapper.toDto(user);
         JwtObject newAccessToken = generateAccessToken(userDto);
         JwtObject newRefreshToken = generateRefreshToken(userDto);
         // Rotation 전략

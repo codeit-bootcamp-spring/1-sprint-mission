@@ -31,4 +31,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
         Pageable pageable);
 
     List<Message> findAllByChannelId(UUID channelId);
+
+    @Query("""
+        SELECT m.channel.id, MAX(m.createdAt)
+        FROM Message m
+        WHERE m.channel.id IN :channelIds
+        GROUP BY m.channel.id
+        """)
+    List<Object[]> findLatestMessageTimestamps(@Param("channelIds") List<UUID> channelIds);
 }

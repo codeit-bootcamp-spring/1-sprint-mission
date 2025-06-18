@@ -25,6 +25,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +46,7 @@ public class BasicUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    @CacheEvict(cacheNames = "users", key = "'all'")    // 캐시 무효화
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
@@ -85,6 +88,11 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
+    // 유저 목록 조회 결과 캐싱
+    @Cacheable(
+        cacheNames = "users",
+        key = "'all'"
+    )
     @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {
@@ -102,6 +110,7 @@ public class BasicUserService implements UserService {
             .toList();
     }
 
+    @CacheEvict(cacheNames = "users", key = "'all'")
     @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
@@ -137,6 +146,7 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
+    @CacheEvict(cacheNames = "users", key = "'all'")
     @Override
     public void delete(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> {

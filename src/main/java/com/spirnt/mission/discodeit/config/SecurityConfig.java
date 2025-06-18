@@ -8,7 +8,6 @@ import com.spirnt.mission.discodeit.security.CustomAuthenticationSuccessHandler;
 import com.spirnt.mission.discodeit.security.CustomUserDetailsService;
 import com.spirnt.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.spirnt.mission.discodeit.security.jwt.JwtLogoutHandler;
-import com.spirnt.mission.discodeit.security.jwt.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/csrf-token").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers("/api/binaryContents/**").permitAll()
                 // 그 외 API는 최소 ROLE_USER 권한 필요
                 .requestMatchers("/api/**").hasRole("USER")
                 // 그 외 인증 필요
@@ -66,7 +67,7 @@ public class SecurityConfig {
                 // csrf 검증 제외
                 .ignoringRequestMatchers("/api/users", "/api/auth/login",
                     "/api/auth/logout")
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRepository(customCsrfTokenRepository())
                 // 요청으로부터 CSRF 토큰 가져오는 법: form data 또는 요청 헤더로부터 가져오는 CsrfTokenRequestAttributeHandler
                 // -> 쿠키 기반 인증 환경에 적합
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
@@ -125,16 +126,6 @@ public class SecurityConfig {
         return customAuthenticationFilter;
     }
 
-    @Bean
-    public CustomAuthenticationSuccessHandler successHandler(
-        ObjectMapper objectMapper, JwtService jwtService) {
-        return new CustomAuthenticationSuccessHandler(objectMapper, jwtService);
-    }
-
-    @Bean
-    public CustomAuthenticationFailureHandler failureHandler(ObjectMapper objectMapper) {
-        return new CustomAuthenticationFailureHandler(objectMapper);
-    }
 
     @Bean
     public RoleHierarchy roleHierarchy() {
@@ -152,5 +143,13 @@ public class SecurityConfig {
         return handler;
     }
 
+    // 쿠키, 헤더 이름 명시
+    @Bean
+    public CsrfTokenRepository customCsrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieName("XSRF-TOKEN");         // 쿠키 이름 지정
+        repository.setHeaderName("X-XSRF-TOKEN");       // 클라이언트가 보낼 헤더 이름 지정
+        return repository;
+    }
 
 }

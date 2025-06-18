@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.spirnt.mission'
-version = '2.2-M10'
+version = '2.3-M11'
 
 java {
     toolchain {
@@ -60,6 +60,26 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-impl:0.12.5"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.12.5"
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
+
+    // @Retryable을 위한 의존성
+    implementation("org.springframework.retry:spring-retry:1.3.3")
+    implementation("org.springframework:spring-aspects:5.3.22")
+
+    // Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    // Caffeine
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    // Kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    // json 직렬화용
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.named('test') {

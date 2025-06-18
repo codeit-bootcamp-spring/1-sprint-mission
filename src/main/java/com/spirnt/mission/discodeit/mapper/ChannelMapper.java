@@ -11,8 +11,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
 public interface ChannelMapper {
 
-  // 이 둘은 채널 서비스에서 전달
-  @Mapping(target = "participants", source = "participants")
-  @Mapping(target = "lastMessageAt", source = "lastMessageAt")
-  ChannelDto toDto(Channel channel, List<UserDto> participants, Instant lastMessageAt);
+    // 이 둘은 채널 서비스에서 전달
+    @Mapping(target = "participants", source = "participants")
+    @Mapping(target = "lastMessageAt", source = "lastMessageAt")
+    ChannelDto toDto(Channel channel, List<UserDto> participants, Instant lastMessageAt);
 }

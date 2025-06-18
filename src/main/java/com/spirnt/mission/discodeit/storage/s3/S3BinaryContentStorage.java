@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public UUID put(UUID binaryContentId, byte[] bytes) {
+    public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
         // 파일 이름 생성
         String fileName = String.valueOf(binaryContentId);
         // PutObjectRequest 생성
@@ -58,9 +59,9 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         } catch (Exception e) {
             throw e;
         }
-
-        return binaryContentId;
+        return CompletableFuture.completedFuture(binaryContentId);
     }
+
 
     @Override
     public InputStream get(UUID binaryContentId) {

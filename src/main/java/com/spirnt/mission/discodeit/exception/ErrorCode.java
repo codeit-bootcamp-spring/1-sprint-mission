@@ -22,7 +22,9 @@ public enum ErrorCode {
 
     JWT_SESSION_NOT_FOUND("AUTH_401_1", HttpStatus.UNAUTHORIZED, "Jwt 인증 정보가 없습니다."),
     INVALID_JWT_TOKEN("AUTH_401_2", HttpStatus.UNAUTHORIZED, "JWT 토큰이 유효하지 않습니다."),
-    INVALID_TOKEN_SECRET("AUTH", HttpStatus.INTERNAL_SERVER_ERROR, "JWT 토큰 시크릿 키가 유효하지 않습니다. ");
+    INVALID_TOKEN_SECRET("AUTH", HttpStatus.INTERNAL_SERVER_ERROR, "JWT 토큰 시크릿 키가 유효하지 않습니다. "),
+
+    NOTIFICATION_NOT_FOUND("NOTIFICATION_404", HttpStatus.NOT_FOUND, "Notification을 찾을 수 없습니다.");
 
     private final String code;
     private final HttpStatus status;

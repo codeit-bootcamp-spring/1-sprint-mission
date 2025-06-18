@@ -1,5 +1,7 @@
 package com.spirnt.mission.discodeit.service.basic;
 
+import com.spirnt.mission.discodeit.cache.event.ChannelDeleteEvent;
+import com.spirnt.mission.discodeit.cache.event.PrivateChannelCreateEvent;
 import com.spirnt.mission.discodeit.dto.channel.ChannelDto;
 import com.spirnt.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
@@ -30,6 +32,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,15 +45,14 @@ public class BasicChannelService implements ChannelService {
 
     private final ChannelMapper channelMapper;
     private final UserMapper userMapper;
-
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
-
     private final ReadStatusService readStatusService;
     private final ReadStatusRepository readStatusRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    @Transactional
+    @CacheEvict(cacheNames = "channels", allEntries = true)
     @Override
     public ChannelDto createChannelPublic(PublicChannelCreateRequest publicChannelCreateRequest) {
         Channel channel = channelRepository.save(new Channel(publicChannelCreateRequest.name(),
@@ -69,6 +73,11 @@ public class BasicChannelService implements ChannelService {
             readStatusService.create(
                 new ReadStatusCreateRequest(userId, channel.getId(), channel.getCreatedAt()));
         }
+
+        // 캐시 무효화 이벤트 발행
+        eventPublisher.publishEvent(
+            new PrivateChannelCreateEvent(privateChannelCreateRequest.participantIds()));
+
         return channelMapper.toDto(channel,
             getParticipants(channel),
             getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
@@ -83,6 +92,11 @@ public class BasicChannelService implements ChannelService {
             getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
     }
 
+
+    @Cacheable(
+        cacheNames = "channels",
+        key = "#userId"
+    )
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
         // User가 존재하지 않으면 예외 발생
@@ -101,11 +115,28 @@ public class BasicChannelService implements ChannelService {
         // PUBLIC + PRIVATE 채널을 하나의 리스트로 병합
         channels.addAll(privateChannels);
 
+        Map<UUID, List<UserDto>> participantsByChannelId =
+            readStatusRepository.findAllByUserId(userId).stream()
+                .collect(Collectors.groupingBy(
+                    rs -> rs.getChannel().getId(),
+                    Collectors.mapping(rs -> userMapper.toDto(rs.getUser()), Collectors.toList())
+                ));
+        List<UUID> allChannelIds = channels.stream()
+            .map(Channel::getId)
+            .toList();
+        Map<UUID, Instant> lastMessageAtByChannelId =
+            messageRepository.findLatestMessageTimestamps(allChannelIds).stream()
+                .collect(Collectors.toMap(
+                    row -> (UUID) row[0],
+                    row -> (Instant) row[1]
+                ));
         return channels.stream()
-            .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
-            .map(channel -> channelMapper.toDto(channel,
-                getParticipants(channel),
-                getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt())))
+            .sorted(Comparator.comparing(Channel::getCreatedAt))
+            .map(channel -> channelMapper.toDto(
+                channel,
+                participantsByChannelId.getOrDefault(channel.getId(), List.of()),
+                lastMessageAtByChannelId.getOrDefault(channel.getId(), channel.getCreatedAt())
+            ))
             .toList();
     }
 
@@ -138,6 +169,18 @@ public class BasicChannelService implements ChannelService {
             log.warn("[Deleting Channel Failed: Channel with id {} not found]", channelId);
             return new ChannelNotFoundException(Map.of("channelId", channelId));
         });
+
+        // 채널 삭제로 인한 캐시 무효화 이벤트 발행
+        List<UUID> participants = getParticipants(channel).stream()
+            .map(userDto -> userDto.getId())
+            .collect(Collectors.toList());
+        ChannelType channelType = channel.getType();
+        eventPublisher.publishEvent(
+            new ChannelDeleteEvent(
+                channelType,
+                participants
+            )
+        );
         channelRepository.delete(channel);
     }
 

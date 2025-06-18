@@ -4,6 +4,7 @@ import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.spirnt.mission.discodeit.entity.Channel;
+import com.spirnt.mission.discodeit.entity.ChannelType;
 import com.spirnt.mission.discodeit.entity.ReadStatus;
 import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
@@ -63,8 +64,11 @@ public class BasicReadStatusService implements ReadStatusService {
                 Map.of("userID", userId, "channelId", channelId));
 
         }
-        ReadStatus readStatus = readStatusRepository.save(
-            new ReadStatus(user, channel, lastReadAt));
+        // PRIVATE 채널은 알림 활성화 기본, PUBLIC 채널은 알림 비활성화 기본
+        ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt,
+            !channel.getType().equals(ChannelType.PUBLIC));
+        readStatusRepository.save(readStatus);
+
         return readStatusMapper.toDto(readStatus);
     }
 
@@ -93,6 +97,8 @@ public class BasicReadStatusService implements ReadStatusService {
                     readStatusId);
                 return new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId));
             });
+        readStatus.update(readStatusUpdateRequest.newLastReadAt(),
+            readStatusUpdateRequest.notificationEnabled());
         return readStatusMapper.toDto(readStatus);
     }
 

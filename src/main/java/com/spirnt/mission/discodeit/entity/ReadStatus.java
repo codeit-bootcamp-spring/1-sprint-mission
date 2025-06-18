@@ -21,47 +21,49 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 public class ReadStatus extends BaseUpdatableEntity {
 
-  @ManyToOne
-  @JoinColumn(name = "user_id")
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private User user;
 
-  @ManyToOne
-  @JoinColumn(name = "channel_id")
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  private Channel channel;
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Channel channel;
 
-  @Column(name = "last_read_at")
-  private Instant lastReadAt;
+    @Column(name = "last_read_at")
+    private Instant lastReadAt;
 
+    private boolean notificationEnabled;
 
-  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
-    super();
-    this.user = user;
-    this.channel = channel;
-    this.lastReadAt = lastReadAt;
-  }
-
-  // 마지막으로 읽은 메세지 업데이트
-  public void update(Instant lastReadAt) {
-    this.lastReadAt = lastReadAt;
-  }
-
-  // UUID만으로 객체를 비교하기 위해 추가
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
+    public ReadStatus(User user, Channel channel, Instant lastReadAt, boolean notificationEnabled) {
+        super();
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = lastReadAt;
+        this.notificationEnabled = notificationEnabled;
     }
-    if (obj == null || getClass() != obj.getClass()) {
-      return false;
-    }
-    ReadStatus readStatus = (ReadStatus) obj;
-    return Objects.equals(this.getId(), readStatus.getId());
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.getId());
-  }
+    public void update(Instant lastReadAt, boolean notificationEnabled) {
+        this.lastReadAt = lastReadAt;
+        this.notificationEnabled = notificationEnabled;
+    }
+
+    // UUID만으로 객체를 비교하기 위해 추가
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ReadStatus readStatus = (ReadStatus) obj;
+        return Objects.equals(this.getId(), readStatus.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getId());
+    }
 }

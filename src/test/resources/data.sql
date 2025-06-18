@@ -5,9 +5,6 @@ INSERT INTO binary_contents (id, created_at, file_name, size, content_type) VALU
 INSERT INTO users (id, created_at, updated_at, username, email, password, profile_id) VALUES ('00000000-0000-0000-0000-000000000101', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,'alice', 'alice@mail.com', 'password123',   '00000000-0000-0000-0000-000000000001'),('00000000-0000-0000-0000-000000000102', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,   'bob', 'bob@mail.com', 'password', '00000000-0000-0000-0000-000000000002');
 INSERT INTO users (id, created_at, updated_at, username, email, password, profile_id) VALUES ('00000000-0000-0000-0000-000000000103', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,'cindy', 'cindy@mail.com', 'password123',   '00000000-0000-0000-0000-000000000001'),('00000000-0000-0000-0000-000000000104', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,   'dan', 'dan@mail.com', 'password', '00000000-0000-0000-0000-000000000002');
 
--- 3. user_statuses에 사용자 상태 데이터 삽입 (user_id는 users의 id)
-INSERT INTO user_statuses (id, created_at, updated_at, user_id, last_active_at) VALUES ('00000000-0000-0000-0000-000000001001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,'00000000-0000-0000-0000-000000000101', CURRENT_TIMESTAMP),  ('00000000-0000-0000-0000-000000001002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '00000000-0000-0000-0000-000000000102', CURRENT_TIMESTAMP);
-
 INSERT INTO channels (id,created_at,updated_at,name,description,type) VALUES ('11111111-1111-1111-1111-111111111111',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,  '일반 채널','모든 사용자가 접근 가능한 공개 채널입니다.','PUBLIC');
 INSERT INTO channels (id,created_at,updated_at,name,description,type) VALUES ('11111111-1111-1111-1111-111111111112',CURRENT_TIMESTAMP, CURRENT_TIMESTAMP,  '일반 채널2','모든 사용자가 접근 가능한 공개 채널입니다.','PUBLIC');
 

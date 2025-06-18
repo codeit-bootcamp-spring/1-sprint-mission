@@ -46,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             User user = userRepository.findById(userId).orElse(null);
             if (user == null) {
                 responseUnauthorized(response, new UserNotFoundException(Map.of("userId", userId)));
+                return;
             }
 
             // 유효한 토큰이면 인증 정보 설정
@@ -54,11 +55,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(auth);
             log.info("JWT Authentication Success: {}", userDetails.getUsername());
+            filterChain.doFilter(request, response);
         } else {
             log.info("JWT Token Validation Failed");
             responseUnauthorized(response, new InvalidJwtTokenException(Map.of("token", token)));
+            return;
         }
-        filterChain.doFilter(request, response);
     }
 
     // 필터를 거치지 않는 경로 설정
@@ -78,7 +80,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 path.startsWith("/v3/api-docs") ||
                 (method.equals("POST") && (path.equals("/api/users") || path.equals(
                     "/api/auth/login"))) ||
-                path.equals("/api/auth/csrf-token")
+                path.equals("/api/auth/csrf-token") ||
+                (method.equals("GET") && path.startsWith("/api/binaryContents") && path.endsWith(
+                    "/download"))
         );
     }
 

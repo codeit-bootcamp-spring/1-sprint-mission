@@ -1,9 +1,12 @@
+CREATE TYPE binary_content_upload_status AS ENUM ('WAITING', 'SUCCESS', 'FAILED');
+
 CREATE TABLE binary_contents(
   id UUID PRIMARY KEY,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   file_name VARCHAR(255) NOT NULL,
   size BIGINT NOT NULL,
-  content_type VARCHAR(100) NOT NULL
+  content_type VARCHAR(100) NOT NULL,
+  upload_status binary_content_upload_status DEFAULT 'WAITING'
 );
 
 CREATE TYPE role AS ENUM (
@@ -54,6 +57,7 @@ CREATE TABLE read_statuses (
   user_id UUID,
   channel_id UUID,
   last_read_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  notification_enabled boolean DEFAULT false,
   UNIQUE (channel_id, user_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (channel_id ) REFERENCES channels(id) ON DELETE CASCADE
@@ -75,4 +79,21 @@ CREATE TABLE jwt_sessions (
  user_id UUID NOT NULL,
  access_token VARCHAR(512) NOT NULL,
  refresh_token VARCHAR(512)
+);
+
+CREATE TYPE notification_type AS ENUM (
+  'NEW_MESSAGE',
+  'ROLE_CHANGED',
+  'ASYNC_FAILED'
+);
+
+CREATE TABLE notifications (
+  id UUID PRIMARY KEY,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  receiver_id UUID NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  content VARCHAR(255),
+  type notification_type,
+  target_id UUID,
+  FOREIGN KEY(receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );

@@ -3,6 +3,7 @@ package com.spirnt.mission.discodeit.service.basic;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.spirnt.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.spirnt.mission.discodeit.entity.BinaryContent;
+import com.spirnt.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.spirnt.mission.discodeit.exception.BinaryContent.BinaryContentNotFoundException;
 import com.spirnt.mission.discodeit.mapper.BinaryContentMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
@@ -39,8 +40,19 @@ public class BasicBinaryContentService implements BinaryContentService {
             contentType
         );
         binaryContentRepository.save(binaryContent);
-        // 로컬 스토리지에 저장
-        binaryContentStorage.put(binaryContent.getId(), bytes);
+        // 로컬 스토리지에 저장 = 비동기 메서드
+        binaryContentStorage.put(binaryContent.getId(), bytes)
+            .thenAccept(binaryContentId -> {
+                // 성공 시 upload status SUCCESS로 변경
+                binaryContentRepository.updateUploadStatus(binaryContentId,
+                    BinaryContentUploadStatus.SUCCESS);
+            })
+            .exceptionally(e -> {
+                // 실패 시 FAILED로 변경
+                binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                    BinaryContentUploadStatus.FAILED);
+                return null;
+            });
         return binaryContentMapper.toDto(binaryContent);
     }
 
