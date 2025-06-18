@@ -45,6 +45,5 @@ public class UserStatus extends BaseUpdatableEntity {
 
   protected void setUser(User user) {
     this.user = user;
-    user.setStatus(this);
   }
 }

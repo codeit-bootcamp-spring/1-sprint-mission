@@ -38,8 +38,10 @@ public class BasicUserStatusService implements UserStatusService {
     UUID userId = request.userId();
     User user = userRepository.findById(userId)
         .orElseThrow(() -> UserNotFoundException.withId(userId));
+    UserStatus duplicateUserStatus = userStatusRepository.findByUserId(userId)
+        .orElse(null);
 
-    Optional.ofNullable(user.getStatus())
+    Optional.ofNullable(duplicateUserStatus)
         .ifPresent(status -> {
           throw DuplicateUserStatusException.withUserId(userId);
         });
