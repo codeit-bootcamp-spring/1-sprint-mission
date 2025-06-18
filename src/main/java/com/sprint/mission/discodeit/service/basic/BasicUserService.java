@@ -1,167 +1,291 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheConfig;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.user.UserExceptions;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.service.AsyncUploadService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.time.Instant;
+import io.micrometer.core.annotation.Timed;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
 
-  private final UserRepository userRepository;
-  private final UserMapper userMapper;
-  private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentStorage binaryContentStorage;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final BinaryContentRepository binaryContentRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AsyncUploadService asyncUploadService;
+    private final CacheManager cacheManager;
 
-  @Transactional
-  @Override
-  public UserDto create(UserCreateRequest userCreateRequest,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-    String username = userCreateRequest.username();
-    String email = userCreateRequest.email();
+    @Timed(value = "user.create.async", description = "Time taken for creation with async upload")
+    @Transactional
+    @Override
+    public UserDto create(UserCreateRequest userCreateRequest,
+        Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        log.debug("사용자 생성 시작: {}", userCreateRequest);
 
-    log.info("Processing user creation: username={}, email={}", username, email);
-    log.debug("hasProfile={}", optionalProfileCreateRequest.isPresent());
+        String username = userCreateRequest.username();
+        String email = userCreateRequest.email();
 
-    if (userRepository.existsByEmail(email)) {
-      log.warn("User creation failed: email already exists - {}", email);
-      throw UserExceptions.emailAlreadyExists(email);
-    }
-    if (userRepository.existsByUsername(username)) {
-      log.warn("User creation failed: username already exists - {}", username);
-      throw UserExceptions.userNameAlreadyExists(username);
-    }
+        if (userRepository.existsByEmail(email)) {
+            throw UserAlreadyExistsException.withEmail(email);
+        }
+        if (userRepository.existsByUsername(username)) {
+            throw UserAlreadyExistsException.withUsername(username);
+        }
 
-    BinaryContent nullableProfile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
+        BinaryContent nullableProfile = optionalProfileCreateRequest
+            .map(profileRequest -> {
+                String fileName = profileRequest.fileName();
+                String contentType = profileRequest.contentType();
+                byte[] bytes = profileRequest.bytes();
+                BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+                    contentType);
+                binaryContentRepository.save(binaryContent);
 
-          log.debug("Generating user profile: filename={}, contentType={}, size={}",
-              fileName, contentType, bytes.length);
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType);
-          binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
-          return binaryContent;
-        })
-        .orElse(null);
+                //트랜잭션 커밋 후 비동기 업로드 실행
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            asyncUploadService.uploadFileAsync(binaryContent.getId(), bytes);
+                        }
+                    }
+                );
 
-    String password = userCreateRequest.password();
+                return binaryContent;
+            })
+            .orElse(null);
+        String password = userCreateRequest.password();
 
-    User user = new User(username, email, password, nullableProfile);
-    Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(user, now);
+        String hashedPassword = passwordEncoder.encode(password);
+        User user = new User(username, email, hashedPassword, nullableProfile);
 
-    userRepository.save(user);
+        userRepository.save(user);
 
-    log.info("User created successfully: userId={}, username={}", user.getId(), username);
-    return userMapper.toDto(user);
-  }
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictAllUsersCache();
+                    log.info("사용자 생성 완료: id={}, username={} - 트랜잭션 커밋 후 전체 사용자 목록 캐시 무효화",
+                        user.getId(), username);
+                }
+            }
+        );
 
-  @Override
-  public UserDto find(UUID userId) {
-    log.debug("Finding user by id: {}", userId);
-
-    return userRepository.findById(userId)
-        .map(user -> {
-          log.debug("User found: userId={}, username={}", userId, user.getUsername());
-          return userMapper.toDto(user);
-        })
-        .orElseThrow(() -> {
-          log.warn("User not found: userId={}", userId);
-          return UserExceptions.notFound(userId);
-        });
-  }
-
-  @Override
-  public List<UserDto> findAll() {
-    log.debug("Finding all user");
-    return userRepository.findAllWithProfileAndStatus()
-        .stream()
-        .map(userMapper::toDto)
-        .toList();
-  }
-
-  @Transactional
-  @Override
-  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-
-    log.info("Processing user update: userId={}, newUsername={}, newEmail={}",
-        userId, userUpdateRequest.newUsername(), userUpdateRequest.newEmail());
-
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.warn("User update failed: user not found - userId={}", userId);
-          return UserExceptions.notFound(userId);
-        });
-
-    String newUsername = userUpdateRequest.newUsername();
-    String newEmail = userUpdateRequest.newEmail();
-    if (userRepository.existsByEmail(newEmail)) {
-      log.warn("User update failed: email already exists - {}", newEmail);
-      throw UserExceptions.emailAlreadyExists(newEmail);
-    }
-    if (userRepository.existsByUsername(newUsername)) {
-      log.warn("User update failed: username already exists - {}", newUsername);
-      throw UserExceptions.userNameAlreadyExists(newUsername);
+        log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
+        return userMapper.toDto(user);
     }
 
-    BinaryContent nullableProfile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-
-          log.debug("Generating user new profile: filename={}, contentType={}, size={}",
-              fileName, contentType, bytes.length);
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType);
-          binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
-          return binaryContent;
-        })
-        .orElse(null);
-
-    String newPassword = userUpdateRequest.newPassword();
-    user.update(newUsername, newEmail, newPassword, nullableProfile);
-
-    log.info("User updated successfully: userId={}", userId);
-    return userMapper.toDto(user);
-  }
-
-  @Transactional
-  @Override
-  public void delete(UUID userId) {
-    log.info("Processing user deletion: userId={}", userId);
-    if (!userRepository.existsById(userId)) {
-      log.warn("User deletion failed: user not found - userId={}", userId);
-      throw UserExceptions.notFound(userId);
+    @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.USER_DETAIL, key = "#userId")
+    @Override
+    public UserDto find(UUID userId) {
+        log.debug("사용자 조회 시작: id={}", userId);
+        UserDto userDto = userRepository.findById(userId)
+            .map(userMapper::toDto)
+            .orElseThrow(() -> UserNotFoundException.withId(userId));
+        log.info("사용자 조회 완료: id={}", userId);
+        return userDto;
     }
 
-    userRepository.deleteById(userId);
-    log.info("User deleted successfully: userId={}", userId);
-  }
+    @Transactional(readOnly = true)
+    @Cacheable(value = CacheConfig.ALL_USERS, key = "'all_users'")
+    @Override
+    public List<UserDto> findAll() {
+        log.debug("모든 사용자 조회 시작");
+        Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
+            .map(JwtSession::getUserId)
+            .collect(Collectors.toSet());
+
+        List<UserDto> userDtos = userRepository.findAllWithProfile()
+            .stream()
+            .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
+            .toList();
+
+        List<UserDto> result = new ArrayList<>(userDtos);
+        log.info("모든 사용자 조회 완료: 총 {}명", result.size());
+        return result;
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
+    @Timed(value = "user.update.async", description = "Time taken for update with async upload")
+    @Transactional
+    @CachePut(value = CacheConfig.USER_DETAIL, key = "#userId")
+    @Override
+    public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+        Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> {
+                UserNotFoundException exception = UserNotFoundException.withId(userId);
+                return exception;
+            });
+
+        String newUsername = userUpdateRequest.newUsername();
+        String newEmail = userUpdateRequest.newEmail();
+
+        if (userRepository.existsByEmail(newEmail)) {
+            throw UserAlreadyExistsException.withEmail(newEmail);
+        }
+
+        if (userRepository.existsByUsername(newUsername)) {
+            throw UserAlreadyExistsException.withUsername(newUsername);
+        }
+
+        BinaryContent nullableProfile = optionalProfileCreateRequest
+            .map(profileRequest -> {
+
+                String fileName = profileRequest.fileName();
+                String contentType = profileRequest.contentType();
+                byte[] bytes = profileRequest.bytes();
+                BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+                    contentType);
+                binaryContentRepository.save(binaryContent);
+
+                //트랜잭션 커밋 후 비동기 업로드 실행
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            asyncUploadService.uploadFileAsync(binaryContent.getId(), bytes);
+                        }
+                    }
+                );
+
+                return binaryContent;
+            })
+            .orElse(null);
+
+        String newPassword = userUpdateRequest.newPassword();
+        String hashedNewPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
+            .orElse(null);
+        user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
+
+        UserDto updatedUserDto = userMapper.toDto(user);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictAllUsersCache();
+                    log.info("사용자 수정 완료: id={} - 트랜잭션 커밋 후 사용자 상세 캐시 갱신, 전체 사용자 목록 캐시 무효화", userId);
+                }
+            }
+        );
+        return updatedUserDto;
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
+    @Transactional
+    @Override
+    public void delete(UUID userId) {
+        log.debug("사용자 삭제 시작: id={}", userId);
+
+        if (!userRepository.existsById(userId)) {
+            throw UserNotFoundException.withId(userId);
+        }
+
+        userRepository.deleteById(userId);
+
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    evictUserRelatedCaches(userId);
+                    log.info("사용자 삭제 완료: id={} - 트랜잭션 커밋 후 관련 캐시 무효화", userId);
+                }
+            }
+        );
+    }
+
+    private void evictAllUsersCache() {
+        try {
+            Cache cache = cacheManager.getCache(CacheConfig.ALL_USERS);
+            if (cache != null) {
+                cache.clear();
+                log.debug("전체 사용자 목록 캐시 무효화 완료");
+            } else {
+                log.warn("전체 사용자 캐시를 찾을 수 없음: cacheName={}", CacheConfig.ALL_USERS);
+            }
+        } catch (Exception e) {
+            log.error("전체 사용자 목록 캐시 무효화 실패", e);
+        }
+    }
+
+    private void evictUserRelatedCaches(UUID userId) {
+        try {
+            // 사용자 상세 캐시 무효화
+            Cache userDetailCache = cacheManager.getCache(
+                CacheConfig.USER_DETAIL);
+            if (userDetailCache != null) {
+                userDetailCache.evict(userId);
+                log.debug("사용자 상세 캐시 무효화 완료: userId={}", userId);
+            }
+
+            // 전체 사용자 목록 캐시 무효화
+            Cache allUsersCache = cacheManager.getCache(
+                CacheConfig.ALL_USERS);
+            if (allUsersCache != null) {
+                allUsersCache.clear();
+                log.debug("전체 사용자 목록 캐시 무효화 완료");
+            }
+
+            // 사용자 채널 캐시 무효화
+            Cache userChannelsCache = cacheManager.getCache(
+                CacheConfig.USER_CHANNELS);
+            if (userChannelsCache != null) {
+                userChannelsCache.evict(userId);
+                log.debug("사용자 채널 캐시 무효화 완료: userId={}", userId);
+            }
+
+            // 사용자 알림 캐시 무효화
+            Cache userNotificationsCache = cacheManager.getCache(
+                CacheConfig.USER_NOTIFICATIONS);
+            if (userNotificationsCache != null) {
+                userNotificationsCache.evict(userId);
+                log.debug("사용자 알림 캐시 무효화 완료: userId={}", userId);
+            }
+
+            log.debug("사용자 관련 모든 캐시 무효화 완료: userId={}", userId);
+        } catch (Exception e) {
+            log.error("사용자 관련 캐시 무효화 실패: userId={}", userId, e);
+        }
+    }
+
+
 }

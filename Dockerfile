@@ -1,29 +1,40 @@
-# Build Stage
+# 빌드 스테이지
 FROM amazoncorretto:17 AS builder
+
+# 작업 디렉토리 설정
 WORKDIR /app
 
-#먼저 gradle 파일만 복사하여 의존성 레이어 캐싱
-COPY build.gradle settings.gradle gradlew ./
+# Gradle Wrapper 파일 먼저 복사
 COPY gradle ./gradle
-# 의존성 다운로드 (소스코드 변경과 무관하게 캐시 활용)
-RUN ./gradlew dependencies --no-daemon
+COPY gradlew ./gradlew
 
-#소스 코드 복사 및 빌드
+# Gradle 캐시를 위한 의존성 파일 복사
+COPY build.gradle settings.gradle ./
+
+# 의존성 다운로드
+RUN ./gradlew dependencies
+
+# 소스 코드 복사 및 빌드
 COPY src ./src
-RUN ./gradlew build -x test --no-daemon
+RUN ./gradlew build -x test
 
-# Runtime Stage: 실행에 필요한 최소 구성만 포함
-FROM amazoncorretto:17-alpine AS runtime
+
+# 런타임 스테이지
+FROM amazoncorretto:17-alpine3.21
+
+# 작업 디렉토리 설정
 WORKDIR /app
 
-# 환경 변수 설정
+# 프로젝트 정보를 ENV로 설정
 ENV PROJECT_NAME=discodeit \
-PROJECT_VERSION=1.2-M8 \
-JVM_OPTS=""
+    PROJECT_VERSION=2.3-M11 \
+    JVM_OPTS=""
 
-# 빌드 스테이지에서 생성된 JAR 파일만 복사
-COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./app.jar
+# 빌드 스테이지에서 jar 파일만 복사
+COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
 
+# 80 포트 노출
 EXPOSE 80
 
-CMD java $JVM_OPTS -jar app.jar
+# jar 파일 실행
+ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]

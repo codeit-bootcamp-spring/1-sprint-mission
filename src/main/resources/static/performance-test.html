@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파일 업로드 성능 테스트</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .test-section {
+      border: 1px solid #ddd;
+      margin: 20px 0;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .result {
+      background: #f5f5f5;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+    }
+
+    .sync {
+      background-color: #ff6b6b;
+      color: white;
+      border: none;
+    }
+
+    .async {
+      background-color: #4ecdc4;
+      color: white;
+      border: none;
+    }
+
+    input[type="file"] {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<h1>📊 파일 업로드 성능 테스트</h1>
+
+<div class="test-section">
+  <h2>테스트 파일 선택</h2>
+  <input type="file" id="testFile" accept="*/*">
+  <p><small>아무 파일이나 선택하세요. 이미지, 문서, 텍스트 파일 등 모두 가능합니다.</small></p>
+</div>
+
+<div class="test-section">
+  <h2>🐌 동기 업로드 테스트</h2>
+  <button class="sync" onclick="testSyncUpload()">동기 업로드 시작</button>
+  <div id="syncResult" class="result" style="display:none;"></div>
+</div>
+
+<div class="test-section">
+  <h2>🚀 비동기 업로드 테스트</h2>
+  <button class="async" onclick="testAsyncUpload()">비동기 업로드 시작</button>
+  <div id="asyncResult" class="result" style="display:none;"></div>
+</div>
+
+<div class="test-section">
+  <h2>📈 성능 비교 결과</h2>
+  <div id="comparison" class="result" style="display:none;"></div>
+</div>
+
+<script>
+  let csrfToken = '';
+  let syncTime = 0;
+  let asyncTime = 0;
+
+  // CSRF 토큰 가져오기
+  async function getCsrfToken() {
+    try {
+      const response = await fetch('/api/auth/csrf-token');
+      const data = await response.json();
+      csrfToken = data.token;
+      console.log('CSRF Token:', csrfToken);
+    } catch (error) {
+      console.error('CSRF 토큰 가져오기 실패:', error);
+    }
+  }
+
+  // 페이지 로드 시 CSRF 토큰 가져오기
+  window.onload = getCsrfToken;
+
+  // 동기 업로드 테스트
+  async function testSyncUpload() {
+    const fileInput = document.getElementById('testFile');
+    const resultDiv = document.getElementById('syncResult');
+
+    if (!fileInput.files[0]) {
+      alert('테스트할 파일을 선택해주세요!');
+      return;
+    }
+
+    if (!csrfToken) {
+      await getCsrfToken();
+    }
+
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '🔄 동기 업로드 진행 중...';
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    const startTime = Date.now();
+
+    try {
+      const response = await fetch('/api/performance-test/sync-upload', {
+        method: 'POST',
+        headers: {
+          'X-XSRF-TOKEN': csrfToken,
+          'Cookie': `XSRF-TOKEN=${csrfToken}`
+        },
+        body: formData
+      });
+
+      const endTime = Date.now();
+      syncTime = endTime - startTime;
+
+      if (response.ok) {
+        const result = await response.json();
+        resultDiv.innerHTML = `
+                        ✅ <strong>동기 업로드 완료</strong><br>
+                        📁 파일: ${fileInput.files[0].name}<br>
+                        📊 크기: ${(fileInput.files[0].size / 1024 / 1024).toFixed(2)} MB<br>
+                        ⏱️ <strong>응답 시간: ${syncTime}ms</strong><br>
+                        🆔 업로드 ID: ${result.id}
+                    `;
+      } else {
+        resultDiv.innerHTML = `❌ 동기 업로드 실패: ${response.status}`;
+      }
+    } catch (error) {
+      resultDiv.innerHTML = `❌ 동기 업로드 에러: ${error.message}`;
+    }
+
+    updateComparison();
+  }
+
+  // 비동기 업로드 테스트
+  async function testAsyncUpload() {
+    const fileInput = document.getElementById('testFile');
+    const resultDiv = document.getElementById('asyncResult');
+
+    if (!fileInput.files[0]) {
+      alert('테스트할 파일을 선택해주세요!');
+      return;
+    }
+
+    if (!csrfToken) {
+      await getCsrfToken();
+    }
+
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '🔄 비동기 업로드 진행 중...';
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    const startTime = Date.now();
+
+    try {
+      const response = await fetch('/api/performance-test/async-upload', {
+        method: 'POST',
+        headers: {
+          'X-XSRF-TOKEN': csrfToken,
+          'Cookie': `XSRF-TOKEN=${csrfToken}`
+        },
+        body: formData
+      });
+
+      const endTime = Date.now();
+      asyncTime = endTime - startTime;
+
+      if (response.ok) {
+        const result = await response.json();
+        resultDiv.innerHTML = `
+                        ✅ <strong>비동기 업로드 응답 완료</strong><br>
+                        📁 파일: ${fileInput.files[0].name}<br>
+                        📊 크기: ${(fileInput.files[0].size / 1024 / 1024).toFixed(2)} MB<br>
+                        ⏱️ <strong>응답 시간: ${asyncTime}ms</strong><br>
+                        🆔 업로드 ID: ${result.id}<br>
+                        📊 상태: ${result.uploadStatus}<br>
+                        <small>💡 실제 파일 업로드는 백그라운드에서 진행됩니다.</small>
+                    `;
+      } else {
+        resultDiv.innerHTML = `❌ 비동기 업로드 실패: ${response.status}`;
+      }
+    } catch (error) {
+      resultDiv.innerHTML = `❌ 비동기 업로드 에러: ${error.message}`;
+    }
+
+    updateComparison();
+  }
+
+  // 성능 비교 결과 업데이트
+  function updateComparison() {
+    if (syncTime > 0 && asyncTime > 0) {
+      const improvement = ((syncTime - asyncTime) / syncTime * 100).toFixed(1);
+      const speedup = (syncTime / asyncTime).toFixed(1);
+
+      document.getElementById('comparison').style.display = 'block';
+      document.getElementById('comparison').innerHTML = `
+                    <h3>🏆 성능 비교 결과</h3>
+                    <table style="width:100%; border-collapse: collapse;">
+                        <tr style="background:#f9f9f9;">
+                            <th style="padding:8px; border:1px solid #ddd;">처리 방식</th>
+                            <th style="padding:8px; border:1px solid #ddd;">응답 시간</th>
+                            <th style="padding:8px; border:1px solid #ddd;">성능</th>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">🐌 동기 처리</td>
+                            <td style="padding:8px; border:1px solid #ddd;">${syncTime}ms</td>
+                            <td style="padding:8px; border:1px solid #ddd;">기준</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px; border:1px solid #ddd;">🚀 비동기 처리</td>
+                            <td style="padding:8px; border:1px solid #ddd;">${asyncTime}ms</td>
+                            <td style="padding:8px; border:1px solid #ddd;"><strong>${speedup}배 빠름</strong></td>
+                        </tr>
+                    </table>
+                    <p style="margin-top:15px;">
+                        📈 <strong>성능 향상: ${improvement}% 단축</strong><br>
+                        💡 비동기 처리가 ${speedup}배 더 빠른 응답을 제공합니다!
+                    </p>
+                `;
+    }
+  }
+</script>
+</body>
+</html>

@@ -3,11 +3,15 @@ package com.sprint.mission.discodeit.exception.channel;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.UUID;
 
-class PrivateChannelUpdateException extends ChannelException {
+public class PrivateChannelUpdateException extends ChannelException {
 
-  PrivateChannelUpdateException(UUID channelId) {
-    super(ErrorCode.PRIVATE_CHANNEL_UPDATE,
-        "Private channel with id " + channelId + " cannot be updated",
-        createDetails("channelId", channelId));
-  }
-}
+    public PrivateChannelUpdateException() {
+        super(ErrorCode.PRIVATE_CHANNEL_UPDATE);
+    }
+
+    public static PrivateChannelUpdateException forChannel(UUID channelId) {
+        PrivateChannelUpdateException exception = new PrivateChannelUpdateException();
+        exception.addDetail("channelId", channelId);
+        return exception;
+    }
+} 

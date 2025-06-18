@@ -5,65 +5,70 @@ spring:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+  datasource:
+    driver-class-name: org.postgresql.Driver
   jpa:
-    properties:
-      hibernate:
-        format_sql: true
+    hibernate:
+      ddl-auto: validate
     open-in-view: false
   profiles:
-    active: dev
-  output:
-    ansi:
-      enabled: always
+    active:
+      - dev
+  config:
+    import: optional:file:.env[.properties]
+  cache:
+    type: redis
+    redis:
+      time-to-live: 30m
+      cache-null-values: true
+      key-prefix: "discodeit:cache:"
+      use-key-prefix: true
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      connect-timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 1
+          time-between-eviction-runs: 30s
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        enable.idempotence: true
+        retries: 3
+        acks: all
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        isolation.level: read_committed
 
-logging:
-  level:
-    root: info
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
-
-discodeit:
-  storage:
-    type: ${STORAGE_TYPE:local} # local | s3 (기본값: local)
-    local:
-      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
-    s3:
-      access-key: ${AWS_S3_ACCESS_KEY}
-      secret-key: ${AWS_S3_SECRET_KEY}
-      region: ${AWS_S3_REGION}
-      bucket: ${AWS_S3_BUCKET}
-      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
-
-#Actuator
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers
+        include: health,info,metrics,loggers,caches
   endpoint:
     health:
       show-details: always
-  info:
-    env:
-      enabled: true
-    java:
-      enabled: true
-    build:
-      enabled: true
-
-# info 엔드포인트
 info:
-  application:
-    name: ${spring.application.name}
-    version: 1.7.0
+  name: Discodeit
+  version: 1.7.0
   java:
-    version: ${java.version}
+    version: 17
   spring-boot:
     version: 3.4.0
   config:
     datasource:
       url: ${spring.datasource.url}
-      driver-clsss-name: ${spring.datasource.driver-class-name}
+      driver-class-name: ${spring.datasource.driver-class-name}
     jpa:
       ddl-auto: ${spring.jpa.hibernate.ddl-auto}
     storage:
@@ -72,3 +77,56 @@ info:
     multipart:
       max-file-size: ${spring.servlet.multipart.maxFileSize}
       max-request-size: ${spring.servlet.multipart.maxRequestSize}
+    cache:
+      type: ${spring.cache.type}
+      redis-ttl: ${spring.cache.redis.time-to-live}
+    kafka:
+      bootstrap-servers: ${spring.kafka.bootstrap-servers}
+    redis:
+      host: ${spring.data.redis.host}
+      port: ${spring.data.redis.port}
+
+discodeit:
+  storage:
+    type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+  admin:
+    username: ${DISCODEIT_ADMIN_USERNAME}
+    email: ${DISCODEIT_ADMIN_EMAIL}
+    password: ${DISCODEIT_ADMIN_PASSWORD}
+  kafka:
+    topics:
+      new-message: discodeit.new-message
+      role-changed: discodeit.role-changed
+      async-task-failed: discodeit.async-task-failed
+      notification: discodeit.notification
+  cache:
+    redis:
+      ttl:
+        user-channels: 60
+        user-notifications: 5
+        all-users: 10
+        user-detail: 30
+        channel-detail: 60
+
+logging:
+  level:
+    root: info
+    org.springframework.cache: debug
+    org.springframework.data.redis: debug
+
+security:
+  remember-me:
+    key: ${SECURITY_REMEMBER_ME_KEY}
+    token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+  jwt:
+    secret: ${SECURITY_JWT_SECRET}
+    access-token-validity-seconds: ${SECURITY_JWT_ACCESS_TOKEN_VALIDITY_SECONDS}
+    refresh-token-validity-seconds: ${SECURITY_JWT_REFRESH_TOKEN_VALIDITY_SECONDS}
