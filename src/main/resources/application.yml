@@ -40,6 +40,8 @@ spring:
       enabled: true
       max-file-size: 5MB
       max-request-size: 10MB
+  aop:
+    proxy-target-class: true
 
 logging:
   level:
@@ -54,10 +56,17 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers, env
+        include: health, info, metrics, loggers, env, prometheus
   endpoint:
     health:
       show-details: always
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
 
 info:
   app.name: Discodeit

@@ -8,29 +8,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class PageResponseMapper {
 
-  /**
-   * Slice<T>를 PageResponse<T>로 변환
-   */
-  public <T> PageResponse<T> fromSlice(Slice<T> slice, Object nextCursor) {
-    return new PageResponse<>(
-        slice.getContent(),
-        nextCursor,
-        slice.getSize(),
-        slice.hasNext(),
-        null
-    );
-  }
+    /**
+     * Slice<T>를 PageResponse<T>로 변환
+     */
+    public <T> PageResponse<T> fromSlice(Slice<T> slice, Object nextCursor) {
+        return new PageResponse<>(
+                slice.getContent(),
+                nextCursor,
+                slice.getSize(),
+                slice.hasNext(),
+                null
+        );
+    }
 
-  /**
-   * Page<T>를 PageResponse<T>로 변환
-   */
-  public <T> PageResponse<T> fromPage(Page<T> page) {
-    return new PageResponse<>(
-        page.getContent(),
-        page.getNumber(),
-        page.getSize(),
-        page.hasNext(),
-        page.getTotalElements()
-    );
-  }
+    /**
+     * Page<T>를 PageResponse<T>로 변환
+     */
+    public <T> PageResponse<T> fromPage(Page<T> page) {
+        return new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.hasNext(),
+                page.getTotalElements()
+        );
+    }
 }

@@ -10,15 +10,15 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfig {
 
-  @Bean
-  public RestTemplate restTemplate() {
-    CloseableHttpClient httpClient = HttpClients.custom()
-        .useSystemProperties()
-        .build();
+    @Bean
+    public RestTemplate restTemplate() {
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .useSystemProperties()
+                .build();
 
-    HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(
-        httpClient);
-    return new RestTemplate(factory);
-  }
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(
+                httpClient);
+        return new RestTemplate(factory);
+    }
 
 }

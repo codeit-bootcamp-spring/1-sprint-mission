@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateMessageRequestDto {
 
-  @NotBlank
-  private String newContent;
+    @NotBlank
+    private String newContent;
 }

@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.security.CustomUserDetailsService;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.CustomUserDetailsService;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
@@ -135,9 +138,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/binaryContents/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/upload/**").permitAll()//테스트용
                         .requestMatchers(
                                 "/", "/index.html", "/swagger-ui/**", "/v3/api-docs/**",
                                 "/actuator/**", "/favicon.ico", "/assets/index-*.js",

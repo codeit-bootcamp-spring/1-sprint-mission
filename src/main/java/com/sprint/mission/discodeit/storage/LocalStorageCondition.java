@@ -7,9 +7,9 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 public class LocalStorageCondition implements Condition {
 
-  @Override
-  public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-    String storageType = context.getEnvironment().getProperty("discodeit.storage.type");
-    return "local".equals(storageType);
-  }
+    @Override
+    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+        String storageType = context.getEnvironment().getProperty("discodeit.storage.type");
+        return "local".equals(storageType);
+    }
 }

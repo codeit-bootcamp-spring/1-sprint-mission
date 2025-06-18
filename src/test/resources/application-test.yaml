@@ -32,3 +32,6 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.web.servlet: DEBUG
     org.springframework.web.multipart: DEBUG
+
+jwt:
+  secret: test-jwt-secret

@@ -28,6 +28,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService userDetailsService;
     private final JwtSessionRepository jwtSessionRepository;
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
+
     private final List<AntPathRequestMatcher> protectedMatchers = List.of(
             new AntPathRequestMatcher("/api/**")
     );
@@ -36,6 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             new AntPathRequestMatcher("/api/auth/login", "POST"),
             new AntPathRequestMatcher("/api/auth/me", "GET"),
             new AntPathRequestMatcher("/api/auth/logout", "POST"),
+            new AntPathRequestMatcher("/api/users", "POST"),
             new AntPathRequestMatcher("/api/binaryContents/**", "GET"),
             new AntPathRequestMatcher("/api/auth/csrf-token", "GET"),
             new AntPathRequestMatcher("/"),
@@ -53,12 +57,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        if (!requiresAuthentication(request)) {
+        log.debug("JwtAuthenticationFilter {}", request.getRequestURI());
+
+        if (!isAuthenticationRequired(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader(AUTHORIZATION_HEADER);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.warn("Authorization header is missing");
@@ -66,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(BEARER_PREFIX.length());
 
         if (!jwtService.validateToken(token)) {
             log.warn("Invalid token");
@@ -104,7 +110,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean requiresAuthentication(HttpServletRequest request) {
+    private boolean isAuthenticationRequired(HttpServletRequest request) {
         if (excludeMatchers.stream().anyMatch(matcher -> matcher.matches(request))) {
             return false;
         }

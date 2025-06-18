@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 public class ReadStatusDto {
 
-  private UUID id;
-  private UUID userId;
-  private UUID channelId;
-  private Instant lastReadAt;
+    private UUID id;
+    private UUID userId;
+    private UUID channelId;
+    private Instant lastReadAt;
 }

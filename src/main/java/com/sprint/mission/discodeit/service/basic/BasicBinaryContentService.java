@@ -8,20 +8,12 @@ import com.sprint.mission.discodeit.exception.file.InvalidFileDataException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
 
 @Slf4j
 @Service

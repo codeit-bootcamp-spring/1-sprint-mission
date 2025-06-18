@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
-import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
@@ -18,19 +16,25 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.Interface.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -47,6 +51,7 @@ public class BasicUserService implements UserService {
     private final JwtSessionRepository jwtSessionRepository;
     private UUID currentSessionUserId;
 
+    @CacheEvict(value = "allUsers", allEntries = true)
     @Override
     @Transactional
     public UserDto createUser(UserCreateRequestDto request, MultipartFile profile) {
@@ -68,16 +73,21 @@ public class BasicUserService implements UserService {
             throw new DuplicatedUsernameException();
         }
 
-        BinaryContent profileImage =
-                (profile != null && !profile.isEmpty()) ? saveProfile(profile) : null;
-
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = new User(request.getUsername(), request.getEmail(), encodedPassword,
-                profileImage);
+                null);
         user.setRole(Role.USER);
         userRepository.save(user);
+
         log.debug("Saved user: id={}, email={}", user.getId(), user.getEmail());
+
+        if (profile != null && !profile.isEmpty()) {
+            BinaryContent profileImage =
+                    (profile != null && !profile.isEmpty()) ? saveProfile(profile, user.getId())
+                            : null;
+            user.setProfile(profileImage);
+        }
 
         return userMapper.toDto(user);
     }
@@ -90,6 +100,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    @Cacheable(value = "allUsers")
     @Override
     public List<UserDto> getAllUsers() {
         /*List<User> all = userRepository.findAll();
@@ -114,6 +125,7 @@ public class BasicUserService implements UserService {
     }
 
 
+    @CacheEvict(value = "allUsers", allEntries = true)
     @Override
     @Transactional
     public UserDto updateUser(UUID userId, UserUpdateRequestDto request, MultipartFile profile) {
@@ -131,7 +143,7 @@ public class BasicUserService implements UserService {
                     binaryContentRepository.deleteById(oldProfile.getId());
                 }
 
-                BinaryContent newProfile = saveProfile(profile);
+                BinaryContent newProfile = saveProfile(profile, user.getId());
                 user.setProfile(newProfile);
             }
         }
@@ -147,6 +159,7 @@ public class BasicUserService implements UserService {
     }
 
 
+    @CacheEvict(value = "allUsers", allEntries = true)
     @Override
     @Transactional
     public void deleteUser(UUID userId) {
@@ -166,7 +179,7 @@ public class BasicUserService implements UserService {
         return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
     }
 
-    private BinaryContent saveProfile(MultipartFile profileFile) {
+    private BinaryContent saveProfile(MultipartFile profileFile, UUID userId) {
         if (profileFile == null || profileFile.isEmpty()) {
             throw new InvalidFileDataException();
         }
@@ -180,7 +193,15 @@ public class BasicUserService implements UserService {
         BinaryContent savedContent = binaryContentRepository.save(binaryContent);
 
         try {
-            binaryContentStorage.put(savedContent.getId(), profileFile.getBytes());
+            binaryContentStorage.putAsync(
+                    savedContent.getId(),
+                    profileFile.getBytes(),
+                    userId,
+                    status -> {
+                        savedContent.setUploadStatus(status);
+                        binaryContentRepository.save(savedContent);
+                    }
+            );
         } catch (IOException e) {
             throw new FileUploadFailedException();
         }

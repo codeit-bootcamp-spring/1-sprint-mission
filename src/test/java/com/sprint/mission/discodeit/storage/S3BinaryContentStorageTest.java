@@ -22,67 +22,65 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 @Testcontainers
 class S3BinaryContentStorageTest {
 
-  static final DockerImageName LOCALSTACK_IMAGE = DockerImageName.parse(
-      "localstack/localstack");
+    static final DockerImageName LOCALSTACK_IMAGE = DockerImageName.parse(
+            "localstack/localstack");
 
-  @Container
-  static LocalStackContainer localstack = new LocalStackContainer(LOCALSTACK_IMAGE)
-      .withServices(LocalStackContainer.Service.S3);
+    @Container
+    static LocalStackContainer localstack = new LocalStackContainer(LOCALSTACK_IMAGE)
+            .withServices(LocalStackContainer.Service.S3);
+    private final String bucket = "test-bucket";
+    private S3BinaryContentStorage storage;
+    private S3Client s3Client;
 
-  private S3BinaryContentStorage storage;
-  private S3Client s3Client;
+    @BeforeEach
+    void setUp() {
+        AwsBasicCredentials credentials = AwsBasicCredentials.create(
+                localstack.getAccessKey(), localstack.getSecretKey());
 
-  private final String bucket = "test-bucket";
+        s3Client = S3Client.builder()
+                .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.S3))
+                .region(Region.of(localstack.getRegion()))
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .build();
 
-  @BeforeEach
-  void setUp() {
-    AwsBasicCredentials credentials = AwsBasicCredentials.create(
-        localstack.getAccessKey(), localstack.getSecretKey());
+        s3Client.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
 
-    s3Client = S3Client.builder()
-        .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.S3))
-        .region(Region.of(localstack.getRegion()))
-        .credentialsProvider(StaticCredentialsProvider.create(credentials))
-        .build();
+        S3Presigner presigner = S3Presigner.builder()
+                .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.S3))
+                .region(Region.of(localstack.getRegion()))
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .build();
 
-    s3Client.createBucket(CreateBucketRequest.builder().bucket(bucket).build());
+        storage = new S3BinaryContentStorage(s3Client, presigner, bucket, 600);
+    }
 
-    S3Presigner presigner = S3Presigner.builder()
-        .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.S3))
-        .region(Region.of(localstack.getRegion()))
-        .credentialsProvider(StaticCredentialsProvider.create(credentials))
-        .build();
+    @Test
+    void putAndGet_shouldSucceed() throws Exception {
+        UUID id = UUID.randomUUID();
+        byte[] content = "Hello LocalStack S3".getBytes();
 
-    storage = new S3BinaryContentStorage(s3Client, presigner, bucket, 600);
-  }
+        storage.put(id, content);
 
-  @Test
-  void putAndGet_shouldSucceed() throws Exception {
-    UUID id = UUID.randomUUID();
-    byte[] content = "Hello LocalStack S3".getBytes();
+        InputStream inputStream = storage.get(id);
+        byte[] result = inputStream.readAllBytes();
 
-    storage.put(id, content);
+        assertThat(result).isEqualTo(content);
+    }
 
-    InputStream inputStream = storage.get(id);
-    byte[] result = inputStream.readAllBytes();
+    @Test
+    void download_shouldReturnRedirectUrl() {
+        UUID id = UUID.randomUUID();
+        byte[] content = "Presigned test".getBytes();
+        storage.put(id, content);
 
-    assertThat(result).isEqualTo(content);
-  }
+        BinaryContentDto dto = new BinaryContentDto();
+        dto.setId(id);
+        dto.setContentType("text/plain");
+        dto.setFileName("test.txt");
+        dto.setSize(content.length);
+        ResponseEntity<?> response = storage.download(dto);
 
-  @Test
-  void download_shouldReturnRedirectUrl() {
-    UUID id = UUID.randomUUID();
-    byte[] content = "Presigned test".getBytes();
-    storage.put(id, content);
-
-    BinaryContentDto dto = new BinaryContentDto();
-    dto.setId(id);
-    dto.setContentType("text/plain");
-    dto.setFileName("test.txt");
-    dto.setSize(content.length);
-    ResponseEntity<?> response = storage.download(dto);
-
-    assertThat(response.getStatusCodeValue()).isEqualTo(302);
-    assertThat(response.getHeaders().getFirst("Location")).contains(bucket);
-  }
+        assertThat(response.getStatusCodeValue()).isEqualTo(302);
+        assertThat(response.getHeaders().getFirst("Location")).contains(bucket);
+    }
 }
