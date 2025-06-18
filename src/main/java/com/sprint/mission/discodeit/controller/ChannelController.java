@@ -36,7 +36,6 @@ public class ChannelController implements ChannelControllerDocs {
   public ResponseEntity<ChannelDto> createPublicChannel(
       @RequestBody @Valid PublicChannelRequest publicChannelRequest
   ) {
-    log.debug("POST /api/channels/public");
     ChannelDto publicChannel = channelService.createPublicChannel(publicChannelRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(publicChannel);
   }
@@ -46,7 +45,6 @@ public class ChannelController implements ChannelControllerDocs {
   public ResponseEntity<ChannelDto> createPrivateChannel(
       @RequestBody @Valid PrivateChannelRequest privateChannelRequest
   ) {
-    log.debug("POST /api/channels/private");
     ChannelDto privateChannel = channelService.
         createPrivateChannel(privateChannelRequest.participantIds());
     return ResponseEntity.status(HttpStatus.CREATED).body(privateChannel);
@@ -55,7 +53,6 @@ public class ChannelController implements ChannelControllerDocs {
   @GetMapping
   @Override
   public ResponseEntity<List<ChannelDto>> getChannels(@RequestParam UUID userId) {
-    log.debug("GET /api/channels");
     return ResponseEntity.ok(channelService.readAllByUserId(userId));
   }
 
@@ -65,7 +62,6 @@ public class ChannelController implements ChannelControllerDocs {
       @PathVariable UUID id,
       @RequestBody @Valid PublicChannelUpdateRequest updateRequest
   ) {
-    log.debug("PATCH /api/channels/{}", id);
     ChannelDto channel = channelService.updateChannel(id, updateRequest);
     return ResponseEntity.ok().body(channel);
   }
@@ -73,7 +69,6 @@ public class ChannelController implements ChannelControllerDocs {
   @DeleteMapping("/{id}")
   @Override
   public ResponseEntity<Void> deleteChannel(@PathVariable UUID id) {
-    log.debug("DELETE /api/channels/{}", id);
     channelService.deleteChannel(id);
     return ResponseEntity.noContent().build();
   }

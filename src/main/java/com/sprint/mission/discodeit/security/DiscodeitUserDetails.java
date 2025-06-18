@@ -40,7 +40,6 @@ public class DiscodeitUserDetails implements UserDetails {
     return this.user.id();
   }
 
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {

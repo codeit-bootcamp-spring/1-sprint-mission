@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.User.Role;
+import com.sprint.mission.discodeit.event.RoleChangedEvent;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class AuthService {
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Value("${discodeit.admin.username}")
   private String adminUsername;
@@ -59,16 +62,19 @@ public class AuthService {
   @Transactional
   public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
     UUID userId = roleUpdateRequest.userId();
-    Role newRole = roleUpdateRequest.newRole();
-    User user = userRepository.findById(roleUpdateRequest.userId())
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
+    Role oldRole = user.getRole();
+    Role newRole = roleUpdateRequest.newRole();
     if (newRole != null) {
       user.updateRole(newRole);
     }
     jwtService.invalidateJwtSession(userId);
 
-    return userMapper.toDto(user);
+    UserDto userDto = userMapper.toDto(user);
+    eventPublisher.publishEvent(RoleChangedEvent.of(userId, oldRole, newRole));
+    return userDto;
   }
 
 }

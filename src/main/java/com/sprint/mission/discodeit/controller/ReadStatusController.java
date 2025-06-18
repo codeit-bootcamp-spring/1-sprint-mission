@@ -46,8 +46,7 @@ public class ReadStatusController implements ReadStatusControllerDocs {
   @Override
   public ResponseEntity<ReadStatusDto> update(@PathVariable UUID id,
       @RequestBody @Valid ReadStatusUpdateRequest readStatusUpdateRequest) {
-    ReadStatusDto readStatusDto = readStatusService.update(id,
-        readStatusUpdateRequest.newLastReadAt());
+    ReadStatusDto readStatusDto = readStatusService.update(id, readStatusUpdateRequest);
     return ResponseEntity.ok(readStatusDto);
   }
 }

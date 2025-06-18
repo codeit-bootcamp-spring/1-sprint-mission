@@ -36,7 +36,6 @@ public class UserController implements UserControllerDocs {
       @RequestPart @Valid UserCreateRequest userCreateRequest,
       @RequestPart(required = false) MultipartFile profile
   ) {
-    log.debug("POST /api/users");
     UserDto userDto = userService.createUser(userCreateRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
@@ -44,7 +43,6 @@ public class UserController implements UserControllerDocs {
   @GetMapping
   @Override
   public ResponseEntity<List<UserDto>> getUsers() {
-    log.debug("GET /api/users");
     return ResponseEntity.ok(userService.readAll());
   }
 
@@ -55,7 +53,6 @@ public class UserController implements UserControllerDocs {
       @RequestPart @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile profile
   ) {
-    log.debug("PATCH /api/users/{}", id);
     UserDto userDto = userService.updateUser(id, userUpdateRequest, profile);
     return ResponseEntity.ok().body(userDto);
   }
@@ -63,7 +60,6 @@ public class UserController implements UserControllerDocs {
   @DeleteMapping("/{id}")
   @Override
   public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-    log.debug("DELETE /api/users/{}", id);
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
   }

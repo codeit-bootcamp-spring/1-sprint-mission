@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.event.AsyncFailedEvent;
 import com.sprint.mission.discodeit.exception.binarycontent.file.DirectoryCreateException;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileDeleteException;
@@ -18,10 +18,12 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -34,8 +36,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
+
+  private final ApplicationEventPublisher eventPublisher;
 
   @Value("${discodeit.storage.local.root-path}")
   private Path root;
@@ -73,8 +78,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   @Recover
-  public CompletableFuture<UUID> recover(FileCreateException cause,
-      BinaryContent binaryContent, byte[] data) {
+  public CompletableFuture<UUID> recover(FileCreateException cause, UUID id, byte[] data) {
     String requestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID);
 
     AsyncTaskFailure failureDetails = new AsyncTaskFailure(
@@ -82,6 +86,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         requestId,
         cause.getMessage()
     );
+
+    eventPublisher.publishEvent(AsyncFailedEvent.of(failureDetails));
 
     log.error("비동기 파일 업로드 실패 : {}", failureDetails, cause);
     throw new FileCreateException(Map.of("failureDetails", failureDetails));

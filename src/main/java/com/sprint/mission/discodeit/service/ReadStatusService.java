@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -69,10 +70,17 @@ public class ReadStatusService {
 
   @PostAuthorize("principal.user.id == returnObject.userId()")
   @Transactional
-  public ReadStatusDto update(UUID id, Instant newLastReadAt) {
+  public ReadStatusDto update(UUID id, ReadStatusUpdateRequest request) {
     ReadStatus readStatus = findById(id);
-    readStatus.updateLastReadAt(newLastReadAt);
-    readStatusRepository.save(readStatus);
+    Instant newLastReadAt = request.newLastReadAt();
+    Boolean newNotificationEnabled = request.newNotificationEnabled();
+
+    if (newLastReadAt != null) {
+      readStatus.updateLastReadAt(newLastReadAt);
+    }
+    if (newNotificationEnabled != null) {
+      readStatus.updateNotificationEnabled(newNotificationEnabled);
+    }
     return readStatusMapper.toDto(readStatus);
   }
 

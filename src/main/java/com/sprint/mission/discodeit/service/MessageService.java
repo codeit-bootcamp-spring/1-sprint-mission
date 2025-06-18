@@ -8,11 +8,13 @@ import com.sprint.mission.discodeit.entity.BinaryContent.UploadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -29,6 +31,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,6 +55,8 @@ public class MessageService {
   private final BinaryContentStorage binaryContentStorage;
   private final MessageMapper messageMapper;
   private final PageResponseMapper pageResponseMapper;
+  private final ApplicationEventPublisher eventPublisher;
+  private final ChannelMapper channelMapper;
 
   @Transactional
   public MessageDto createMessage(MessageCreateRequest messageCreateRequest,
@@ -76,7 +81,9 @@ public class MessageService {
         .save(Message.create(user, messageCreateRequest.content(), channel, contents));
     log.info("Message 생성. id: {}", message.getId());
 
-    return messageMapper.toDto(message);
+    MessageDto messageDto = messageMapper.toDto(message);
+    eventPublisher.publishEvent(NewMessageEvent.of(messageDto, channelMapper.toDto(channel)));
+    return messageDto;
   }
 
   private List<BinaryContent> createAttachments(List<MultipartFile> attachments) {

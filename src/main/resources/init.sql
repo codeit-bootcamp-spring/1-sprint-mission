@@ -74,7 +74,17 @@ create table jwt_sessions(
     created_at timestamp not null,
     updated_at timestamp,
     user_id uuid not null,
-    access_token varchar(512) not null unique,
-    refresh_token varchar(512) not null unique,
+    access_token varchar(2048) not null unique,
+    refresh_token varchar(2048) not null unique,
     expiration_time timestamp not null
+);
+
+create table notifications(
+    id uuid primary key,
+    created_at timestamp not null,
+    receiver_id uuid not null,
+    title varchar(255) not null,
+    content varchar(512) not null,
+    type varchar(20) not null,
+    target_id uuid
 );

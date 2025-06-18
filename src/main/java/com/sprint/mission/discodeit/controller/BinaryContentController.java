@@ -29,7 +29,6 @@ public class BinaryContentController implements BinaryContentControllerDocs {
   @GetMapping("/{id}")
   @Override
   public ResponseEntity<BinaryContentDto> getBinaryContentById(@PathVariable UUID id) {
-    log.debug("GET /api/binaryContents/{}", id);
     return ResponseEntity.ok(binaryContentService.find(id));
   }
 
@@ -37,7 +36,6 @@ public class BinaryContentController implements BinaryContentControllerDocs {
   @Override
   public ResponseEntity<List<BinaryContentDto>> getBinaryContents(
       @RequestParam List<UUID> binaryContentIds) {
-    log.debug("GET /api/binaryContents");
     ArrayList<BinaryContentDto> responses = new ArrayList<>(100);
 
     binaryContentIds.stream()
@@ -49,7 +47,6 @@ public class BinaryContentController implements BinaryContentControllerDocs {
 
   @GetMapping("/{id}/download")
   public ResponseEntity<Resource> getFile(@PathVariable UUID id) {
-    log.debug("GET /api/binaryContents/{}/download", id);
     return binaryContentStorage.download(binaryContentService.find(id));
   }
 }

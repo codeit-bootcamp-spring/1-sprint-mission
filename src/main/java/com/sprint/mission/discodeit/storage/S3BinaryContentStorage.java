@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.config.S3StorageProperties;
 import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.event.AsyncFailedEvent;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   private final S3Client s3Client;
   private final S3Presigner s3Presigner;
   private final S3StorageProperties properties;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Async("binaryContentExecutor")
   @Override
@@ -64,7 +66,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
   @Recover
   @Transactional
-  public CompletableFuture<UUID> recover(SdkException cause, BinaryContent binaryContent, byte[] data) {
+  public CompletableFuture<UUID> recover(SdkException cause, UUID id, byte[] data) {
     String requestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID);
 
     AsyncTaskFailure failureDetails = new AsyncTaskFailure(
@@ -72,6 +74,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         requestId,
         cause.getMessage()
     );
+
+    eventPublisher.publishEvent(AsyncFailedEvent.of(failureDetails));
 
     log.error("비동기 파일 업로드 실패 : {}", failureDetails, cause);
     return CompletableFuture.failedFuture(cause);

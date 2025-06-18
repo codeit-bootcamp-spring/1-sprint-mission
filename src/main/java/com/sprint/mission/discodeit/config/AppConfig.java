@@ -19,12 +19,24 @@ import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecu
 public class AppConfig {
 
   @Bean(name = "binaryContentExecutor")
-  public AsyncTaskExecutor asyncExecutor() {
+  public AsyncTaskExecutor binaryContentExecutor() {
     ThreadPoolTaskExecutor delegate = new ThreadPoolTaskExecutor();
     delegate.setCorePoolSize(4);
     delegate.setMaxPoolSize(16);
     delegate.setQueueCapacity(100);
     delegate.setThreadNamePrefix("binaryContent-");
+    delegate.setTaskDecorator(new MdcTaskDecorator());
+    delegate.initialize();
+    return new DelegatingSecurityContextAsyncTaskExecutor(delegate);
+  }
+
+  @Bean(name = "eventExecutor")
+  public AsyncTaskExecutor eventExecutor() {
+    ThreadPoolTaskExecutor delegate = new ThreadPoolTaskExecutor();
+    delegate.setCorePoolSize(2);
+    delegate.setMaxPoolSize(4);
+    delegate.setQueueCapacity(100);
+    delegate.setThreadNamePrefix("event-");
     delegate.setTaskDecorator(new MdcTaskDecorator());
     delegate.initialize();
     return new DelegatingSecurityContextAsyncTaskExecutor(delegate);

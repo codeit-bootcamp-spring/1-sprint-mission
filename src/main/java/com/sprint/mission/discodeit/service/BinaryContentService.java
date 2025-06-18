@@ -40,7 +40,7 @@ public class BinaryContentService {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    binaryContentStorage.put(content, data);
+    binaryContentStorage.put(content.getId(), data);
 
     return content;
   }
