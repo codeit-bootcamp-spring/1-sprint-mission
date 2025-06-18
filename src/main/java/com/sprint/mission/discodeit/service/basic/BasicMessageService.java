@@ -1,17 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.async.event.NewMessageNotificationEvent;
+import com.sprint.mission.discodeit.common.NotificationType;
 import com.sprint.mission.discodeit.dto.message.MessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.page.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
@@ -20,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -38,12 +45,15 @@ public class BasicMessageService implements MessageService {
 
   private final MessageMapper messageMapper;
   private final PageResponseMapper<MessageResponseDto> pageResponseMapper;
+  private final ChannelRepository channelRepository;
+  private final ReadStatusRepository readStatusRepository;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   private void addAttachmentToMessage(Message message, List<MultipartFile> attachments)
       throws IOException {
     for (MultipartFile attachment : attachments) {
       // 1. BinaryContent 저장
-      UUID id = binaryContentService.create(attachment).id();
+      UUID id = binaryContentService.create(attachment, message.getAuthor().getId()).id();
       BinaryContent binaryContent = binaryContentRepository.findById(id)
           .orElseThrow(() -> new BinaryContentNotFoundException(id));
 
@@ -68,6 +78,21 @@ public class BasicMessageService implements MessageService {
       addAttachmentToMessage(message, attachments);
     }
     Message savedMessage = messageRepository.save(message);
+
+    List<User> users = readStatusRepository.findByChannelIdAndNotificationEnabledTrue(
+            messageReqDTO.channelId())
+        .stream()
+        .map(ReadStatus::getUser)
+        .toList();
+
+    log.info("✨ 채널 사용자 확인: {}", users);
+
+    for (User receiver : users) {
+      log.info("✨ 이벤트 잘 돌아가니?: {}", receiver);
+      applicationEventPublisher.publishEvent(new NewMessageNotificationEvent(
+          receiver.getId(), messageReqDTO.channelId(), NotificationType.NEW_MESSAGE
+      ));
+    }
 
     log.info("메시지가 생성되었습니다. - id: {}", savedMessage.getId());
     return messageMapper.toResponseDto(savedMessage);

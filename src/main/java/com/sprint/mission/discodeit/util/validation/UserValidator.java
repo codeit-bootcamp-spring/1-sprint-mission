@@ -16,8 +16,8 @@ public class UserValidator implements Validator<User, UserSignupRequestDto, User
 
   @Override
   public void validateCreate(UserSignupRequestDto entity) {
-    if (!ValidatorExp.USERNAME.matches(entity.username())) {
-      throw new UserValidationException(ErrorCode.INVALID_USERNAME, entity.username());
+    if (!ValidatorExp.USERNAME.matches(entity.userName())) {
+      throw new UserValidationException(ErrorCode.INVALID_USERNAME, entity.userName());
     }
 
     if (!ValidatorExp.NICKNAME.matches(entity.nickname())) {
@@ -44,9 +44,9 @@ public class UserValidator implements Validator<User, UserSignupRequestDto, User
   @Override
   public User validateUpdate(User current, UserUpdateDto update) {
     boolean isUpdated = false;
-    if (update.username() != null && !update.username().equals(current.getUsername())
-        && ValidatorExp.USERNAME.matches(update.username())) {
-      current.updateUsername(update.username());
+    if (update.newUsername() != null && !update.newUsername().equals(current.getUsername())
+        && ValidatorExp.USERNAME.matches(update.newUsername())) {
+      current.updateUsername(update.newUsername());
       isUpdated = true;
     }
 

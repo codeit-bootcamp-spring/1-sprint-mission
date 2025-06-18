@@ -22,7 +22,7 @@ spring:
         format_sql: false
         use_sql_comments: true
         highlight_sql: true
-        generate_statistics: false
+        generate_statistics: true
         cache:
           use_second_level_cache: false
       open-in-view: false
@@ -36,10 +36,14 @@ management:
     web:
       base-path: /actuator
       exposure:
-        include: health, info, metrics, loggers
+        include: health, info, metrics, loggers, prometheus
   info:
     env:
       enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 
 # actuator - info
 info:
@@ -70,11 +74,12 @@ logging:
     org:
       springframework:
         core:
-          env: debug
-        security: trace
+          env: off
+        security: off
         web: debug
       hibernate:
         sql: debug
+        stat: debug
         type:
           descriptor:
             sql: debug
@@ -96,6 +101,7 @@ springdoc:
 
 # port
 server:
+  port: ${APP_PORT:80}
   tomcat:
     uri-encoding: UTF-8
   servlet:

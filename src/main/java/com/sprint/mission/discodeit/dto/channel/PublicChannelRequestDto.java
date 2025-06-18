@@ -18,7 +18,7 @@ public class PublicChannelRequestDto {
 
   @NotNull
   @Builder.Default
-  private UUID ownerId = UUID.fromString("abdbdf81-5cb8-4a5a-97e7-d2d839c2bbcf");
+  private UUID ownerId = UUID.fromString("371ab422-6362-4d73-90fb-13d85b178250");
 
   public String serverName() {
     return this.name;

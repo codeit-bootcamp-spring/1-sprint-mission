@@ -32,7 +32,7 @@ class UserControllerTest {
 
   @MockitoBean
   private UserService userService;
-  
+
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
@@ -40,7 +40,7 @@ class UserControllerTest {
   void createUserSuccess() throws Exception {
     // given
     UserSignupRequestDto requestDto = new UserSignupRequestDto(
-        "username", "nickname", "test@email.com", "password",
+        "userName", "nickname", "test@email.com", "password",
         "010-1234-5678", Phone.RegionCode.KR, Role.USER, "자기소개"
     );
 
@@ -71,7 +71,7 @@ class UserControllerTest {
   void createUserFailed() throws Exception {
     // given
     UserSignupRequestDto requestDto = new UserSignupRequestDto(
-        "username", "nickname", "test@email.com", null,
+        "userName", "nickname", "test@email.com", null,
         "010-1234-5678", Phone.RegionCode.KR, Role.USER, "자기소개"
     );
 

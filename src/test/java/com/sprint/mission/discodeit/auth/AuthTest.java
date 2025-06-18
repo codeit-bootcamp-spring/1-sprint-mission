@@ -56,7 +56,7 @@ public class AuthTest {
   @DisplayName("로그인 성공")
   void login_success() throws Exception {
     JsonNode requestBody = objectMapper.createObjectNode()
-        .put("username", "test")
+        .put("userName", "test")
         .put("password", "!@asdf1234");
 
     mockMvc.perform(post("/api/auth/login")
@@ -71,7 +71,7 @@ public class AuthTest {
   @DisplayName("비밀번호 불일치로 인한 로그인 실패")
   void login_fail_invalid_password() throws Exception {
     JsonNode requestBody = objectMapper.createObjectNode()
-        .put("username", "test")
+        .put("userName", "test")
         .put("password", "wrongPassword1234!");
 
     mockMvc.perform(post("/api/auth/login")
@@ -86,7 +86,7 @@ public class AuthTest {
   @DisplayName("사용자명 불일치로 인한 로그인 실패")
   void login_fail_invalid_username() throws Exception {
     JsonNode requestBody = objectMapper.createObjectNode()
-        .put("username", "wronguser")
+        .put("userName", "wronguser")
         .put("password", "!@asdf1234");
 
     mockMvc.perform(post("/api/auth/login")

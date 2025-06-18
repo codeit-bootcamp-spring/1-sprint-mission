@@ -17,7 +17,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -54,8 +53,10 @@ public class SecurityConfig {
     handler.setCsrfRequestAttributeName("_csrf");
 
     http
-        // JWT 사용 시 CSRF 불필요
-        .csrf(AbstractHttpConfigurer::disable)
+        .csrf(csrf -> csrf
+            .csrfTokenRepository(repo)
+            .csrfTokenRequestHandler(handler::handle)
+        )
         // 세션 정책: 세션 사용 안함
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -80,7 +81,9 @@ public class SecurityConfig {
                 "/images/**",
                 "/favicon.ico",
                 "/static/**",
-                "/assets/**"
+                "/assets/**",
+                "/actuator/**",
+                "/test/**"
             ).permitAll()
             // Swagger - API 문서 공개 경로
             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()

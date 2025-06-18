@@ -28,7 +28,7 @@ public class UserMapper {
 
   public User toEntity(UserSignupRequestDto userSignupRequestDto, String hashedPassword) {
     return new User(
-        userSignupRequestDto.username(),
+        userSignupRequestDto.userName(),
         userSignupRequestDto.nickname(),
         userSignupRequestDto.email(),
         hashedPassword,

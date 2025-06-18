@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.exception.ExceptionDto;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -44,7 +46,8 @@ public interface ReadStatusControllerDocs {
   })
   ResponseEntity<ReadStatusResponseDto> updateReadStatus(
       @PathVariable UUID readStatusId,
-      @RequestBody ReadStatusUpdateRequestDto readStatusUpdateRequest);
+      @RequestBody ReadStatusUpdateRequestDto readStatusUpdateRequest,
+      @AuthenticationPrincipal CustomUserDetails userDetails);
 
   @Operation(summary = "유저별 읽음 상태 조회", description = "주어진 유저 ID에 해당하는 읽음 상태 리스트를 반환합니다.")
   @ApiResponses(value = {

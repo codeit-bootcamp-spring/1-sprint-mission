@@ -15,21 +15,24 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ReadStatusMapper {
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
 
-    public ReadStatusResponseDto toResponseDto(ReadStatus readStatus) {
-        return ReadStatusResponseDto.builder()
-                .id(readStatus.getId())
-                .userId(readStatus.getUser().getId())
-                .channelId(readStatus.getChannel().getId())
-                .lastReadAt(readStatus.getLastReadAt())
-                .build();
-    }
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
 
-    public ReadStatus toEntity(ReadStatusRequestDto readStatusRequestDto) {
-        User user = userRepository.findById(readStatusRequestDto.userId()).orElseThrow(() -> new UserNotFoundException(readStatusRequestDto.userId()));
-        Channel channel = channelRepository.findById(readStatusRequestDto.channelId()).orElseThrow(() -> new ChannelNotFoundException(readStatusRequestDto.channelId()));
-        return new ReadStatus(user, channel, readStatusRequestDto.lastReadAt());
-    }
+  public ReadStatusResponseDto toResponseDto(ReadStatus readStatus) {
+    return ReadStatusResponseDto.builder()
+        .id(readStatus.getId())
+        .userId(readStatus.getUser().getId())
+        .channelId(readStatus.getChannel().getId())
+        .lastReadAt(readStatus.getLastReadAt())
+        .build();
+  }
+
+  public ReadStatus toEntity(ReadStatusRequestDto readStatusRequestDto) {
+    User user = userRepository.findById(readStatusRequestDto.userId())
+        .orElseThrow(() -> new UserNotFoundException(readStatusRequestDto.userId()));
+    Channel channel = channelRepository.findById(readStatusRequestDto.channelId())
+        .orElseThrow(() -> new ChannelNotFoundException(readStatusRequestDto.channelId()));
+    return new ReadStatus(user, channel, readStatusRequestDto.lastReadAt());
+  }
 }

@@ -126,7 +126,7 @@ public class User extends BaseUpdatableEntity {
   @Override
   public String toString() {
     return "User{" +
-        "username='" + username + '\'' +
+        "userName='" + username + '\'' +
         ", nickname='" + nickname + '\'' +
         ", email=" + email +
         ", phone=" + phone +

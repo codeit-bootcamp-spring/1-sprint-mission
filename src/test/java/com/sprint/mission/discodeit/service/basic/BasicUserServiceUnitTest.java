@@ -80,7 +80,7 @@ public class BasicUserServiceUnitTest {
         savedUser.getNickname(), savedUser.getEmail(), Role.USER, null, true);
 
     when(userRepository.existsUserByEmail(dto.email())).thenReturn(false);
-    when(userRepository.existsUserByUsername(dto.username())).thenReturn(false);
+    when(userRepository.existsUserByUsername(dto.userName())).thenReturn(false);
     when(passwordEncoder.encode(dto.password())).thenReturn(hashedPassword);
     when(userMapper.toEntity(dto, hashedPassword)).thenReturn(userEntity);
     when(userRepository.save(userEntity)).thenReturn(userEntity);
@@ -129,10 +129,10 @@ public class BasicUserServiceUnitTest {
     );
 
     given(userRepository.existsUserByEmail(dto.email())).willReturn(false);
-    given(userRepository.existsUserByUsername(dto.username())).willReturn(false);
+    given(userRepository.existsUserByUsername(dto.userName())).willReturn(false);
     given(userMapper.toEntity(dto, hashedPassword)).willReturn(userEntity);
 
-    given(binaryContentService.create(profile)).willReturn(profileDto);
+    given(binaryContentService.create(profile, userId)).willReturn(profileDto);
     given(binaryContentRepository.findById(profileId)).willReturn(Optional.of(profileEntity));
     willDoNothing().given(userEntity)
         .updateProfile(profileEntity);  // mock한 userEntity에 대해 updateProfile 호출
@@ -169,16 +169,17 @@ public class BasicUserServiceUnitTest {
     User userEntity = mock(User.class);
 
     given(userRepository.existsUserByEmail(dto.email())).willReturn(false);
-    given(userRepository.existsUserByUsername(dto.username())).willReturn(false);
+    given(userRepository.existsUserByUsername(dto.userName())).willReturn(false);
     given(userMapper.toEntity(dto, hashedPassword)).willReturn(userEntity);
 
-    given(binaryContentService.create(profile)).willThrow(EmptyFileUploadException.class);
+    given(binaryContentService.create(profile, userEntity.getId())).willThrow(
+        EmptyFileUploadException.class);
 
     // when & then
     Assertions.assertThatThrownBy(() -> userService.create(dto, profile))
         .isInstanceOf(EmptyFileUploadException.class);
 
-    then(binaryContentService).should().create(profile);
+    then(binaryContentService).should().create(profile, userEntity.getId());
   }
 
   @Test
@@ -242,7 +243,7 @@ public class BasicUserServiceUnitTest {
     given(updatedUser.getProfile()).willReturn(oldProfile);
     willDoNothing().given(binaryContentRepository).delete(oldProfile);
 
-    given(binaryContentService.create(profile)).willReturn(profileDto);
+    given(binaryContentService.create(profile, userId)).willReturn(profileDto);
     given(binaryContentRepository.findById(newProfileId)).willReturn(Optional.of(newProfile));
 
     willDoNothing().given(updatedUser).updateProfile(newProfile);
@@ -259,7 +260,7 @@ public class BasicUserServiceUnitTest {
     verify(userRepository).findById(userId);
     verify(userValidator).validateUpdate(currentUser, requestDto);
     verify(binaryContentRepository).delete(oldProfile);
-    verify(binaryContentService).create(profile);
+    verify(binaryContentService).create(profile, userId);
     verify(binaryContentRepository).findById(newProfileId);
     verify(updatedUser).updateProfile(newProfile);
     verify(userRepository).save(updatedUser);

@@ -60,13 +60,13 @@ public class BasicAuthService implements AuthService {
           userService.isUserOnline(userDetails.getUsername()));
 
       String accessToken = jwtService.generateAccessToken(userDto);
-      String refreshToken = jwtService.generateRefreshToken(userDto.username());
+      String refreshToken = jwtService.generateRefreshToken(userDto.getUsername());
 
       ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
           .httpOnly(true)
           .secure(true)
           .path("/")
-          .maxAge(Duration.ofDays(14))
+          .maxAge(Duration.ofDays(7))
           .sameSite("None")
           .build();
 

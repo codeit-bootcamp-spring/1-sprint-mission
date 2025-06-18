@@ -27,7 +27,7 @@ ext {
 }
 
 group = 'com.sprint.mission'
-version = 'v2.2-M10'
+version = 'v2.3-M11'
 
 java {
     toolchain {
@@ -64,7 +64,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-    
+
     // actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     // spring boot admin (client)
@@ -88,6 +88,26 @@ dependencies {
 
     // postgreSQL
     runtimeOnly 'org.postgresql:postgresql'
+
+    // Retryable
+    implementation 'org.springframework.retry:spring-retry:2.0.8'
+
+    // prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.13.5'
+    implementation 'io.micrometer:micrometer-core:1.13.6'
+
+    // caffeine cache
+//    implementation 'org.springframework.boot:spring-boot-starter-cache:3.3.2'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+
+    // kafka
+    implementation 'org.springframework.kafka:spring-kafka:3.2.4'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.3.3'
+
+    // JSR-310 모듈
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 dependencyManagement {

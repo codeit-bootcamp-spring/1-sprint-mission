@@ -20,6 +20,25 @@ spring:
           use_second_level_cache: false
       open-in-view: false
 
+    transaction:
+      default-timeout: 30
+
+# actuator
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health, info, metrics, loggers, prometheus
+  info:
+    env:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+
 # logging
 logging:
   level:

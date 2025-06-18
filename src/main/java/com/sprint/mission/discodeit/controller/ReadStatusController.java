@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.docs.ReadStatusControllerDocs;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequestDto;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,13 +38,14 @@ public class ReadStatusController implements ReadStatusControllerDocs {
         .body(readStatusService.create(readStatusReqDto));
   }
 
-  @PreAuthorize("#readStatusReqDto.userId() == authentication.principal.id")
+  @PreAuthorize("#userDetails.user.id == authentication.principal.id")
   @PatchMapping(path = "/{readStatusId}")
   public ResponseEntity<ReadStatusResponseDto> updateReadStatus(
       @PathVariable UUID readStatusId,
-      @RequestBody ReadStatusUpdateRequestDto readStatusUpdateRequest) {
+      @RequestBody ReadStatusUpdateRequestDto readStatusUpdateRequest,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
     return ResponseEntity.ok(
-        readStatusService.update(readStatusId, readStatusUpdateRequest.newLastReadAt()));
+        readStatusService.update(readStatusId, readStatusUpdateRequest));
   }
 
   @GetMapping

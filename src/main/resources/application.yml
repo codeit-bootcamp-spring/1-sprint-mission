@@ -10,11 +10,36 @@ spring:
       enabled: true
       max-file-size: 10MB
       max-request-size: 30MB
+
   boot:
     admin:
       client:
         instance:
           name: Discodeit
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+  cache:
+    cache-names: userChannels, userNotifications, allUsers
+
+  kafka:
+    bootstrap-servers: ${KAFKA_NAME}:${KAFKA_INNER_PORT}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: "*"
+    listener:
+      ack-mode: batch
+
 
 discodeit:
   storage:

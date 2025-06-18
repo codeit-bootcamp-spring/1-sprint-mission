@@ -1,112 +1,178 @@
--- DDL
-
--- 파일 컨텐츠 추가
-create table binary_contents
+create table if not exists binary_contents
 (
-    id           uuid primary key      default gen_random_uuid(),
-    file_name    varchar(255) not null,
-    size         integer      not null check (size >= 0),
-    content_type varchar(50)  not null,
-    created_at   timestamptz  not null default now()
+    id            uuid                     default gen_random_uuid()            not null
+        primary key,
+    file_name     varchar(255)                                                  not null,
+    size          integer                                                       not null
+        constraint binary_contents_size_check
+            check (size >= 0),
+    content_type  varchar(50)                                                   not null,
+    created_at    timestamp with time zone default now()                        not null,
+    upload_status varchar(15)              default 'WAITING'::character varying not null
 );
 
-CREATE TABLE users
+create table if not exists users
 (
-    id           uuid primary key             default gen_random_uuid(),
-    username     varchar(50) unique  not null,
-    nickname     varchar(50)         not null,
-    email        varchar(100) unique not null,
-    password     varchar(200)        not null,
-    phone_num    varchar(20)         not null,
-    role    varchar(20)         not null default 'USER',
-    phone_region varchar(10)         not null default 'KR',
-    is_active    boolean             not null default true,
-    introduce    text,
-    profile_id   uuid,
-    created_at   timestamptz         not null default now(),
-    updated_at   timestamptz                  default now(),
-
---     외래키 설정
-    constraint fk_profile foreign key (profile_id) references binary_contents (id) on delete set null
+    id                    uuid                     default gen_random_uuid()         not null
+        primary key,
+    username              varchar(50)                                                not null
+        unique,
+    nickname              varchar(50)                                                not null,
+    email                 varchar(100)                                               not null
+        unique,
+    password              varchar(200)                                               not null,
+    phone_num             varchar(20)                                                not null,
+    role                  varchar(20)              default 'USER'::character varying not null,
+    phone_region          varchar(10)              default 'KR'::character varying   not null,
+    is_active             boolean                  default true                      not null,
+    introduce             text,
+    profile_id            uuid
+        constraint fk_profile
+            references binary_contents
+            on delete set null,
+    created_at            timestamp with time zone default now()                     not null,
+    updated_at            timestamp with time zone default now(),
+    is_account_non_locked boolean                  default true
 );
 
-CREATE TABLE user_statuses
+create table if not exists user_statuses
 (
-    id             uuid primary key     default gen_random_uuid(),
-    user_id        uuid unique not null,
-    last_active_at timestamptz not null default now(),
-    created_at     timestamptz not null default now(),
-    updated_at     timestamptz          default now(),
-
---     외래키 설정
-    constraint fk_user foreign key (user_id) references users (id) on delete cascade
+    id             uuid                     default gen_random_uuid() not null
+        primary key,
+    user_id        uuid                                               not null
+        unique
+        constraint fk_user
+            references users
+            on delete cascade,
+    last_active_at timestamp with time zone default now()             not null,
+    created_at     timestamp with time zone default now()             not null,
+    updated_at     timestamp with time zone default now()
 );
 
-CREATE TABLE channels
+create table if not exists channels
 (
-    id           uuid primary key     default gen_random_uuid(),
-    owner_id     uuid        not null,
-    name         varchar(100)         default 'Unnamed Channel',
+    id           uuid                     default gen_random_uuid() not null
+        primary key,
+    owner_id     uuid                                               not null
+        constraint fk_owner
+            references users
+            on delete set null,
+    name         varchar(100)             default 'Unnamed Channel'::character varying,
     description  text,
-    channel_type varchar(10) not null check (channel_type in ('PUBLIC', 'PRIVATE')),
-    created_at   timestamptz not null default now(),
-    updated_at   timestamptz          default now(),
-
---     외래키 설정
-    constraint fk_owner foreign key (owner_id) references users (id) on delete set null
+    channel_type varchar(10)                                        not null
+        constraint channels_channel_type_check
+            check ((channel_type)::text = ANY
+                   ((ARRAY ['PUBLIC'::character varying, 'PRIVATE'::character varying])::text[])),
+    created_at   timestamp with time zone default now()             not null,
+    updated_at   timestamp with time zone default now()
 );
 
-CREATE TABLE messages
+create table if not exists messages
 (
-    id         uuid primary key     default gen_random_uuid(),
-    channel_id uuid        not null,
-    author_id  uuid        not null,
-    content    text        not null,
-    created_at timestamptz not null default now(),
-    updated_at timestamptz          default now(),
-
---     외래키 설정
-    constraint fk_author foreign key (author_id) references users (id) on delete set null,
-    constraint fk_channel foreign key (channel_id) references channels (id) on delete cascade
+    id         uuid                     default gen_random_uuid() not null
+        primary key,
+    channel_id uuid                                               not null
+        constraint fk_channel
+            references channels
+            on delete cascade,
+    author_id  uuid                                               not null
+        constraint fk_author
+            references users
+            on delete set null,
+    content    text                                               not null,
+    created_at timestamp with time zone default now()             not null,
+    updated_at timestamp with time zone default now()
 );
 
-CREATE TABLE read_statuses
+create table if not exists read_statuses
 (
-    id           uuid primary key     default gen_random_uuid(),
-    channel_id   uuid        not null,
-    user_id      uuid        not null,
-    last_read_at timestamptz not null default now(),
-    created_at   timestamptz not null default now(),
-    updated_at   timestamptz          default now(),
-
---     외래키 설정
-    constraint fk_user foreign key (user_id) references users (id) on delete cascade,
-    constraint fk_channel foreign key (channel_id) references channels (id) on delete cascade,
-
--- 복합 UNIQUE 제약 조건
-    constraint unique_user_channel unique (user_id, channel_id)
+    id                   uuid                     default gen_random_uuid() not null
+        primary key,
+    channel_id           uuid                                               not null
+        constraint fk_channel
+            references channels
+            on delete cascade,
+    user_id              uuid                                               not null
+        constraint fk_user
+            references users
+            on delete cascade,
+    last_read_at         timestamp with time zone default now()             not null,
+    created_at           timestamp with time zone default now()             not null,
+    updated_at           timestamp with time zone default now(),
+    notification_enabled boolean                  default true,
+    constraint unique_user_channel
+        unique (user_id, channel_id)
 );
 
-CREATE TABLE message_attachments
+create table if not exists message_attachments
 (
-    id            uuid primary key     default gen_random_uuid(),
-    message_id    uuid        not null,
-    attachment_id uuid        not null,
-    created_at    timestamptz not null default now(),
-
---     외래키 설정
-    constraint fk_message foreign key (message_id) references messages (id) on delete cascade,
-    constraint fk_attachment_file foreign key (attachment_id) references binary_contents (id) on delete cascade
+    id            uuid                     default gen_random_uuid() not null
+        primary key,
+    message_id    uuid                                               not null
+        constraint fk_message
+            references messages
+            on delete cascade,
+    attachment_id uuid                                               not null
+        constraint fk_attachment_file
+            references binary_contents
+            on delete cascade,
+    created_at    timestamp with time zone default now()             not null
 );
 
-CREATE TABLE channel_members
+create table if not exists channel_members
 (
-    id         uuid primary key     default gen_random_uuid(),
-    member_id  uuid        not null,
-    channel_id uuid        not null,
-    created_at timestamptz not null default now(),
+    id         uuid                     default gen_random_uuid() not null
+        primary key,
+    member_id  uuid                                               not null
+        constraint fk_member
+            references users
+            on delete cascade,
+    channel_id uuid                                               not null
+        constraint fk_channel
+            references channels
+            on delete cascade,
+    created_at timestamp with time zone default now()             not null
+);
 
---     외래키 설정
-    constraint fk_member foreign key (member_id) references users (id) on delete cascade,
-    constraint fk_channel foreign key (channel_id) references channels (id) on delete cascade
+create table if not exists persistent_logins
+(
+    username  varchar(64) not null,
+    series    varchar(64) not null
+        primary key,
+    token     varchar(64) not null,
+    last_used timestamp   not null
+);
+
+create table if not exists jwt_session
+(
+    id            uuid default gen_random_uuid() not null
+        primary key,
+    username      varchar(255)                   not null
+        unique,
+    access_token  varchar(2048)                  not null,
+    refresh_token varchar(2048)                  not null,
+    issued_at     timestamp,
+    expires_at    timestamp
+);
+
+create table if not exists async_task_failure
+(
+    id             uuid         not null
+        primary key,
+    task_name      varchar(100) not null,
+    request_id     varchar(40)  not null,
+    failure_reason varchar(500) not null,
+    failed_at      timestamp with time zone
+);
+
+create table if not exists notification
+(
+    id                uuid                     default gen_random_uuid() not null
+        primary key,
+    receiver_id       uuid                                               not null,
+    title             varchar(100)                                       not null,
+    content           varchar(255)                                       not null,
+    notification_type varchar(20)                                        not null,
+    target_id         uuid,
+    created_at        timestamp with time zone default now()             not null
 );

@@ -16,9 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,13 +50,13 @@ public class UserController implements UserControllerDocs {
   public ResponseEntity<UserResponseDto> getUser(@PathVariable UUID userId) {
     return ResponseEntity.ok(userService.find(userId));
   }
-  
+
   @PreAuthorize("#userId == authentication.principal.id or hasRole('ADMIN')")
-  @PutMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PatchMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponseDto> updateUser(
       @PathVariable UUID userId,
-      @RequestPart("update") UserUpdateDto userUpdateDto,
-      @RequestPart(value = "file", required = false) MultipartFile updateProfile
+      @RequestPart(value = "userUpdateRequest", required = false) UserUpdateDto userUpdateDto,
+      @RequestPart(value = "profile", required = false) MultipartFile updateProfile
   ) {
     return ResponseEntity.ok(userService.update(userId, userUpdateDto, updateProfile));
   }

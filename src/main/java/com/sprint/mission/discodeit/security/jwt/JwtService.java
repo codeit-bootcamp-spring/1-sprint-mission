@@ -40,7 +40,7 @@ public class JwtService {
     Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
     String token = Jwts.builder()
-        .subject(userDto.username())
+        .subject(userDto.getUsername())
         .claim("userDto", objectMapper.convertValue(userDto, Map.class))
         .claim("iat", now)
         .claim("exp", expiryDate)
@@ -50,10 +50,11 @@ public class JwtService {
         .compact();
 
     // 기존 세션 존재 시, 제거 후 새 세션 저장
-    jwtSessionRepository.findByUsername(userDto.username()).ifPresent(jwtSessionRepository::delete);
+    jwtSessionRepository.findByUsername(userDto.getUsername())
+        .ifPresent(jwtSessionRepository::delete);
 
     jwtSessionRepository.save(JwtSession.builder()
-        .username(userDto.username())
+        .username(userDto.getUsername())
         .accessToken(token)
         .refreshToken("")   // refreshToken은 별도로 설정
         .issuedAt(now.toInstant())
@@ -78,7 +79,7 @@ public class JwtService {
         .signWith(getSigningKey())
         .compact();
 
-    // 기존 세션에서 username 기반으로 조회
+    // 기존 세션에서 userName 기반으로 조회
     jwtSessionRepository.findByUsername(username).ifPresent(session -> {
       session.setRefreshToken(refreshToken);
       session.setIssuedAt(now.toInstant());

@@ -10,25 +10,25 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminController {
-  
-    // 특정 사용자의 모든 Remember-Me 토큰 삭제
+
+  // 특정 사용자의 모든 Remember-Me 토큰 삭제
     /*
-    @DeleteMapping("/users/{username}/rememberMe")
-    public ResponseEntity<Map<String, Object>> revokeRememberMeTokens(@PathVariable String username) {
-        log.info("사용자 [{}]의 Remember-Me 토큰 관리자 삭제 요청", username);
+    @DeleteMapping("/users/{userName}/rememberMe")
+    public ResponseEntity<Map<String, Object>> revokeRememberMeTokens(@PathVariable String userName) {
+        log.info("사용자 [{}]의 Remember-Me 토큰 관리자 삭제 요청", userName);
 
         HashMap<String, Object> response = new HashMap<>();
-        response.put("username", username);
+        response.put("userName", userName);
         response.put("status", "revoked");
         response.put("timestamp", Instant.now());
 
-        log.info("사용자 [{}]의 모든 Remember-Me 토큰이 삭제 되었습니다", username);
+        log.info("사용자 [{}]의 모든 Remember-Me 토큰이 삭제 되었습니다", userName);
 
         return ResponseEntity.ok(response);
     }
     */
 
-    // 전체 Remember-Me 토큰 통계 조회
+  // 전체 Remember-Me 토큰 통계 조회
 
     /*
     @GetMapping("/rememberMe/stats")
@@ -41,7 +41,7 @@ public class AdminController {
                 "SELECT COUNT(*) FROM public.persistent_logins", Integer.class);
 
         Integer activeUsers = jdbcTemplate.queryForObject(
-                "SELECT COUNT(DISTINCT username) FROM public.persistent_logins", Integer.class);
+                "SELECT COUNT(DISTINCT userName) FROM public.persistent_logins", Integer.class);
 
         Integer recentTokens = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM public.persistent_logins WHERE last_used > (CURRENT_TIMESTAMP - INTERVAL '24 hours')",
