@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.configure.UploadStatus;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
@@ -18,6 +19,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
@@ -31,6 +33,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,7 +49,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
-
+  
   @Transactional
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
@@ -54,12 +58,9 @@ public class BasicMessageService implements MessageService {
     UUID authorId = messageCreateRequest.authorId();
 
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(
-            ChannelNotFoundException::new);
+        .orElseThrow(ChannelNotFoundException::new);
     User author = userRepository.findById(authorId)
-        .orElseThrow(
-            UserNotFoundException::new
-        );
+        .orElseThrow(UserNotFoundException::new);
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
@@ -69,11 +70,22 @@ public class BasicMessageService implements MessageService {
 
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
+          binaryContent.setUploadStatus(UploadStatus.WAITING);
+          binaryContent.setFileData(bytes);
+
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
           return binaryContent;
         })
         .toList();
+
+    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+      @Override
+      public void afterCommit() {
+        attachments.forEach(content -> {
+          binaryContentStorage.uploadFileAsync(content, content.getFileData());
+        });
+      }
+    });
 
     String content = messageCreateRequest.content();
     Message message = new Message(
@@ -137,5 +149,16 @@ public class BasicMessageService implements MessageService {
 
     log.debug("delete message");
     messageRepository.deleteById(messageId);
+  }
+
+  @Transactional
+  public void handleUpload(UUID contentId, byte[] fileBytes) {
+    BinaryContent content = binaryContentRepository.findById(contentId)
+        .orElseThrow(() -> new IllegalArgumentException("Not found"));
+
+    content.setUploadStatus(UploadStatus.WAITING);
+    binaryContentRepository.save(content);
+
+    binaryContentStorage.uploadFileAsync(content, fileBytes);
   }
 }

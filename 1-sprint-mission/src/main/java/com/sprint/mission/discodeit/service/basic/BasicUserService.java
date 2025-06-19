@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -175,5 +177,21 @@ public class BasicUserService implements UserService {
 
   public UUID findByUserName(String username) {
     return userRepository.findByUsername(username).orElseThrow(NoSuchElementException::new).id;
+  }
+
+  public User findById(UUID id) {
+    return userRepository.findById(id).orElseThrow(NoSuchElementException::new);
+  }
+
+  @Cacheable(value = "userList")
+  public List<UserDto> getAllUsers() {
+    List<User> users = userRepository.findAll();
+    List<UserDto> result = new ArrayList<>();
+
+    for (User u : users) {
+      result.add(userMapper.toDto(u));
+    }
+
+    return result;
   }
 }

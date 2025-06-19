@@ -4,8 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.UUID;
 
-@NotBlank
+
 public record PrivateChannelCreateRequest(
+    String name,
+    String description,
     List<UUID> participantIds
 ) {
 

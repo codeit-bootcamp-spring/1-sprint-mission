@@ -88,4 +88,16 @@ public class BasicReadStatusService implements ReadStatusService {
     }
     readStatusRepository.deleteById(readStatusId);
   }
+
+  @Transactional
+  public void updateNotificationSetting(UUID channelId, UUID userId, boolean enabled) {
+    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(channelId, userId)
+        .orElseThrow(() -> new IllegalStateException("ReadStatus not found"));
+    readStatus.setNotificationEnabled(enabled);
+  }
+
+  public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+    return readStatusRepository.findByUserIdAndChannelId(userId, channelId)
+        .orElseThrow(NoSuchElementException::new);
+  }
 }

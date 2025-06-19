@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
   List<Channel> findAllByTypeOrIdIn(ChannelType type, List<UUID> ids);
+
+  List<Channel> findAllByJoin_id(UUID userId);
 }
