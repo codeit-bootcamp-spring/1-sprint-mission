@@ -45,10 +45,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'software.amazon.awssdk:s3:2.31.7'
-    implementation 'io.jsonwebtoken:jjwt:0.12.6'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt:0.12.6'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

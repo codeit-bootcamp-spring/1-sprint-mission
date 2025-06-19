@@ -46,7 +46,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers
+        include: health, info, metrics, loggers, caches
 
 info:
   app:

@@ -20,6 +20,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,7 @@ public class JwtService {
   private int refreshTokenValiditySeconds;
 
   @Transactional
+  @CacheEvict(cacheNames = "users", key = "'all'")
   public JwtSession registerJwtSession(UserDto userDto) {
     JwtObject accessToken = generateJwtToken(userDto, accessTokenValiditySeconds);
     JwtObject refreshToken = generateJwtToken(userDto, refreshTokenValiditySeconds);
@@ -120,12 +122,14 @@ public class JwtService {
   }
 
   @Transactional
+  @CacheEvict(cacheNames = "users", key = "'all'")
   public void invalidateJwtSession(String refreshToken) {
     jwtSessionRepository.findByRefreshToken(refreshToken)
         .ifPresent(this::invalidate);
   }
 
   @Transactional
+  @CacheEvict(cacheNames = "users", key = "'all'")
   public void invalidateJwtSession(UUID userId) {
     jwtSessionRepository.findByUserId(userId)
         .ifPresent(this::invalidate);

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.config.CacheName;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
@@ -25,6 +26,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,6 +50,7 @@ public class UserService {
   private final JwtService jwtService;
 
   @Transactional
+  @CacheEvict(cacheNames = CacheName.USERS, key = "'all'")
   public UserDto createUser(UserCreateRequest userCreateRequest, MultipartFile profile) {
     log.debug("createUser() 호출");
     duplicationCheck(userCreateRequest.username(), userCreateRequest.email());
@@ -63,6 +67,7 @@ public class UserService {
     return userMapper.toDto(newUser);
   }
 
+  @Cacheable(cacheNames = CacheName.USERS, key = "'all'", unless = "#result.isEmpty()")
   public List<UserDto> readAll() {
     log.debug("readAll() 호출");
     Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
@@ -74,8 +79,9 @@ public class UserService {
         .toList();
   }
 
-  @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
   @Transactional
+  @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
+  @CacheEvict(cacheNames = CacheName.USERS, key = "'all'")
   public UserDto updateUser(UUID userId, UserUpdateRequest userUpdateRequest,
       MultipartFile profile) {
     log.debug("updateUser() 호출");
@@ -111,8 +117,9 @@ public class UserService {
     return userMapper.toDto(user);
   }
 
-  @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
   @Transactional
+  @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
+  @CacheEvict(cacheNames = CacheName.USERS, key = "'all'")
   public void deleteUser(UUID userId) {
     log.debug("deleteUser() 호출");
     userRepository.findByIdWithProfile(userId)
