@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.3-M11'
+version = '3.0-M12'
 
 java {
     toolchain {
@@ -37,7 +37,6 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
-//    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
