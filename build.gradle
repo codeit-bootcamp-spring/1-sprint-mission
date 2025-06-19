@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.3-M11'
+version = '3.0-M12'
 
 java {
     toolchain {
@@ -92,5 +92,5 @@ springBoot {
 
 bootJar {
     archiveBaseName.set("discodeit")
-    archiveVersion.set("2.3-M11")
+    archiveVersion.set("3.0-M12")
 }
