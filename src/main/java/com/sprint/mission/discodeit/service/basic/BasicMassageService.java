@@ -56,7 +56,11 @@ public class BasicMassageService implements MessageService {
 
         UUID userId = request.getAuthorId();
         UUID channelId = request.getChannelId();
-        UUID requestId = UUID.fromString(MDC.get(MDCLoggingInterceptor.REQUEST_ID));
+        String rawRequestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID);
+
+        UUID requestId = Optional.ofNullable(rawRequestId)
+            .map(UUID::fromString)
+            .orElseGet(UUID::randomUUID);
 
         User user = userRepository.findById(userId).orElseThrow(() ->
             new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
