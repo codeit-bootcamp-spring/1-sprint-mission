@@ -33,7 +33,6 @@ public class AsyncBinaryContentUploadService {
   @Async
   @Retryable(
       value = {IOException.class},
-      maxAttempts = 3,
       backoff = @Backoff(delay = 2000)
   )
   public void uploadAsync(UUID contentId, byte[] bytes) throws IOException {
@@ -68,6 +67,6 @@ public class AsyncBinaryContentUploadService {
     });
 
     String content = String.format("파일 업로드 실패 - 파일 ID: %s, 요청 ID: %s", contentId, requestId);
-    notificationService.createNotification(content, NotificationType.ASYNC_FAILED, null);
+    notificationService.create(content, NotificationType.ASYNC_FAILED, null);
   }
 }

@@ -96,7 +96,7 @@ public class BasicMessageService implements MessageService {
     ReadStatus readStatus = readStatusRepository.findByChannelId(channelId)
         .orElseThrow(() -> new ReadStatusNotFoundException());
     if (readStatus.isNotificationEnabled()) {
-      notificationService.createNotification(notificationContent, NotificationType.NEW_MESSAGE,
+      notificationService.create(notificationContent, NotificationType.NEW_MESSAGE,
           channelId);
     }
 

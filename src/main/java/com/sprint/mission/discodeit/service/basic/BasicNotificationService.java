@@ -5,18 +5,20 @@ import static com.sprint.mission.discodeit.entity.Notification.newMessage;
 import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.Notification.NotificationType;
+import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
 import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.NotificationService;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,8 +31,8 @@ public class BasicNotificationService implements NotificationService {
 
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
-  @Autowired
-  private CacheManager cacheManager;
+  private final CacheManager cacheManager;
+  private final ApplicationEventPublisher eventPublisher;
 
   public static UUID getCurrentUserId() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -50,7 +52,7 @@ public class BasicNotificationService implements NotificationService {
 
   @Transactional
   @Override
-  public NotificationDto createNotification(String content, NotificationType type,
+  public NotificationDto create(String content, NotificationType type,
       UUID targetId) {
     UUID receiverId = getCurrentUserId();
 
@@ -76,5 +78,26 @@ public class BasicNotificationService implements NotificationService {
     notificationRepository.deleteById(id);
     log.info("알림 삭제 완료: id={}", id);
     return notificationMapper.toDto(notification);
+  }
+
+  @Override
+  public void createAll(Set<UUID> receiverIds, String title, String content,
+      NotificationType notificationType, UUID targetId) {
+    log.debug("새 알림 생성 시작: receiverIds={}, targetId={}", receiverIds, targetId);
+    List<Notification> notifications = receiverIds.stream()
+        .map(receiverId -> new Notification(
+            receiverId,
+            title,
+            content,
+            notificationType,
+            targetId
+        )).toList();
+    notificationRepository.saveAll(notifications);
+
+    // 이벤트 발행
+    eventPublisher.publishEvent(new MultipleNotificationCreatedEvent(receiverIds));
+
+    log.info("새 알림 생성 완료: receiverIds={}, targetId={}",
+        receiverIds, targetId);
   }
 }
