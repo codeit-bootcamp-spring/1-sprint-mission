@@ -12,7 +12,7 @@ import static org.mockito.BDDMockito.verify;
 import static org.mockito.BDDMockito.verifyNoMoreInteractions;
 
 import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
@@ -22,7 +22,6 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -100,7 +99,7 @@ class BasicMessageServiceTest {
         setId(user, userId);
         setId(channel, channelId);
 
-        CreateMessageRequestDto request = new CreateMessageRequestDto("테스트", channelId, userId);
+        MessageCreateRequest request = new MessageCreateRequest("테스트", channelId, userId);
         Message message = new Message("테스트 메시지", channel, user, List.of());
         setId(message, messageId);
 
@@ -120,7 +119,7 @@ class BasicMessageServiceTest {
     @Test
     void 메시지_생성_실패_채널없음() {
         UUID userId = UUID.randomUUID();
-        CreateMessageRequestDto request = new CreateMessageRequestDto("테스트", null, userId);
+        MessageCreateRequest request = new MessageCreateRequest("테스트", null, userId);
         given(channelRepository.findById(null)).willReturn(Optional.empty());
         assertThrows(ChannelNotFoundException.class,
                 () -> basicMessageService.createMessage(request,
@@ -130,7 +129,7 @@ class BasicMessageServiceTest {
     /*@Test
     void 메시지_생성_실패_작성자없음() {
         UUID channelId = UUID.randomUUID();
-        CreateMessageRequestDto request = new CreateMessageRequestDto("테스트", channelId, null);
+        MessageCreateRequest request = new MessageCreateRequest("테스트", channelId, null);
 
         Channel dummyChannel = new Channel(ChannelType.PUBLIC, "더미 채널", null);
         given(channelRepository.findById(channelId)).willReturn(Optional.of(dummyChannel));

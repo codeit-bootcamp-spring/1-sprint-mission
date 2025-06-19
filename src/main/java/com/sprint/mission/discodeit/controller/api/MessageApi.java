@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
@@ -46,7 +46,7 @@ public interface MessageApi {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<MessageDto> createMessage(
-            @RequestPart("messageCreateRequest") @Parameter(description = "Message 생성 정보") CreateMessageRequestDto messageCreateRequest,
+            @RequestPart("messageCreateRequest") @Parameter(description = "Message 생성 정보") MessageCreateRequest messageCreateRequest,
             @RequestPart(value = "attachments", required = false) @Parameter(description = "Message 첨부 파일들") List<MultipartFile> attachments
     );
 

@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.user.AuthRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import java.util.UUID;
@@ -86,7 +86,7 @@ public class MessageIntegrationTest {
                 "$.id");
 
         // 4. 메시지 전송
-        var messageRequest = new CreateMessageRequestDto("안녕하세요", UUID.fromString(channelId),
+        var messageRequest = new MessageCreateRequest("안녕하세요", UUID.fromString(channelId),
                 userId);
         MockMultipartFile messageJson = new MockMultipartFile(
                 "messageCreateRequest",
@@ -137,7 +137,7 @@ public class MessageIntegrationTest {
         String channelId = JsonPath.read(channelResult.getResponse().getContentAsString(), "$.id");
 
         // 2. 메시지 생성
-        var createMessageRequest = new CreateMessageRequestDto("Hello!", UUID.fromString(channelId),
+        var createMessageRequest = new MessageCreateRequest("Hello!", UUID.fromString(channelId),
                 UUID.fromString(userId));
         var messageResult = mvc.perform(multipart("/api/messages")
                         .file(new MockMultipartFile("messageCreateRequest", "", "application/json",

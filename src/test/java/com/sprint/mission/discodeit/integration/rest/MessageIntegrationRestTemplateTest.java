@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.user.AuthRequestDto;
@@ -106,7 +106,7 @@ public class MessageIntegrationRestTemplateTest {
                 .get("id").toString();
 
         // 4. 메시지 전송
-        var messageRequest = new CreateMessageRequestDto("안녕하세요", UUID.fromString(channelId),
+        var messageRequest = new MessageCreateRequest("안녕하세요", UUID.fromString(channelId),
                 userId);
         HttpEntity<String> messageJson = new HttpEntity<>(
                 objectMapper.writeValueAsString(messageRequest), jsonHeaders);

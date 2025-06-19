@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.Interface;
 
 import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
 
-    MessageDto createMessage(CreateMessageRequestDto request
+    MessageDto createMessage(MessageCreateRequest request
             , List<BinaryContentCreateRequest> binaryContentCreateRequests);
 
     Message getMessageById(UUID id);

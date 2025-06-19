@@ -4,7 +4,7 @@ import static com.sprint.mission.discodeit.entity.NotificationType.NEW_MESSAGE;
 
 import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
@@ -67,7 +67,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
-    public MessageDto createMessage(CreateMessageRequestDto request,
+    public MessageDto createMessage(MessageCreateRequest request,
             List<BinaryContentCreateRequest> binaryRequests) {
         log.info("메시지 생성 요청: channelId={}, authorId={}, 첨부파일 수={}, 내용={}",
                 request.getChannelId(), request.getAuthorId(), binaryRequests.size(),

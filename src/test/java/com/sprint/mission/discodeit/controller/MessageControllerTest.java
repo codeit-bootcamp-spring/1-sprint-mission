@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
@@ -53,7 +53,7 @@ class MessageControllerTest {
         UUID userId = UUID.randomUUID();
         UUID channelId = UUID.randomUUID();
         UUID messageId = UUID.randomUUID();
-        CreateMessageRequestDto request = new CreateMessageRequestDto("test", channelId, userId);
+        MessageCreateRequest request = new MessageCreateRequest("test", channelId, userId);
 
         MessageDto responseDto = new MessageDto();
         responseDto.setId(messageId);
@@ -82,7 +82,7 @@ class MessageControllerTest {
     void createMessage_첨부파일_오류() throws Exception {
         UUID userId = UUID.randomUUID();
         UUID channelId = UUID.randomUUID();
-        CreateMessageRequestDto request = new CreateMessageRequestDto("내용", channelId, userId);
+        MessageCreateRequest request = new MessageCreateRequest("내용", channelId, userId);
 
         given(messageService.createMessage(any(), any()))
                 .willThrow(new InvalidFileDataException());
