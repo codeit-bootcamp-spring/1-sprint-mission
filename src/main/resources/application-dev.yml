@@ -29,7 +29,7 @@ spring:
       time-to-live: 600000
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
 server:
