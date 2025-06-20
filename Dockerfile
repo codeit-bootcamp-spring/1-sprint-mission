@@ -24,7 +24,7 @@ COPY --from=builder /app/build/libs/*.jar /app
 EXPOSE 8080
 
 ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=2.3-M11 \
+    PROJECT_VERSION=3.0-M12 \
     JVM_OPTS=""
 
 ENTRYPOINT ["/bin/bash", "-c", "java -jar ${JVM_OPTS} ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
