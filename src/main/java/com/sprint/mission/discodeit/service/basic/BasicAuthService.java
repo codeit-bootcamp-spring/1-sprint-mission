@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.UserListChangedEvent;
 import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.global.exception.BusinessException;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
@@ -63,6 +64,8 @@ public class BasicAuthService implements AuthService {
             .username(targetUser.getUsername())
             .build();
         eventPublisher.publishEvent(event);
+
+        eventPublisher.publishEvent(new UserListChangedEvent(targetUserId));
 
         return userMapper.entityToDto(targetUser);
     }

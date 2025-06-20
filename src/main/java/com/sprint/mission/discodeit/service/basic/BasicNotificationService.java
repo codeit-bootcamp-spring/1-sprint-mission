@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Notification.NotificationType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.event.NewMessageEvent;
+import com.sprint.mission.discodeit.event.NotificationCreatedEvent;
 import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
@@ -69,16 +70,20 @@ public class BasicNotificationService implements NotificationService {
         backoff = @Backoff(delay = 1000, multiplier = 2)
     )
     public void createNotification(NotificationEvent notificationEvent) {
-        log.info("이벤트 발행 확인: {} / {}", notificationEvent.getType(),
-            notificationEvent.getReceiverId());
+        UUID userId = notificationEvent.getReceiverId();
+
+        log.info("이벤트 발행 확인: {} / {}", notificationEvent.getType(), userId);
         Notification notification = Notification.create(
-            notificationEvent.getReceiverId(),
+            userId,
             notificationEvent.getTitle(),
             notificationEvent.getContent(),
             notificationEvent.getType(),
             notificationEvent.getTargetId());
 
-        notificationRepository.save(notification);
+        Notification savedNotification = notificationRepository.save(notification);
+        NotificationResponse response = notificationMapper.entityToDto(savedNotification);
+
+        eventPublisher.publishEvent(new NotificationCreatedEvent(userId, response));
     }
 
     @Recover

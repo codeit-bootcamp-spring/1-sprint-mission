@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContent.BinaryContentUploadStatus;
+import com.sprint.mission.discodeit.event.FileUploadStatusChangedEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.global.exception.binarycontent.FileConversionException;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +34,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentStorage binaryContentStorage;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Timed("file.upload.async")
     @Override
@@ -60,7 +63,11 @@ public class BasicBinaryContentService implements BinaryContentService {
                     newFile.updateUploadStatus(BinaryContentUploadStatus.FAILED);
                     log.error("File upload failed: {}", newFile.getId());
                 }
-                binaryContentRepository.save(newFile);
+
+                BinaryContent binaryContent = binaryContentRepository.save(newFile);
+                BinaryContentResponse response = binaryContentMapper.entityToDto(binaryContent);
+                eventPublisher.publishEvent(new FileUploadStatusChangedEvent(userId, response));
+
                 return null;
             });
         return newFile;

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.event.UserListChangedEvent;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
@@ -9,7 +10,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -21,6 +25,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final ObjectMapper objectMapper;
     private final JwtService jwtService;
+    private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -31,6 +37,12 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         UserResponse userDto = principal.getUserResponse();
 
         JwtSession jwtSession = jwtService.saveJwtSession(principal, userDto);
+
+        // 캐시 삭제
+        clearUsersCache();
+
+        // 온라인 상태 갱신을 위함
+        eventPublisher.publishEvent(new UserListChangedEvent(userDto.id()));
 
         // 쿠키에 저장
         String refreshToken = jwtSession.getRefreshToken();
@@ -43,5 +55,9 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         //response.getWriter().write(objectMapper.writeValueAsString(jwtSession.getAccessToken()));
         objectMapper.writeValue(response.getWriter(), jwtSession.getAccessToken());
+    }
+
+    private void clearUsersCache() {
+        Objects.requireNonNull(cacheManager.getCache("users")).clear();
     }
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.UserRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.UserListChangedEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +43,7 @@ public class BasicUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtSessionRepository jwtSessionRepository;
     private final NotificationRepository notificationRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(cacheNames = "users", allEntries = true)
     @Override
@@ -57,6 +60,8 @@ public class BasicUserService implements UserService {
 
         binaryContentService.save(userProfileImage, newUser.getId(),
             requestId);
+
+        eventPublisher.publishEvent(new UserListChangedEvent(newUser.getId()));
 
         log.info("Created user - id: {}", newUser.getId());
         return userMapper.entityToDto(newUser, false);
@@ -106,6 +111,8 @@ public class BasicUserService implements UserService {
 
         binaryContentService.save(userProfileImage, user.getId(), requestId);
 
+        eventPublisher.publishEvent(new UserListChangedEvent(user.getId()));
+
         log.info("Updated user - id: {}", user.getId());
         return userMapper.entityToDto(user);
     }
@@ -117,6 +124,8 @@ public class BasicUserService implements UserService {
         findByIdOrThrow(id);
         userRepository.deleteById(id);
         notificationRepository.deleteAllByReceiverId(id);
+
+        eventPublisher.publishEvent(new UserListChangedEvent(id));
         log.info("Deleted user - id: {}", id);
     }
 
