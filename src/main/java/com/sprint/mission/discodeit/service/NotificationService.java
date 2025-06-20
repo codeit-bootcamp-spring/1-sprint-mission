@@ -36,15 +36,6 @@ public class NotificationService {
     return notificationMapper.toDto(notification);
   }
 
-  @Transactional
-  public List<NotificationDto> create(
-      List<UUID> receiverIds, String title, String content, Type type, UUID targetId
-  ) {
-    return receiverIds.stream()
-        .map(id -> create(id, title, content, type, targetId))
-        .toList();
-  }
-
   @PreAuthorize("principal.user.id == #receiverId")
   @Cacheable(cacheNames = CacheName.NOTIFICATIONS_BY_USER, key = "#receiverId")
   public List<NotificationDto> findByReceiverId(UUID receiverId) {

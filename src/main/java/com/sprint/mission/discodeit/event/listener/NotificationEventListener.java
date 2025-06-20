@@ -1,28 +1,25 @@
 package com.sprint.mission.discodeit.event.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.event.AsyncFailedEvent;
+import com.sprint.mission.discodeit.event.AuthenticatedAsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.event.RoleChangedEvent;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.NotificationService;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -31,15 +28,17 @@ public class NotificationEventListener {
 
   private final NotificationService notificationService;
   private final ReadStatusRepository readStatusRepository;
+  private final ObjectMapper objectMapper;
 
   @Async("eventExecutor")
-  @TransactionalEventListener
+  @KafkaListener(topics = "discodeit.new_message")
   @Retryable(
       retryFor = Exception.class,
       backoff = @Backoff(delay = 2000)
   )
-  public void handle(NewMessageEvent event) {
+  public void handleNewMessageEvent(String kafkaEvent) throws JsonProcessingException {
     log.info("새 메세지 생성 이벤트 발생");
+    NewMessageEvent event = objectMapper.readValue(kafkaEvent, NewMessageEvent.class);
     MessageDto messageDto = event.messageDto();
     ChannelDto channelDto = event.channelDto();
 
@@ -49,24 +48,21 @@ public class NotificationEventListener {
         : authorDto.username();
     String content = messageDto.content();
 
-    List<UUID> userIds = readStatusRepository
-        .findByChannelIdAndNotificationEnabledTure(messageDto.channelId())
-        .stream()
+    readStatusRepository.findByChannelIdAndNotificationEnabledTure(messageDto.channelId()).stream()
         .map(readStatus -> readStatus.getUser().getId())
         .filter(userId -> !userId.equals(messageDto.author().id()))
-        .toList();
-
-    notificationService.create(userIds, title, content, event.type(), channelDto.id());
+        .forEach(id -> notificationService.create(id, title, content, event.type(), channelDto.id()));
   }
 
   @Async("eventExecutor")
-  @TransactionalEventListener
+  @KafkaListener(topics = "discodeit.role_changed")
   @Retryable(
       retryFor = Exception.class,
       backoff = @Backoff(delay = 2000)
   )
-  public void handle(RoleChangedEvent event) {
+  public void handleRoleChangedEvent(String kafkaEvent) throws JsonProcessingException {
     log.info("역할 변경 이벤트 발생");
+    RoleChangedEvent event = objectMapper.readValue(kafkaEvent, RoleChangedEvent.class);
     String title = String.format("권한 변경: %s -> %s", event.oldRole(), event.newRole());
     String content = String.format("관리자에 의해 권한이 '%s'(으)로 변경되었습니다.", event.newRole());
     notificationService.create(
@@ -79,27 +75,26 @@ public class NotificationEventListener {
   }
 
   @Async("eventExecutor")
-  @EventListener
+  @KafkaListener(topics = "discodeit.async_task_failed")
   @Retryable(
       retryFor = Exception.class,
       backoff = @Backoff(delay = 2000)
   )
-  public void handle(AsyncFailedEvent event) {
+  public void handleAuthenticatedAsyncTaskFailedEvent(String kafkaEvent) throws JsonProcessingException {
     log.info("비동기 파일 업로드 실패 이벤트 발생");
-    AsyncTaskFailure asyncTaskFailure = event.asyncTaskFailure();
+    AuthenticatedAsyncTaskFailedEvent event = objectMapper.readValue(kafkaEvent, AuthenticatedAsyncTaskFailedEvent.class);
+    AsyncTaskFailure asyncTaskFailure = event.asyncTaskFailedEvent().asyncTaskFailure();
 
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null || !authentication.isAuthenticated()
-        || !(authentication.getPrincipal() instanceof DiscodeitUserDetails principal)) {
-      log.error("비동기 파일 업로드 실패: 인증되지 않은 사용자");
+    UUID id = event.authenticatedUserId();
+    if (id == null) {
+      log.warn("비동기 작업 실패 알림 이벤트 처리 실패: 인증되지 않은 사용자");
       return;
     }
 
-    UUID id = principal.getUser().id();
     String title = String.format("비동기 작업 실패: %s", asyncTaskFailure.taskName());
     String content = String.format("요청 ID: %s\n실패 사유: %s", asyncTaskFailure.requestId(),
         asyncTaskFailure.failureReason());
 
-    notificationService.create(id, title, content, event.type(), null);
+    notificationService.create(id, title, content, event.asyncTaskFailedEvent().type(), null);
   }
 }

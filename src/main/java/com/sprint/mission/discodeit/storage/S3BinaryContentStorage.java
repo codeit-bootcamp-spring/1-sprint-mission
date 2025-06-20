@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.config.S3StorageProperties;
 import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.event.AsyncFailedEvent;
+import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
@@ -75,7 +75,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         cause.getMessage()
     );
 
-    eventPublisher.publishEvent(AsyncFailedEvent.of(failureDetails));
+    eventPublisher.publishEvent(AsyncTaskFailedEvent.of(failureDetails));
 
     log.error("비동기 파일 업로드 실패 : {}", failureDetails, cause);
     return CompletableFuture.failedFuture(cause);
