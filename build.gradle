@@ -51,7 +51,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 
     implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     implementation 'org.springframework.kafka:spring-kafka'
     testImplementation 'org.springframework.kafka:spring-kafka-test'

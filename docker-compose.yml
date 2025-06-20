@@ -24,10 +24,14 @@ services:
       SECURITY_JWT_ACCESS_TOKEN_VALIDITY_SECONDS: ${SECURITY_JWT_ACCESS_TOKEN_VALIDITY_SECONDS}
       SECURITY_JWT_REFRESH_TOKEN_VALIDITY_SECONDS: ${SECURITY_JWT_REFRESH_TOKEN_VALIDITY_SECONDS}
       KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
     volumes:
       - binary-content-storage:/app/files
     depends_on:
       - postgres
+      - broker
+      - redis
 
   postgres:
     image: postgres
@@ -62,6 +66,16 @@ services:
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
 
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+
 volumes:
   binary-content-storage:
   postgres-data:
+  redis-data:

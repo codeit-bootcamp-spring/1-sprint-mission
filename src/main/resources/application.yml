@@ -22,6 +22,12 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  cache:
+    type: redis
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
 
 discodeit:
   admin:
