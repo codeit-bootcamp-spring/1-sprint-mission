@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BinaryContentMapper {
 
-    private final BinaryContentStorage binaryContentStorage;
-
     public BinaryContentDto toDto(BinaryContent entity) {
         if (entity == null) {
             return null;
@@ -23,6 +21,5 @@ public class BinaryContentMapper {
                 entity.getSize(),
                 entity.getContentType()
         );
-
     }
 }

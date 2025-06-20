@@ -6,6 +6,10 @@ import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.exception.file.FileUploadFailedException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.sse.SseEventSender;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -38,14 +42,18 @@ import org.springframework.scheduling.annotation.Async;
 @RequiredArgsConstructor
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-    private final Path root;
-    private final ApplicationEventPublisher eventPublisher;
+    private Path root;
 
-    public LocalBinaryContentStorage(
-            @Value("${discodeit.storage.local.root-path}") String rootPath,
-            ApplicationEventPublisher eventPublisher) {
+    @Value("${discodeit.storage.local.root-path}")
+    private final String rootPath;
+    private final ApplicationEventPublisher eventPublisher;
+    private final SseEventSender sseEventSender;
+    private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentRepository binaryContentRepository;
+
+    @PostConstruct
+    public void initRootPath() {
         this.root = Paths.get(rootPath);
-        this.eventPublisher = eventPublisher;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -69,6 +77,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             put(id, data);
             statusCallback.accept(BinaryContentUploadStatus.SUCCESS);
+            binaryContentRepository.findById(id).ifPresent(binaryContent -> {
+                BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
+                sseEventSender.sendBinaryStatus(userId, dto);
+            });
             return CompletableFuture.completedFuture(null);
         } catch (FileUploadFailedException | IOException e) {
             log.error("비동기 파일 업로드 실패: {}", id);

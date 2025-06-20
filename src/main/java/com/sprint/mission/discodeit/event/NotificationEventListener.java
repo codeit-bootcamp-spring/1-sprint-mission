@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.event;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.sse.SseEventSender;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,10 @@ public class NotificationEventListener {
 
     @Autowired
     private CacheManager cacheManager;
+    @Autowired
+    private SseEventSender sseEventSender;
+    @Autowired
+    private NotificationMapper notificationMapper;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -69,6 +75,8 @@ public class NotificationEventListener {
                 notificationRepository.save(notification);
                 log.debug("알림 저장 완료: receiver={}, type={}, title={}",
                         receiver.getId(), event.getType(), event.getTitle());
+                sseEventSender.sendNotification(receiver.getId(),
+                        notificationMapper.toDto(notification));
             });
         }
     }

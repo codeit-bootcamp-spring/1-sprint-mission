@@ -18,7 +18,9 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.Interface.ChannelService;
+import com.sprint.mission.discodeit.sse.SseEventSender;
 import jakarta.transaction.Transactional;
+import java.awt.desktop.ScreenSleepEvent;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +41,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final ChannelMapper channelMapper;
+    private final SseEventSender sseEventSender;
 
 
     @CacheEvict(value = "userChannels", allEntries = true)
@@ -49,6 +52,9 @@ public class BasicChannelService implements ChannelService {
                 request.getDescription());
         Channel channel = new Channel(PUBLIC, request.getName(), request.getDescription());
         Channel save = channelRepository.save(channel);
+        userRepository.findAll().forEach(user -> {
+            sseEventSender.sendChannelRefresh(user.getId(), save.getId());
+        });
         log.info("Save channel: id={}, name={}", save.getId(), channel.getName());
         return channelMapper.toDto(save);
     }
@@ -72,6 +78,7 @@ public class BasicChannelService implements ChannelService {
         participants.forEach(user -> {
             ReadStatus readStatus = ReadStatus.createWithDefaultNotification(user, savedChannel,
                     Instant.now());
+            sseEventSender.sendChannelRefresh(user.getId(), savedChannel.getId());
             readStatusRepository.save(readStatus);
         });
 
@@ -112,6 +119,9 @@ public class BasicChannelService implements ChannelService {
             throw new PrivateChannelUpdateException();
         }
         channel.update(request.getNewName(), request.getNewDescription());
+        List<UUID> userIds = readStatusRepository.findAllByChannel_Id(id).stream()
+                .map(rs -> rs.getUser().getId()).toList();
+        userIds.forEach(userId -> sseEventSender.sendChannelRefresh(userId, id));
         log.info("update channel: id={}, name={}", id, channel.getName());
         return channelMapper.toDto(channel);
     }
@@ -125,7 +135,10 @@ public class BasicChannelService implements ChannelService {
             log.warn("channel not found: {}", id);
             throw new ChannelNotFoundException();
         }
+        List<UUID> userIds = readStatusRepository.findAllByChannelId(id).stream()
+                .map(rs -> rs.getUser().getId()).toList();
         channelRepository.deleteById(id);
+        userIds.forEach(userId -> sseEventSender.sendChannelRefresh(userId, id));
         log.info("delete channel: id={}", id);
     }
 }

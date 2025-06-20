@@ -32,6 +32,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -126,6 +127,7 @@ public class SecurityConfig {
 
         // jwt
         http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(cookieCsrfTokenRepository())
                         .disable())
@@ -144,6 +146,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/auth/csrf-token").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/upload/**").permitAll()//테스트용
+                        .requestMatchers(HttpMethod.GET, "/api/sse").permitAll()
                         .requestMatchers(
                                 "/", "/index.html", "/swagger-ui/**", "/v3/api-docs/**",
                                 "/actuator/**", "/favicon.ico", "/assets/index-*.js",

@@ -115,5 +115,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return false;
         }
         return protectedMatchers.stream().anyMatch(matcher -> matcher.matches(request));
+        //return excludeMatchers.stream().noneMatch(matcher -> matcher.matches(request));
     }
 }

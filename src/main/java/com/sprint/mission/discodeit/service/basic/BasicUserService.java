@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.Interface.UserService;
+import com.sprint.mission.discodeit.sse.SseEventSender;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentMapper binaryContentMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtSessionRepository jwtSessionRepository;
-    private UUID currentSessionUserId;
+    private final SseEventSender sseEventSender;
 
     @CacheEvict(value = "allUsers", allEntries = true)
     @Override
@@ -89,6 +90,7 @@ public class BasicUserService implements UserService {
             user.setProfile(profileImage);
         }
 
+        sseEventSender.sendUserRefresh(user.getId(), user.getId());
         return userMapper.toDto(user);
     }
 
@@ -154,7 +156,7 @@ public class BasicUserService implements UserService {
         } else {
             user.update(request.getNewUsername(), request.getNewEmail(), request.getNewPassword());
         }
-
+        sseEventSender.sendUserRefresh(user.getId(), user.getId());
         return userMapper.toDto(user);
     }
 
@@ -171,6 +173,7 @@ public class BasicUserService implements UserService {
         }
 
         userRepository.delete(user);
+        sseEventSender.sendUserRefresh(user.getId(), user.getId());
         log.debug("Deleted user o: id={}, email={}", userId, user.getEmail());
     }
 

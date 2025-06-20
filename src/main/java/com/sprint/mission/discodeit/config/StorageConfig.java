@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.sse.SseEventSender;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.storage.LocalBinaryContentStorage;
 import com.sprint.mission.discodeit.storage.S3BinaryContentStorage;
@@ -65,8 +68,15 @@ public class StorageConfig {
     @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local", matchIfMissing = true)
     public BinaryContentStorage localStorage(
             @Value("${discodeit.storage.local.root-path}") String rootPath,
-            ApplicationEventPublisher eventPublisher) {
+            ApplicationEventPublisher eventPublisher,
+            SseEventSender sseEventSender,
+            BinaryContentMapper binaryContentMapper,
+            BinaryContentRepository binaryContentRepository) {
         log.info("✅ Using LocalBinaryContentStorage");
-        return new LocalBinaryContentStorage(rootPath, eventPublisher);
+        return new LocalBinaryContentStorage(rootPath,
+                eventPublisher,
+                sseEventSender,
+                binaryContentMapper,
+                binaryContentRepository);
     }
 }
