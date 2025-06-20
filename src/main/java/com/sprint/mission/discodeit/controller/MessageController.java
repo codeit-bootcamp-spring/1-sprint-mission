@@ -37,7 +37,7 @@ public class MessageController implements MessageApi {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<MessageDto> createMessage(
       @Valid @RequestPart(value = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
-      @RequestPart(value = "binaryContents", required = false) List<MultipartFile> attachments) {
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
     log.info("메세지 생성 요청(Request): messageContent={}, hasProfileImage={}",
         messageCreateRequest.content(),
         attachments != null);
@@ -64,8 +64,9 @@ public class MessageController implements MessageApi {
     MessageDto messageDto = messageService.createMessage(messageCreateRequest,
         attachmentRequests);
 
-    log.info("메세지 생성 응답(Response): messageContent={}, HttpStatus={}",
+    log.info("메세지 생성 응답(Response): messageContent={}, messageDto.attachments={}, HttpStatus={}",
         messageDto.content(),
+        messageDto.attachments(),
         HttpStatus.OK);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(messageDto);

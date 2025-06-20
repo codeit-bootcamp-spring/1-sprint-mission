@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.basic.NotificationService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.File;
@@ -49,8 +50,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final UserRepository userRepository;
   //
-  private final ApplicationEventPublisher eventPublisher;
-  //
   private Path root;
 
   @Value("${discodeit.storage.local.root-path}")
@@ -77,7 +76,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   )
   @Async
   @Override
-  public CompletableFuture<UUID> put(UUID id, byte[] bytes) {
+  public CompletableFuture<Void> put(UUID id, byte[] bytes) {
     log.info("파일 업로드 시작, traceId={}, fileId={}", MDC.get("traceId"), id);
 
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -100,20 +99,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
       User user = userRepository.findByUsername(auth.getName())
           .orElseThrow(() -> new UserNotFoundException(Map.of("username", auth.getName())));
-      eventPublisher.publishEvent(
-          NotificationDto.builder()
-              .title("파일 업로드 중 실패")
-              .content(id.toString())
-              .type(NotificationType.ASYNC_FAILED)
-              .receiverId(user.getId())
-              .build()
-      );
 
       return CompletableFuture.failedFuture(e);
     }
 
     log.info("파일 업로드 시도 성공");
-    return CompletableFuture.completedFuture(id);
+    return CompletableFuture.completedFuture(null);
   }
 
   @Recover

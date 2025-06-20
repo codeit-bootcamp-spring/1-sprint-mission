@@ -3,14 +3,18 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.binaryContent.FileNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.io.File;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -31,16 +35,18 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Transactional
   @Override
-  public BinaryContentDto createBinaryContent(BinaryContentCreateRequest request) {
+  public BinaryContent createBinaryContent(BinaryContentCreateRequest request) {
+    log.info("BinaryContent 객체 생성 시작 fileName={}", request.fileName());
+
     BinaryContent binaryContent = BinaryContent.builder()
         .fileName(request.fileName())
         .size(request.size())
         .contentType(request.contentType())
+        .uploadStatus(BinaryContentUploadStatus.WAITING)
         .build();
     binaryContentRepository.save(binaryContent);
-
-    binaryContentStorage.put(binaryContent.getId(), request.bytes());
-    return binaryContentMapper.toDto(binaryContent);
+    log.info("파일 업로드 요청 접수 완료. 비동기 처리 시작 : fileId={}", binaryContent.getId());
+    return binaryContent;
   }
 
   @Override

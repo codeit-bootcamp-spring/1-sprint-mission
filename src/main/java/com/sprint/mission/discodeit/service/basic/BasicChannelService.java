@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exception.channel.ChannelModificationNotAllowedException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -42,6 +43,7 @@ public class BasicChannelService implements ChannelService {
   private final ChannelMapper channelMapper;
   //
   private final InputHandler inputHandler;
+  private final NotificationService notificationService;
 
 
   @CacheEvict(value = "userChannel", allEntries = true)
@@ -58,6 +60,11 @@ public class BasicChannelService implements ChannelService {
         .build();
     channel = channelRepository.save(channel);
 
+    // 공개 채널 생성 -> 모든 접속자에게 보낸다.
+    log.info("공개 채널 생성으로 SSE 이벤트 생성");
+    String channelId = channel.getId().toString();
+    notificationService.sendToAll("channels.refresh", Map.of("channelId", channelId));
+
     log.info("공개 채널 생성 성공: channelName={}, createdAt={}",
         channel.getName(),
         channel.getCreatedAt());
@@ -71,28 +78,31 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.builder()
         .type(ChannelType.PRIVATE)
         .build();
-    Channel savedChannel = channelRepository.save(channel);
-    log.info("채널 저장 성공, ID: {}", savedChannel.getId());
+    channelRepository.save(channel);
+    log.info("채널 저장 성공, ID: {}", channel.getId());
 
-    request.participantIds().stream()
-        .map(userId -> ReadStatus.builder()
-            .user(userRepository.findById(userId).orElseThrow(() ->
-            {
-              log.error("비공개 채널 생성 단계에서 유저를 찾지 못함: userId={}", userId);
-              return new UserNotFoundException(Map.of("UserId", userId));
-            }))
-            .channel(channelRepository.findById(savedChannel.getId()).orElseThrow(
-                () -> {
-                  log.error("비공개 채널을 찾지 못함: privateChannelId={}", savedChannel.getId());
-                  return new ChannelNotFoundException(Map.of("channelId", savedChannel.getId()));
-                }))
-            .lastReadAt(savedChannel.getCreatedAt())
-            .build()
-        )
-        .forEach(readStatusRepository::save);
+    List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
+        .map(user ->
+            ReadStatus.builder()
+                .lastReadAt(channel.getCreatedAt())
+                .user(user)
+                .channel(channel)
+                .build())
+        .toList();
+    readStatusRepository.saveAll(readStatuses);
+
+    // 비공개 채널 생성 -> 비공개 채널에 초대된 유저들에게 보낸다.
+    log.info("비공개 채널 생성으로 SSE 이벤트 생성");
+    List<User> users = request.participantIds().stream()
+        .map(participantId -> userRepository.findById(participantId)
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", participantId))))
+        .toList();
+    users.forEach((user) ->
+        notificationService.send(user, "channels.refresh", Map.of("channelId", channel.getId()))
+    );
 
     log.info("비공개 채널 생성 성공");
-    return channelMapper.toDto(savedChannel);
+    return channelMapper.toDto(channel);
   }
 
   @Cacheable(value = "userChannel", key = "#userId")
@@ -147,6 +157,14 @@ public class BasicChannelService implements ChannelService {
       channel.refreshUpdateAt();
     }
 
+    // 채널 수정 -> 모든 사용자에게 보낸다.
+    log.info("공개 채널 수정으로 알림 생성");
+    String channelId = channel.getId().toString();
+    List<User> users = userRepository.findAll();
+    users.forEach((user) ->
+        notificationService.send(user, "channels.refresh", Map.of("channelId", channelId))
+    );
+
     log.info("채널 수정 시도 성공: channelName={}, updatedAt={}",
         channel.getName(),
         channel.getCreatedAt());
@@ -158,37 +176,48 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void deleteChannelById(UUID id) {
     log.info("채널 삭제 시도");
-    String keyword = inputHandler.getYesNOInput().toLowerCase();
-    if (keyword.equals("y")) {
 
-      channelRepository.findById(id)
-          .orElseThrow(() -> {
-            log.error("채널 수정 단계에서 채널을 찾지 못함: channelId={}", id);
-            return new ChannelNotFoundException(Map.of("id", id));
-          });
+    channelRepository.findById(id)
+        .orElseThrow(() -> {
+          log.error("채널 수정 단계에서 채널을 찾지 못함: channelId={}", id);
+          return new ChannelNotFoundException(Map.of("id", id));
+        });
 
-      log.info("채널 메세지 삭제");
-      // 채널 메세지 삭제
-      List<UUID> messageIds =
-          messageRepository.findByChannelId(id).stream()
-              .map(BaseEntity::getId)
-              .toList();
+    log.info("채널 메세지 삭제");
+    // 채널 메세지 삭제
+    List<UUID> messageIds =
+        messageRepository.findByChannelId(id).stream()
+            .map(BaseEntity::getId)
+            .toList();
 
-      // messageRepository::deleteMessageById 메서드 참조
-      messageIds.forEach(messageRepository::deleteById);
+    // messageRepository::deleteMessageById 메서드 참조
+    messageIds.forEach(messageRepository::deleteById);
 
-      log.info("채널의 읽음 상태 삭제");
-      // 채널의 읽음 상태 삭제
-      List<UUID> readStatuseIds =
-          readStatusService.findAllReadStatusEntitiesByUserId(id).stream()
-              .map(ReadStatus::getId)
-              .toList();
+    List<UUID> readStatusIds =
+        readStatusService.findAllByChannelId(id).stream()
+            .map(ReadStatus::getId)
+            .toList();
 
-      readStatuseIds.forEach(readStatusService::deleteReadStatusById);
+    // 채널 삭제 -> 채널에 속한 유저들에게 보낸다.
+    log.info("공개 채널 수정으로 알림 생성");
+    String channelId = id.toString();
+    List<User> users = readStatusIds.stream()
+        .map(readStatusId -> readStatusRepository.findById(readStatusId)
+            .orElseThrow(
+                () -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId))))
+        .map(ReadStatus::getUser)
+        .toList();
 
-      // 채널 삭제
-      channelRepository.deleteById(id);
-      log.info("채널 삭제 시도 성공");
-    }
+    users.forEach((user) ->
+        notificationService.send(user, "channels.refresh", Map.of("channelId", channelId))
+    );
+
+    log.info("채널의 읽음 상태 삭제");
+    readStatusIds.forEach(readStatusService::deleteReadStatusById);
+
+    // 채널 삭제
+    channelRepository.deleteById(id);
+    log.info("채널 삭제 시도 성공");
+
   }
 }

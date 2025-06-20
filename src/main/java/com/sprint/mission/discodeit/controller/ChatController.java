@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.MessageService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,27 +30,14 @@ public class ChatController {
   private final ChannelRepository channelRepository;
   private final MessageMapper messageMapper;
   private final MessageRepository messageRepository;
+  private final MessageService messageService;
 
   // (1) 클라이언트(발행자)의 메시지 송신 /pub/messages
   @MessageMapping("/messages")
   public void sendMassage(MessageCreateRequest request) {
     log.info("발행자가 메세지 송신 : authorId={}, content={}", request.authorId(), request.content());
-
-    User author = userRepository.findById(request.authorId())
-        .orElseThrow(() -> new UserNotFoundException(Map.of("authorId", request.authorId())));
-    Channel channel = channelRepository.findById(request.channelId())
-        .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", request.channelId())));
-
-    Message message = Message
-        .builder()
-        .content(request.content())
-        .channel(channel)
-        .author(author)
-        .build();
-
-    messageRepository.save(message);
-
-    MessageDto messageDto = messageMapper.toDto(message);
+    
+    MessageDto messageDto = messageService.createMessage(request, null);
 
     // (2) 다른 클라이언트 들(구독자)에게 메세지 수신
     // Subscribe 엔드 포인트 : /sub/channels.{channelId}.messages
