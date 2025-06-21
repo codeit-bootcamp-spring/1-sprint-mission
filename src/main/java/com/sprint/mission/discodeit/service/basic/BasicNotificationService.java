@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.event.NotificationCreateEvent;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
+import com.sprint.mission.discodeit.repository.EmitterRepository;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
 @Service
@@ -29,13 +32,19 @@ public class BasicNotificationService implements NotificationService {
 
   private final ApplicationEventPublisher eventPublisher;
   private final KafkaTemplate<String, NotificationCreateEvent> kafkaTemplate;
+  private final EmitterRepository emitterRepository;
 
   @Override
   public void create(NotificationType type, UUID targetId, String title, String content) {
-    NotificationCreateEvent event = new NotificationCreateEvent(type, targetId, title, content);
+    Notification notification = new Notification(targetId, title, content, type, targetId);
+    notificationRepository.save(notification);
+    NotificationDto dto = notificationMapper.toDto(notification);
 
+    NotificationCreateEvent event = new NotificationCreateEvent(type, targetId, title, content);
     eventPublisher.publishEvent(event);
     kafkaTemplate.send("notification-events", event);
+
+    sendSseNotification(dto);
   }
 
   @Transactional(readOnly = true)
@@ -64,5 +73,21 @@ public class BasicNotificationService implements NotificationService {
   @Transactional
   public void delete(UUID notificationId) {
     notificationRepository.deleteById(notificationId);
+  }
+
+  private void sendSseNotification(NotificationDto dto) {
+    List<SseEmitter> emitters = emitterRepository.get(dto.targetId());
+    for (SseEmitter emitter : emitters) {
+      try {
+        emitter.send(
+            SseEmitter.event()
+                .id(dto.id().toString())
+                .name("notifications")
+                .data(dto)
+        );
+      } catch (IOException e) {
+        emitter.completeWithError(e);
+      }
+    }
   }
 }

@@ -1,6 +1,36 @@
 version: '3.8'
 
 services:
+  nginx:
+    image: nginx:latest
+    container_name: reverse-proxy
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    networks:
+      - discodeit-network
+  backend:
+    image: your-backend-image:latest
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/discodeit
+      - SPRING_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      - db
+      - redis
+      - kafka
+    networks:
+      - discodeit-network
   broker:
     image: apache/kafka:latest
     hostname: broker
@@ -57,7 +87,6 @@ services:
       - binary-content-storage:/app/.discodeit/storage
     networks:
       - discodeit-network
-
   db:
     image: postgres:16-alpine
     container_name: discodeit-db

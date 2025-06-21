@@ -11,11 +11,14 @@ import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.EmitterRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,6 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
 @Service
@@ -31,11 +35,12 @@ import lombok.extern.slf4j.Slf4j;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
+  private final ChannelMapper channelMapper;
 
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
-  private final ChannelMapper channelMapper;
+  private final EmitterRepository emitterRepository;
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @CacheEvict(value = "channels", key = "#userId")
@@ -49,6 +54,9 @@ public class BasicChannelService implements ChannelService {
 
     channelRepository.save(channel);
     log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+
+    broadcastChannelRefreshEvent(channel.getId());
+
     return channelMapper.toDto(channel);
   }
 
@@ -66,6 +74,9 @@ public class BasicChannelService implements ChannelService {
     readStatusRepository.saveAll(readStatuses);
 
     log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+
+    emitterRepository.sendChannelRefreshToUsers(request.participantIds(), channel.getId());
+
     return channelMapper.toDto(channel);
   }
 
@@ -107,6 +118,9 @@ public class BasicChannelService implements ChannelService {
     }
     channel.update(newName, newDescription);
     log.info("채널 수정 완료: id={}, name={}", channelId, channel.getName());
+
+    broadcastChannelRefreshEvent(channel.getId());
+
     return channelMapper.toDto(channel);
   }
 
@@ -125,5 +139,26 @@ public class BasicChannelService implements ChannelService {
 
     channelRepository.deleteById(channelId);
     log.info("채널 삭제 완료: id={}", channelId);
+  }
+
+  private void broadcastChannelRefreshEvent(UUID channelId) {
+    Map<UUID, List<SseEmitter>> allEmitters = emitterRepository.getAll();
+
+    for (Map.Entry<UUID, List<SseEmitter>> entry : allEmitters.entrySet()) {
+      UUID userId = entry.getKey();
+      List<SseEmitter> emitters = entry.getValue();
+
+      for (SseEmitter emitter : emitters) {
+        try {
+          emitter.send(SseEmitter.event()
+              .id(UUID.randomUUID().toString())
+              .name("channels.refresh")
+              .data(Map.of("channelId", channelId)));
+        } catch (IOException e) {
+          emitter.completeWithError(e);
+          log.warn("SSE 전송 실패: userId={}, error={}", userId, e.getMessage());
+        }
+      }
+    }
   }
 }
