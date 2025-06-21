@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +58,27 @@ public class MessageService {
   private final PageResponseMapper pageResponseMapper;
   private final ApplicationEventPublisher eventPublisher;
   private final ChannelMapper channelMapper;
+  private final SimpMessagingTemplate messagingTemplate;
+
+  @Transactional
+  public void publishMessage(MessageCreateRequest request) {
+    log.debug("publishMessage() 호출");
+    UUID channelId = request.channelId();
+    UUID authorId = request.authorId();
+
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> new ChannelNotFoundException(Map.of("id", channelId)));
+    User user = userRepository.findById(authorId)
+        .orElseThrow(() -> new UserNotFoundException(Map.of("id", authorId)));
+
+    Message message = messageRepository.save(
+        Message.create(user, request.content(), channel, List.of()));
+
+    MessageDto messageDto = messageMapper.toDto(message);
+    String destination = "/sub/channels." + channelId + ".messages";
+    messagingTemplate.convertAndSend(destination, messageDto);
+    log.info("메세지 전송. destination: {}, content: {}", destination, messageDto.content());
+  }
 
   @Transactional
   public MessageDto createMessage(MessageCreateRequest messageCreateRequest,
@@ -82,6 +104,8 @@ public class MessageService {
     log.info("Message 생성. id: {}", message.getId());
 
     MessageDto messageDto = messageMapper.toDto(message);
+    String destination = "/sub/channels." + channelId + ".messages";
+    messagingTemplate.convertAndSend(destination, messageDto);
     eventPublisher.publishEvent(NewMessageEvent.of(messageDto, channelMapper.toDto(channel)));
     return messageDto;
   }
