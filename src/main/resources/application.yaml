@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8080
   servlet:
     session:
       cookie:
@@ -67,7 +67,7 @@ info:
 
   datasource:
     url: ${spring.datasource.url}
-    driver-class-name: ${spring.datasource.driver-class-name}
+    driver-class-name: org.postgresql.Driver
 
 
 springdoc:

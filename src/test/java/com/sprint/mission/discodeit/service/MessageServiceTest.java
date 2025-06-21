@@ -102,10 +102,10 @@ public class MessageServiceTest {
 
     BinaryContentDto binaryContentDto1 = BinaryContentDto.builder().build();
     BinaryContentDto binaryContentDto2 = BinaryContentDto.builder().build();
-    given(binaryContentService.createBinaryContent(binaryContentCreateRequest1)).willReturn(
-        binaryContentDto1);
-    given(binaryContentService.createBinaryContent(binaryContentCreateRequest2)).willReturn(
-        binaryContentDto2);
+//    given(binaryContentService.createBinaryContent(binaryContentCreateRequest1)).willReturn(
+//        binaryContentDto1);
+//    given(binaryContentService.createBinaryContent(binaryContentCreateRequest2)).willReturn(
+//        binaryContentDto2);
 
     BinaryContent binaryContent1 = mock(BinaryContent.class);
     BinaryContent binaryContent2 = mock(BinaryContent.class);
@@ -157,10 +157,10 @@ public class MessageServiceTest {
 
     BinaryContentDto binaryContentDto1 = BinaryContentDto.builder().build();
     BinaryContentDto binaryContentDto2 = BinaryContentDto.builder().build();
-    given(binaryContentService.createBinaryContent(binaryContentCreateRequest1)).willReturn(
-        binaryContentDto1);
-    given(binaryContentService.createBinaryContent(binaryContentCreateRequest2)).willReturn(
-        binaryContentDto2);
+//    given(binaryContentService.createBinaryContent(binaryContentCreateRequest1)).willReturn(
+//        binaryContentDto1);
+//    given(binaryContentService.createBinaryContent(binaryContentCreateRequest2)).willReturn(
+//        binaryContentDto2);
 
     BinaryContent binaryContent1 = mock(BinaryContent.class);
     BinaryContent binaryContent2 = mock(BinaryContent.class);
