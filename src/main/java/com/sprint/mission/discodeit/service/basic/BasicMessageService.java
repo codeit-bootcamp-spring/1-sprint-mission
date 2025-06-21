@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +52,7 @@ public class BasicMessageService implements MessageService {
   private final PageResponseMapper pageResponseMapper;
   private final ReadStatusRepository readStatusRepository;
   private final NotificationService notificationService;
+  private final SimpMessagingTemplate messagingTemplate;
 
   @Transactional
   @Override
@@ -90,11 +92,13 @@ public class BasicMessageService implements MessageService {
     messageRepository.save(message);
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
 
-    // notification
+    MessageDto messageDto = messageMapper.toDto(message);
+    messagingTemplate.convertAndSend("/sub/channels." + channelId + ".messages", messageDto);
+
     String notificationContent = String.format("%s 님이 %s 채널에 메시지를 작성했습니다.", author.getUsername(),
         channel.getName());
     ReadStatus readStatus = readStatusRepository.findByChannelId(channelId)
-        .orElseThrow(() -> new ReadStatusNotFoundException());
+        .orElseThrow(ReadStatusNotFoundException::new);
     if (readStatus.isNotificationEnabled()) {
       notificationService.create(notificationContent, NotificationType.NEW_MESSAGE,
           channelId);
