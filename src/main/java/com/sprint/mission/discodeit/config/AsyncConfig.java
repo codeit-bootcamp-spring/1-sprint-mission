@@ -14,7 +14,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @RequiredArgsConstructor
 @EnableAsync // 비동기 기능 활성
 @EnableRetry // 재시도 기능 활성
-public class AsyncConfig implements AsyncConfigurer {
+public class AsyncConfig {
 
   private final ContextPropagatingTaskDecorator decorator;
 
@@ -27,7 +27,7 @@ public class AsyncConfig implements AsyncConfigurer {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(cores); // 기본 스레드 수
     executor.setMaxPoolSize(cores * 2); // 최대 스레드 수
-    executor.setQueueCapacity(1000); // 대기열
+    executor.setQueueCapacity(100); // 대기열
     executor.setThreadNamePrefix("default-");
     executor.setTaskDecorator(decorator); // 스레드 context 유지
     executor.setRejectedExecutionHandler(
@@ -38,7 +38,6 @@ public class AsyncConfig implements AsyncConfigurer {
   }
 
   // Spring 의 기본 Executor 설정
-  @Override
   public Executor getAsyncExecutor() {
     return defaultExecutor();
   }
