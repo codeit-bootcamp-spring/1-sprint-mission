@@ -1,33 +1,47 @@
-version: '3'
 services:
   db:
-    image: postgres:14
+    image: postgres:16
+    container_name: postgres-db
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
       - discodeit-postgres-data:/var/lib/postgresql/data
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
 
-  app:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: backend
     image: discodeit-app:local
-    ports:
-      - "${APP_PORT}:80"
     environment:
       PROFILES_ACTIVE: ${PROFILES_ACTIVE}
       DATABASE_URL: ${SPRING_DATASOURCE_URL}
       DATABASE_USER: ${SPRING_DATASOURCE_USERNAME}
       DATABASE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: ${SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE}
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: ${SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
     volumes:
       - binary-storage:/app/binaryStorage
     depends_on:
       - db
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./src/main/resources/static:/etc/nginx/html:ro
+    depends_on:
+      - backend
 
 volumes:
   discodeit-postgres-data:

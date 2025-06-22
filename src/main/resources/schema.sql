@@ -123,4 +123,14 @@ create table notifications
     content     varchar(1000)            not null,
     type        varchar(20)              not null,
     target_id   uuid
-)
+);
+
+create table async_task_failures
+(
+    id             uuid primary key,
+    created_at     timestamp with time zone not null,
+    task_name      VARCHAR(255)             NOT NULL,
+    request_id     UUID                     NOT NULL,
+    failure_reason TEXT                     NOT NULL
+);
+
