@@ -40,6 +40,8 @@ public class BasicChannelService implements ChannelService {
   private final ChannelMapper channelMapper;
   private final JwtSessionRepository jwtSessionRepository;
 
+  private final SseService sseService;
+
 
   @CacheEvict(cacheNames = "channelsByUser", allEntries = true)
   @Override
@@ -68,6 +70,10 @@ public class BasicChannelService implements ChannelService {
               return userMapper.toDto(user, isUserOnline(user));
             })
             .toList();
+
+    //SSE 이벤트 전송
+    dto.getParticipantIds().forEach(userId ->
+            sseService.sendChannelRefresh(userId, channel.getId()));
 
     Instant lastMessageAt = findLastMessageAt(channel);
 
@@ -129,6 +135,13 @@ public class BasicChannelService implements ChannelService {
     }
     findChannel.setChannel(dto.getNewName(), dto.getNewDescription());
 
+    //public 채널 수정이니 모든 사용자에게 채널 목록 갱신 알림 전송
+    List<UUID> allUserIds = userRepository.findAll().stream()
+            .map(User::getId)
+            .toList();
+    allUserIds.forEach(userId ->
+            sseService.sendChannelRefresh(userId, findChannel.getId()));
+
     Instant lastMessageAt = findLastMessageAt(findChannel);
     log.info("채널 수정 완료 id: {}", findChannel.getId());
     return channelMapper.toDto(findChannel, List.of(), lastMessageAt);
@@ -137,10 +150,23 @@ public class BasicChannelService implements ChannelService {
   @CacheEvict(cacheNames = "channelsByUser", allEntries = true)
   @Override
   public void delete(UUID id) {
-    if (!channelRepository.existsById(id)) {
-      throw new ChannelNotFoundException(id);
-    }
+    Channel channel = channelRepository.findById(id)
+            .orElseThrow(() -> new ChannelNotFoundException(id));
+
     channelRepository.deleteById(id);
+
+    //채널 삭제시, 해당 채널이 private 면 참가자만, public이면 전체 사용자
+    List<UUID> targetUserIds = channel.getChannelType() == ChannelType.PRIVATE
+            ? readStatusRepository.findAllByChannel(channel).stream()
+            .map(rs -> rs.getUser().getId())
+            .toList()
+            : userRepository.findAll().stream()
+            .map(User::getId)
+            .toList();
+
+    targetUserIds.forEach(userId ->
+            sseService.sendChannelRefresh(userId, channel.getId()));
+
     log.info("채널 삭제 완료 id: {}", id);
   }
 

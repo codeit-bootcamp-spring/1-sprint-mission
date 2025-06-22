@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.async;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.exception.file.FileSaveFailedException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.notification.NotificationEvent;
 import com.sprint.mission.discodeit.notification.NotificationEventPublisher;
 import com.sprint.mission.discodeit.repository.jpa.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.basic.SseService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,18 +30,28 @@ public class BinaryContentUploadExecutor {
     private final BinaryContentRepository binaryContentRepository;
     private final NotificationEventPublisher notificationEventPublisher;
 
+    private final BinaryContentMapper binaryContentMapper;
+    private final SseService sseService;
+
     @Async
     @Retryable(
             value = FileSaveFailedException.class,
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000)
     )
-    public void uploadAsync(UUID id, byte[] bytes, String requestId) {
+    public void uploadAsync(UUID id, byte[] bytes, UUID requestId) {
         try {
             MDC.put("requestId", requestId);
             storage.put(id, bytes);
             binaryContentRepository.updateUploadStatus(id, BinaryContentUploadStatus.SUCCESS);
             log.info("업로드 성공 - id: {}", id);
+
+            //파일 업로드 상태 변경 이벤트 전송
+            binaryContentRepository.findById(id).ifPresent(content -> {
+                BinaryContentDto dto = binaryContentMapper.toDto(content);
+                sseService.sendBinaryStatus(requestId, dto);
+            });
+
         } finally {
             MDC.clear();
         }

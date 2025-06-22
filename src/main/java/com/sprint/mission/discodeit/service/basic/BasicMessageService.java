@@ -80,7 +80,7 @@ public class BasicMessageService implements MessageService {
                     @Override
                     public void afterCommit() {
                       String requestId = MDC.get("requestId");
-                      uploadExecutor.uploadAsync(savedBinaryContent.getId(), attachmentRequest.getBytes(), requestId);
+                      uploadExecutor.uploadAsync(savedBinaryContent.getId(), attachmentRequest.getBytes(), dto.getAuthorId());
                     }
                   }
           );
