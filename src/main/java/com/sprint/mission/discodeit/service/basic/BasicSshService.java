@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class BasicSshService implements SshService {
 
   private static final long TIMEOUT = 30 * 60 * 1000L; // 30분
+  private static final long PING_INTERVAL = 20 * 60 * 1000L; // 20분
 
   private final Map<UUID, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
 
@@ -91,7 +92,7 @@ public class BasicSshService implements SshService {
   }
 
   @Override
-  @Scheduled
+  @Scheduled(fixedRate = PING_INTERVAL)
   public void ping() {
     emitters.forEach((userId, list) ->
         list.removeIf(emitter -> {

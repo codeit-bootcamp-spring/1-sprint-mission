@@ -27,7 +27,7 @@ WORKDIR /app
 
 # 프로젝트 정보를 ENV로 설정
 ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=2.3-M11 \
+    PROJECT_VERSION=2.3-M12 \
     JVM_OPTS=""
 
 # 빌드 스테이지에서 jar 파일만 복사
