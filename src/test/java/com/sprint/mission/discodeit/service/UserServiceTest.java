@@ -14,9 +14,11 @@ import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -97,7 +99,7 @@ class UserServiceTest {
           "test@discodeit.com",
           true,
           null,
-          "ROLE_USER"
+          Role.USER
       );
 
       // Mock: 가짜 user 객체 반환하도록 설정
@@ -155,7 +157,7 @@ class UserServiceTest {
           "test@discodeit.com",
           true,
           null,
-          "ROLE_USER"
+          Role.USER
       );
 
       // Mock: 가짜 user 객체 반환하도록 설정
@@ -217,7 +219,8 @@ class UserServiceTest {
       BinaryContent binaryContent = new BinaryContent(
           multipartFile.getName(),
           multipartFile.getContentType(),
-          multipartFile.getSize()
+          multipartFile.getSize(),
+          BinaryContentUploadStatus.WAITING
       );
 
       // 리플렉션을 사용하여 id 필드 설정
@@ -234,7 +237,8 @@ class UserServiceTest {
           binaryContent.getFileName(),
           binaryContent.getContentType(),
           binaryContent.getCreatedAt(),
-          binaryContent.getSize()
+          binaryContent.getSize(),
+          BinaryContentUploadStatus.SUCCESS
       );
 
       // 예상되는 반환 UserDto
@@ -245,7 +249,7 @@ class UserServiceTest {
           true,
           // 프로필 이미지는 null,
           binaryContentDto,
-          "ROLE_USER"
+          Role.USER
       );
 
       // Mock: 가짜 user 객체 반환하도록 설정
@@ -304,7 +308,7 @@ class UserServiceTest {
           "test@discodeit.com",
           true,
           null,
-          "ROLE_USER"
+          Role.USER
       );
 
     }
@@ -333,7 +337,7 @@ class UserServiceTest {
           "new_test@discodeit.com",
           true,
           null,
-          "ROLE_USER"
+          Role.USER
       );
 
       when(userMapper.toDto(any(User.class), any(boolean.class))).thenReturn(updatedDto);
@@ -394,7 +398,7 @@ class UserServiceTest {
           "test@discodeit.com",
           true,
           null,
-          "ROLE_USER"
+          Role.USER
       );
 
 

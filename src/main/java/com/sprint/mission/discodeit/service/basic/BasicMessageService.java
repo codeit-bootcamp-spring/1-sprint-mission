@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
@@ -26,6 +27,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.util.Objects;
@@ -38,6 +40,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -147,9 +150,11 @@ public class BasicMessageService implements MessageService {
 
         message.addFile(binaryContent);
 
+        UUID currentUserId = getCurrentUserId();
         eventPublisher.publishEvent(new BinaryContentCreatedEvent(
             binaryContent.getId(),
-            file.getBytes()
+            file.getBytes(),
+            currentUserId
         ));
         log.debug("첨부 파일 저장 이벤트 발행 완료: attachmentId = {}", binaryContent.getId());
       } catch (IOException e) {
@@ -163,6 +168,11 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
+  // SecurityContext에서 사용자 정보 가져오기
+  private UUID getCurrentUserId() {
+    return ((DiscodeitUserDetails) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal()).getUserDto().id();
+  }
 
   @Override
   @Transactional(readOnly = true)

@@ -20,7 +20,6 @@ public class KafkaHandler {
   private final ObjectMapper objectMapper;
 
   @Async("eventTaskExecutor")
-  // @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   @EventListener
   public void handleNewMessageEvent(NewMessageEvent event) throws JsonProcessingException {
     log.info("새 메세지 생성 이벤트 kafka 전송: {}", event);

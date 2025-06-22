@@ -45,7 +45,7 @@ public class MessageController {
 
     log.info("메세지 생성 요청: {}", messageCreateRequest);
 
-    if (attachments != null && !attachments.isEmpty()) {
+    if (attachments == null || attachments.isEmpty()) {
       return ResponseEntity.badRequest().body(ErrorCode.EMPTY_DATA);
     }
 

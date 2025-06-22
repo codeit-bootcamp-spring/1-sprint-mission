@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.UUID;
@@ -49,6 +50,7 @@ public class BasicUserService implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
+  private final SseService sseService;
 
   @CachePut(value = "users", key = "#result.id")
   @Override
@@ -81,12 +83,14 @@ public class BasicUserService implements UserService {
 
     User user = new User(createUserDto.username(), createUserDto.email(),
         passwordEncoder.encode(createUserDto.password()), null);
-    userRepository.save(user);
+    User newUser = userRepository.save(user);
 
     log.info("사용자 생성 완료: id = {}, email = {}, username = {}", user.getId(), user.getEmail(),
         user.getUsername());
 
-    return userMapper.toDto(user);
+    sseService.sendUserRefresh(newUser.getId());
+
+    return userMapper.toDto(newUser);
   }
 
   @CachePut(value = "users", key = "#result.id")
@@ -114,6 +118,9 @@ public class BasicUserService implements UserService {
       userRepository.save(user);
       log.info("사용자 프로필 사진 등록: id = {}, profile = {}", user.getId(), profile.getId());
     }
+
+    sseService.sendUserRefresh(user.getId());
+
     return userMapper.toDto(user);
   }
 
@@ -164,7 +171,7 @@ public class BasicUserService implements UserService {
     User savedUser = userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", savedUser.getId());
 
-    userRepository.save(user);
+    sseService.sendUserRefresh(savedUser.getId());
 
     return userMapper.toDto(savedUser);
   }
@@ -207,6 +214,8 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
     log.info("사용자 수정 완료: userId = {}", userId);
 
+    sseService.sendUserRefresh(user.getId());
+
     return userMapper.toDto(user);
   }
 
@@ -226,11 +235,14 @@ public class BasicUserService implements UserService {
 
     userRepository.delete(user);
     log.info("사용자 삭제 완료: userId = {}", userId);
+
+    sseService.sendUserRefresh(user.getId());
+
     return true;
   }
 
 
-  @CacheEvict(value = "users", key = "#roleUpdateRequest.userId")
+  @CacheEvict(value = "users", key = "#roleUpdateRequest.userId", beforeInvocation = true)
   @Transactional
   @Override
   public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {
@@ -257,7 +269,10 @@ public class BasicUserService implements UserService {
     log.debug("사용자 권한 변경 후 알림 발행을 위한 이벤트 호출");
     eventPublisher.publishEvent(
         new UserRoleChangedEvent(
-            user.getId(), user.getId(), roleUpdateRequest.getNewRole().toString()));
+            user.getId(), user.getId(), previousRole.toString(),
+            roleUpdateRequest.getNewRole().toString()));
+
+    sseService.sendUserRefresh(user.getId());
 
     return userMapper.toDto(user);
   }

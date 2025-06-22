@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundExcep
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorResponse> handleException(Exception e) {
+  public ResponseEntity<ErrorResponse> handleException(Exception e, HttpServletRequest request) {
+    // SSE 요청은 처리하지 않음 (Broken pipe 등 정상적인 오류)
+    if ("text/event-stream".equals(request.getHeader("Accept")) ||
+        request.getRequestURI().contains("/sse/")) {
+      return null;
+    }
+
     log.error("서버 내부 에러: {}", e.getMessage());
     ErrorResponse errorResponse = new ErrorResponse(
         Instant.now(),

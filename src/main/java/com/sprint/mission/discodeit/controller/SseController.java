@@ -1,31 +1,46 @@
 package com.sprint.mission.discodeit.controller;
 
-import java.io.IOException;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.service.SseService;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@RestController("/api/sse")
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
 public class SseController {
+
+  private final SseService sseService;
 
   // SSE 연결 엔드포인트
   // 클라이언트가 GET 요청으로 /api/sse 에 접속하면 SSE 연결이 시작됨
-  @GetMapping
-  public SseEmitter streamData() {
-    // SSE 연결 생성 (타임아웃: 무제한) => 데이터를 지속적으로 보낼 수 있는 연결
-    SseEmitter sseEmitter = new SseEmitter(Long.MAX_VALUE);
+  @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public ResponseEntity<SseEmitter> streamData(
+      @RequestHeader(value = "Last-Event-ID", required = false) String lastEventId) {
 
-    try {
-      //연결 즉시 환영 메세지 전송
-      sseEmitter.send(SseEmitter.event()
-          .name("welcome")   // 이벤트 이름 지정 -> 클라이언트가 필터링 가능
-          .data("SSE 연결 성공")); // 전송할 내용
-    } catch (IOException e) {
-      sseEmitter.completeWithError(e); //메세지 전송 도중 오류 발생 시 연결 종료
+    // SecurityContext에서 현재 사용자 ID 가져오기
+    UUID currentUserId = getCurrentUserId();
+
+    // SseService의 subscribe 메서드로 구독
+    return ResponseEntity.ok(sseService.subscribe(currentUserId, lastEventId));
+  }
+
+  private UUID getCurrentUserId() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth == null || !auth.isAuthenticated()) {
+      throw new SecurityException("인증되지 않은 사용자");
     }
-
-    // SseEmitter 반환 --> 클라이언트와 연결 유지됨
-    return sseEmitter;
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) auth.getPrincipal();
+    return userDetails.getUserDto().id();
   }
 
 }

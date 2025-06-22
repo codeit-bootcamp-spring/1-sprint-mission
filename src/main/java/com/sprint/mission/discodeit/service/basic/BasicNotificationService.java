@@ -2,15 +2,12 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
-import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.NotificationService;
@@ -38,29 +35,17 @@ public class BasicNotificationService implements NotificationService {
 
   private final CacheManager cacheManager;
   private final NotificationRepository notificationRepository;
-  private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
 
   @CacheEvict(value = "userNotifications", key = "#event.receiverId")
   @Override
   @Transactional
-  public void create(NotificationEvent event) {
+  public NotificationDto create(NotificationEvent event) {
     log.info("알림 생성 시작: 수신 사용자 ID = {}, 제목: {}", event.getReceiverId(), event.getTitle());
 
     User receiver = userRepository.findById(event.getReceiverId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
     );
-
-    // NEW_MESSAGE 타입의 경우 알림 설정 확인
-    if (event.getType() == NotificationType.NEW_MESSAGE && event.getTargetId() != null) {
-      ReadStatus readStatus = readStatusRepository
-          .findByChannelIdAndUserId(event.getTargetId(), event.getReceiverId()).orElse(null);
-      // 알림이 비활성화되어 있으면 생성하지 않음
-      if (readStatus == null || !readStatus.isNotificationEnabled()) {
-        log.debug("알림 비활성화 상태: user={}, channel={}", event.getReceiverId(), event.getTargetId());
-        return;
-      }
-    }
 
     Notification notification = new Notification(
         receiver,
@@ -72,6 +57,8 @@ public class BasicNotificationService implements NotificationService {
 
     notificationRepository.save(notification);
     log.info("알림 생성 완료: 수신 사용자 ID = {}, 제목: {}", receiver.getId(), event.getTitle());
+
+    return NotificationDto.from(notification);
   }
 
   @Cacheable(value = "userNotifications", key = "#userId")
@@ -97,6 +84,7 @@ public class BasicNotificationService implements NotificationService {
     return notificationsDto;
   }
 
+  @CacheEvict(value = "userNotifications", key = "#event.receiverId")
   @Override
   @Transactional
   public void deleteNotification(UUID notificationId) {

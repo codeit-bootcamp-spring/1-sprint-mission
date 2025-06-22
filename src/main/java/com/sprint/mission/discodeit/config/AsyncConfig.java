@@ -36,9 +36,6 @@ public class AsyncConfig {
     executor.setAllowCoreThreadTimeOut(true);  // 유휴 시 코어 스레드도 정리
     executor.setThreadNamePrefix("binary-");
 
-    executor.setRejectedExecutionHandler(      // 거부 정책
-        new ThreadPoolExecutor.CallerRunsPolicy() // 호출 스레드에서 직접 실행
-    );
     executor.setTaskDecorator(new ContextPropagatingTaskDecorator()); // 컨텍스트 전파를 위한 데코레이터 설정
     executor.initialize();
 

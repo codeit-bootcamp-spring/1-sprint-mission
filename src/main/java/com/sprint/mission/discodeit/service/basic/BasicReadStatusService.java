@@ -43,7 +43,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final UserRepository userRepository;
   private final ReadStatusMapper readStatusMapper;
 
-  @CacheEvict(value = "userReadStatuses", key = "#createReadStatusDto.userId")
+  @CacheEvict(value = "userReadStatuses", key = "#createReadStatusDto.userId", beforeInvocation = true)
   @Override
   @Transactional
   public ReadStatusDto create(CreateReadStatusDto createReadStatusDto)
@@ -85,7 +85,7 @@ public class BasicReadStatusService implements ReadStatusService {
     return readStatusMapper.toDto(readStatus);
   }
 
-  @CacheEvict(value = "userReadStatuses", key = "#result.userId.toString()", beforeInvocation = false)
+  @CacheEvict(value = "userReadStatuses", key = "#result.userId.toString()")
   @PostAuthorize("authentication.principal.userDto.id == returnObject.userId()")
   @Override
   @Transactional
@@ -129,6 +129,7 @@ public class BasicReadStatusService implements ReadStatusService {
     return readStatusDtos;
   }
 
+  @CacheEvict(value = "userReadStatuses", key = "#result.userId.toString()")
   @Override
   @Transactional
   public boolean delete(String readStatusId) {
