@@ -15,6 +15,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -24,6 +26,7 @@ public class NotificationService {
 
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
+  private final SseService sseService;
 
   @Transactional
   @CacheEvict(cacheNames = CacheName.NOTIFICATIONS_BY_USER, key = "#receiverId")
@@ -33,7 +36,17 @@ public class NotificationService {
     Notification notification = Notification.create(receiverId, title, content, type, targetId);
     notificationRepository.save(notification);
     log.info("알림 생성. id: {}", notification.getId());
-    return notificationMapper.toDto(notification);
+    NotificationDto dto = notificationMapper.toDto(notification);
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            sseService.push(dto.receiverId(), "notifications", dto);
+          }
+        }
+    );
+    return dto;
   }
 
   @PreAuthorize("principal.user.id == #receiverId")

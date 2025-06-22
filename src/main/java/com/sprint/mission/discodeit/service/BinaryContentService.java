@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent.UploadStatus;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +26,7 @@ public class BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentMapper binaryContentMapper;
+  private final SseService sseService;
 
   @Transactional
   public BinaryContent create(MultipartFile file) {
@@ -53,6 +56,15 @@ public class BinaryContentService {
     return files.stream()
         .map(this::create)
         .toList();
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void markStatusAndPush(UUID userId, UUID id, UploadStatus status) {
+    binaryContentRepository.updateStatus(id, status);
+    binaryContentRepository.findById(id).ifPresent(entity -> {
+      BinaryContentDto dto = binaryContentMapper.toDto(entity);
+      sseService.push(userId, "binaryContents.status", dto);
+    });
   }
 
   public BinaryContentDto find(UUID id) {

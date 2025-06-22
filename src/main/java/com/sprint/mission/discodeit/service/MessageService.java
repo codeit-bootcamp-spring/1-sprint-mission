@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
@@ -59,6 +60,9 @@ public class MessageService {
   private final ApplicationEventPublisher eventPublisher;
   private final ChannelMapper channelMapper;
   private final SimpMessagingTemplate messagingTemplate;
+  private final BinaryContentMapper binaryContentMapper;
+  private final SseService sseService;
+  private final BinaryContentService binaryContentService;
 
   @Transactional
   public void publishMessage(MessageCreateRequest request) {
@@ -98,7 +102,7 @@ public class MessageService {
       }
     }
 
-    List<BinaryContent> contents = createAttachments(attachments);
+    List<BinaryContent> contents = createAttachments(authorId, attachments);
     Message message = messageRepository
         .save(Message.create(user, messageCreateRequest.content(), channel, contents));
     log.info("Message 생성. id: {}", message.getId());
@@ -110,7 +114,7 @@ public class MessageService {
     return messageDto;
   }
 
-  private List<BinaryContent> createAttachments(List<MultipartFile> attachments) {
+  private List<BinaryContent> createAttachments(UUID userId, List<MultipartFile> attachments) {
     List<BinaryContent> contents = new ArrayList<>();
     if (attachments == null || attachments.isEmpty()) {
       return contents;
@@ -137,9 +141,9 @@ public class MessageService {
             public void afterCommit() {
               binaryContentStorage.put(content.getId(), data)
                   .thenAccept(id ->
-                      binaryContentRepository.updateStatus(id, UploadStatus.SUCCESS))
+                      binaryContentService.markStatusAndPush(userId, id, UploadStatus.SUCCESS))
                   .exceptionally(e -> {
-                    binaryContentRepository.updateStatus(content.getId(), UploadStatus.FAILED);
+                    binaryContentService.markStatusAndPush(userId, content.getId(), UploadStatus.FAILED);
                     return null;
                   });
             }

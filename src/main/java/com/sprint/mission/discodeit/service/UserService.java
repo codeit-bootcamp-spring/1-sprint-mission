@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.config.CacheName;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
@@ -12,6 +13,7 @@ import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserEmailDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNameDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -48,6 +50,8 @@ public class UserService {
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final SseService sseService;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Transactional
   @CacheEvict(cacheNames = CacheName.USERS, key = "'all'")
@@ -58,9 +62,9 @@ public class UserService {
     String encodedPassword = passwordEncoder.encode(userCreateRequest.password());
     User newUser = User.create(userCreateRequest.username(), userCreateRequest.email(),
         encodedPassword);
-    BinaryContent content = createProfile(profile);
-
     newUser = userRepository.save(newUser);
+    BinaryContent content = createProfile(newUser.getId(), profile);
+
     newUser.updateProfile(content);
     log.info("User 생성. id: {}", newUser.getId());
 
@@ -108,7 +112,7 @@ public class UserService {
     }
     if (profile != null) {
       user.getProfile().ifPresent(content -> binaryContentStorage.delete(content.getId()));
-      BinaryContent content = createProfile(profile);
+      BinaryContent content = createProfile(userId, profile);
       user.updateProfile(content);
     }
 
@@ -139,7 +143,7 @@ public class UserService {
   }
 
 
-  private BinaryContent createProfile(MultipartFile profile) {
+  private BinaryContent createProfile(UUID userId, MultipartFile profile) {
     log.debug("createProfile() 호출");
     if (profile == null || profile.isEmpty()) {
       return null;
@@ -164,10 +168,19 @@ public class UserService {
           @Override
           public void afterCommit() {
             binaryContentStorage.put(content.getId(), data)
-                .thenAccept(id ->
-                    binaryContentRepository.updateStatus(id, UploadStatus.SUCCESS))
+                .thenAccept(id -> {
+                  binaryContentRepository.updateStatus(id, UploadStatus.SUCCESS);
+                  binaryContentRepository.findById(id).ifPresent(binaryContent -> {
+                    BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
+                    sseService.push(userId, "binaryContents.status", dto);
+                  });
+                })
                 .exceptionally(e -> {
                   binaryContentRepository.updateStatus(content.getId(), UploadStatus.FAILED);
+                  binaryContentRepository.findById(content.getId()).ifPresent(binaryContent -> {
+                    BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
+                    sseService.push(userId, "binaryContents.status", dto);
+                  });
                   return null;
                 });
           }
