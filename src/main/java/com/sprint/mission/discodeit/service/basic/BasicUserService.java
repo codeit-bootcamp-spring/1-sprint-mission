@@ -1,14 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.NotificationEvent;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.event.NotificationEventPublisher;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -29,6 +27,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,9 +43,9 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
-  private final NotificationEventPublisher notificationEventPublisher;
 
   @Transactional
+  @CacheEvict(value = "users", key = "'all'")
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -67,7 +69,26 @@ public class BasicUserService implements UserService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+          TransactionSynchronizationManager.registerSynchronization(
+              new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                  binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                      .thenAccept(result -> {
+                        log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
+                        binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                            BinaryContentUploadStatus.SUCCESS);
+                      })
+                      .exceptionally(throwable -> {
+                        log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
+                        binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                            BinaryContentUploadStatus.FAILED);
+                        return null;
+                      })
+                  ;
+                }
+              });
+
           return binaryContent;
         })
         .orElse(null);
@@ -92,6 +113,7 @@ public class BasicUserService implements UserService {
     return userDto;
   }
 
+  @Cacheable(value = "users", key = "'all'", unless = "#result.isEmpty()")
   @Override
   public List<UserDto> findAll() {
     log.debug("모든 사용자 조회 시작");
@@ -109,6 +131,7 @@ public class BasicUserService implements UserService {
 
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   @Transactional
+  @CacheEvict(value = "users", key = "'all'")
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -133,26 +156,35 @@ public class BasicUserService implements UserService {
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
-
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+          TransactionSynchronizationManager.registerSynchronization(
+              new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                  binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                      .thenAccept(result -> {
+                        log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
+                        binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                            BinaryContentUploadStatus.SUCCESS);
+                      })
+                      .exceptionally(throwable -> {
+                        log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
+                        binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                            BinaryContentUploadStatus.FAILED);
+                        return null;
+                      })
+                  ;
+                }
+              });
+
           return binaryContent;
         })
         .orElse(null);
-
-    notificationEventPublisher.publish(
-        new NotificationEvent(
-            userId,
-            NotificationType.ROLE_CHANGED,
-            userId,
-            "당신의 권한이 변경되었습니다."
-        )
-    );
 
     String newPassword = userUpdateRequest.newPassword();
     String hashedNewPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
@@ -165,6 +197,7 @@ public class BasicUserService implements UserService {
 
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   @Transactional
+  @CacheEvict(value = "users", key = "'all'")
   @Override
   public void delete(UUID userId) {
     log.debug("사용자 삭제 시작: id={}", userId);

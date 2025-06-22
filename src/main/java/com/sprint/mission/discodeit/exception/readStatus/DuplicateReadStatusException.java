@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.exception.readStatus;
 
 import com.sprint.mission.discodeit.exception.ErrorCode;
+
 import java.util.UUID;
 
 public class DuplicateReadStatusException extends ReadStatusException {

@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,8 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
-import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -49,10 +45,11 @@ class AuthControllerTest {
         "testuser",
         "test@example.com",
         null,
-        true
+        true,
+        Role.USER
     );
 
-    given(authService.login(any(LoginRequest.class))).willReturn(loggedInUser);
+//    given(authService.login(any(LoginRequest.class))).willReturn(loggedInUser);
 
     // When & Then
     mockMvc.perform(post("/api/auth/login")
@@ -74,8 +71,8 @@ class AuthControllerTest {
         "Password1!"
     );
 
-    given(authService.login(any(LoginRequest.class)))
-        .willThrow(UserNotFoundException.withUsername("nonexistentuser"));
+//    given(authService.login(any(LoginRequest.class)))
+//        .willThrow(UserNotFoundException.withUsername("nonexistentuser"));
 
     // When & Then
     mockMvc.perform(post("/api/auth/login")
@@ -93,8 +90,8 @@ class AuthControllerTest {
         "WrongPassword1!"
     );
 
-    given(authService.login(any(LoginRequest.class)))
-        .willThrow(InvalidCredentialsException.wrongPassword());
+//    given(authService.login(any(LoginRequest.class)))
+//        .willThrow(InvalidCredentialsException.wrongPassword());
 
     // When & Then
     mockMvc.perform(post("/api/auth/login")
