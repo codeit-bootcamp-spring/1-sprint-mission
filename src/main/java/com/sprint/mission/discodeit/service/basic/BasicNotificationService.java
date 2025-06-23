@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheNames;
 import com.sprint.mission.discodeit.dto.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.User;
@@ -37,7 +38,7 @@ public class BasicNotificationService implements NotificationService {
   private final NotificationRepository notificationRepository;
   private final UserRepository userRepository;
 
-  @CacheEvict(value = "userNotifications", key = "#event.receiverId")
+  @CacheEvict(value = CacheNames.USER_NOTIFICATIONS, key = "#event.receiverId")
   @Override
   @Transactional
   public NotificationDto create(NotificationEvent event) {
@@ -61,7 +62,7 @@ public class BasicNotificationService implements NotificationService {
     return NotificationDto.from(notification);
   }
 
-  @Cacheable(value = "userNotifications", key = "#userId")
+  @Cacheable(value = CacheNames.USER_NOTIFICATIONS, key = "#userId")
   @PreAuthorize("#userId.equals(authentication.principal.userDto.id)")
   @Override
   @Transactional(readOnly = true)
@@ -84,7 +85,7 @@ public class BasicNotificationService implements NotificationService {
     return notificationsDto;
   }
 
-  @CacheEvict(value = "userNotifications", key = "#event.receiverId")
+  @CacheEvict(value = CacheNames.USER_NOTIFICATIONS, key = "#event.receiverId")
   @Override
   @Transactional
   public void deleteNotification(UUID notificationId) {
@@ -101,7 +102,7 @@ public class BasicNotificationService implements NotificationService {
       throw new AccessDeniedException("권한이 없습니다");
     }
 
-    Objects.requireNonNull(cacheManager.getCache("userNotifications"))
+    Objects.requireNonNull(cacheManager.getCache(CacheNames.USER_NOTIFICATIONS))
         .evict(notification.getReceiver().getId());
 
     notificationRepository.deleteById(notificationId);

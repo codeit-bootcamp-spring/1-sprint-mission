@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheNames;
 import com.sprint.mission.discodeit.dto.user.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
@@ -52,7 +53,7 @@ public class BasicUserService implements UserService {
   private final ApplicationEventPublisher eventPublisher; // 이벤트 발행
   private final SseService sseService;
 
-  @CachePut(value = "users", key = "#result.id")
+  @CachePut(value = CacheNames.USERS, key = "#result.id")
   @Override
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   //todo - 고민
@@ -93,7 +94,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(newUser);
   }
 
-  @CachePut(value = "users", key = "#result.id")
+  @CachePut(value = CacheNames.USERS, key = "#result.id")
   @Override
   @Transactional
   public UserDto create(CreateUserDto createUserDto, MultipartFile file)
@@ -130,7 +131,7 @@ public class BasicUserService implements UserService {
     return userRepository.findAll().stream().map(userMapper::toDto).toList();
   }
 
-  @Cacheable(value = "users", key = "#userId")
+  @Cacheable(value = CacheNames.USERS, key = "#userId")
   @Override
   @Transactional(readOnly = true)
   public UserDto findById(String userId) throws DiscodeitException {
@@ -142,7 +143,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
-  @CachePut(value = "users", key = "#userId")
+  @CachePut(value = CacheNames.USERS, key = "#userId")
   @Override
   @Transactional
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto)
@@ -177,7 +178,7 @@ public class BasicUserService implements UserService {
   }
 
   // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
-  @CachePut(value = "users", key = "#userId")
+  @CachePut(value = CacheNames.USERS, key = "#userId")
   @Override
   @Transactional
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
@@ -220,10 +221,10 @@ public class BasicUserService implements UserService {
   }
 
   @Caching(evict = {
-      @CacheEvict(value = "users", key = "#userId"),
-      @CacheEvict(value = "userChannels", key = "#userId"),
-      @CacheEvict(value = "userNotifications", key = "#userId"),
-      @CacheEvict(value = "channelParticipants", allEntries = true)
+      @CacheEvict(value = CacheNames.USERS, key = "#userId"),
+      @CacheEvict(value = CacheNames.USER_CHANNELS, key = "#userId"),
+      @CacheEvict(value = CacheNames.USER_NOTIFICATIONS, key = "#userId"),
+      @CacheEvict(value = CacheNames.CHANNEL_PARTICIPANTS, allEntries = true)
   })
   @Override
   @Transactional
@@ -242,7 +243,7 @@ public class BasicUserService implements UserService {
   }
 
 
-  @CacheEvict(value = "users", key = "#roleUpdateRequest.userId", beforeInvocation = true)
+  @CacheEvict(value = CacheNames.USERS, key = "#roleUpdateRequest.userId", beforeInvocation = true)
   @Transactional
   @Override
   public UserDto updateUserRole(RoleUpdateRequest roleUpdateRequest) {

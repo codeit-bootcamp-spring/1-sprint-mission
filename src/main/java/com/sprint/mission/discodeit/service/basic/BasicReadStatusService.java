@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheNames;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
@@ -43,7 +44,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final UserRepository userRepository;
   private final ReadStatusMapper readStatusMapper;
 
-  @CacheEvict(value = "userReadStatuses", key = "#createReadStatusDto.userId", beforeInvocation = true)
+  @CacheEvict(value = CacheNames.USER_READ_STATUSES, key = "#createReadStatusDto.userId", beforeInvocation = true)
   @Override
   @Transactional
   public ReadStatusDto create(CreateReadStatusDto createReadStatusDto)
@@ -85,7 +86,7 @@ public class BasicReadStatusService implements ReadStatusService {
     return readStatusMapper.toDto(readStatus);
   }
 
-  @CacheEvict(value = "userReadStatuses", key = "#result.userId.toString()")
+  @CacheEvict(value = CacheNames.USER_READ_STATUSES, key = "#result.userId.toString()")
   @PostAuthorize("authentication.principal.userDto.id == returnObject.userId()")
   @Override
   @Transactional
@@ -111,7 +112,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
 
-  @Cacheable(value = "userReadStatuses", key = "#userId")
+  @Cacheable(value = CacheNames.USER_READ_STATUSES, key = "#userId")
   public List<ReadStatusDto> findAllByUserId(String userId) {
 
     List<ReadStatus> allReadStatusByUserId = readStatusRepository.findByUserId(
@@ -129,7 +130,7 @@ public class BasicReadStatusService implements ReadStatusService {
     return readStatusDtos;
   }
 
-  @CacheEvict(value = "userReadStatuses", key = "#result.userId.toString()")
+  @CacheEvict(value = CacheNames.USER_READ_STATUSES, key = "#result.userId.toString()")
   @Override
   @Transactional
   public boolean delete(String readStatusId) {
@@ -138,7 +139,7 @@ public class BasicReadStatusService implements ReadStatusService {
         .orElseThrow(() -> new ReadStatusNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
 
     log.debug("해당 readStatusId를 가진 유저의 캐시 무효화");
-    Objects.requireNonNull(cacheManager.getCache("userReadStatuses"))
+    Objects.requireNonNull(cacheManager.getCache(CacheNames.USER_READ_STATUSES))
         .evictIfPresent(readStatus.getUser().getId());
 
     //cacheManager.getCache()는 Cache 객체를 반환하는데, 만약 해당 캐시 이름이 존재하지 않으면 null을 반환할 수 있다.

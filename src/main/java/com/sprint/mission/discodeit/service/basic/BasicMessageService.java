@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheNames;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
@@ -112,9 +112,9 @@ public class BasicMessageService implements MessageService {
           );
           eventPublisher.publishEvent(event);
           log.info("이벤트 발행 완료: {}", event.getClass().getSimpleName()); // 추가
-          Objects.requireNonNull(cacheManager.getCache("userReadStatuses"))
+          Objects.requireNonNull(cacheManager.getCache(CacheNames.USER_READ_STATUSES))
               .evictIfPresent(readStatus.getUser().getId());
-          Objects.requireNonNull(cacheManager.getCache("userChannels"))
+          Objects.requireNonNull(cacheManager.getCache(CacheNames.USER_CHANNELS))
               .evictIfPresent(readStatus.getUser().getId());
         });
     log.info("메세지 생성 이후 알림 생성 이벤트 호출 완료: messageId = {}", saved.getId());

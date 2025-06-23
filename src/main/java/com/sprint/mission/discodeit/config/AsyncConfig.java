@@ -54,7 +54,7 @@ public class AsyncConfig {
     executor.setThreadNamePrefix("event-");
 
     executor.setRejectedExecutionHandler(
-        new ThreadPoolExecutor.CallerRunsPolicy()
+        new ThreadPoolExecutor.AbortPolicy()
     );
     executor.setTaskDecorator(new ContextPropagatingTaskDecorator());
     executor.initialize();

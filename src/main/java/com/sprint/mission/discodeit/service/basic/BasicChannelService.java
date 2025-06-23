@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheNames;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelDto;
@@ -22,7 +23,6 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.SseService;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class BasicChannelService implements ChannelService {
   private final SseService sseService;
 
 
-  @CacheEvict(value = "userChannels", allEntries = true, beforeInvocation = true)
+  @CacheEvict(value = CacheNames.USER_CHANNELS, allEntries = true, beforeInvocation = true)
   @Override
   @Transactional
   public ChannelDto create(CreatePublicChannelDto createPublicChannelDto)
@@ -71,7 +71,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
   }
 
-  @CacheEvict(value = "userChannels", allEntries = true, beforeInvocation = true)
+  @CacheEvict(value = CacheNames.USER_CHANNELS, allEntries = true, beforeInvocation = true)
   @Override
   @Transactional //channel create 동작 중, readStatus 생성 오류시 롤백 되도록 해야되는데?
   public ChannelDto create(CreatePrivateChannelDTo createPrivateChannelDTo) {
@@ -101,7 +101,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
   }
 
-  @Cacheable(value = "userChannels", key = "#userId")
+  @Cacheable(value = CacheNames.USER_CHANNELS, key = "#userId")
   @Override
   @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(String userId) {
@@ -151,7 +151,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
   }
 
-  @Cacheable(value = "channelParticipants", key = "#channelId")
+  @Cacheable(value = CacheNames.CHANNEL_PARTICIPANTS, key = "#channelId")
   public List<UserDto> getPrivateChannelParticipants(String channelId) {
     return readStatusRepository.findByChannelId(UUID.fromString(channelId))
         .stream()
@@ -159,7 +159,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
-  @CacheEvict(value = "userChannels", allEntries = true, beforeInvocation = true)
+  @CacheEvict(value = CacheNames.USER_CHANNELS, allEntries = true, beforeInvocation = true)
   @Override
   @Transactional
   public ChannelDto updateChannel(String channelId, UpdateChannelDto updateChannelDto)
@@ -194,8 +194,8 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Caching(evict = {
-      @CacheEvict(value = "userChannels", allEntries = true),
-      @CacheEvict(value = "channelParticipants", key = "#channelId")
+      @CacheEvict(value = CacheNames.USER_CHANNELS, allEntries = true),
+      @CacheEvict(value = CacheNames.CHANNEL_PARTICIPANTS, key = "#channelId")
   })
   @Override
   @Transactional
