@@ -36,6 +36,7 @@ dependencies {
     implementation 'software.amazon.awssdk:s3:2.31.7'
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-messaging'
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
 
     compileOnly 'org.projectlombok:lombok'

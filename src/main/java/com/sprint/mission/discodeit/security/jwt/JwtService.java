@@ -27,6 +27,9 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,5 +186,15 @@ public class JwtService {
     if (!session.isExpired()) {
       jwtBlacklist.put(session.getAccessToken(), session.getExpirationTime());
     }
+  }
+
+  public Authentication getAuthentication(String token) {
+    JwtObject jwtObject = parse(token);
+    UserDto userDto = jwtObject.userDto();
+
+    List<SimpleGrantedAuthority> authorities =
+        List.of(new SimpleGrantedAuthority("ROLE_" + userDto.role()));
+
+    return new UsernamePasswordAuthenticationToken(userDto, token, authorities);
   }
 }
