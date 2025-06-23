@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.status.UserSessionService;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -115,9 +116,9 @@ public class SecurityConfig {
                     "/assets/**",
                     "/static/index.html",
                     "/static/favicon.ico").permitAll()
+                .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.REQUEST).permitAll()
                 .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me",
-                    "/ws/**")
-                .permitAll()
+                    "/ws/**", "/api/sse/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()

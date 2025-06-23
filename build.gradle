@@ -39,6 +39,8 @@ dependencies {
 //    implementation("com.github.ben-manes.caffeine:guava:3.2.0")
 //    implementation("com.github.ben-manes.caffeine:jcache:3.2.0")
 
+    implementation 'org.springframework.security:spring-security-messaging'
+
     testImplementation 'org.springframework.batch:spring-batch-test'
     annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
