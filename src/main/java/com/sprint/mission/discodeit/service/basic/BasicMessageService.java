@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheNames;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.status.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.event.BinaryContentCreatedEvent;
-import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
+import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -26,6 +27,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.util.Objects;
@@ -38,6 +40,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,25 +66,25 @@ public class BasicMessageService implements MessageService {
   //텍스트만 있는 메세지
   @Override
   @Transactional
-  public MessageDto create(CreateMessageDto createMessageDto) throws DiscodeitException {
+  public MessageDto create(MessageCreateRequest messageCreateRequest) throws DiscodeitException {
     log.info("메세지 생성 시작: userId = {}, channelId = {}, messageContent = {}",
-        createMessageDto.getAuthorId(), createMessageDto.getChannelId(),
-        createMessageDto.content());
+        messageCreateRequest.getAuthorId(), messageCreateRequest.getChannelId(),
+        messageCreateRequest.content());
 
-    if (createMessageDto.content() == null) {
+    if (messageCreateRequest.content() == null) {
       log.warn("메세지 생성 정보 누락");
       throw new DiscodeitException(ErrorCode.EMPTY_DATA);
     }
 
-    UUID channelId = createMessageDto.getChannelId();
-    UUID authorId = createMessageDto.getAuthorId();
+    UUID channelId = messageCreateRequest.getChannelId();
+    UUID authorId = messageCreateRequest.getAuthorId();
 
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
     User author = userRepository.findById(authorId)
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    Message message = new Message(author, createMessageDto.content(), channel);
+    Message message = new Message(author, messageCreateRequest.content(), channel);
     Message saved = messageRepository.save(message);
 
     log.info("메세지 생성 완료: messageId = {}", saved.getId());
@@ -94,19 +97,24 @@ public class BasicMessageService implements MessageService {
     subscribers.stream()
         .filter(ReadStatus::isNotificationEnabled) // 구독한 사용자들
         .filter(readStatus -> !readStatus.getUser().getId().equals(authorId)) // 보낸사람 제외
+        .peek(readStatus -> log.info("알림 대상자: {}", readStatus.getUser().getId())) // 추가
         .forEach(readStatus -> {
-          NewMessageNotificationEvent event = new NewMessageNotificationEvent(
+          log.info("구독자: {}, 알림활성화: {}, 작성자여부: {}",
+              readStatus.getUser().getId(), readStatus.isNotificationEnabled(),
+              readStatus.getUser().getId().equals(authorId));
+          NewMessageEvent event = new NewMessageEvent(
               readStatus.getUser().getId(),
-              createMessageDto.getChannelId(),
+              messageCreateRequest.getChannelId(),
               (channel.getName() == null || channel.getName().isEmpty()) ? "개인 채널"
                   : channel.getName(),
               message.getContent().length() > 20 ? message.getContent().substring(0, 20) + "..."
                   : message.getContent()
           );
           eventPublisher.publishEvent(event);
-          Objects.requireNonNull(cacheManager.getCache("userReadStatuses"))
+          log.info("이벤트 발행 완료: {}", event.getClass().getSimpleName()); // 추가
+          Objects.requireNonNull(cacheManager.getCache(CacheNames.USER_READ_STATUSES))
               .evictIfPresent(readStatus.getUser().getId());
-          Objects.requireNonNull(cacheManager.getCache("userChannels"))
+          Objects.requireNonNull(cacheManager.getCache(CacheNames.USER_CHANNELS))
               .evictIfPresent(readStatus.getUser().getId());
         });
     log.info("메세지 생성 이후 알림 생성 이벤트 호출 완료: messageId = {}", saved.getId());
@@ -117,9 +125,9 @@ public class BasicMessageService implements MessageService {
   //텍스트 + 파일 메세지
   @Override
   @Transactional
-  public MessageDto create(CreateMessageDto createMessageDto, List<MultipartFile> files)
+  public MessageDto create(MessageCreateRequest messageCreateRequest, List<MultipartFile> files)
       throws DiscodeitException {
-    MessageDto messageDto = create(createMessageDto);
+    MessageDto messageDto = create(messageCreateRequest);
 
     log.info("메세지 파일 첨부 시작: messageId = {}", messageDto.id());
 
@@ -142,9 +150,11 @@ public class BasicMessageService implements MessageService {
 
         message.addFile(binaryContent);
 
+        UUID currentUserId = getCurrentUserId();
         eventPublisher.publishEvent(new BinaryContentCreatedEvent(
             binaryContent.getId(),
-            file.getBytes()
+            file.getBytes(),
+            currentUserId
         ));
         log.debug("첨부 파일 저장 이벤트 발행 완료: attachmentId = {}", binaryContent.getId());
       } catch (IOException e) {
@@ -158,6 +168,11 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
+  // SecurityContext에서 사용자 정보 가져오기
+  private UUID getCurrentUserId() {
+    return ((DiscodeitUserDetails) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal()).getUserDto().id();
+  }
 
   @Override
   @Transactional(readOnly = true)

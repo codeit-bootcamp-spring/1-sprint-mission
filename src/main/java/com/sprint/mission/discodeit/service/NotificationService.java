@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface NotificationService {
 
-  void create(NotificationEvent notificationEvent);
+  NotificationDto create(NotificationEvent notificationEvent);
 
   List<NotificationDto> getNotifications(UUID userId);
 

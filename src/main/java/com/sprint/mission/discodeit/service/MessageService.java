@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 
@@ -14,9 +14,9 @@ public interface MessageService {
 
 
   //생성
-  MessageDto create(CreateMessageDto createMessageDto);
+  MessageDto create(MessageCreateRequest messageCreateRequest);
 
-  MessageDto create(CreateMessageDto createMessageDto, List<MultipartFile> files);
+  MessageDto create(MessageCreateRequest messageCreateRequest, List<MultipartFile> files);
 
   //모두 읽기
   List<MessageDto> findAll();

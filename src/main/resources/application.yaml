@@ -18,13 +18,37 @@ spring:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+  cache:
+    type: redis
+    cache-names:
+      - users               # 유저 개개인의 정보를 담을 캐시
+      - userChannels        # 유저별 참여 채널 목록
+      - userNotifications   # 유저별 알림 목록
+      - userReadStatuses    # 유저별 읽음 상태 목록
+      - channelParticipants # 채널별 참여자 목록
+    redis:
+      enable-statistics: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 jwt:
   issuer: discodeit-yudility
   access-token:
-    validity-seconds: 900  # 15분
+    validity-seconds: ${SECURITY_JWT_ACCESS_TOKEN_VALIDITY_SECONDS}
   refresh-token:
-    validity-seconds: 2592000  # 30일
+    validity-seconds: ${SECURITY_JWT_REFRESH_TOKEN_VALIDITY_SECONDS}
   secret: ${JWT_SECRET:dev-secret-key-must-be-at-least-32-characters-long}
 
 security:
@@ -85,6 +109,9 @@ management:
     metrics:
       export:
         enabled: true
+  observations:
+    annotations:
+      enabled: true
 
 info:
   application:

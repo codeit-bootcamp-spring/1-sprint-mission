@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.CacheNames;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelDto;
@@ -21,6 +22,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.SseService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,18 +40,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-
   private final UserRepository userRepository;
-
   private final MessageRepository messageRepository;
-
   private final ReadStatusRepository readStatusRepository;
-
   private final ChannelMapper channelMapper;
   private final MessageMapper messageMapper;
   private final UserMapper userMapper;
+  private final SseService sseService;
 
-  @CacheEvict(value = "userChannels", allEntries = true)
+
+  @CacheEvict(value = CacheNames.USER_CHANNELS, allEntries = true, beforeInvocation = true)
   @Override
   @Transactional
   public ChannelDto create(CreatePublicChannelDto createPublicChannelDto)
@@ -63,12 +63,15 @@ public class BasicChannelService implements ChannelService {
 
     Channel channel = new Channel(createPublicChannelDto.name(), ChannelType.PUBLIC,
         createPublicChannelDto.description());
-    channelRepository.save(channel);
+    Channel newChannel = channelRepository.save(channel);
     log.info("Public 채널 생성 완료: channelId = {}", channel.getId());
+
+    sseService.sendChannelRefresh(newChannel.getId());
+
     return channelMapper.toDto(channel);
   }
 
-  @CacheEvict(value = "userChannels", allEntries = true)
+  @CacheEvict(value = CacheNames.USER_CHANNELS, allEntries = true, beforeInvocation = true)
   @Override
   @Transactional //channel create 동작 중, readStatus 생성 오류시 롤백 되도록 해야되는데?
   public ChannelDto create(CreatePrivateChannelDTo createPrivateChannelDTo) {
@@ -81,21 +84,24 @@ public class BasicChannelService implements ChannelService {
     }
 
     Channel channel = new Channel(null, ChannelType.PRIVATE, null);
-    channelRepository.save(channel);
+    Channel newChannel = channelRepository.save(channel);
 
     List<UUID> userIds = createPrivateChannelDTo.participantIds().stream().map(UUID::fromString)
         .toList();
+    log.info("참여자 수: {} ", userIds.size());
 
     List<ReadStatus> readStatuses = userRepository.findAllById(userIds).stream()
         .map(user -> new ReadStatus(channel, user, channel.getCreatedAt(), true))
         .toList();
     readStatusRepository.saveAll(readStatuses);
 
+    sseService.sendChannelRefresh(newChannel.getId(), userIds);
+
     log.info("Private 채널 생성 완료: channelId = {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
-  @Cacheable(value = "userChannels", key = "#userId")
+  @Cacheable(value = CacheNames.USER_CHANNELS, key = "#userId")
   @Override
   @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(String userId) {
@@ -145,7 +151,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
   }
 
-  @Cacheable(value = "channelParticipants", key = "#channelId")
+  @Cacheable(value = CacheNames.CHANNEL_PARTICIPANTS, key = "#channelId")
   public List<UserDto> getPrivateChannelParticipants(String channelId) {
     return readStatusRepository.findByChannelId(UUID.fromString(channelId))
         .stream()
@@ -153,7 +159,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
-  @CacheEvict(value = "userChannels", allEntries = true)
+  @CacheEvict(value = CacheNames.USER_CHANNELS, allEntries = true, beforeInvocation = true)
   @Override
   @Transactional
   public ChannelDto updateChannel(String channelId, UpdateChannelDto updateChannelDto)
@@ -182,12 +188,14 @@ public class BasicChannelService implements ChannelService {
     Channel updatedChannel = channelRepository.save(channel);
     log.info("Public 채널 정보 수정 완료: channelId = {}", updatedChannel.getId());
 
+    sseService.sendChannelRefresh(updatedChannel.getId());
+
     return channelMapper.toDto(updatedChannel);
   }
 
   @Caching(evict = {
-      @CacheEvict(value = "userChannels", allEntries = true),
-      @CacheEvict(value = "channelParticipants", key = "#channelId")
+      @CacheEvict(value = CacheNames.USER_CHANNELS, allEntries = true),
+      @CacheEvict(value = CacheNames.CHANNEL_PARTICIPANTS, key = "#channelId")
   })
   @Override
   @Transactional
@@ -208,7 +216,9 @@ public class BasicChannelService implements ChannelService {
     // 대용량 데이터의 경우 CASCADE 삭제도 시간이 오래 걸릴 수 있으므로, 비동기 처리나 배치 처리를 고려해볼 수 있다.
     channelRepository.delete(channel);
     log.info("체널 삭제 완료: channelId = {}", channelId);
+
+    sseService.sendChannelRefresh(channel.getId());
+
     return true;
   }
-
 }

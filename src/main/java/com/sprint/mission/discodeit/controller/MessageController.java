@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.Instant;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,22 +34,29 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController {
 
   private final MessageService messageService;
+  private final SimpMessagingTemplate messagingTemplate;
 
-  //특정 채널 메세지 생성
+  //특정 채널 메세지 생성 - 첨부파일 포함
+  @Timed("message.create.async")
   @PostMapping
-  public ResponseEntity<MessageDto> createMessage(
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments,
-      @Valid @RequestPart(value = "messageCreateRequest") CreateMessageDto createMessageDto) {
+  public ResponseEntity<?> createMessage(
+      @RequestPart(value = "attachments") List<MultipartFile> attachments,
+      @Valid @RequestPart(value = "messageCreateRequest") MessageCreateRequest messageCreateRequest) {
 
-    log.info("메세지 생성 요청: {}", createMessageDto);
+    log.info("메세지 생성 요청: {}", messageCreateRequest);
+
+    if (attachments == null || attachments.isEmpty()) {
+      return ResponseEntity.badRequest().body(ErrorCode.EMPTY_DATA);
+    }
+
     try {
-      MessageDto messageDto;
+      MessageDto messageDto = messageService.create(messageCreateRequest, attachments);
 
-      if (attachments != null && !attachments.isEmpty()) {
-        messageDto = messageService.create(createMessageDto, attachments);
-      } else {
-        messageDto = messageService.create(createMessageDto);
-      }
+      messagingTemplate.convertAndSend(
+          "/sub/channels." + messageCreateRequest.getChannelId() + ".messages",
+          messageDto
+      );
+
       return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
     } catch (Exception e) {
       log.error(e.getMessage(), e);

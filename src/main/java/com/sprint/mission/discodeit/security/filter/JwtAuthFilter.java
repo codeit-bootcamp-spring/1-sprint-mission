@@ -20,6 +20,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final JwtBlacklist jwtBlacklist;
+  private final int BEARER_TOKEN_LENGTH = 7;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -31,7 +32,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       return;
     }
     // 'Bearer ' 제거
-    String accessToken = auth.substring(7);
+    String accessToken = auth.substring(BEARER_TOKEN_LENGTH);
 
     // JWT 토큰 파싱하여 서명 검증
     if (!jwtTokenProvider.validate(accessToken)) {

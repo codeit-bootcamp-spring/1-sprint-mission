@@ -15,6 +15,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +36,8 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   @Transactional
   public BinaryContentDto create(MultipartFile file) {
+    UUID currentUserId = getCurrentUserId();
+
     log.info("파일 정보 생성 시작 : {}", file);
     BinaryContent binaryContent = new BinaryContent(
         file.getName(),
@@ -44,23 +48,13 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     BinaryContent savedContent = binaryContentRepository.save(binaryContent);
 
-//    // 동기 처리로 임시 변경 (성능 비교용)
-//    UUID contentId = binaryContent.getId();
-//    try {
-//      UUID result = binaryContentStorage.put(contentId, file.getBytes());
-//      binaryContentStatusService.updateStatus(contentId, BinaryContentUploadStatus.SUCCESS);
-//      log.info("동기 파일 업로드 성공: id = {}", result);
-//    } catch (Exception e) {
-//      binaryContentStatusService.updateStatus(contentId, BinaryContentUploadStatus.FAILED);
-//      log.error("동기 파일 업로드 실패: {}", e.getMessage());
-//    }
-
     log.info("비동기 파일 업로드");
 
     try {
       eventPublisher.publishEvent(new BinaryContentCreatedEvent(
           savedContent.getId(),
-          file.getBytes()
+          file.getBytes(),
+          currentUserId
       ));
     } catch (IOException e) {
       throw new BinaryContentUploadException(ErrorCode.FILE_NOT_SAVED);
@@ -97,5 +91,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     binaryContentRepository.deleteById(binaryContent.getId());
     log.info("파일 삭제 완료: contentId = {}", contentId);
     return true;
+  }
+
+  private UUID getCurrentUserId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return UUID.fromString(authentication.getName());
   }
 }
