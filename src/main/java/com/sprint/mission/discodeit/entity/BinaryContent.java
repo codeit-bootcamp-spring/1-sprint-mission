@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,29 +25,12 @@ public class BinaryContent extends BaseEntity {
   private String contentType;
 
   @Enumerated(EnumType.STRING)
-  private BinaryContentUploadStatus uploadStatus;
+  @Column(nullable = false)
+  private BinaryContentUploadStatus uploadStatus = BinaryContentUploadStatus.WAITING;
 
   public BinaryContent(String fileName, Long size, String contentType) {
     this.fileName = fileName;
     this.size = size;
     this.contentType = contentType;
   }
-  public void markWaiting() {
-    this.uploadStatus = BinaryContentUploadStatus.WAITING;
-  }
-
-  public void markSuccess() {
-    this.uploadStatus = BinaryContentUploadStatus.SUCCESS;
-  }
-
-  public void markFailed() {
-    this.uploadStatus = BinaryContentUploadStatus.FAILED;
-  }
-
-  public boolean isFailed() {
-    return this.uploadStatus == BinaryContentUploadStatus.FAILED;
-  }
-
-
-
 }

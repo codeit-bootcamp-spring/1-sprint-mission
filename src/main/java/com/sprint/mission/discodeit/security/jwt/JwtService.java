@@ -27,6 +27,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,7 @@ public class JwtService {
   private final ObjectMapper objectMapper;
   private final JwtBlacklist jwtBlacklist;
 
+  @CacheEvict(value = "users", key = "'all'")
   @Transactional
   public JwtSession registerJwtSession(UserDto userDto) {
     JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
@@ -130,12 +132,14 @@ public class JwtService {
     return session;
   }
 
+  @CacheEvict(value = "users", key = "'all'")
   @Transactional
   public void invalidateJwtSession(String refreshToken) {
     jwtSessionRepository.findByRefreshToken(refreshToken)
         .ifPresent(this::invalidate);
   }
 
+  @CacheEvict(value = "users", key = "'all'")
   @Transactional
   public void invalidateJwtSession(UUID userId) {
     jwtSessionRepository.findByUserId(userId)

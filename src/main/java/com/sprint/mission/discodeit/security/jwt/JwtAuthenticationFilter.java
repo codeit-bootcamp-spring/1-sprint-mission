@@ -21,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
@@ -29,6 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
   private final ObjectMapper objectMapper;
+  private final AntPathRequestMatcher protectedPaths =
+      new AntPathRequestMatcher("/api/**");
 
   @Override
   protected void doFilterInternal(
@@ -80,5 +83,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private boolean isPermitAll(HttpServletRequest request) {
     return Arrays.stream(SecurityMatchers.PUBLIC_MATCHERS)
         .anyMatch(requestMatcher -> requestMatcher.matches(request));
+  }
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+    return !protectedPaths.matches(request);
   }
 }

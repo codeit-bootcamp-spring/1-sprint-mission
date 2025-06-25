@@ -1,17 +1,17 @@
 package com.sprint.mission.discodeit.event;
 
-import lombok.Getter;
+import java.time.Instant;
+import java.util.UUID;
 
-@Getter
-public class RoleChangedEvent {
+import com.sprint.mission.discodeit.entity.Role;
 
-  private final String userId;
-  private final String oldRole;
-  private final String newRole;
-
-  public RoleChangedEvent(String userId, String oldRole, String newRole) {
-    this.userId = userId;
-    this.oldRole = oldRole;
-    this.newRole = newRole;
+public record RoleChangedEvent(
+    Instant createdAt,
+    UUID userId,
+    Role previousRole,
+    Role newRole
+) {
+  public RoleChangedEvent(UUID userId, Role previousRole, Role newRole) {
+    this(Instant.now(), userId, previousRole, newRole);
   }
-}
+} 

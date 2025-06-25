@@ -1,40 +1,16 @@
-# 빌드 스테이지
-FROM amazoncorretto:17 AS builder
+######## 1) 빌드 스테이지 ########
+FROM eclipse-temurin:17-jdk-alpine AS builder
+WORKDIR /workspace
+COPY . .
+RUN ./gradlew bootJar -x test --no-daemon   # build/libs/*.jar 생성
 
-# 작업 디렉토리 설정
+######## 2) 런타임 스테이지 ########
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Gradle Wrapper 파일 먼저 복사
-COPY gradle ./gradle
-COPY gradlew ./gradlew
+# ★ 와일드카드로 “가장 최신” JAR 하나를 app.jar 로 복사
+ARG JAR_FILE=/workspace/build/libs/*.jar
+COPY --from=builder ${JAR_FILE} app.jar
 
-# Gradle 캐시를 위한 의존성 파일 복사
-COPY build.gradle settings.gradle ./
-
-# 의존성 다운로드
-RUN ./gradlew dependencies
-
-# 소스 코드 복사 및 빌드
-COPY src ./src
-RUN ./gradlew build -x test
-
-
-# 런타임 스테이지
-FROM amazoncorretto:17-alpine3.21
-
-# 작업 디렉토리 설정
-WORKDIR /app
-
-# 프로젝트 정보를 ENV로 설정
-ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=1.2-M8 \
-    JVM_OPTS=""
-
-# 빌드 스테이지에서 jar 파일만 복사
-COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
-
-# 80 포트 노출
-EXPOSE 80
-
-# jar 파일 실행
-ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
+EXPOSE 8080

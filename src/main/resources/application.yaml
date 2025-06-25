@@ -1,21 +1,4 @@
 spring:
-  kafka:
-    bootstrap-servers: localhost:9092
-
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      properties:
-        acks: all
-
-    consumer:
-      group-id: discodeit-group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-
-    listener:
-      ack-mode: batch
   application:
     name: discodeit
   servlet:
@@ -33,15 +16,40 @@ spring:
       - dev
   config:
     import: optional:file:.env[.properties]
+  cache:
+    type: redis
+    cache-names:
+      - channelsByUser
+      - notificationsByUser
+      - users
+    redis:
+      enable-statistics: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers
+        include: health,info,metrics,loggers,caches
   endpoint:
     health:
       show-details: always
+  observations:
+    annotations:
+      enabled: true
 
 info:
   name: Discodeit
@@ -75,9 +83,9 @@ discodeit:
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
   admin:
-    username: asdasd
-    email: tmdcks1234@naver.com
-    password: tmdcks1234
+    username: ${DISCODEIT_ADMIN_USERNAME}
+    email: ${DISCODEIT_ADMIN_EMAIL}
+    password: ${DISCODEIT_ADMIN_PASSWORD}
 
 logging:
   level:
@@ -85,9 +93,9 @@ logging:
 
 security:
   remember-me:
-    key: tmdcks1234akdskjglfkadj;fk;kd;w;lkaf[skflgka;sgk;akd;lka;glkw[go[fboa[pgro[fksfljsfa[gaf[pol
-    token-validity-seconds: 1209600
+    key: ${SECURITY_REMEMBER_ME_KEY}
+    token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
   jwt:
-    secret: tmdcks1234akdskjglfkadj;fk;kd;w;lkaf[skflgka;sgk;akd;lka;glkw[go[fboa[pgro[fksfljsfa[gaf[pol
-    access-token-validity-seconds: 1209600
-    refresh-token-validity-seconds: 1209600
+    secret: ${SECURITY_JWT_SECRET}
+    access-token-validity-seconds: ${SECURITY_JWT_ACCESS_TOKEN_VALIDITY_SECONDS}
+    refresh-token-validity-seconds: ${SECURITY_JWT_REFRESH_TOKEN_VALIDITY_SECONDS}

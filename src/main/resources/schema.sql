@@ -19,8 +19,8 @@ CREATE TABLE binary_contents
     created_at   timestamp with time zone NOT NULL,
     file_name    varchar(255)             NOT NULL,
     size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
---     ,bytes        bytea        NOT NULL
+    content_type varchar(100)             NOT NULL,
+    upload_status varchar(20)             NOT NULL
 );
 
 
@@ -63,6 +63,7 @@ CREATE TABLE read_statuses
     user_id      uuid                     NOT NULL,
     channel_id   uuid                     NOT NULL,
     last_read_at timestamp with time zone NOT NULL,
+    notification_enabled boolean NOT NULL,
     UNIQUE (user_id, channel_id)
 );
 
@@ -130,3 +131,25 @@ CREATE TABLE jwt_sessions
     expiration_time timestamp with time zone NOT NULL
 );
 
+CREATE TABLE async_task_failures
+(
+    id             uuid PRIMARY KEY,
+    created_at     timestamp with time zone NOT NULL,
+    updated_at     timestamp with time zone,
+    
+    task_name      varchar(255) NOT NULL,
+    request_id     varchar(255) NOT NULL, 
+    failure_reason text NOT NULL
+);
+
+CREATE TABLE notifications
+(
+    id uuid PRIMARY KEY,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
+    receiver_id uuid NOT NULL,
+    title varchar(255) NOT NULL,
+    content text NOT NULL,
+    type varchar(20) NOT NULL,
+    target_id uuid
+);

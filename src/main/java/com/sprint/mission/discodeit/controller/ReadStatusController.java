@@ -59,6 +59,4 @@ public class ReadStatusController implements ReadStatusApi {
         .status(HttpStatus.OK)
         .body(readStatuses);
   }
-
-
 }

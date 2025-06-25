@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
@@ -21,6 +22,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -41,15 +43,17 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
+  private final SimpMessagingTemplate messaging;
 
+  @Timed("message.create.async")
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    log.info("메시지 생성 요청: request={}, attachmentCount={}", 
+    log.info("메시지 생성 요청: request={}, attachmentCount={}",
         messageCreateRequest, attachments != null ? attachments.size() : 0);
-    
+
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
@@ -66,6 +70,9 @@ public class MessageController implements MessageApi {
             .toList())
         .orElse(new ArrayList<>());
     MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+
+    String dest = "/sub/channels." + createdMessage.channelId() + ".messages";
+    messaging.convertAndSend(dest, createdMessage);
     log.debug("메시지 생성 응답: {}", createdMessage);
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -104,7 +111,7 @@ public class MessageController implements MessageApi {
           sort = "createdAt",
           direction = Direction.DESC
       ) Pageable pageable) {
-    log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}", 
+    log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}",
         channelId, cursor, pageable);
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);
