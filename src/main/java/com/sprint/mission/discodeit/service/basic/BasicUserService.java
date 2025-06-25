@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.EmitterRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
@@ -45,6 +46,7 @@ public class BasicUserService implements UserService {
 
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final EmitterRepository emitterRepository;
 
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
@@ -111,6 +113,8 @@ public class BasicUserService implements UserService {
 
     userRepository.save(user);
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
+
+    broadcastUserRefreshEvent(user.getId());
 
     return userMapper.toDto(user);
   }
@@ -210,5 +214,10 @@ public class BasicUserService implements UserService {
 
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
+  }
+
+  public void broadcastUserRefreshEvent(UUID targetUserId) {
+    List<UUID> allUserIds = userRepository.findAllUserIds();
+    emitterRepository.sendUserRefreshToUsers(allUserIds, targetUserId);
   }
 }
