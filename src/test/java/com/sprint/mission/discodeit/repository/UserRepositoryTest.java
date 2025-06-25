@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.hibernate.Hibernate;
@@ -102,7 +101,7 @@ class UserRepositoryTest {
 
   @Test
   @DisplayName("모든 사용자를 프로필과 상태 정보와 함께 조회할 수 있다")
-  void findAll() {
+  void findAllWithProfileAndStatus_ReturnsUsersWithProfileAndStatus() {
     // given
     User user1 = createTestUser("user1", "user1@example.com");
     User user2 = createTestUser("user2", "user2@example.com");
@@ -114,7 +113,7 @@ class UserRepositoryTest {
     entityManager.clear();
 
     // when
-    List<User> users = userRepository.findAll();
+    List<User> users = userRepository.findAllWithProfile();
 
     // then
     assertThat(users).hasSize(2);

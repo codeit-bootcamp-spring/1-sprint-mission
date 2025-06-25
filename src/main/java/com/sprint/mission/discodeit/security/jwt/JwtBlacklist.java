@@ -1,45 +1,27 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtBlacklist {
 
-  private final ConcurrentHashMap<String, Instant> blacklistedTokens = new ConcurrentHashMap<>();
-  private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+  private final Map<String, Instant> blacklist = new ConcurrentHashMap<>();
 
-  public JwtBlacklist() {
-    scheduler.scheduleAtFixedRate(this::cleanupExpiredTokens, 1, 1, TimeUnit.HOURS);
+  public void put(String accessToken, Instant expirationTime) {
+    blacklist.putIfAbsent(accessToken, expirationTime);
   }
 
-  public void addToBlacklist(String accessToken, Instant expirationTime) {
-    blacklistedTokens.put(accessToken, expirationTime);
+  public boolean contains(String accessToken) {
+    return blacklist.containsKey(accessToken);
   }
 
-  public boolean isBlacklisted(String accessToken) {
-    Instant expirationTime = blacklistedTokens.get(accessToken);
-    if (expirationTime == null) {
-      return false;
-    }
-
-    if (Instant.now().isAfter(expirationTime)) {
-      blacklistedTokens.remove(accessToken);
-      return false;
-    }
-    return true;
-  }
-
-  private void cleanupExpiredTokens() {
-    Instant now = Instant.now();
-    blacklistedTokens.entrySet().removeIf(entry -> now.isAfter(entry.getValue()));
-  }
-
-  public int getBlacklistSize() {
-    return blacklistedTokens.size();
+  // 1시간마다 정리
+  @Scheduled(fixedDelay = 60 * 60 * 1000)
+  public void cleanUp() {
+    blacklist.values().removeIf(expirationTime -> expirationTime.isBefore(Instant.now()));
   }
 }

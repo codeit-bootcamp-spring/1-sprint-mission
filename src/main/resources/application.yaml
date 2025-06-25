@@ -16,15 +16,40 @@ spring:
       - dev
   config:
     import: optional:file:.env[.properties]
+  cache:
+    type: redis
+    cache-names:
+      - channelsByUser
+      - notificationsByUser
+      - users
+    redis:
+      enable-statistics: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers
+        include: health,info,metrics,loggers,caches
   endpoint:
     health:
       show-details: always
+  observations:
+    annotations:
+      enabled: true
 
 info:
   name: Discodeit
@@ -57,10 +82,10 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
-    admin:
-      username: ${DISCODEIT_ADMIN_USERNAME}
-      email: ${DISCODEIT_ADMIN_EMAIL}
-      password: ${DISCODEIT_ADMIN_PASSWORD}
+  admin:
+    username: ${DISCODEIT_ADMIN_USERNAME}
+    email: ${DISCODEIT_ADMIN_EMAIL}
+    password: ${DISCODEIT_ADMIN_PASSWORD}
 
 logging:
   level:
@@ -70,14 +95,7 @@ security:
   remember-me:
     key: ${SECURITY_REMEMBER_ME_KEY}
     token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
-  max-concurrent-sessions: 1
-
-jwt:
-  secret: your-super-secret-key-must-be-at-least-256-bits-long-for-HS512-algorithm-security-requirements-make-it-even-longer
-  access-token-validity: 3600000   # 1시간
-  refresh-token-validity: 86400000 # 24시간
-
-admin:
-  username: admin
-  email: admin@discodeit.com
-  password: admin123!
+  jwt:
+    secret: ${SECURITY_JWT_SECRET}
+    access-token-validity-seconds: ${SECURITY_JWT_ACCESS_TOKEN_VALIDITY_SECONDS}
+    refresh-token-validity-seconds: ${SECURITY_JWT_REFRESH_TOKEN_VALIDITY_SECONDS}

@@ -36,13 +36,16 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     }
 
     try {
+      // JSON 요청 본문 파싱
       LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(),
           LoginRequest.class);
 
-      UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-          loginRequest.username(), loginRequest.password());
+      UsernamePasswordAuthenticationToken authRequest =
+          new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
+
       setDetails(request, authRequest);
       return this.getAuthenticationManager().authenticate(authRequest);
+
     } catch (IOException e) {
       throw new AuthenticationServiceException("Request parsing failed", e);
     }
@@ -58,36 +61,29 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
         objectMapper);
     filter.setRequiresAuthenticationRequestMatcher(SecurityMatchers.LOGIN);
     filter.setAuthenticationManager(authenticationManager);
-    filter.setAuthenticationSuccessHandler(new JsonAuthenticationSuccessHandler(objectMapper));
-    filter.setAuthenticationFailureHandler(new JsonAuthenticationFailureHandler(objectMapper));
+    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper));
+    filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
     filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
     filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
     filter.setRememberMeServices(rememberMeServices);
-
     return filter;
   }
 
   public static class Configurer extends
       AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, JsonUsernamePasswordAuthenticationFilter> {
 
-    private final ObjectMapper objectMapper;
-
     public Configurer(ObjectMapper objectMapper) {
       super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), SecurityMatchers.LOGIN_URL);
-      this.objectMapper = objectMapper;
     }
 
     @Override
-    public RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
+    protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
       return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.POST.name());
     }
 
     @Override
     public void init(HttpSecurity http) throws Exception {
       loginProcessingUrl(SecurityMatchers.LOGIN_URL);
-      successHandler(new JsonAuthenticationSuccessHandler(objectMapper));
-      failureHandler(new JsonAuthenticationFailureHandler(objectMapper));
     }
   }
-
 }

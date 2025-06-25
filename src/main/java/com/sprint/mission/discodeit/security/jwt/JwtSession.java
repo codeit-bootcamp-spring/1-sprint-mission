@@ -6,39 +6,39 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "jwt_sessions")
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
 public class JwtSession extends BaseUpdatableEntity {
 
-  @Column(name = "user_id", nullable = false)
+  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
   private UUID userId;
-
-  @Column(name = "access_token", nullable = false)
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String accessToken;
-
-  @Column(name = "refresh_token", nullable = false)
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String refreshToken;
-
-  @Column(nullable = false)
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant expirationTime;
 
-  public boolean isExpired() {
-    return Instant.now().isAfter(this.expirationTime);
-  }
-
-  public void setAccessToken(String accessToken) {
+  public JwtSession(UUID userId, String accessToken, String refreshToken, Instant expirationTime) {
+    this.userId = userId;
     this.accessToken = accessToken;
-  }
-
-  public void setRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
   }
 
+  public boolean isExpired() {
+    return this.expirationTime.isBefore(Instant.now());
+  }
+
+  public void update(String accessToken, String refreshToken, Instant expirationTime) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
+  }
 }

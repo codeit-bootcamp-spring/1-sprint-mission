@@ -1,32 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "async_task_failures")
-@RequiredArgsConstructor
-@AllArgsConstructor
-public class AsyncTaskFailure extends BaseUpdatableEntity {
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class AsyncTaskFailure extends BaseEntity {
+
+  @Column(nullable = false)
+  private String taskName;
 
   @Column(nullable = false)
   private String requestId;
 
-  @Column(nullable = false)
-  private String taskType;
+  @Column(nullable = false, columnDefinition = "text")
+  private String failureReason;
 
-  @Column
-  private UUID binaryContentId;
-
-  @Column(columnDefinition = "TEXT")
-  private String errorMessage;
-
-  @Column
-  private Integer retryCount;
-
-}
+  public AsyncTaskFailure(String taskName, String requestId, String failureReason) {
+    this.taskName = taskName;
+    this.requestId = requestId;
+    this.failureReason = failureReason;
+  }
+} 

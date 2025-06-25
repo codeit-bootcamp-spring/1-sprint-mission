@@ -4,9 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-  // Authorization
-  UNAUTHRORIZE("인증되지 않은 사용자입니다."),
-
   // User 관련 에러 코드
   USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
   DUPLICATE_USER("이미 존재하는 사용자입니다."),
@@ -30,21 +27,17 @@ public enum ErrorCode {
   USER_STATUS_NOT_FOUND("사용자 상태를 찾을 수 없습니다."),
   DUPLICATE_USER_STATUS("이미 존재하는 사용자 상태입니다."),
 
+  // Notification 관련 에러 코드
+  NOTIFICATION_NOT_FOUND("알림을 찾을 수 없습니다."),
+
   // Server 에러 코드
   INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
   INVALID_REQUEST("잘못된 요청입니다."),
 
-  // token
+  // 인증/인가 에러 코드
+  INVALID_TOKEN_SECRET("유효하지 않은 시크릿입니다."),
   INVALID_TOKEN("유효하지 않은 토큰입니다."),
-  EXPIRED_TOKEN("만료된 토큰입니다."),
-  INVALID_REFRESH_TOKEN("유효하지 않은 리프레시 토큰입니다."),
-  EXPIRED_REFRESH_TOKEN("만료된 리프레시 토큰입니다."),
-  TOKEN_EXTRACTION_FAILED("토큰에서 정보 추출에 실패했습니다."),
-
-  // notification
-  NOTIFICATION_NOT_FOUND("알림을 찾을 수 없습니다."),
-  INVALID_NOTIFICATION_TYPE("알림 타입이 지정되지 않았습니다."),
-  UNSUPPORTED_NOTIFICATION_TYPE("원하지 않는 알림 타입입니다.");
+  TOKEN_NOT_FOUND("토큰을 찾을 수 없습니다.");
 
   private final String message;
 

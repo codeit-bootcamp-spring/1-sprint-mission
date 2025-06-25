@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -54,7 +55,7 @@ class BasicUserServiceTest {
 
     user = new User(username, email, password, null);
     ReflectionTestUtils.setField(user, "id", userId);
-    userDto = new UserDto(userId, username, email, null, true);
+    userDto = new UserDto(userId, username, email, null, true, Role.USER);
   }
 
   @Test

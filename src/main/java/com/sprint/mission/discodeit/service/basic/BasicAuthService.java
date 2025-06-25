@@ -1,141 +1,80 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.RoleChangedEvent;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
-@Transactional
 public class BasicAuthService implements AuthService {
 
-  private final JwtService jwtService;
+  @Value("${discodeit.admin.username}")
+  private String username;
+  @Value("${discodeit.admin.password}")
+  private String password;
+  @Value("${discodeit.admin.email}")
+  private String email;
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
+  private final ApplicationEventPublisher eventPublisher;
 
-  @Value("${ADMIN_USERNAME}")
-  private String username;
-  @Value("${ADMIN_EMAIL}")
-  private String email;
-  @Value("${ADMIN_PASSWORD}")
-  private String password;
-
-  public BasicAuthService(JwtService jwtService, UserRepository userRepository,
-      UserMapper userMapper,
-      PasswordEncoder passwordEncoder) {
-    this.jwtService = jwtService;
-    this.userRepository = userRepository;
-    this.userMapper = userMapper;
-    this.passwordEncoder = passwordEncoder;
-  }
-
+  @Transactional
   @Override
   public UserDto initAdmin() {
     if (userRepository.existsByEmail(email) || userRepository.existsByUsername(username)) {
-      log.warn("이미 존재하는 관리자입니다.");
+      log.warn("이미 어드민이 존재합니다.");
       return null;
     }
 
-    String encodedPw = passwordEncoder.encode(password);
-    User admin = new User(username, email, encodedPw, null);
+    String encodedPassword = passwordEncoder.encode(password);
+    User admin = new User(username, email, encodedPassword, null);
     admin.updateRole(Role.ADMIN);
     userRepository.save(admin);
 
     UserDto adminDto = userMapper.toDto(admin);
-    log.info("관리자가 초기화되었습니다. ID = {}", adminDto.id());
+    log.info("어드민이 초기화되었습니다. {}", adminDto);
     return adminDto;
-  }
-
-  @Override
-  public TokenResponse login(UUID userId) {
-    JwtService.TokenPair tokenPair = jwtService.generateTokenPair(userId);
-
-    log.info("사용자 로그인 완료: 사용자 ID = {}", userId);
-    return new TokenResponse(tokenPair.getAccessToken(), tokenPair.getRefreshToken());
-  }
-
-  @Override
-  public void logout(String accessToken) {
-    if (jwtService.isValidAccessToken(accessToken)) {
-      jwtService.logout(accessToken);
-      log.info("사용자 로그아웃 완료");
-    }
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @Transactional
   @Override
-  public UserDto updateRole(UserRoleUpdateRequest request) {
-    log.info("사용자 권한 업데이트 요청: userId = {}, newRole = {}",
-        request.userId(), request.newRole());
-
-    User user = userRepository.findById(request.userId())
-        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + request.userId()));
-
-    // 기존 권한과 동일한지 확인
-    if (user.getRole().equals(request.newRole())) {
-      log.info("사용자의 권한이 이미 {}입니다", request.newRole());
-      return userMapper.toDto(user);
-    }
-
-    // 권한 업데이트
+  public UserDto updateRole(RoleUpdateRequest request) {
+    UUID userId = request.userId();
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
+    
+    Role oldRole = user.getRole();
     user.updateRole(request.newRole());
-    User updatedUser = userRepository.save(user);
-
-    // 권한 변경 시 모든 세션 무효화 (보안상 중요)
-    jwtService.logoutAll(updatedUser.getId());
-
-    log.info("사용자 권한 업데이트 완료: userId = {}, role = {}, 모든 세션 무효화됨",
-        updatedUser.getId(), updatedUser.getRole());
-
-    return userMapper.toDto(updatedUser);
-  }
-
-  @Override
-  public boolean isUserLoggedIn(UUID userId) {
-    return jwtService.isUserLoggedIn(userId);
-  }
-
-  @Override
-  public TokenResponse refreshToken(String refreshToken) {
-    JwtService.TokenPair tokenPair = jwtService.refreshTokenPair(refreshToken);
-    return new TokenResponse(tokenPair.getAccessToken(), tokenPair.getRefreshToken());
-  }
-
-  @Override
-  public int getActiveSessionCount(UUID userId) {
-    return jwtService.getActiveSessionCount(userId);
-  }
-
-  public static class TokenResponse {
-
-    private final String accessToken;
-    private final String refreshToken;
-
-    public TokenResponse(String accessToken, String refreshToken) {
-      this.accessToken = accessToken;
-      this.refreshToken = refreshToken;
+    
+    // 권한이 변경된 경우에만 알림 발행
+    if (!oldRole.equals(request.newRole())) {
+      eventPublisher.publishEvent(new RoleChangedEvent(userId, oldRole, request.newRole()));
     }
 
-    public String getAccessToken() {
-      return accessToken;
-    }
-
-    public String getRefreshToken() {
-      return refreshToken;
-    }
+    jwtService.invalidateJwtSession(user.getId());
+    return userMapper.toDto(user);
   }
 }

@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -12,8 +11,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,7 +29,6 @@ public class ReadStatusController implements ReadStatusApi {
 
   private final ReadStatusService readStatusService;
 
-  @PreAuthorize("@basicReadStatusService.isOwner(#request, authentication.name)")
   @PostMapping
   public ResponseEntity<ReadStatusDto> create(@RequestBody @Valid ReadStatusCreateRequest request) {
     log.info("읽음 상태 생성 요청: {}", request);
@@ -55,30 +51,9 @@ public class ReadStatusController implements ReadStatusApi {
   }
 
   @GetMapping
-  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(
-      @RequestParam("userId") String userId,
-      Authentication authentication) {
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
     log.info("사용자별 읽음 상태 목록 조회 요청: userId={}", userId);
-
-    UUID actualUserId;
-
-    if (userId == null || "undefined".equals(userId) || userId.trim().isEmpty()) {
-      // 현재 인증된 사용자 사용
-      log.debug("userId가 null 또는 undefined이므로 현재 사용자 ID 사용");
-      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-      actualUserId = userDetails.getUserDto().id();
-    } else {
-      try {
-        actualUserId = UUID.fromString(userId);
-        log.debug("요청된 userId 사용: {}", actualUserId);
-      } catch (IllegalArgumentException e) {
-        // 유효하지 않은 UUID인 경우 현재 사용자 사용
-        log.warn("유효하지 않은 UUID 형식: {}. 현재 사용자 ID 사용", userId);
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        actualUserId = userDetails.getUserDto().id();
-      }
-    }
-    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(actualUserId);
+    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
     log.debug("사용자별 읽음 상태 목록 조회 응답: count={}", readStatuses.size());
     return ResponseEntity
         .status(HttpStatus.OK)

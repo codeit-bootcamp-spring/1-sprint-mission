@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 
 @Tag(name = "Channel", description = "Channel API")
 public interface ChannelApi {
@@ -85,7 +84,6 @@ public interface ChannelApi {
       )
   })
   ResponseEntity<List<ChannelDto>> findAll(
-      @Parameter(description = "조회할 User ID") String userId,
-      Authentication authentication
+      @Parameter(description = "조회할 User ID") UUID userId
   );
 } 

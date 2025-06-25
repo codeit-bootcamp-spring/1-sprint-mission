@@ -5,7 +5,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +28,13 @@ public class Channel extends BaseUpdatableEntity {
   private String name;
   @Column(length = 500)
   private String description;
+  @ManyToMany
+  @JoinTable(
+      name = "channel_members",
+      joinColumns = @JoinColumn(name = "channel_id"),
+      inverseJoinColumns = @JoinColumn(name = "user_id")
+  )
+  private Set<User> members = new HashSet<>();
 
   public Channel(ChannelType type, String name, String description) {
     this.type = type;
@@ -37,5 +49,13 @@ public class Channel extends BaseUpdatableEntity {
     if (newDescription != null && !newDescription.equals(this.description)) {
       this.description = newDescription;
     }
+  }
+
+  public void addMember(User user) {
+    this.members.add(user);
+  }
+
+  public void removeMember(User user) {
+    this.members.remove(user);
   }
 }

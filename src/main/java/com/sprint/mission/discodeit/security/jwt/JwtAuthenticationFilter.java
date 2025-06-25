@@ -1,95 +1,84 @@
 package com.sprint.mission.discodeit.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.ErrorResponse;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.SecurityMatchers;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.Map;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
-  private final PathMatcher pathMatcher = new AntPathMatcher();
-
-  private final List<String> skipAuthenticationPaths = Arrays.asList(
-      "/api/auth/login",
-      "/api/auth/refresh",
-      "/api/auth/csrf-token",
-      "/api/users",
-      "/css/**",
-      "/images/**",
-      "/js/**",
-      "/swagger-ui/**",
-      "/v3/api-docs/**",
-      "/actuator/**",
-      "/api/public/**"
-  );
-
-  public JwtAuthenticationFilter(JwtService jwtService) {
-    this.jwtService = jwtService;
-  }
+  private final ObjectMapper objectMapper;
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request,
+  protected void doFilterInternal(
+      HttpServletRequest request,
       HttpServletResponse response,
-      FilterChain filterChain) throws ServletException, IOException {
+      FilterChain chain
+  ) throws IOException, ServletException {
+    Optional<String> optionalAccessToken = resolveAccessToken(request);
+    if (optionalAccessToken.isPresent() && !isPermitAll(request)) {
+      String accessToken = optionalAccessToken.get();
+      if (jwtService.validate(accessToken)) {
+        UserDto userDto = jwtService.parse(accessToken).userDto();
+        DiscodeitUserDetails userDetails = new DiscodeitUserDetails(userDto, null);
+        UsernamePasswordAuthenticationToken auth =
+            new UsernamePasswordAuthenticationToken(userDetails, null,
+                userDetails.getAuthorities());
 
-    if (shouldSkipAuthentication(request)) {
-      log.debug("JWT 인증을 건너뛰는 경로: {}", request.getRequestURI());
-      filterChain.doFilter(request, response);
-      return;
-    }
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
-    String token = getTokenFromRequest(request);
+        chain.doFilter(request, response);
 
-    if (StringUtils.hasText(token) && jwtService.isValidAccessToken(token)) {
-      UUID userId = jwtService.getUserIdFromToken(token);
-
-      UsernamePasswordAuthenticationToken authentication =
-          new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
-      authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-      SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
-    filterChain.doFilter(request, response);
-  }
-
-  private String getTokenFromRequest(HttpServletRequest request) {
-    String bearerToken = request.getHeader("Authorization");
-    if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-      return bearerToken.substring(7);
-    }
-    return null;
-  }
-
-  private boolean shouldSkipAuthentication(HttpServletRequest request) {
-    String requestPath = request.getRequestURI();
-    String method = request.getMethod();
-
-    for (String skipPath : skipAuthenticationPaths) {
-      if (pathMatcher.match(skipPath, requestPath)) {
-        if (skipPath.equals("/api/users") && !"POST".equals(method)) {
-          continue;
-        }
-        return true;
+      } else {
+        jwtService.invalidateJwtSession(accessToken);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        ErrorResponse errorResponse = new ErrorResponse(
+            new DiscodeitException(ErrorCode.INVALID_TOKEN,
+                Map.of("accessToken", accessToken)), HttpServletResponse.SC_UNAUTHORIZED);
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
       }
+    } else {
+      chain.doFilter(request, response);
     }
-    return false;
+  }
+
+  private Optional<String> resolveAccessToken(HttpServletRequest request) {
+    String prefix = "Bearer ";
+    return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+        .map(value -> {
+          if (value.startsWith(prefix)) {
+            return value.substring(prefix.length());
+          } else {
+            return null;
+          }
+        });
+  }
+
+  private boolean isPermitAll(HttpServletRequest request) {
+    return Arrays.stream(SecurityMatchers.PUBLIC_MATCHERS)
+        .anyMatch(requestMatcher -> requestMatcher.matches(request));
   }
 }

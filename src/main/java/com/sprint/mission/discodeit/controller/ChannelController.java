@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -13,8 +12,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,7 +31,6 @@ public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
 
-  @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
   @PostMapping(path = "public")
   public ResponseEntity<ChannelDto> create(@RequestBody @Valid PublicChannelCreateRequest request) {
     log.info("공개 채널 생성 요청: {}", request);
@@ -46,8 +42,7 @@ public class ChannelController implements ChannelApi {
   }
 
   @PostMapping(path = "private")
-  public ResponseEntity<ChannelDto> create(
-      @RequestBody @Valid PrivateChannelCreateRequest request) {
+  public ResponseEntity<ChannelDto> create(@RequestBody @Valid PrivateChannelCreateRequest request) {
     log.info("비공개 채널 생성 요청: {}", request);
     ChannelDto createdChannel = channelService.create(request);
     log.debug("비공개 채널 생성 응답: {}", createdChannel);
@@ -56,7 +51,6 @@ public class ChannelController implements ChannelApi {
         .body(createdChannel);
   }
 
-  @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
   @PatchMapping(path = "{channelId}")
   public ResponseEntity<ChannelDto> update(
       @PathVariable("channelId") UUID channelId,
@@ -69,7 +63,6 @@ public class ChannelController implements ChannelApi {
         .body(updatedChannel);
   }
 
-  @PreAuthorize("hasRole('ROLE_CHANNEL_MANAGER')")
   @DeleteMapping(path = "{channelId}")
   public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
     log.info("채널 삭제 요청: id={}", channelId);
@@ -81,30 +74,12 @@ public class ChannelController implements ChannelApi {
   }
 
   @GetMapping
-  public ResponseEntity<List<ChannelDto>> findAll(
-      @RequestParam(required = false) String userId,
-      Authentication authentication) {
-
-    UUID actualUserId;
-
-    if (userId == null || "undefined".equals(userId) || userId.trim().isEmpty()) {
-      // 현재 인증된 사용자 사용
-      log.debug("userId가 null 또는 undefined이므로 현재 사용자 ID 사용");
-      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-      actualUserId = userDetails.getUserDto().id();
-    } else {
-      try {
-        actualUserId = UUID.fromString(userId);
-        log.debug("요청된 userId 사용: {}", actualUserId);
-      } catch (IllegalArgumentException e) {
-        // 유효하지 않은 UUID인 경우 현재 사용자 사용
-        log.warn("유효하지 않은 UUID 형식: {}. 현재 사용자 ID 사용", userId);
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        actualUserId = userDetails.getUserDto().id();
-      }
-    }
-
-    List<ChannelDto> channels = channelService.findAllByUserId(actualUserId);
-    return ResponseEntity.ok(channels);
+  public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
+    log.info("사용자별 채널 목록 조회 요청: userId={}", userId);
+    List<ChannelDto> channels = channelService.findAllByUserId(userId);
+    log.debug("사용자별 채널 목록 조회 응답: count={}", channels.size());
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(channels);
   }
 }

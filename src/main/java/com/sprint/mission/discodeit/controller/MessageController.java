@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
@@ -21,7 +22,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -43,6 +43,7 @@ public class MessageController implements MessageApi {
 
   private final MessageService messageService;
 
+  @Timed("message.create.async")
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
@@ -73,7 +74,6 @@ public class MessageController implements MessageApi {
         .body(createdMessage);
   }
 
-  @PreAuthorize("@basicMessageService.isMessageAuthor(#messageId, authentication.name)")
   @PatchMapping(path = "{messageId}")
   public ResponseEntity<MessageDto> update(
       @PathVariable("messageId") UUID messageId,
@@ -86,7 +86,6 @@ public class MessageController implements MessageApi {
         .body(updatedMessage);
   }
 
-  @PreAuthorize("@basicMessageService.isMessageAuthorOrAdmin(#messageId, authentication.name)")
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
     log.info("메시지 삭제 요청: id={}", messageId);
