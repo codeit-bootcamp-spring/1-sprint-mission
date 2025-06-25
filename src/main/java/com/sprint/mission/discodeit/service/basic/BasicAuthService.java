@@ -65,7 +65,7 @@ public class BasicAuthService implements AuthService {
     user.updateRole(request.newRole());
 
     String content = String.format("%s님이 %s 역할로 변경되었습니다.", username, request.newRole().name());
-    notificationService.createNotification(content, NotificationType.ROLE_CHANGED, userId);
+    notificationService.create(content, NotificationType.ROLE_CHANGED, userId);
 
     jwtService.invalidateJwtSession(user.getId());
     return userMapper.toDto(user);

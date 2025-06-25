@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -70,6 +71,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
       log.error("S3에 파일 업로드 실패: {}", e.getMessage());
       throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
     }
+  }
+
+  @Override
+  public CompletableFuture<UUID> putAsync(UUID binaryContentId, byte[] bytes) {
+    return null;
   }
 
   @Override

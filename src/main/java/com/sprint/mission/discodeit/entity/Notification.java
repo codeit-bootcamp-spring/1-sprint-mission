@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -25,6 +27,7 @@ public class Notification extends BaseEntity {
   String title;
   @Column
   String content;
+  @Enumerated(EnumType.STRING)
   @Column
   NotificationType type;
   @Column
