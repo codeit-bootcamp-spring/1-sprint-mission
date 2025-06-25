@@ -1,53 +1,75 @@
+# 공통 backend 설정
+x-backend-common: &backend-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+    args:
+      PROJECT_NAME: ${PROJECT_NAME}
+      PROJECT_VERSION: ${PROJECT_VERSION}
+  image: ${PROJECT_NAME}:local-slim
+  expose:
+    - "8080"
+  depends_on:
+    - db
+    - redis
+    - broker
+  environment:
+    PROJECT_NAME: ${PROJECT_NAME}
+    PROJECT_VERSION: ${PROJECT_VERSION}
+    JVM_OPTS: ${JVM_OPTS:-""}
+    SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+    SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+    SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    STORAGE_TYPE: ${STORAGE_TYPE}
+    STORAGE_LOCAL_ROOT_PATH: ${STORAGE_LOCAL_ROOT_PATH}
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    AWS_S3_REGION: ${AWS_S3_REGION}
+    AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+    JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    ADMIN_USERNAME: ${ADMIN_USERNAME}
+    ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+    ADMIN_EMAIL: ${ADMIN_EMAIL}
+    PERSISTENT_COOKIE_KEY: ${PERSISTENT_COOKIE_KEY}
+    KAFKA_NAME: ${KAFKA_NAME}
+    KAFKA_INNER_PORT: ${KAFKA_INNER_PORT}
+    SPRING_DATA_REDIS_HOST: ${SPRING_DATA_REDIS_HOST}
+    SPRING_DATA_REDIS_PORT: ${SPRING_DATA_REDIS_PORT}
+  networks:
+    - discodeit-network
+
 services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-lb
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      - discodeit-network
+
   db:
     image: postgres:${POSTGRES_VERSION}
+    container_name: db
     environment:
       POSTGRES_VERSION: ${POSTGRES_VERSION}
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     ports:
-      - "5433:${PROD_DB_PORT}"
+      - "${PROD_DB_PORT}:5432"
     volumes:
       - discodeit-postgres-data:/var/lib/postgresql/data
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        PROJECT_NAME: ${PROJECT_NAME}
-        PROJECT_VERSION: ${PROJECT_VERSION}
-    image: ${PROJECT_NAME}:local-slim
-    ports:
-      - "8081:${APP_PORT}"
-    depends_on:
-      - db
-    environment:
-      PROJECT_NAME: ${PROJECT_NAME}
-      PROJECT_VERSION: ${PROJECT_VERSION}
-      JVM_OPTS: ${JVM_OPTS:-""}
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
-      STORAGE_TYPE: ${STORAGE_TYPE}
-      STORAGE_LOCAL_ROOT_PATH: ${STORAGE_LOCAL_ROOT_PATH}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_S3_REGION: ${AWS_S3_REGION}
-      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      ADMIN_USERNAME: ${ADMIN_USERNAME}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      ADMIN_EMAIL: ${ADMIN_EMAIL}
-      PERSISTENT_COOKIE_KEY: ${PERSISTENT_COOKIE_KEY}
-      KAFKA_NAME: ${KAFKA_NAME}
-      KAFKA_INNER_PORT: ${KAFKA_INNER_PORT}
-      SPRING_DATA_REDIS_HOST: ${SPRING_DATA_REDIS_HOST}
-      SPRING_DATA_REDIS_PORT: ${SPRING_DATA_REDIS_PORT}
-
-
+    networks:
+      - discodeit-network
 
   adminer:
     image: adminer:latest
@@ -55,6 +77,8 @@ services:
       - "${ADMINER_PORT}:8080"
     depends_on:
       - db
+    networks:
+      - discodeit-network
 
   broker:
     image: apache/kafka:latest
@@ -79,7 +103,9 @@ services:
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
     volumes:
-      - kafka-data:/tmp/kraft-combinde-logs
+      - ./kafka-data:/tmp/kraft-combined-logs
+    networks:
+      - discodeit-network
 
   redis:
     image: redis:7.2-alpine
@@ -89,8 +115,27 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
+    networks:
+      - discodeit-network
+
+  # backend - 로드밸런서, 3개
+  backend1:
+    <<: *backend-common
+    container_name: backend-1
+
+  backend2:
+    <<: *backend-common
+    container_name: backend-2
+
+  backend3:
+    <<: *backend-common
+    container_name: backend-3
 
 volumes:
   discodeit-postgres-data:
   kafka-data:
   redis-data:
+
+networks:
+  discodeit-network:
+    driver: bridge

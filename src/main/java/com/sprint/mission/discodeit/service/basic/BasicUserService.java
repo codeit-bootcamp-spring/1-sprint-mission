@@ -22,6 +22,7 @@ import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.security.role.RoleUpdateRequest;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.validation.Validator;
 import io.jsonwebtoken.JwtException;
@@ -65,6 +66,7 @@ public class BasicUserService implements UserService {
   private final JwtSessionRepository jwtSessionRepository;
   private final JwtService jwtService;
   private final ApplicationEventPublisher applicationEventPublisher;
+  private final SseService sseService;
 
   // TODO: LoadData Entity Name Magic Number를 어떻게 하면 좋을까?
 
@@ -102,6 +104,9 @@ public class BasicUserService implements UserService {
     UUID savedUser = userRepository.save(user).getId();
     User loadUser = userRepository.findById(savedUser)
         .orElseThrow(() -> new UserNotFoundException(savedUser));
+
+    // 사용자 리프레시 알림
+    sseService.sendUserRefresh(savedUser);
 
     log.info("사용자가 생성되었습니다. - id: {}", loadUser.getId());
     return userMapper.toResponseDto(loadUser, isUserOnline(loadUser.getUsername()));
@@ -169,6 +174,9 @@ public class BasicUserService implements UserService {
 
       userRepository.save(updatedUser); // DB에 반영
 
+      // 사용자 리프레시 알림
+      sseService.sendUserRefresh(updatedUser.getId());
+
       log.info("사용자 정보가 수정되었습니다. - id: {}", updatedUser.getId());
 
       return userMapper.toResponseDto(updatedUser, isUserOnline(updatedUser.getUsername()));
@@ -189,6 +197,9 @@ public class BasicUserService implements UserService {
     User deleteUser = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(userId));
     userRepository.delete(deleteUser);
+
+    // 사용자 리프레시 알림
+    sseService.sendUserRefresh(deleteUser.getId());
 
     log.info("사용자가 삭제되었습니다. - id: {}", deleteUser.getId());
     return userMapper.toResponseDto(deleteUser, isUserOnline(deleteUser.getUsername()));

@@ -16,6 +16,8 @@ public interface MessageService {
   MessageResponseDto create(MessageRequestDto messageReqDTO, List<MultipartFile> attachments)
       throws IOException;
 
+  MessageResponseDto create(MessageRequestDto messageReqDTO);
+
   // 조회
   // 단일 조회
   MessageResponseDto find(UUID messageId);

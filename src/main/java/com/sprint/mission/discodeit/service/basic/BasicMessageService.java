@@ -49,6 +49,48 @@ public class BasicMessageService implements MessageService {
   private final ReadStatusRepository readStatusRepository;
   private final ApplicationEventPublisher applicationEventPublisher;
 
+  @Transactional
+  @Override
+  public MessageResponseDto create(MessageRequestDto messageReqDTO, List<MultipartFile> attachments)
+      throws IOException {
+    log.debug("메시지 생성 요청 - 메시지 요청 데이터: {}, 첨부파일 존재 여부: {}", messageReqDTO, attachments != null);
+    Message message = messageMapper.toEntity(messageReqDTO);
+    if (attachments != null && !attachments.isEmpty()) {
+      addAttachmentToMessage(message, attachments);
+    }
+    return saveAndNotify(message, messageReqDTO.channelId());
+  }
+
+  @Transactional
+  @Override
+  public MessageResponseDto create(MessageRequestDto messageReqDTO) {
+    log.debug("단일 텍스트 메시지 생성 요청 - 메시지 요청 데이터: {}", messageReqDTO);
+    Message message = messageMapper.toEntity(messageReqDTO);
+    return saveAndNotify(message, messageReqDTO.channelId());
+  }
+
+  // 저장 및 알림 생성
+  private MessageResponseDto saveAndNotify(Message message, UUID channelId) {
+    Message savedMessage = messageRepository.save(message);
+
+    List<User> users = readStatusRepository.findByChannelIdAndNotificationEnabledTrue(
+            channelId)
+        .stream()
+        .map(ReadStatus::getUser)
+        .toList();
+
+    log.info("✨ 채널 사용자 확인: {}", users);
+
+    for (User receiver : users) {
+      applicationEventPublisher.publishEvent(new NewMessageNotificationEvent(
+          receiver.getId(), channelId, NotificationType.NEW_MESSAGE
+      ));
+    }
+
+    log.info("메시지가 생성되었습니다. - id: {}", savedMessage.getId());
+    return messageMapper.toResponseDto(savedMessage);
+  }
+
   private void addAttachmentToMessage(Message message, List<MultipartFile> attachments)
       throws IOException {
     for (MultipartFile attachment : attachments) {
@@ -66,36 +108,6 @@ public class BasicMessageService implements MessageService {
     log.info("첨부파일이 등록되었습니다. - id: {}",
         message.getAttachments().stream().map(MessageAttachment::getId)
             .collect(Collectors.toList()));
-  }
-
-  @Transactional
-  @Override
-  public MessageResponseDto create(MessageRequestDto messageReqDTO, List<MultipartFile> attachments)
-      throws IOException {
-    log.debug("메시지 생성 요청 - 메시지 요청 데이터: {}, 첨부파일 존재 여부: {}", messageReqDTO, attachments != null);
-    Message message = messageMapper.toEntity(messageReqDTO);
-    if (attachments != null && !attachments.isEmpty()) {
-      addAttachmentToMessage(message, attachments);
-    }
-    Message savedMessage = messageRepository.save(message);
-
-    List<User> users = readStatusRepository.findByChannelIdAndNotificationEnabledTrue(
-            messageReqDTO.channelId())
-        .stream()
-        .map(ReadStatus::getUser)
-        .toList();
-
-    log.info("✨ 채널 사용자 확인: {}", users);
-
-    for (User receiver : users) {
-      log.info("✨ 이벤트 잘 돌아가니?: {}", receiver);
-      applicationEventPublisher.publishEvent(new NewMessageNotificationEvent(
-          receiver.getId(), messageReqDTO.channelId(), NotificationType.NEW_MESSAGE
-      ));
-    }
-
-    log.info("메시지가 생성되었습니다. - id: {}", savedMessage.getId());
-    return messageMapper.toResponseDto(savedMessage);
   }
 
   @Override

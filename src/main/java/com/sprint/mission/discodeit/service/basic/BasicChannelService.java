@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelMember;
 import com.sprint.mission.discodeit.entity.User;
@@ -19,7 +20,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.SseService;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +51,7 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepository messageRepository;
   private final JwtSessionRepository jwtSessionRepository;
   private final CacheManager cacheManager;
+  private final SseService sseService;
 
   @Transactional
   @CacheEvict(value = "userChannels", key = "#channelReqDTO.ownerId()")
@@ -58,6 +62,11 @@ public class BasicChannelService implements ChannelService {
         channelMapper.toPublicEntity(channelReqDTO));
     List<UserResponseDto> participants = getChannelParticipants(savedChannel);
     Instant lastMessageAt = getLastMessageAt(savedChannel.getId());
+
+    // public 채널 리프레시 알림
+    sseService.sendChannelRefreshToIdList(
+        userRepository.findAll().stream().map(BaseEntity::getId).toList(), savedChannel.getId());
+
     log.info("public 채널이 생성되었습니다. - id: {}", savedChannel.getId());
     return channelMapper.toResponseDto(savedChannel, participants, lastMessageAt);
   }
@@ -74,6 +83,12 @@ public class BasicChannelService implements ChannelService {
     createChannelParticipants(savedChannel, channelReqDTO.participantIds());
     List<UserResponseDto> participants = getChannelParticipants(savedChannel);
     Instant lastMessageAt = getLastMessageAt(savedChannel.getId());
+
+    List<UUID> userIds = new ArrayList<>(channelReqDTO.participantIds());
+    userIds.add(channelReqDTO.ownerId());
+
+    // private 채널 리프레시 알림
+    sseService.sendChannelRefreshToIdList(userIds, savedChannel.getId());
 
     log.info("private 채널이 생성되었습니다. - id: {}", savedChannel.getId());
     return channelMapper.toResponseDto(savedChannel, participants, lastMessageAt);
@@ -147,7 +162,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelResponseDto update(UUID channelId, ChannelUpdateDto updateDTO) {
-    log.debug("private 채널 수정 요청 - 수정 대상 id: {}, 생성 요청 데이터: {}", channelId, updateDTO);
+    log.debug("채널 수정 요청 - 수정 대상 id: {}, 생성 요청 데이터: {}", channelId, updateDTO);
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
@@ -164,7 +179,11 @@ public class BasicChannelService implements ChannelService {
 
     evictUserChannelsCaches(participants.stream().map(UserResponseDto::getId).toList());
 
-    log.info("private 채널 정보가 수정되었습니다. - id: {}", channel.getId());
+    // public 채널 리프레시 알림
+    sseService.sendChannelRefreshToIdList(
+        userRepository.findAll().stream().map(BaseEntity::getId).toList(), channel.getId());
+
+    log.info("public 채널 정보가 수정되었습니다. - id: {}", channel.getId());
     return channelMapper.toResponseDto(channel, participants, lastMessageAt);
   }
 
@@ -179,6 +198,13 @@ public class BasicChannelService implements ChannelService {
 
     evictUserChannelsCaches(
         getChannelParticipants(deleteChannel).stream().map(UserResponseDto::getId).toList());
+
+    // private 채널 리프레시 알림
+    List<UUID> userIds = new ArrayList<>(
+        deleteChannel.getMembers().stream().map(BaseEntity::getId).toList());
+    userIds.add(deleteChannel.getOwner().getId());
+
+    sseService.sendChannelRefreshToIdList(userIds, deleteChannel.getId());
 
     log.info("대상 채널이 삭제되었습니다. - id: {}", deleteChannel.getId());
     return channelMapper.toResponseDto(deleteChannel, null, null);

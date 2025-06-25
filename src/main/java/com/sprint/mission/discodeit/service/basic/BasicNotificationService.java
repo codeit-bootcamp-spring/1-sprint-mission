@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.SseService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class BasicNotificationService implements NotificationService {
   private final UserRepository userRepository;
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
+  private final SseService sseService;
 
   @Override
   @CacheEvict(value = "userNotifications", key = "#receiverId")
@@ -45,8 +47,11 @@ public class BasicNotificationService implements NotificationService {
 
     log.info("✨ 알림 생성: {}", notification);
     Notification saved = notificationRepository.save(notification);
+    NotificationDto notificationDto = notificationMapper.toResponseDto(saved);
 
-    return notificationMapper.toResponseDto(saved);
+    sseService.sendNotification(receiverId, notificationDto);
+    
+    return notificationDto;
   }
 
   @Override

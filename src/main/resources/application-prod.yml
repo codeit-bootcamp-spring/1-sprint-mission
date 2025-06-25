@@ -47,6 +47,9 @@ logging:
     org:
       hibernate:
         sql: debug
+      springframework:
+        messaging: trace
+        security: debug
 
 # swagger
 springdoc:
@@ -65,7 +68,7 @@ springdoc:
 
 # port
 server:
-  port: ${APP_PORT:80}
+  port: ${APP_PORT:8080}
   tomcat:
     uri-encoding: UTF-8
   servlet:

@@ -8,7 +8,9 @@ import com.sprint.mission.discodeit.common.NotificationType;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContent.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityManager;
 import java.util.UUID;
@@ -44,16 +46,23 @@ public class FileUploadEventHandler {
   private final EntityManager entityManager;
   private final TransactionTemplate transactionTemplate;
   private final ApplicationEventPublisher applicationEventPublisher;
+  private final SseService sseService;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Async("unifiedPool")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handle(FileUploadEvent event) {
     try {
+      // todo: FileUploadEvent file을 넣는 것이 아니라 Id만 넣고 해서 리팩토링이 필요할 듯
       self.uploadWithRetry(event.getFileId(), event.getFile());
       // 상태 업데이트
       binaryContentRepository.findById(event.getFileId()).ifPresent(content -> {
         content.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
         binaryContentRepository.saveAndFlush(content);
+
+        sseService.sendBinaryContentStatus(event.getReceiverId(),
+            binaryContentMapper.toResponseDto(content));
+
       });
     } catch (Exception e) {
       self.recover(e, event);
@@ -84,6 +93,8 @@ public class FileUploadEventHandler {
     content.updateUploadStatus(BinaryContentUploadStatus.FAILED);
     binaryContentRepository.saveAndFlush(content);
     binaryContentStorage.delete(event.getFileId());
+    sseService.sendBinaryContentStatus(event.getReceiverId(),
+        binaryContentMapper.toResponseDto(content));
 
     String requestIdStr = MDC.get(REQUEST_ID);
     UUID requestId = requestIdStr != null ? UUID.fromString(requestIdStr) : null;

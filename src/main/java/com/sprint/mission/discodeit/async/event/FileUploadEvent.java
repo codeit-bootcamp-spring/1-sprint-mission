@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.async.event;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileUploadEvent {
 
   private UUID fileId;
+  @JsonIgnore
   private MultipartFile file;
   private UUID receiverId;
 

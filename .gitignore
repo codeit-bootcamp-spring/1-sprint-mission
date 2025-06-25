@@ -45,3 +45,5 @@ out/
 
 ### VS Code ###
 .vscode/.env
+
+kafka-data

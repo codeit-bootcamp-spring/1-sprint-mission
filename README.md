@@ -3,6 +3,8 @@
 ## 스프린트 미션 대상 서비스: 디스코드
 
 [![codecov](https://codecov.io/github/silvarge/1-sprint-mission/graph/badge.svg?token=00FSRXRYS0)](https://codecov.io/github/silvarge/1-sprint-mission)
+<br>
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/silvarge/1-sprint-mission?utm_source=oss&utm_medium=github&utm_campaign=silvarge%2F1-sprint-mission&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 ---
 
