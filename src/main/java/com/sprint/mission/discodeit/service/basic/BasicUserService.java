@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.ProfileUploadDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
@@ -13,30 +13,25 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UsernameAlreadyExistsException;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 //
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 //
 import java.util.UUID;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionTemplate;
+
 
 @Slf4j
 @Service
@@ -51,11 +46,11 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   //
   private final InputHandler inputHandler;
-  private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentStorage binaryContentStorage;
   //
   private final PasswordEncoder passwordEncoder;
-  private final TransactionTemplate transactionTemplate;
+  //
+  private final ApplicationEventPublisher eventPublisher;
+
 
   @CacheEvict(value = "users", allEntries = true)
   @Transactional
@@ -67,6 +62,7 @@ public class BasicUserService implements UserService {
     log.debug("사용자 생성 시도: userCreateRequest={}, optionalProfileCreateRequest={}", userCreateRequest,
         optionalProfileCreateRequest);
 
+    // 1. 유효성 검증
     if (userRepository.existsByUsername(userCreateRequest.username())) {
       log.warn("이미 존재하는 유저 이름: username={}", userCreateRequest.username());
       throw new UsernameAlreadyExistsException(Map.of("username", userCreateRequest.username()));
@@ -77,81 +73,11 @@ public class BasicUserService implements UserService {
           Map.of("email", userCreateRequest.email()));
     }
 
-    BinaryContent nullableProfile =
-        optionalProfileCreateRequest.map(
-                profileRequest -> {
-                  log.info("프로필 이미지 생성 시도: fileName={}, contentType={} ",
-                      profileRequest.fileName(),
-                      profileRequest.contentType());
-                  BinaryContent binaryContent = BinaryContent.builder()
-                      .fileName(profileRequest.fileName())
-                      .size(profileRequest.size())
-                      .contentType(profileRequest.contentType())
-                      .uploadStatus(BinaryContentUploadStatus.WAITING)
-                      .build();
-                  BinaryContent content = binaryContentRepository.save(binaryContent);
+    // 2. 프로필 이미지 객체 생성
+    BinaryContent nullableProfile = optionalProfileCreateRequest.map(
+        binaryContentService::createBinaryContent).orElse(null);
 
-                  MDC.put("traceId", String.valueOf(UUID.randomUUID()));
-
-                  log.info("프로필 이미지 저장소에 업로드 시도 : fileName={}, Id={}", content.getFileName(),
-                      content.getId());
-                  TransactionSynchronizationManager.registerSynchronization(
-                      new TransactionSynchronization() {
-                        @Override
-                        public void afterCommit() {
-
-                          CompletableFuture<UUID> future = binaryContentStorage.put(content.getId(),
-                              profileRequest.bytes());
-
-//                          UUID id = binaryContentStorage.put(content.getId(), profileRequest.bytes());
-
-//                          if (id == null) {
-//                            transactionTemplate.execute(status -> {
-//                              log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}",
-//                                  content.getId());
-//                              binaryContentRepository.updateStatusById(content.getId(),
-//                                  BinaryContentUploadStatus.FAILED);
-//                              return null;
-//                            });
-//                          } else {
-//                            transactionTemplate.execute(status -> {
-//                              log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
-//                              binaryContentRepository.updateStatusById(content.getId(),
-//                                  BinaryContentUploadStatus.SUCCESS);
-//                              return null; // execute 메서드 반환값
-//                            });
-//                          }
-
-                          future.thenAccept(
-                                  fileId -> {
-
-                                    transactionTemplate.execute(status -> {
-                                      log.info("파일 업로드 성공, SUCCESS 로 상태 변경: contentId={}", content.getId());
-                                      binaryContentRepository.updateStatusById(content.getId(),
-                                          BinaryContentUploadStatus.SUCCESS);
-                                      return null; // execute 메서드 반환값
-                                    });
-                                  })
-                              .exceptionally(ex -> {
-                                transactionTemplate.execute(status -> {
-                                  log.error("파일 업로드 실패, FAILED 로 상태 변경: contentId={}, message={}",
-                                      content.getId(), ex.getMessage(), ex);
-                                  binaryContentRepository.updateStatusById(content.getId(),
-                                      BinaryContentUploadStatus.FAILED);
-                                  return null;
-                                });
-                                return null;
-                              });
-                        }
-                      }
-                  );
-                  return content;
-                })
-            .orElse(null);
-
-//    log.info("프로필 이미지 여부 : {}", nullableProfile.getId());
-
-    // 유저 생성 : User 도메인 객체 생성
+    // 3. 유저 객체 생성및 저장
     User user = User.builder()
         .username(userCreateRequest.username())
         .email(userCreateRequest.email())
@@ -159,10 +85,19 @@ public class BasicUserService implements UserService {
         .profile(nullableProfile)
         .role(Role.USER)
         .build();
-
     user = userRepository.save(user);
 
-    /* 중복이 없는 유저 이름과 만들어진 시각을 log.info에 담는다.*/
+    if (nullableProfile != null) {
+      ProfileUploadDto uploadDto = ProfileUploadDto.builder()
+          .id(nullableProfile.getId())
+          .bytes(optionalProfileCreateRequest.get().bytes())
+          .userId(user.getId())
+          .build();
+      // 5. 커밋 후 프로필 이미지 업로드 및 알림 관련 이벤트 발행
+      eventPublisher.publishEvent(uploadDto);
+    }
+
+    // 4. userDto 반환
     log.info("사용자 생성 시도 성공: username={}, createdAt={}", user.getUsername(),
         user.getCreatedAt());
     return userMapper.toDto(user);
@@ -192,7 +127,6 @@ public class BasicUserService implements UserService {
 
     // boolean isUpdated = false; JPA 의 더티 채킹으로 save 하지 않아도 DB에 자동 업데이트
 
-    // 유저 존재 유무 확인
     User user = userRepository.findById(id)
         .orElseThrow(() -> {
           log.error("유저 수정 단계에서 유저를 찾지 못함: userId={}", id);
@@ -201,7 +135,7 @@ public class BasicUserService implements UserService {
 
     log.info("유저 수정 시도: originalUsername={}", user.getUsername());
 
-    // 유저 데이터 수정
+    // 1. 유저 데이터 수정
     if (userUpdateRequest.newUsername() != null) {
       if (userRepository.existsByUsername(userUpdateRequest.newUsername())) {
         log.warn("이미 존재하는 유저 이름: username={}", userUpdateRequest.newUsername());
@@ -225,26 +159,25 @@ public class BasicUserService implements UserService {
       log.info("유저 패스워드 수정");
     }
 
-    // 프로필 이미지 수정
+    // 2. 프로필 이미지 수정
 
-    BinaryContent nullableProfile =
-        optionalProfileCreateRequest.map(
-                profileRequest -> {
-                  log.info("프로필 이미지 생성 시도: fileName={}, contentType={} ",
-                      profileRequest.fileName(),
-                      profileRequest.contentType());
-                  BinaryContent binaryContent = BinaryContent.builder()
-                      .fileName(profileRequest.fileName())
-                      .size(profileRequest.size())
-                      .contentType(profileRequest.contentType())
-                      .build();
-                  BinaryContent content = binaryContentRepository.save(binaryContent);
-                  binaryContentStorage.put(content.getId(), profileRequest.bytes());
-                  return content;
-                })
-            .orElse(null);
-    user.updateProfile(nullableProfile);
+    if (optionalProfileCreateRequest.isPresent()) {
+      BinaryContent nullableProfile = optionalProfileCreateRequest.map(
+          binaryContentService::createBinaryContent).orElse(null);
 
+      user.updateProfile(nullableProfile);
+
+      ProfileUploadDto uploadDto = ProfileUploadDto.builder()
+          .id(nullableProfile.getId())
+          .bytes(optionalProfileCreateRequest.get().bytes())
+          .userId(user.getId())
+          .build();
+
+      // 4. 커밋 후 프로필 이미지 업로드 및 알림 관련 이벤트 발행
+      eventPublisher.publishEvent(uploadDto);
+    }
+
+    // 3. userDto 반환
     log.info("사용자 수정 시도 성공: username={}, updatedAt={}", user.getUsername(), user.getUpdatedAt());
     return userMapper.toDto(user);
   }

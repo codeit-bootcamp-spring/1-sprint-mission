@@ -18,7 +18,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class NotificationEventListner {
 
-  private final NotificationRepository notificationRepository;
   private final NotificationService notificationService;
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -31,7 +30,6 @@ public class NotificationEventListner {
     log.info("비동기 알림 생성 시작 : type={}", notificationDto.getType());
 
     try {
-
       notificationService.create(notificationDto);
 
       log.info("알림 생성 및 저장 성공");

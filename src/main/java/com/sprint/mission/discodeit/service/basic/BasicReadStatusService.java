@@ -37,7 +37,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
   @CacheEvict(value = "userChannel", key = "#request.user().id")
-  @PreAuthorize("#request.user.id == authentication.principal.id")
+//  @PreAuthorize("#request.user.id == authentication.principal.id")
   @Transactional
   @Override
   public ReadStatusDto createReadStatus(ReadStatusCreateRequest request) {
@@ -90,16 +90,9 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public List<ReadStatus> findAllReadStatusEntitiesByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
-  }
-
-  @Override
-  public List<ReadStatusDto> findAllByChannelId(UUID channelId) {
+  public List<ReadStatus> findAllByChannelId(UUID channelId) {
     // TODO 예외 처리
-    return readStatusRepository.findByChannelId(channelId).stream()
-        .map(readStatusMapper::toDto)
-        .toList();
+    return readStatusRepository.findByChannelId(channelId);
   }
 
 

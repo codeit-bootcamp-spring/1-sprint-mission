@@ -86,7 +86,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  public CompletableFuture<UUID> put(UUID id, byte[] bytes) {
+  public CompletableFuture<Void> put(UUID id, byte[] bytes) {
 //  public UUID put(UUID id, byte[] bytes) {
     log.info("S3 버킷에 객체 업로드 시도");
     String key = id.toString();
@@ -95,7 +95,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
       s3Client.putObject(builder ->
           builder.bucket(bucket).key(key).build(), RequestBody.fromBytes(bytes));
       log.info("S3 버킷에 객체 업로드 완료. key: {}", key);
-      return CompletableFuture.completedFuture(id);
+      return CompletableFuture.completedFuture(null);
 //      return id;
     } catch (Exception e) {
       log.error("S3 업로드 실패. key: {}", key, e);

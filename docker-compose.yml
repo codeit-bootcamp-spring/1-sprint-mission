@@ -1,34 +1,113 @@
-version: '3'
 services:
-  app:
+  # reverse proxy
+  reverse-proxy:
+    container_name: reverse-proxy
+    image: nginx:1.28-alpine # 250423 stable
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./static_files:/usr/share/nginx/html
+    depends_on:
+      - backend
+    networks:
+      - webnet
+
+  # backend
+  backend:
     container_name: discodeit-container
     build:
       context: .
       dockerfile: Dockerfile
-    image: discodeit:prod
-    ports:
-      - "8081:${APP_PORT}"
     env_file:
-      - .env # Docker Compose 에서도 위 설정을 주입할 수 있도록 수정
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:${POSTGRES_PORT}/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - .discodeit/storage:/app/.discodeit/storage
+      - ./.env
+    image: discodeit:prod
     depends_on:
-      - db
+      db:
+        condition: service_healthy # DB 완전히 준비되면
+      redis:
+        condition: service_started # Redis 시작되면 시작
+      kafka:
+        condition: service_started # Kafak 시작되면 시작
+    environment:
+      - JVM_OPTS=-Xms256m -Xmx512m
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:${POSTGRES_PORT}/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    networks:
+      - webnet
+
+  # Database : PostgreSQL
   db:
-    image: postgres:14
+    container_name: postgresDB
+    image: postgres:14-alpine
+    env_file:
+      - ./.env
+    restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
-      - my-postgres-data:/var/lib/postgresql/data # postgres 의 volumes 경로
-      - ./ddl:/docker-entrypoint-initdb.d/
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck: # DB가 정상적으로 연결받을 준비 됐는지 확인
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webnet
+
+  # Memory DB : redis
+  redis:
+    container_name: redis
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - webnet
+
+
+  # Message Broker : 메시지 큐 : Kafka
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:7.3.2
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - webnet
+
+  # Message Broker : kafka
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:7.3.2
+    depends_on:
+      - zookeeper
+    restart: always
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # Zookeeper의 주소
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # 단일 브로커 환경이므로 복제 팩터 1
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092 # (서버 입장) -> 모든 포트에서 받을 수 있도록 열어두는 것
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # (클라이언트 입장) -> 카프카 접속시 사용해야하는 주소
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT # 두 리스너의 이름과 보안 프로토콜 매핑
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT # 브로커들끼리 통신 (단일 브로커라도 필요)
+
+    networks:
+      - webnet
+
+
+networks:
+  webnet:
+    driver: bridge
 
 volumes:
-  my-postgres-data:
+  postgres-data:
+  redis_data:
+  frontend_build:
