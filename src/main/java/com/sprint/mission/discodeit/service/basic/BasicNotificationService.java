@@ -59,7 +59,7 @@ public class BasicNotificationService {
     )
     @CacheEvict(cacheNames = "notificationsByUser", key = "#event.receiverId")
     @Transactional
-    public void send(NotificationEvent event) {
+    public Notification send(NotificationEvent event) {
         Notification notification = Notification.builder()
                 .receiver(User.withId(event.receiverId())) // User.withId()는 직접 만든 정적 팩토리 메서드 (프록시 생성용)
                 .title(event.title())
@@ -68,6 +68,6 @@ public class BasicNotificationService {
                 .targetId(event.targetId())
                 .build();
 
-        notificationRepository.save(notification);
+        return notificationRepository.save(notification);
     }
 }

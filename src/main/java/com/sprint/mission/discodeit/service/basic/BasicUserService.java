@@ -53,6 +53,8 @@ public class BasicUserService implements UserService {
 
   private final NotificationEventPublisher notificationEventPublisher;
 
+  private final SseService sseService;
+
 
   @CacheEvict(cacheNames = "allUsers", allEntries = true)
   @Override
@@ -76,9 +78,38 @@ public class BasicUserService implements UserService {
     //cascade persist
     User saveUser = userRepository.save(user);
 
+
+    // 유저가 생성되고 아이디를 받기 위해서 생성 이후 비동기 호출
+    optionalProfileCreateRequest.ifPresent(request -> {
+      byte[] bytes = request.getBytes();
+      registerUploadAfterCommit(saveUser.getId(), nullableProfile.getId(), bytes);
+    });
+
+    //사용자 목록 갱신 알림
+    notifyAllUsersToRefreshUserList();
+
     log.info("사용자 생성 완료 id: {}", saveUser.getId());
 
     return userMapper.toDto(saveUser, isUserOnline(saveUser));
+  }
+
+  private void registerUploadAfterCommit(UUID userId, UUID binaryContentId, byte[] bytes) {
+    TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+              @Override
+              public void afterCommit() {
+                uploadExecutor.uploadAsync(binaryContentId, bytes, userId);
+              }
+            }
+    );
+  }
+
+  private void notifyAllUsersToRefreshUserList() {
+    List<UUID> allUserIds = userRepository.findAll().stream()
+            .map(User::getId)
+            .toList();
+
+    sseService.sendUserRefreshToAll(allUserIds);
   }
 
   @Override
@@ -121,6 +152,15 @@ public class BasicUserService implements UserService {
 
     log.info("사용자 수정 완료 id: {}", findUser.getId());
 
+    //비동기 호출
+    optionalProfileCreateRequest.ifPresent(request -> {
+      byte[] bytes = request.getBytes();
+      registerUploadAfterCommit(findUser.getId(), nullableProfile.getId(), bytes);
+    });
+
+    //사용자 목록 갱신 알림
+    notifyAllUsersToRefreshUserList();
+
     return userMapper.toDto(findUser, isUserOnline(findUser));
   }
 
@@ -132,6 +172,10 @@ public class BasicUserService implements UserService {
       throw new UserNotFoundException(id);
     }
     userRepository.deleteById(id);
+
+    //사용자 목록 갱신 알림
+    notifyAllUsersToRefreshUserList();
+
     log.info("사용자 삭제 완료 id: {}", id);
   }
 
@@ -167,7 +211,7 @@ public class BasicUserService implements UserService {
               binaryContent.updateUploadStatus(BinaryContentUploadStatus.WAITING);
               BinaryContent saved = binaryContentRepository.save(binaryContent);
 
-              //비동기 업로드 등록 -> 트랜잭션 커밋 이후 실행
+/*              //비동기 업로드 등록 -> 트랜잭션 커밋 이후 실행
               TransactionSynchronizationManager.registerSynchronization(
                       new TransactionSynchronization() {
                         @Override
@@ -176,7 +220,7 @@ public class BasicUserService implements UserService {
                           uploadExecutor.uploadAsync(saved.getId(), bytes, requestId);
                         }
                       }
-              );
+              );*/
 
               return saved;
             })

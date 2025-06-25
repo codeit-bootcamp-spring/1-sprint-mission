@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.3-M11'
+version = '3.0-M12'
 
 java {
     toolchain {
@@ -25,6 +25,9 @@ repositories {
 }
 
 dependencies {
+
+    //웹 소켓
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // Caffeine 캐시
     implementation 'org.springframework.boot:spring-boot-starter-cache'
