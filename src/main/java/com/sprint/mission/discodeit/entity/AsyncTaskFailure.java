@@ -1,37 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
+@Table(name = "async_task_failures")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class AsyncTaskFailure {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class AsyncTaskFailure extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  private UUID id;
+    @Column(nullable = false)
+    private String taskName;
 
-  private String taskName;
+    @Column(nullable = false)
+    private String requestId;
 
-  private String requestId;
+    @Column(nullable = false, columnDefinition = "text")
+    private String failureReason;
 
-  private String failureReason;
-
-  public AsyncTaskFailure(String taskName, String requestId, String failureReason) {
-    this.taskName = taskName;
-    this.requestId = requestId;
-    this.failureReason = failureReason;
-  }
-}
+    public AsyncTaskFailure(String taskName, String requestId, String failureReason) {
+        this.taskName = taskName;
+        this.requestId = requestId;
+        this.failureReason = failureReason;
+    }
+} 
