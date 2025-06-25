@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.response.ChannelDto;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.channel.create.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.create.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.update.ChannelModifyRequest;
@@ -19,7 +20,7 @@ public interface ChannelService {
   void remove(UUID channelId);
 
   // 채널 수정
-  ChannelDto update(UUID channelId, ChannelModifyRequest request);
+  ChannelDto update(UUID channelId, ChannelModifyRequest request, UserDto userDto);
 
   // 유저가 참여 중인 모든 채널 뽑기
   List<ChannelDto> findAllChannelsByUserId(UUID userId);

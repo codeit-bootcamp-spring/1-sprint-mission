@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.jwt.JwtInvalidationException;
 import com.sprint.mission.discodeit.exception.jwt.JwtTokenNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -172,7 +174,32 @@ public class JwtService {
     jwtSessionRepository.deleteAllByRefreshToken(refreshToken);
     log.info("기존 refresh 토큰 삭제: {}", refreshToken);
 
-    UserDto userDto = getUserDto(refreshToken);
+//    UserDto userDto = getUserDto(refreshToken);
+    User user = jwtSession.getUser();
+    User newUser = userRepository.findById(user.getId())
+        .orElseThrow(
+            () -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of(
+                ErrorCode.USER_STATUS_NOT_FOUND.getCode(),
+                ErrorCode.USER_STATUS_NOT_FOUND.getMessage()
+            )));
+
+    BinaryContentDto binaryContentDto;
+    if (user.getProfile() == null) {
+      binaryContentDto = null;
+    } else {
+      binaryContentDto = new BinaryContentDto(newUser.getProfile().getId(),
+          newUser.getProfile().getFileName(),
+          newUser.getProfile().getSize(), newUser.getProfile().getContentType());
+    }
+
+    UserDto userDto = UserDto.builder()
+        .id(newUser.getId())
+        .username(newUser.getUsername())
+        .email(newUser.getEmail())
+        .profile(binaryContentDto)
+        .online(jwtSessionRepository.existsByUser_Id(newUser.getId()))
+        .Role(newUser.getRole())
+        .build();
 
     String accessToken = createAccessToken(userDto);
     log.info("새로운 access 토큰 생성: {}", accessToken);
@@ -180,7 +207,6 @@ public class JwtService {
     String newRefreshToken = generateRefreshToken(userDto);
     log.info("새로운 refresh 토큰 생성: {}", newRefreshToken);
 
-    User user = userRepository.findUserByUsername(userDto.username());
     JwtSession newSession = new JwtSession(accessToken, newRefreshToken, user);
     jwtSessionRepository.save(newSession);
 

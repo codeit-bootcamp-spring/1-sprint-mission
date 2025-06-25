@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.2-M10'
+version = '3.0-M12'
 
 java {
     toolchain { languageVersion = JavaLanguageVersion.of(17) }
@@ -33,9 +33,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.kafka:spring-kafka'
 
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 //    implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
 //    implementation("com.github.ben-manes.caffeine:guava:3.2.0")
 //    implementation("com.github.ben-manes.caffeine:jcache:3.2.0")
+
+    implementation 'org.springframework.security:spring-security-messaging'
 
     testImplementation 'org.springframework.batch:spring-batch-test'
     annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"

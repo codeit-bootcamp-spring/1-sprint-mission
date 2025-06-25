@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import static com.sprint.mission.discodeit.dto.response.SseEvent.BIN_STATUS_EVENT;
+import static com.sprint.mission.discodeit.dto.response.SseEvent.NOTI_EVENT;
+
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.NotificationDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentUploadStatus;
@@ -8,8 +13,10 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.message.MessageContentUpdateRequest;
 import com.sprint.mission.discodeit.entity.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.entity.notification.Notification;
+import com.sprint.mission.discodeit.entity.notification.NotificationType;
+import com.sprint.mission.discodeit.entity.status.read.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.events.NotiMessageEvent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.ChannelAuthorNotFoundException;
@@ -20,15 +27,18 @@ import com.sprint.mission.discodeit.mapper.entitymapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.notification.NotificationService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +68,8 @@ public class BasicMessageService implements MessageService {
   private final MessageMapper messageMapper;
   private final ApplicationEventPublisher eventPublisher;
   private final ReadStatusRepository readStatusRepository;
+  private final NotificationService notificationService;
+  private final NotificationRepository notificationRepository;
 
   /**
    * 메세지 만들기
@@ -79,9 +91,10 @@ public class BasicMessageService implements MessageService {
     Message message = createMessage(request, findChannel, findUser);
     message.attachFiles(files);
     messageRepository.save(message);
-    uploadFiles(attachments, files);
+    uploadFiles(request, attachments, files);
 
-    sendNotification(request, message);
+    sendNotification(request, NOTI_EVENT, NotificationType.NEW_MESSAGE, request.content(),
+        request.channelId());
 
     log.info("메세지 전송: {}", message.getId());
     return messageMapper.toDto(message);
@@ -93,11 +106,52 @@ public class BasicMessageService implements MessageService {
    * @author : wongil
    * @Description: 알림 발송
    **/
-  private void sendNotification(MessageCreateRequest request, Message message) {
-        request.authorId(), request.channelId(), message.getContent());
+  private void sendNotification(MessageCreateRequest request, String name,
+      NotificationType notificationType, String content, UUID targetId) {
 
-    eventPublisher.publishEvent(
-        new NotiMessageEvent(request.authorId(), request.channelId(), message.getContent()));
+    List<ReadStatus> enabledNotification = readStatusRepository.findAllByChannel_IdAndNotificationEnabled(
+        request.channelId(), true);
+    List<UUID> enableUser = enabledNotification.stream()
+        .map(readStatus -> readStatus.getUser().getId())
+        .filter(userId -> !userId.equals(request.authorId()))
+        .toList();
+
+    enableUser.forEach(userId -> {
+
+      User receiver = getUser(userId);
+      User sender = getUser(request.authorId());
+
+      Notification notification = getNotification(receiver, sender, content,
+          targetId, notificationType);
+      notificationRepository.save(notification);
+
+      NotificationDto dto = toDto(request, notification, notificationType);
+      notificationService.sendEvent(userId, name, dto);
+    });
+  }
+
+  private void sendUploadNotification(MessageCreateRequest request, String name,
+      NotificationType notificationType, String content, UUID targetId,
+      BinaryContent binaryContent) {
+
+    readStatusRepository.findAllByChannel_IdAndNotificationEnabled(request.channelId(), true)
+        .stream()
+        .map(readStatus -> readStatus.getUser().getId())
+        .filter(userId -> userId.equals(request.authorId()))
+        .forEach(userId -> {
+          BinaryContentDto dto = toDto(binaryContent);
+          notificationService.sendEvent(userId, name, dto);
+        });
+  }
+
+  private BinaryContentDto toDto(BinaryContent binaryContent) {
+    BinaryContentDto dto = BinaryContentDto.builder()
+        .id(binaryContent.getId())
+        .fileName(binaryContent.getFileName())
+        .size(binaryContent.getSize())
+        .contentType(binaryContent.getContentType())
+        .build();
+    return dto;
   }
 
 
@@ -158,16 +212,25 @@ public class BasicMessageService implements MessageService {
   }
 
   // 파일 업로드
-  private void uploadFiles(List<MultipartFile> attachments, List<BinaryContent> files) {
+  private void uploadFiles(MessageCreateRequest request, List<MultipartFile> attachments,
+      List<BinaryContent> files) {
     if (attachments != null) {
+      sendUploadNotification(request, BIN_STATUS_EVENT, NotificationType.FILE_UPLOAD, "파일 업로드 중",
+          request.authorId(), files.get(0));
+
       attachments.forEach(file -> files.forEach(bin -> {
         try {
           binaryContentStorage.put(bin.getId(), file.getBytes());
           bin.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
           log.info("파일 업로드: {}", bin.getFileName());
+          sendUploadNotification(request, BIN_STATUS_EVENT, NotificationType.FILE_UPLOAD,
+              "파일 업로드 완료",
+              request.authorId(), bin);
         } catch (IOException e) {
           log.error("업로드 실패: {}", bin.getFileName());
           bin.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+          sendUploadNotification(request, BIN_STATUS_EVENT, NotificationType.FILE_UPLOAD, "파일 실패",
+              request.authorId(), bin);
           throw new RuntimeException(e);
         }
       }));
@@ -248,4 +311,38 @@ public class BasicMessageService implements MessageService {
     return mapper.fromPage(page);
   }
 
+  private User getUser(UUID userId) {
+    return userRepository.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
+            Map.of(
+                ErrorCode.USER_NOT_FOUND.getCode(),
+                ErrorCode.USER_NOT_FOUND.getMessage()
+            )));
+  }
+
+  private Notification getNotification(User receiver, User sender, String content, UUID targetId,
+      NotificationType notificationType) {
+
+    return Notification.builder()
+        .receiver(receiver)
+        .type(notificationType)
+        .title(sender.getUsername())
+        .content(content)
+        .targetId(targetId)
+        .build();
+  }
+
+  private NotificationDto toDto(MessageCreateRequest request,
+      Notification notification, NotificationType notificationType) {
+
+    return NotificationDto.builder()
+        .id(notification.getId())
+        .createdAt(notification.getCreatedAt())
+        .receiverId(notification.getReceiver().getId())
+        .title(notification.getTitle())
+        .content(notification.getContent())
+        .type(notificationType)
+        .targetId(Optional.of(request.channelId()))
+        .build();
+  }
 }

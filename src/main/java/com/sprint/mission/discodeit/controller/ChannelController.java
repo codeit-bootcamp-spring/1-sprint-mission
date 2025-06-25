@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.response.ChannelDto;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.channel.create.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.create.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.update.ChannelModifyRequest;
+import com.sprint.mission.discodeit.security.jwt.JwtHeader;
+import com.sprint.mission.discodeit.security.jwt.JwtUtils;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -32,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChannelController {
 
   private final ChannelService channelService;
+  private final JwtUtils jwtUtils;
 
   /**
    * public 채널 생성
@@ -78,10 +83,14 @@ public class ChannelController {
   @Operation(summary = "채널 정보 수정")
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @PatchMapping("/{channelId}")
-  public ChannelDto updateChannel(@NotNull @PathVariable("channelId") UUID channelId,
-      @Validated @RequestBody ChannelModifyRequest request) {
+  public ChannelDto updateChannel(
+      @NotNull @PathVariable("channelId") UUID channelId,
+      @Validated @RequestBody ChannelModifyRequest request,
+      @RequestHeader(JwtHeader.JWT_HEADER) String token) {
 
-    return channelService.update(channelId, request);
+    UserDto userDto = jwtUtils.parseUserDto(token);
+
+    return channelService.update(channelId, request, userDto);
   }
 
   /**

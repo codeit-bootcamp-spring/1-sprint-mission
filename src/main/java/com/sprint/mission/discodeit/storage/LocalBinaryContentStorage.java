@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.exception.async.AsyncTaskFailure;
 import com.sprint.mission.discodeit.exception.binary.FailReadBinaryContent;
 import com.sprint.mission.discodeit.exception.binary.NotSavedBinaryContentException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.service.notification.NotificationService;
 import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -43,13 +44,16 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
+  private final NotificationService notificationService;
   private final ApplicationEventPublisher eventPublisher;
   private final BinaryContentRepository binaryContentRepository;
   private final Path path;
 
-  public LocalBinaryContentStorage(ApplicationEventPublisher eventPublisher,
+  public LocalBinaryContentStorage(NotificationService notificationService,
+      ApplicationEventPublisher eventPublisher,
       BinaryContentRepository binaryContentRepository,
       @Value("${discodeit.storage.local.root-path}") String path) {
+    this.notificationService = notificationService;
     this.eventPublisher = eventPublisher;
     this.binaryContentRepository = binaryContentRepository;
     this.path = Paths.get(path);

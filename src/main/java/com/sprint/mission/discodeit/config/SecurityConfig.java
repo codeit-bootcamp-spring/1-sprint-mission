@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.JwtSessionRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.status.UserSessionService;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -99,6 +100,7 @@ public class SecurityConfig {
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/api/users", "POST"))
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/api/auth/login", "POST"))
                 .ignoringRequestMatchers(new AntPathRequestMatcher("/api/auth/logout", "POST"))
+                .ignoringRequestMatchers("/ws/**")
         )
         .authorizeHttpRequests(request ->
             request
@@ -114,8 +116,9 @@ public class SecurityConfig {
                     "/assets/**",
                     "/static/index.html",
                     "/static/favicon.ico").permitAll()
-                .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me")
-                .permitAll()
+                .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.REQUEST).permitAll()
+                .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me",
+                    "/ws/**", "/api/sse/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()

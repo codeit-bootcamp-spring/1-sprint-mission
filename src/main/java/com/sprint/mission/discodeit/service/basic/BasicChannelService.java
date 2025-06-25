@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.channel.create.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.create.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.channel.update.ChannelModifyRequest;
+import com.sprint.mission.discodeit.entity.notification.Notification;
+import com.sprint.mission.discodeit.entity.notification.NotificationType;
 import com.sprint.mission.discodeit.entity.status.read.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -21,6 +23,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.notification.NotificationService;
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +32,10 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -43,6 +48,8 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
   private final ChannelMapper mapper;
   private final UserMapper userMapper;
+  private final NotificationService notificationService;
+  private final EntityManager entityManager;
 
   /**
    * 공개채널 생성
@@ -111,23 +118,24 @@ public class BasicChannelService implements ChannelService {
   /**
    * 채널 정보 수정
    */
-  @CacheEvict(cacheNames = "channels", allEntries = true, beforeInvocation = true)
   @Override
-  public ChannelDto update(UUID channelId, ChannelModifyRequest request) {
-    Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND,
-            Map.of(channelId.toString(), ErrorCode.CHANNEL_NOT_FOUND.getMessage())
-        ));
+  public ChannelDto update(UUID channelId, ChannelModifyRequest request, UserDto userDto) {
+    Channel channel = getChannel(channelId);
 
-    if (channel.getType() == ChannelType.PRIVATE) {
-      log.error("Private 채널 수정 시도");
-      throw new PrivateChannelCanNotModifyException(Instant.now(), ErrorCode.MODIFY_PRIVATE_CHANNEL,
-          Map.of(channelId.toString(), ErrorCode.MODIFY_PRIVATE_CHANNEL.getMessage())
-      );
-    }
+    User user = getUser(userDto);
 
     Channel modifiedChannel = channel.modify(request.newName(), request.newDescription());
+    entityManager.flush();
     log.info("채널 수정: {}", channel.getId());
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            notificationService.broadcastEvent(user, "channels.refresh", "channelId", channelId);
+          }
+        }
+    );
 
     return mapper.toDto(modifiedChannel);
   }
@@ -136,8 +144,6 @@ public class BasicChannelService implements ChannelService {
    * 유저가 참여 중인 모든 채널 뽑기
    */
   @Override
-  @Transactional(readOnly = true)
-  @Cacheable(cacheNames = "channels", key = "#root.methodName", sync = true)
   public List<ChannelDto> findAllChannelsByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
       throw new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
@@ -151,6 +157,17 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
+  private Notification getNotification(User receiver, User sender, String content, UUID targetId,
+      NotificationType notificationType) {
+
+    return Notification.builder()
+        .receiver(receiver)
+        .type(notificationType)
+        .title(sender.getUsername())
+        .content(content)
+        .targetId(targetId)
+        .build();
+  }
 
   /**
    * user -> userDto
@@ -169,20 +186,21 @@ public class BasicChannelService implements ChannelService {
   }
 
   // userDTO로 변환 후 저장
+
   private List<UserDto> getParticipants(List<ReadStatus> readStatuses) {
     List<ReadStatus> participantsReadStatus = readStatusRepository.saveAll(readStatuses);
     return getUsers(participantsReadStatus);
   }
-
   // 유저를 찾고, 유저의 readStatus 생성
+
   private List<ReadStatus> createParticipantsReadStatus(List<UUID> participantIds,
       Channel channel, boolean notificationEnabled) {
 
     List<User> users = userRepository.findByIdIn(participantIds);
     return getReadStatuses(users, channel, notificationEnabled);
   }
-
   // 유저 정보로 readStatus 생성
+
   private List<ReadStatus> getReadStatuses(List<User> users, Channel channel,
       boolean notificationEnabled) {
     return users.stream()
@@ -192,13 +210,37 @@ public class BasicChannelService implements ChannelService {
         })
         .toList();
   }
-
   // 채널 객체 생성
+
   private static Channel createChannel(PublicChannelCreateRequest request) {
     return Channel.builder()
         .name(request.name())
         .description(request.description())
         .type(ChannelType.PUBLIC)
         .build();
+  }
+
+  private User getUser(UserDto userDto) {
+    return userRepository.findById(userDto.id())
+        .orElseThrow(
+            () -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of(
+                ErrorCode.USER_STATUS_NOT_FOUND.getCode(),
+                ErrorCode.USER_STATUS_NOT_FOUND.getMessage()
+            )));
+  }
+
+  private Channel getChannel(UUID channelId) {
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND,
+            Map.of(channelId.toString(), ErrorCode.CHANNEL_NOT_FOUND.getMessage())
+        ));
+
+    if (channel.getType() == ChannelType.PRIVATE) {
+      log.error("Private 채널 수정 시도");
+      throw new PrivateChannelCanNotModifyException(Instant.now(), ErrorCode.MODIFY_PRIVATE_CHANNEL,
+          Map.of(channelId.toString(), ErrorCode.MODIFY_PRIVATE_CHANNEL.getMessage())
+      );
+    }
+    return channel;
   }
 }

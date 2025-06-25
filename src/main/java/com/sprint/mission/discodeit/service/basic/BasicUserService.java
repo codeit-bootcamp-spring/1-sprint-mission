@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import static com.sprint.mission.discodeit.dto.response.SseEvent.USER_REFRESH;
+
 import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
@@ -24,6 +26,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.notification.NotificationService;
 import com.sprint.mission.discodeit.service.status.UserSessionService;
 import com.sprint.mission.discodeit.service.util.BinaryContentUtils;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -46,7 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
-@Transactional(readOnly = false)
+@Transactional
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
@@ -58,6 +61,7 @@ public class BasicUserService implements UserService {
   private final UserSessionService userSessionService;
   private final JwtSessionRepository jwtSessionRepository;
   private final JwtService jwtService;
+  private final NotificationService notificationService;
 
   @PersistenceContext
   EntityManager em;
@@ -77,6 +81,8 @@ public class BasicUserService implements UserService {
     User savedMember = saveUser(request, profile);
 
     BinaryContentUtils.saveProfileImg(file, savedMember, binaryContentStorage);
+
+    notificationService.broadcastEvent(savedMember, USER_REFRESH, "userId", savedMember.getId());
 
     return new UserCreateResponse(
         savedMember.getId(),
@@ -158,10 +164,16 @@ public class BasicUserService implements UserService {
       );
     }
 
+    User findUser = userRepository.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND,
+            Map.of(userId.toString(), ErrorCode.USER_NOT_FOUND.getMessage())));
+
     readStatusRepository.deleteAllByuser_id(userId);
     messageRepository.deleteAllByauthor_id(userId);
 
     userRepository.deleteById(userId);
+
+    notificationService.broadcastEvent(findUser, USER_REFRESH, "userId", findUser.getId());
 
     log.info("유저 삭제: {}", userId);
     return userId;
@@ -186,6 +198,8 @@ public class BasicUserService implements UserService {
     changeUser(findUser, request, profile);
     changeJwtAccessToken(userId, refreshToken, findUser);
 
+    notificationService.broadcastEvent(findUser, USER_REFRESH, "userId", findUser.getId());
+
     log.info("유저 수정: {}", userId);
     return new UserUpdateResponse(userId, findUser.getUsername(), findUser.getEmail(),
         BinaryContentMapper.toDto(findUser.getProfile()), true);
@@ -194,11 +208,10 @@ public class BasicUserService implements UserService {
   private void changeJwtAccessToken(UUID userId, String refreshToken, User findUser) {
     // TODO: 유저 정보 변경하면 기존의 토큰 정보가 바뀌지 않아서 프로필 사진이 제대로 안나옴(로그아웃하고 다시 접속하면 됨)
     JwtSession jwtSession = getJwtSession(refreshToken);
-    UserDto userDto = getUserDto(userId, findUser);
-    String accessToken = jwtService.createAccessToken(userDto);
-    jwtSession.setAccessToken(accessToken);
+    jwtSession.setUser(findUser);
 
-    log.info("Jwt Access Token 변경 완료: {}", accessToken);
+    UserDto userDto = getUserDto(userId, findUser);
+    
   }
 
   private JwtSession getJwtSession(String refreshToken) {
@@ -211,14 +224,20 @@ public class BasicUserService implements UserService {
   }
 
   private UserDto getUserDto(UUID userId, User findUser) {
+    BinaryContentDto binaryContentDto;
+    if (findUser.getProfile() != null) {
+      binaryContentDto = new BinaryContentDto(findUser.getProfile().getId(),
+          findUser.getProfile().getFileName(),
+          findUser.getProfile().getSize(), findUser.getProfile().getContentType());
+    } else {
+      binaryContentDto = null;
+    }
     return UserDto.builder()
         .id(userId)
         .username(findUser.getUsername())
         .email(findUser.getEmail())
         .online(userSessionService.isOnline(findUser.getUsername())) // TODO: 토큰기반으로 변경후 수정
-        .profile(
-            new BinaryContentDto(findUser.getProfile().getId(), findUser.getProfile().getFileName(),
-                findUser.getProfile().getSize(), findUser.getProfile().getContentType()))
+        .profile(binaryContentDto)
         .Role(findUser.getRole())
         .build();
   }
@@ -254,6 +273,8 @@ public class BasicUserService implements UserService {
     }
     if (newPassword == null) {
       newPassword = findUser.getPassword();
+    } else {
+      newPassword = passwordEncoder.encode(request.newPassword());
     }
 
     findUser.changeUserInfo(newName, newEmail,
@@ -263,9 +284,6 @@ public class BasicUserService implements UserService {
     if (profile != null) {
       findUser.changeProfile(profile);
     }
-
-    em.flush();
-    em.clear();
 
     BinaryContentUtils.saveProfileImg(file, findUser);
   }
