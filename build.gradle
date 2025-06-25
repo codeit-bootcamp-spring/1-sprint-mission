@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.spirnt.mission'
-version = '2.3-M11'
+version = '3.0-M12'
 
 java {
     toolchain {
@@ -72,14 +72,18 @@ dependencies {
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
     // Kafka
-    implementation 'org.springframework.kafka:spring-kafka'
+//    implementation 'org.springframework.kafka:spring-kafka'
 
     // Redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     // json 직렬화용
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
+//    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+//    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
+//    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // 웹소켓 환경 구성하기
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 }
 
 tasks.named('test') {

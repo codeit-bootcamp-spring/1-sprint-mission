@@ -10,6 +10,7 @@ import com.spirnt.mission.discodeit.exception.ErrorCode;
 import com.spirnt.mission.discodeit.mapper.NotificationMapper;
 import com.spirnt.mission.discodeit.repository.NotificationRepository;
 import com.spirnt.mission.discodeit.service.NotificationService;
+import com.spirnt.mission.discodeit.sse.SseEmitterManager;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final SseEmitterManager emitterManager;
 
     @Transactional
     public List<NotificationDto> create(NotificationCreateEvent event) {
@@ -45,6 +47,12 @@ public class BasicNotificationService implements NotificationService {
                 .collect(Collectors.toList()))
         );
 
+        // sse로 실시간 알림 전송
+        for (Notification notification : notifications) {
+            emitterManager.sendNotification(notification.getReceiver().getId(),
+                notificationMapper.toDto(notification));
+        }
+
         return notificationMapper.toDto(notifications);
     }
 
@@ -52,6 +60,7 @@ public class BasicNotificationService implements NotificationService {
         cacheNames = "notifications",
         key = "#userId"
     )
+    @Transactional(readOnly = true)
     @Override
     public List<NotificationDto> findAll(UUID userId) {
         List<Notification> notifications = notificationRepository.findAllByReceiverId(userId);
@@ -71,4 +80,6 @@ public class BasicNotificationService implements NotificationService {
 
         notificationRepository.delete(notification);
     }
+
+
 }

@@ -11,6 +11,7 @@ import com.spirnt.mission.discodeit.dto.user.UserDto;
 import com.spirnt.mission.discodeit.entity.Channel;
 import com.spirnt.mission.discodeit.entity.ChannelType;
 import com.spirnt.mission.discodeit.entity.Message;
+import com.spirnt.mission.discodeit.entity.base.BaseEntity;
 import com.spirnt.mission.discodeit.exception.Channel.ChannelNotFoundException;
 import com.spirnt.mission.discodeit.exception.Channel.PrivateChannelUpdateException;
 import com.spirnt.mission.discodeit.exception.User.UserNotFoundException;
@@ -22,6 +23,7 @@ import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
 import com.spirnt.mission.discodeit.repository.UserRepository;
 import com.spirnt.mission.discodeit.service.ChannelService;
 import com.spirnt.mission.discodeit.service.ReadStatusService;
+import com.spirnt.mission.discodeit.sse.SseEmitterManager;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -51,12 +53,20 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusService readStatusService;
     private final ReadStatusRepository readStatusRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final SseEmitterManager emitterManager;
 
     @CacheEvict(cacheNames = "channels", allEntries = true)
     @Override
     public ChannelDto createChannelPublic(PublicChannelCreateRequest publicChannelCreateRequest) {
         Channel channel = channelRepository.save(new Channel(publicChannelCreateRequest.name(),
             publicChannelCreateRequest.description(), ChannelType.PUBLIC));
+
+        // sse 알림 전송
+        emitterManager.sendChannelRefreshEvent(
+            userRepository.findAll().stream().map(
+                BaseEntity::getId).toList(),
+            channel.getId());
+
         return channelMapper.toDto(channel,
             getParticipants(channel),
             getLastMessageAt(channel.getId()).orElse(channel.getCreatedAt()));
@@ -77,6 +87,9 @@ public class BasicChannelService implements ChannelService {
         // 캐시 무효화 이벤트 발행
         eventPublisher.publishEvent(
             new PrivateChannelCreateEvent(privateChannelCreateRequest.participantIds()));
+
+        // sse 알림 전송
+        emitterManager.sendChannelRefreshEvent(participantIds, channel.getId());
 
         return channelMapper.toDto(channel,
             getParticipants(channel),
@@ -181,6 +194,11 @@ public class BasicChannelService implements ChannelService {
                 participants
             )
         );
+
+        // sse 알림 전송
+        emitterManager.sendChannelRefreshEvent(
+            getParticipants(channel).stream().map(UserDto::getId).collect(Collectors.toList()),
+            channelId);
         channelRepository.delete(channel);
     }
 

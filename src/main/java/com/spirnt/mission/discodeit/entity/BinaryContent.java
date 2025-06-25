@@ -35,7 +35,6 @@ public class BinaryContent extends BaseEntity {
         this.uploadStatus = BinaryContentUploadStatus.WAITING;
     }
 
-
     // UUID만으로 객체를 비교하기 위해 추가
     @Override
     public boolean equals(Object obj) {

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-
+    @Transactional
     @Override
     public ReadStatusDto create(ReadStatusCreateRequest readStatusCreateRequest) {
         UUID userId = readStatusCreateRequest.userId();
@@ -72,6 +73,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusMapper.toDto(readStatus);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ReadStatusDto find(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
@@ -80,7 +82,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusMapper.toDto(readStatus);
     }
 
-
+    @Transactional(readOnly = true)
     @Override
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId).stream()
@@ -88,6 +90,7 @@ public class BasicReadStatusService implements ReadStatusService {
             .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public ReadStatusDto update(UUID readStatusId,
         ReadStatusUpdateRequest readStatusUpdateRequest) {
@@ -98,10 +101,11 @@ public class BasicReadStatusService implements ReadStatusService {
                 return new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId));
             });
         readStatus.update(readStatusUpdateRequest.newLastReadAt(),
-            readStatusUpdateRequest.notificationEnabled());
+            readStatusUpdateRequest.newNotificationEnabled());
         return readStatusMapper.toDto(readStatus);
     }
 
+    @Transactional
     @Override
     public void delete(UUID id) {
         readStatusRepository.deleteById(id);

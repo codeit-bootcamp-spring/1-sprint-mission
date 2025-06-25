@@ -8,7 +8,9 @@ import com.spirnt.mission.discodeit.exception.BinaryContent.BinaryContentNotFoun
 import com.spirnt.mission.discodeit.mapper.BinaryContentMapper;
 import com.spirnt.mission.discodeit.repository.BinaryContentRepository;
 import com.spirnt.mission.discodeit.service.BinaryContentService;
+import com.spirnt.mission.discodeit.sse.SseEmitterManager;
 import com.spirnt.mission.discodeit.storage.BinaryContentStorage;
+import com.spirnt.mission.discodeit.util.BinaryContentStatusUpater;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +29,13 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final SseEmitterManager emitterManager;
+    private final BinaryContentStatusUpater statusUpater;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @Override
-    public BinaryContentDto create(BinaryContentCreateRequest binaryContentCreateRequest) {
+    public BinaryContentDto create(UUID userId,
+        BinaryContentCreateRequest binaryContentCreateRequest) {
         String fileName = binaryContentCreateRequest.fileName();
         byte[] bytes = binaryContentCreateRequest.bytes();
         String contentType = binaryContentCreateRequest.contentType();
@@ -40,20 +45,22 @@ public class BasicBinaryContentService implements BinaryContentService {
             contentType
         );
         binaryContentRepository.save(binaryContent);
+        BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
         // 로컬 스토리지에 저장 = 비동기 메서드
         binaryContentStorage.put(binaryContent.getId(), bytes)
             .thenAccept(binaryContentId -> {
+                log.info("!!!!success로 변경");
                 // 성공 시 upload status SUCCESS로 변경
-                binaryContentRepository.updateUploadStatus(binaryContentId,
-                    BinaryContentUploadStatus.SUCCESS);
+                statusUpater.uploadStatus(binaryContentId, BinaryContentUploadStatus.SUCCESS);
+                emitterManager.sendFileUploadStatus(userId, dto);
             })
             .exceptionally(e -> {
-                // 실패 시 FAILED로 변경
-                binaryContentRepository.updateUploadStatus(binaryContent.getId(),
-                    BinaryContentUploadStatus.FAILED);
+                statusUpater.uploadStatus(binaryContent.getId(), BinaryContentUploadStatus.FAILED);
+                emitterManager.sendFileUploadStatus(userId, dto);
                 return null;
             });
-        return binaryContentMapper.toDto(binaryContent);
+
+        return dto;
     }
 
     @Override

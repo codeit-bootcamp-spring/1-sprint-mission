@@ -18,6 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -38,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController implements MessageApiDocs {
 
     private final MessageService messageService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     // 메시지 전송
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -47,6 +49,11 @@ public class MessageController implements MessageApiDocs {
         log.info("[Creating Message started]");
         MessageDto message = messageService.create(messageCreateRequest, attachments);
         log.info("[Message Created / id:{}]", message.getId());
+
+        // 구독 중인 클라이언트에게 전송
+        String destination = "/sub/channels." + messageCreateRequest.channelId() + ".messages";
+        simpMessagingTemplate.convertAndSend(destination, message);
+
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(message);
     }

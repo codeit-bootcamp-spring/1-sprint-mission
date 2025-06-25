@@ -15,20 +15,20 @@ spring:
   #          name: discodeit
   config:
     import: optional:file:.env[.properties]
-  kafka:
-    bootstrap-servers: host.docker.internal:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    consumer:
-      group-id: discodeit-group
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-  data:
-    redis:
-      host: host.docker.internal
-      port: 6379
+#  kafka:
+#    bootstrap-servers: host.docker.internal:9092
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#    consumer:
+#      group-id: discodeit-group
+#      auto-offset-reset: earliest
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#  data:
+#    redis:
+#      host: host.docker.internal
+#      port: 6379
 server:
   servlet:
     session:

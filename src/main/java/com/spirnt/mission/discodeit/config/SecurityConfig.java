@@ -61,12 +61,14 @@ public class SecurityConfig {
                 .requestMatchers("/api/binaryContents/**").permitAll()
                 // 그 외 API는 최소 ROLE_USER 권한 필요
                 .requestMatchers("/api/**").hasRole("USER")
+                // 웹 소켓 연결 허용
+                .requestMatchers("/ws/**").permitAll()
                 // 그 외 인증 필요
                 .anyRequest().authenticated())
             .csrf(csrf -> csrf
                 // csrf 검증 제외
                 .ignoringRequestMatchers("/api/users", "/api/auth/login",
-                    "/api/auth/logout")
+                    "/api/auth/logout", "/ws/**")
                 .csrfTokenRepository(customCsrfTokenRepository())
                 // 요청으로부터 CSRF 토큰 가져오는 법: form data 또는 요청 헤더로부터 가져오는 CsrfTokenRequestAttributeHandler
                 // -> 쿠키 기반 인증 환경에 적합

@@ -1,6 +1,7 @@
 package com.spirnt.mission.discodeit.repository;
 
 import com.spirnt.mission.discodeit.entity.Notification;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,8 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
     @Query("SELECT n FROM Notification n where n.receiver.id = :receiverId")
     List<Notification> findAllByReceiverId(@Param("receiverId") UUID userId);
+
+
+    List<Notification> findAllByReceiverIdAndCreatedAtAfterOrderByCreatedAt(UUID userId,
+        Instant createdAt);
 }

@@ -58,8 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } else {
             log.info("JWT Token Validation Failed");
-            responseUnauthorized(response, new InvalidJwtTokenException(Map.of("token", token)));
-            return;
+            responseUnauthorized(response, new InvalidJwtTokenException(Map.of()));
         }
     }
 
@@ -82,7 +81,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     "/api/auth/login"))) ||
                 path.equals("/api/auth/csrf-token") ||
                 (method.equals("GET") && path.startsWith("/api/binaryContents") && path.endsWith(
-                    "/download"))
+                    "/download")) ||
+                path.startsWith("/ws/")
         );
     }
 
