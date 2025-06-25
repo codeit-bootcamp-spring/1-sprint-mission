@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +35,9 @@ public class ReadStatusService {
   private final ChannelRepository channelRepository;
   private final ReadStatusMapper readStatusMapper;
 
+  @PreAuthorize("principal.user.id == #dto.userId()")
   @Transactional
-  public ReadStatusResponse create(ReadStatusCreateRequest dto) {
+  public ReadStatusDto create(ReadStatusCreateRequest dto) {
     UUID userId = dto.userId();
     UUID channelId = dto.channelId();
 
@@ -54,7 +58,7 @@ public class ReadStatusService {
         .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("id", id)));
   }
 
-  public List<ReadStatusResponse> findAllByUserId(UUID userId) {
+  public List<ReadStatusDto> findAllByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
       return Collections.emptyList();
     } else {
@@ -64,11 +68,19 @@ public class ReadStatusService {
     }
   }
 
+  @PostAuthorize("principal.user.id == returnObject.userId()")
   @Transactional
-  public ReadStatusResponse update(UUID id, Instant newLastReadAt) {
+  public ReadStatusDto update(UUID id, ReadStatusUpdateRequest request) {
     ReadStatus readStatus = findById(id);
-    readStatus.updateLastReadAt(newLastReadAt);
-    readStatusRepository.save(readStatus);
+    Instant newLastReadAt = request.newLastReadAt();
+    Boolean newNotificationEnabled = request.newNotificationEnabled();
+
+    if (newLastReadAt != null) {
+      readStatus.updateLastReadAt(newLastReadAt);
+    }
+    if (newNotificationEnabled != null) {
+      readStatus.updateNotificationEnabled(newNotificationEnabled);
+    }
     return readStatusMapper.toDto(readStatus);
   }
 

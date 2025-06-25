@@ -9,10 +9,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
-import com.sprint.mission.discodeit.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.Type;
@@ -95,18 +95,18 @@ class MessageServiceTest {
     given(userRepository.findById(authorId)).willReturn(Optional.of(user));
     given(messageRepository.save(any())).willReturn(message);
 
-    MessageResponse messageResponse = new MessageResponse(message.getId(), message.getCreatedAt(),
+    MessageDto messageDto = new MessageDto(message.getId(), message.getCreatedAt(),
         message.getUpdatedAt(), message.getContent(),
-        new UserResponse(user.getId(), user.getUsername(), user.getUsername(), null, false),
+        new UserDto(user.getId(), user.getUsername(), user.getUsername(), null, false),
         message.getChannel().getId(), List.of());
-    given(messageMapper.toDto(message)).willReturn(messageResponse);
+    given(messageMapper.toDto(message)).willReturn(messageDto);
 
-    MessageResponse response = messageService.createMessage(messageCreateRequest, null);
+    MessageDto response = messageService.createMessage(messageCreateRequest, null);
 
-    assertThat(response.id()).isEqualTo(messageResponse.id());
-    assertThat(response.content()).isEqualTo(messageResponse.content());
-    assertThat(response.channelId()).isEqualTo(messageResponse.channelId());
-    assertThat(response.author()).isEqualTo(messageResponse.author());
+    assertThat(response.id()).isEqualTo(messageDto.id());
+    assertThat(response.content()).isEqualTo(messageDto.content());
+    assertThat(response.channelId()).isEqualTo(messageDto.channelId());
+    assertThat(response.author()).isEqualTo(messageDto.author());
   }
 
   @Test
@@ -133,7 +133,7 @@ class MessageServiceTest {
     Message message = Message.create(user, content, channel, List.of(binaryContent));
     ReflectionTestUtils.setField(message, "id", messageId);
 
-    List<BinaryContentResponse> attachments = message.getAttachments().stream()
+    List<BinaryContentDto> attachments = message.getAttachments().stream()
         .map(binaryContentMapper::toDto)
         .toList();
 
@@ -142,15 +142,15 @@ class MessageServiceTest {
     given(userRepository.findById(authorId)).willReturn(Optional.of(user));
     given(messageRepository.save(any())).willReturn(message);
 
-    MessageResponse messageResponse = new MessageResponse(message.getId(), message.getCreatedAt(),
+    MessageDto messageDto = new MessageDto(message.getId(), message.getCreatedAt(),
         message.getUpdatedAt(), message.getContent(),
-        new UserResponse(user.getId(), user.getUsername(), user.getUsername(), null, false),
+        new UserDto(user.getId(), user.getUsername(), user.getUsername(), null, false),
         message.getChannel().getId(), attachments);
-    given(messageMapper.toDto(message)).willReturn(messageResponse);
+    given(messageMapper.toDto(message)).willReturn(messageDto);
 
-    MessageResponse response = messageService.createMessage(messageCreateRequest, List.of(file));
+    MessageDto response = messageService.createMessage(messageCreateRequest, List.of(file));
 
-    assertThat(response).isEqualTo(messageResponse);
+    assertThat(response).isEqualTo(messageDto);
 
     verify(binaryContentStorage).put(any(), any());
     verify(binaryContentRepository).save(any());
@@ -214,24 +214,24 @@ class MessageServiceTest {
     UUID channelId = UUID.randomUUID();
     Pageable pageable = PageRequest.of(0, 10);
     Instant createdAt = Instant.now();
-    MessageResponse messageResponse = new MessageResponse(
+    MessageDto messageDto = new MessageDto(
         UUID.randomUUID(),
         createdAt,
         createdAt,
         "message",
-        mock(UserResponse.class),
+        mock(UserDto.class),
         channelId,
         List.of()
     );
 
     given(messageRepository.findPageByChannelId(channelId, pageable))
         .willReturn(new SliceImpl<>(List.of(mock(Message.class)), pageable, false));
-    given(messageMapper.toDto(any())).willReturn(messageResponse);
+    given(messageMapper.toDto(any())).willReturn(messageDto);
 
-    PageResponse<MessageResponse> pageResponse =
+    PageResponse<MessageDto> pageResponse =
         messageService.readAllByChannelId(channelId, null, pageable);
 
-    assertThat(pageResponse.content().get(0)).isEqualTo(messageResponse);
+    assertThat(pageResponse.content().get(0)).isEqualTo(messageDto);
     assertThat(pageResponse.size()).isEqualTo(pageable.getPageSize());
     assertThat(pageResponse.hasNext()).isFalse();
     assertThat(pageResponse.nextCursor()).isEqualTo(createdAt);
@@ -247,36 +247,36 @@ class MessageServiceTest {
     Pageable pageable = PageRequest.of(0, 10);
     Instant cursor = Instant.parse("2024-04-02T00:00:00Z");
     Message message1 = mock(Message.class);
-    MessageResponse messageResponse1 = new MessageResponse(
+    MessageDto messageDto1 = new MessageDto(
         UUID.randomUUID(),
         Instant.parse("2024-04-01T00:00:00Z"),
         Instant.parse("2024-04-01T00:00:00Z"),
         "message1",
-        mock(UserResponse.class),
+        mock(UserDto.class),
         channelId,
         List.of()
     );
-    MessageResponse messageResponse2 = new MessageResponse(
+    MessageDto messageDto2 = new MessageDto(
         UUID.randomUUID(),
         Instant.parse("2024-04-03T00:00:00Z"),
         Instant.parse("2024-04-03T00:00:00Z"),
         "message2",
-        mock(UserResponse.class),
+        mock(UserDto.class),
         channelId,
         List.of()
     );
 
     given(messageRepository.findPageByChannelIdWithCursor(channelId, cursor, pageable))
         .willReturn(new SliceImpl<>(List.of(message1), pageable, false));
-    given(messageMapper.toDto(message1)).willReturn(messageResponse1);
+    given(messageMapper.toDto(message1)).willReturn(messageDto1);
 
-    PageResponse<MessageResponse> pageResponse =
+    PageResponse<MessageDto> pageResponse =
         messageService.readAllByChannelId(channelId, cursor, pageable);
 
-    assertThat(pageResponse.content().get(0)).isEqualTo(messageResponse1);
+    assertThat(pageResponse.content().get(0)).isEqualTo(messageDto1);
     assertThat(pageResponse.size()).isEqualTo(pageable.getPageSize());
     assertThat(pageResponse.hasNext()).isFalse();
-    assertThat(pageResponse.nextCursor()).isEqualTo(messageResponse1.createdAt());
+    assertThat(pageResponse.nextCursor()).isEqualTo(messageDto1.createdAt());
     assertThat(pageResponse.totalElements()).isNull();
 
     verify(messageRepository, never()).findPageByChannelId(any(), any());
@@ -292,12 +292,12 @@ class MessageServiceTest {
 
     given(messageRepository.findById(messageId)).willReturn(Optional.of(message));
     given(messageMapper.toDto(message)).willAnswer(i ->
-        new MessageResponse(messageId, message.getCreatedAt(), message.getUpdatedAt(),
+        new MessageDto(messageId, message.getCreatedAt(), message.getUpdatedAt(),
             message.getContent(), null, null, null));
 
-    MessageResponse messageResponse = messageService.updateMessage(messageId, newContent);
+    MessageDto messageDto = messageService.updateMessage(messageId, newContent);
 
-    assertThat(messageResponse.content()).isEqualTo(newContent);
+    assertThat(messageDto.content()).isEqualTo(newContent);
   }
 
   @Test

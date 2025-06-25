@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.docs;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,14 +22,14 @@ public interface BinaryContentControllerDocs {
       @ApiResponse(responseCode = "404", description = "파일을 찾을 수 없음")
   })
   @GetMapping("/{id}")
-  ResponseEntity<BinaryContentResponse> getBinaryContentById(@PathVariable UUID id);
+  ResponseEntity<BinaryContentDto> getBinaryContentById(@PathVariable UUID id);
 
   @Operation(summary = "파일 여러개 조회")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "파일 조회 성공")
   })
   @GetMapping
-  ResponseEntity<List<BinaryContentResponse>> getBinaryContents(
+  ResponseEntity<List<BinaryContentDto>> getBinaryContents(
       @RequestParam List<UUID> binaryContentIds);
 
   @Operation(summary = "파일 다운로드")

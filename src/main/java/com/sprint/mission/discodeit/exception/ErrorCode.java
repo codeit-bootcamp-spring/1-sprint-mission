@@ -26,7 +26,9 @@ public enum ErrorCode {
   FILE_READ_FAIL("파일 조회 실패", 500),
   FILE_DELETE_FAIL("파일 삭제 실패", 500),
 
-  VALIDATION_FAIL("잘못된 요청 값", 400),
+  INVALID_TOKEN("유효하지 않은 토큰", 401),
+  TOKEN_NOT_FOUND("토큰을 찾을 수 없음", 401),
+
   UNKNOWN_EXCEPTION("서버 오류", 500);
 
   private final String message;

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent.UploadStatus;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ public class BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentMapper binaryContentMapper;
+  private final SseService sseService;
 
   @Transactional
   public BinaryContent create(MultipartFile file) {
@@ -35,11 +37,13 @@ public class BinaryContentService {
 
     BinaryContent content = binaryContentRepository
         .save(BinaryContent.create(size, fileName, contentType));
+    byte[] data;
     try {
-      binaryContentStorage.put(content.getId(), file.getBytes());
+      data = file.getBytes();
     } catch (IOException e) {
-      throw new FileCreateException(Map.of());
+      throw new RuntimeException(e);
     }
+    binaryContentStorage.put(content.getId(), data);
 
     return content;
   }
@@ -54,7 +58,16 @@ public class BinaryContentService {
         .toList();
   }
 
-  public BinaryContentResponse find(UUID id) {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void markStatusAndPush(UUID userId, UUID id, UploadStatus status) {
+    binaryContentRepository.updateStatus(id, status);
+    binaryContentRepository.findById(id).ifPresent(entity -> {
+      BinaryContentDto dto = binaryContentMapper.toDto(entity);
+      sseService.push(userId, "binaryContents.status", dto);
+    });
+  }
+
+  public BinaryContentDto find(UUID id) {
     BinaryContent content = binaryContentRepository.findById(id)
         .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("id", id)));
     return binaryContentMapper.toDto(content);

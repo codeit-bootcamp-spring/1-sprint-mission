@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.Channel.Type;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,21 +39,31 @@ public class ReadStatus extends BaseUpdatableEntity {
   @Column(nullable = false)
   private Instant lastReadAt;
 
+  @Column(nullable = false)
+  private boolean notificationEnabled;
+
   @Builder(access = AccessLevel.PRIVATE)
-  private ReadStatus(User user, Channel channel) {
+  private ReadStatus(User user, Channel channel, boolean notificationEnabled) {
     this.user = user;
     this.channel = channel;
     this.lastReadAt = Instant.now();
+    this.notificationEnabled = notificationEnabled;
   }
 
   public static ReadStatus create(User user, Channel channel) {
+    boolean notificationEnabled = channel.getType() == Type.PRIVATE;
     return ReadStatus.builder()
         .user(user)
         .channel(channel)
+        .notificationEnabled(notificationEnabled)
         .build();
   }
 
   public void updateLastReadAt(Instant lastReadAt) {
     this.lastReadAt = lastReadAt;
+  }
+
+  public void updateNotificationEnabled(boolean notificationEnabled) {
+    this.notificationEnabled = notificationEnabled;
   }
 }

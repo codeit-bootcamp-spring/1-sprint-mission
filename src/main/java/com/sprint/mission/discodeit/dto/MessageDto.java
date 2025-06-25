@@ -1,17 +1,17 @@
-package com.sprint.mission.discodeit.dto.response;
+package com.sprint.mission.discodeit.dto;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record MessageResponse(
+public record MessageDto(
     UUID id,
     Instant createdAt,
     Instant updatedAt,
     String content,
-    UserResponse author,
+    UserDto author,
     UUID channelId,
-    List<BinaryContentResponse> attachments
+    List<BinaryContentDto> attachments
 ) {
 
 }

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.docs;
 
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,7 +32,7 @@ public interface MessageControllerDocs {
       @ApiResponse(responseCode = "404", description = "채널 혹은 유저를 찾을 수 없음")
   })
   @PostMapping
-  ResponseEntity<MessageResponse> createMessage(
+  ResponseEntity<MessageDto> createMessage(
       @RequestPart MessageCreateRequest messageCreateRequest,
       @RequestPart(required = false) List<MultipartFile> attachments
   );
@@ -40,7 +40,7 @@ public interface MessageControllerDocs {
   @Operation(summary = "채널의 모든 메세지 조회")
   @ApiResponse(responseCode = "200", description = "메세지 목록 조회 성공")
   @GetMapping
-  ResponseEntity<PageResponse<MessageResponse>> getMessages(
+  ResponseEntity<PageResponse<MessageDto>> getMessages(
       @RequestParam UUID channelId,
       @RequestParam Instant cursor,
       Pageable pageable
@@ -52,7 +52,7 @@ public interface MessageControllerDocs {
       @ApiResponse(responseCode = "404", description = "메세지를 찾을 수 없음")
   })
   @PatchMapping("/{id}")
-  ResponseEntity<MessageResponse> updateMessage(
+  ResponseEntity<MessageDto> updateMessage(
       @PathVariable UUID id,
       @RequestBody MessageUpdateRequest messageUpdateRequest
   );

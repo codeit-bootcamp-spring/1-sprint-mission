@@ -1,30 +1,41 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.config.CacheName;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.binarycontent.file.FileCreateException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserEmailDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNameDuplicateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -34,46 +45,54 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
+  private final SseService sseService;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Transactional
-  public UserResponse createUser(UserCreateRequest userCreateRequest, MultipartFile profile) {
+  @CacheEvict(cacheNames = CacheName.USERS, key = "'all'")
+  public UserDto createUser(UserCreateRequest userCreateRequest, MultipartFile profile) {
     log.debug("createUser() 호출");
     duplicationCheck(userCreateRequest.username(), userCreateRequest.email());
 
     String encodedPassword = passwordEncoder.encode(userCreateRequest.password());
     User newUser = User.create(userCreateRequest.username(), userCreateRequest.email(),
         encodedPassword);
-    BinaryContent content = createProfile(profile);
-
     newUser = userRepository.save(newUser);
+    BinaryContent content = createProfile(newUser.getId(), profile);
+
     newUser.updateProfile(content);
     log.info("User 생성. id: {}", newUser.getId());
-    UserStatus userStatus = userStatusRepository.save(UserStatus.create(newUser));
-    log.info("UserStatus 생성. id: {}", userStatus.getId());
 
     return userMapper.toDto(newUser);
   }
 
-  public List<UserResponse> readAll() {
+  @Cacheable(cacheNames = CacheName.USERS, key = "'all'", unless = "#result.isEmpty()")
+  public List<UserDto> readAll() {
     log.debug("readAll() 호출");
-    return userRepository.findAllWithProfileAndStatus().stream()
-        .map(userMapper::toDto)
+    Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
+        .map(JwtSession::getUserId)
+        .collect(Collectors.toSet());
+
+    return userRepository.findAllWithProfile().stream()
+        .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
         .toList();
   }
 
   @Transactional
-  public UserResponse updateUser(UUID userId, UserUpdateRequest userUpdateRequest,
+  @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
+  @CacheEvict(cacheNames = CacheName.USERS, key = "'all'")
+  public UserDto updateUser(UUID userId, UserUpdateRequest userUpdateRequest,
       MultipartFile profile) {
     log.debug("updateUser() 호출");
     String newEmail = userUpdateRequest.newEmail();
     String newUsername = userUpdateRequest.newUsername();
     String newPassword = userUpdateRequest.newPassword();
-    User user = userRepository.findByIdWithProfileAndStatus(userId)
+    User user = userRepository.findByIdWithProfile(userId)
         .orElseThrow(() -> new UserNotFoundException(Map.of("id", userId)));
 
     if (newEmail != null) {
@@ -93,7 +112,7 @@ public class UserService {
     }
     if (profile != null) {
       user.getProfile().ifPresent(content -> binaryContentStorage.delete(content.getId()));
-      BinaryContent content = createProfile(profile);
+      BinaryContent content = createProfile(userId, profile);
       user.updateProfile(content);
     }
 
@@ -103,9 +122,11 @@ public class UserService {
   }
 
   @Transactional
+  @PreAuthorize("hasRole('ADMIN') or principal.user.id == #userId")
+  @CacheEvict(cacheNames = CacheName.USERS, key = "'all'")
   public void deleteUser(UUID userId) {
     log.debug("deleteUser() 호출");
-    userRepository.findByIdWithProfileAndStatus(userId)
+    userRepository.findByIdWithProfile(userId)
         .ifPresent(user -> {
           user.getProfile().ifPresent(content -> binaryContentStorage.delete(content.getId()));
           log.info("user 삭제. id: {}", user.getId());
@@ -122,7 +143,7 @@ public class UserService {
   }
 
 
-  private BinaryContent createProfile(MultipartFile profile) {
+  private BinaryContent createProfile(UUID userId, MultipartFile profile) {
     log.debug("createProfile() 호출");
     if (profile == null || profile.isEmpty()) {
       return null;
@@ -135,12 +156,35 @@ public class UserService {
     BinaryContent content = binaryContentRepository
         .save(BinaryContent.create(size, fileName, contentType));
     log.info("BinaryContent 생성. id: {}", content.getId());
+    byte[] data;
     try {
-      binaryContentStorage.put(content.getId(), profile.getBytes());
+      data = profile.getBytes();
     } catch (IOException e) {
-      log.error("파일 생성 실패");
       throw new FileCreateException(Map.of());
     }
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            binaryContentStorage.put(content.getId(), data)
+                .thenAccept(id -> {
+                  binaryContentRepository.updateStatus(id, UploadStatus.SUCCESS);
+                  binaryContentRepository.findById(id).ifPresent(binaryContent -> {
+                    BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
+                    sseService.push(userId, "binaryContents.status", dto);
+                  });
+                })
+                .exceptionally(e -> {
+                  binaryContentRepository.updateStatus(content.getId(), UploadStatus.FAILED);
+                  binaryContentRepository.findById(content.getId()).ifPresent(binaryContent -> {
+                    BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
+                    sseService.push(userId, "binaryContents.status", dto);
+                  });
+                  return null;
+                });
+          }
+        });
 
     return content;
   }

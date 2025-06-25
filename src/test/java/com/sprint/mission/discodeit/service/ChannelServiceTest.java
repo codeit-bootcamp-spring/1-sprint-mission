@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 
 import com.sprint.mission.discodeit.dto.request.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.ChannelResponse;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.Type;
 import com.sprint.mission.discodeit.entity.Message;
@@ -23,7 +23,6 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapperImpl;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.UserMapperImpl;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -82,9 +81,9 @@ class ChannelServiceTest {
 
     given(channelRepository.save(any(Channel.class))).willReturn(channel);
     given(channelMapper.toDto(any(Channel.class)))
-        .willReturn(ChannelResponse.of(channel, channel.getCreatedAt(), null));
+        .willReturn(ChannelDto.of(channel, channel.getCreatedAt(), null));
 
-    ChannelResponse publicChannel = channelService.createPublicChannel(publicChannelRequest);
+    ChannelDto publicChannel = channelService.createPublicChannel(publicChannelRequest);
 
     assertThat(publicChannel.id()).isEqualTo(channel.getId());
     assertThat(publicChannel.name()).isEqualTo(channel.getName());
@@ -103,22 +102,22 @@ class ChannelServiceTest {
     User test2 = User.create("test1", "test1", "tset1");
     ReflectionTestUtils.setField(test1, "id", userIds.get(0));
     ReflectionTestUtils.setField(test2, "id", userIds.get(1));
-    List<UserResponse> userResponses = Stream.of(test1, test2)
+    List<UserDto> userRespons = Stream.of(test1, test2)
         .map(userMapper::toDto)
         .toList();
     given(userRepository.findById(test1.getId())).willReturn(Optional.of(test1));
     given(userRepository.findById(test2.getId())).willReturn(Optional.of(test2));
     given(channelMapper.toDto(any(Channel.class)))
-        .willReturn(ChannelResponse.of(channel, channel.getCreatedAt(), userResponses));
+        .willReturn(ChannelDto.of(channel, channel.getCreatedAt(), userRespons));
 
-    ChannelResponse privateChannel = channelService.createPrivateChannel(userIds);
+    ChannelDto privateChannel = channelService.createPrivateChannel(userIds);
 
     assertThat(privateChannel.id()).isEqualTo(channel.getId());
     assertThat(privateChannel.name()).isNull();
     assertThat(privateChannel.description()).isNull();
     assertThat(privateChannel.type()).isEqualTo(Type.PRIVATE);
-    assertThat(privateChannel.participants()).containsExactlyInAnyOrder(userResponses.get(0),
-        userResponses.get(1));
+    assertThat(privateChannel.participants()).containsExactlyInAnyOrder(userRespons.get(0),
+        userRespons.get(1));
   }
 
   @Test
@@ -138,19 +137,19 @@ class ChannelServiceTest {
     given(readStatusRepository.findByUserId(userId)).willReturn(List.of(readStatus));
     given(channelRepository.findAll()).willReturn(List.of(channel1, channel2, channel3));
 
-    ChannelResponse publicChannelResponse = ChannelResponse.of(channel1, channel1.getCreatedAt(),
+    ChannelDto publicChannelDto = ChannelDto.of(channel1, channel1.getCreatedAt(),
         null);
-    ChannelResponse privateChannelResponse = ChannelResponse.of(channel2, channel2.getCreatedAt(),
+    ChannelDto privateChannelDto = ChannelDto.of(channel2, channel2.getCreatedAt(),
         null);
-    given(channelMapper.toDto(channel1)).willReturn(publicChannelResponse);
-    given(channelMapper.toDto(channel2)).willReturn(privateChannelResponse);
+    given(channelMapper.toDto(channel1)).willReturn(publicChannelDto);
+    given(channelMapper.toDto(channel2)).willReturn(privateChannelDto);
 
-    List<ChannelResponse> channelResponses = channelService.readAllByUserId(userId);
+    List<ChannelDto> channelRespons = channelService.readAllByUserId(userId);
 
-    assertThat(channelResponses)
-        .containsExactlyInAnyOrder(publicChannelResponse, privateChannelResponse);
-    assertThat(channelResponses)
-        .doesNotContain(ChannelResponse.of(channel3, channel3.getCreatedAt(), null));
+    assertThat(channelRespons)
+        .containsExactlyInAnyOrder(publicChannelDto, privateChannelDto);
+    assertThat(channelRespons)
+        .doesNotContain(ChannelDto.of(channel3, channel3.getCreatedAt(), null));
   }
 
   @Test
@@ -177,15 +176,15 @@ class ChannelServiceTest {
     given(channelRepository.findById(channelId))
         .willReturn(Optional.of(channel));
     given(channelMapper.toDto(channel))
-        .willAnswer(i -> ChannelResponse.of(channel, channel.getCreatedAt(), null));
+        .willAnswer(i -> ChannelDto.of(channel, channel.getCreatedAt(), null));
 
-    ChannelResponse channelResponse = channelService.updateChannel(channelId,
+    ChannelDto channelDto = channelService.updateChannel(channelId,
         publicChannelUpdateRequest);
 
-    assertThat(channelResponse.id()).isEqualTo(channelId);
-    assertThat(channelResponse.name()).isEqualTo(newName);
-    assertThat(channelResponse.description()).isEqualTo(newDescription);
-    assertThat(channelResponse.type()).isEqualTo(Type.PUBLIC);
+    assertThat(channelDto.id()).isEqualTo(channelId);
+    assertThat(channelDto.name()).isEqualTo(newName);
+    assertThat(channelDto.description()).isEqualTo(newDescription);
+    assertThat(channelDto.type()).isEqualTo(Type.PUBLIC);
   }
 
   @Test

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.response.ChannelResponse;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -21,18 +21,18 @@ public class ChannelMapper {
   private final ReadStatusRepository readStatusRepository;
   private final UserMapper userMapper;
 
-  public ChannelResponse toDto(Channel channel) {
+  public ChannelDto toDto(Channel channel) {
     List<Message> messages = messageRepository.findByChannel_Id(channel.getId());
     Instant latestMessageTime = messages.stream()
         .max(Comparator.comparing(Message::getCreatedAt))
         .map(Message::getCreatedAt)
         .orElse(channel.getCreatedAt());
 
-    List<UserResponse> participants = readStatusRepository.findByChannel(channel).stream()
+    List<UserDto> participants = readStatusRepository.findByChannel(channel).stream()
         .map(ReadStatus::getUser)
         .map(userMapper::toDto)
         .toList();
 
-    return ChannelResponse.of(channel, latestMessageTime, participants);
+    return ChannelDto.of(channel, latestMessageTime, participants);
   }
 }

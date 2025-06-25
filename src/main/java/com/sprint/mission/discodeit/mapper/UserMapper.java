@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import java.util.Optional;
@@ -16,10 +16,15 @@ public abstract class UserMapper {
   protected BinaryContentMapper binaryContentMapper;
 
   @Mapping(source = "profile", target = "profile")
-  @Mapping(source = "status.online", target = "online")
-  public abstract UserResponse toDto(User user);
+  @Mapping(target = "online", ignore = true)
+  public abstract UserDto toDto(User user);
 
-  protected BinaryContentResponse map(Optional<BinaryContent> optionalProfile) {
+  @Mapping(source = "user.profile", target = "profile")
+  @Mapping(target = "online", expression = "java(online)")
+  public abstract UserDto toDto(User user, boolean online);
+
+  protected BinaryContentDto map(Optional<BinaryContent> optionalProfile) {
     return optionalProfile.map(binaryContentMapper::toDto).orElse(null);
   }
+
 }

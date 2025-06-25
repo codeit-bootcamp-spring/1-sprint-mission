@@ -2,75 +2,55 @@ package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.request.UserLoginRequest;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
-import com.sprint.mission.discodeit.mapper.UserMapper;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Slf4j
-@Component
-public class DiscodeitLoginFilter extends AbstractAuthenticationProcessingFilter {
+@RequiredArgsConstructor
+public class DiscodeitLoginFilter extends UsernamePasswordAuthenticationFilter {
 
   private final ObjectMapper objectMapper;
-  private final UserMapper userMapper;
-
-  @Autowired
-  public DiscodeitLoginFilter(
-      AuthenticationManager authenticationManager,
-      ObjectMapper objectMapper,
-      UserMapper userMapper
-  ) {
-    super(new AntPathRequestMatcher("/api/auth/login", "POST"), authenticationManager);
-    this.objectMapper = objectMapper;
-    this.userMapper = userMapper;
-  }
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request,
-      HttpServletResponse response) throws AuthenticationException, IOException {
+      HttpServletResponse response) throws AuthenticationException {
     log.debug("JsonUsernamePasswordAuthenticationFilter 호출");
-    UserLoginRequest userLoginRequest = objectMapper.readValue(request.getInputStream(),
-        UserLoginRequest.class);
+    UserLoginRequest userLoginRequest = null;
+    try {
+      userLoginRequest = objectMapper.readValue(request.getInputStream(),
+          UserLoginRequest.class);
+    } catch (IOException e) {
+      throw new AuthenticationServiceException("Request parsing failed", e);
+    }
 
     UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
         userLoginRequest.username(), userLoginRequest.password());
     return this.getAuthenticationManager().authenticate(token);
   }
 
-  @Override
-  protected void successfulAuthentication(HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain chain,
-      Authentication authResult)
-      throws IOException, ServletException {
-    SecurityContext context = SecurityContextHolder.createEmptyContext();
-    context.setAuthentication(authResult);
+  public static class Configurer extends
+      AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, DiscodeitLoginFilter> {
 
-    SecurityContextRepository repo = new HttpSessionSecurityContextRepository();
-    repo.saveContext(context, request, response);
+    public Configurer(ObjectMapper objectMapper) {
+      super(new DiscodeitLoginFilter(objectMapper), SecurityMatchers.LOGIN_URL);
+    }
 
-    DiscodeitUserDetails principal = (DiscodeitUserDetails) authResult.getPrincipal();
-
-    UserResponse userResponse  = userMapper.toDto(principal.getUser());
-    response.setStatus(HttpStatus.OK.value());
-    response.setContentType("application/json");
-    objectMapper.writeValue(response.getWriter(), userResponse);
+    @Override
+    protected RequestMatcher createLoginProcessingUrlMatcher(String loginProcessingUrl) {
+      return new AntPathRequestMatcher(loginProcessingUrl, HttpMethod.POST.name());
+    }
   }
 }

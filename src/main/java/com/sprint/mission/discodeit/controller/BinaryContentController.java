@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.docs.BinaryContentControllerDocs;
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.ArrayList;
@@ -28,17 +28,15 @@ public class BinaryContentController implements BinaryContentControllerDocs {
 
   @GetMapping("/{id}")
   @Override
-  public ResponseEntity<BinaryContentResponse> getBinaryContentById(@PathVariable UUID id) {
-    log.debug("GET /api/binaryContents/{}", id);
+  public ResponseEntity<BinaryContentDto> getBinaryContentById(@PathVariable UUID id) {
     return ResponseEntity.ok(binaryContentService.find(id));
   }
 
   @GetMapping
   @Override
-  public ResponseEntity<List<BinaryContentResponse>> getBinaryContents(
+  public ResponseEntity<List<BinaryContentDto>> getBinaryContents(
       @RequestParam List<UUID> binaryContentIds) {
-    log.debug("GET /api/binaryContents");
-    ArrayList<BinaryContentResponse> responses = new ArrayList<>(100);
+    ArrayList<BinaryContentDto> responses = new ArrayList<>(100);
 
     binaryContentIds.stream()
         .map(binaryContentService::find)
@@ -49,7 +47,6 @@ public class BinaryContentController implements BinaryContentControllerDocs {
 
   @GetMapping("/{id}/download")
   public ResponseEntity<Resource> getFile(@PathVariable UUID id) {
-    log.debug("GET /api/binaryContents/{}/download", id);
     return binaryContentStorage.download(binaryContentService.find(id));
   }
 }

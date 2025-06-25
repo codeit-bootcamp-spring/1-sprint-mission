@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel.Type;
 import com.sprint.mission.discodeit.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -47,7 +47,7 @@ class ChannelControllerTest {
     PublicChannelRequest request = new PublicChannelRequest("public",
         "public channel");
     UUID channelId = UUID.randomUUID();
-    ChannelResponse channelResponse = new ChannelResponse(
+    ChannelDto channelDto = new ChannelDto(
         channelId,
         Type.PUBLIC,
         request.name(),
@@ -56,7 +56,7 @@ class ChannelControllerTest {
         Instant.now()
     );
 
-    given(channelService.createPublicChannel(any())).willReturn(channelResponse);
+    given(channelService.createPublicChannel(any())).willReturn(channelDto);
 
     mockMvc.perform(post("/api/channels/public")
             .contentType(MediaType.APPLICATION_JSON)
@@ -74,7 +74,7 @@ class ChannelControllerTest {
     UUID userId2 = UUID.randomUUID();
     PrivateChannelRequest request = new PrivateChannelRequest(List.of(userId1, userId2));
     UUID channelId = UUID.randomUUID();
-    ChannelResponse channelResponse = new ChannelResponse(
+    ChannelDto channelDto = new ChannelDto(
         channelId,
         Type.PRIVATE,
         null,
@@ -83,7 +83,7 @@ class ChannelControllerTest {
         Instant.now()
     );
 
-    given(channelService.createPrivateChannel(any())).willReturn(channelResponse);
+    given(channelService.createPrivateChannel(any())).willReturn(channelDto);
 
     mockMvc.perform(post("/api/channels/private")
             .contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +100,7 @@ class ChannelControllerTest {
         "newDescription"
     );
     UUID channelId = UUID.randomUUID();
-    ChannelResponse channelResponse = new ChannelResponse(
+    ChannelDto channelDto = new ChannelDto(
         channelId,
         Type.PUBLIC,
         request.newName(),
@@ -109,7 +109,7 @@ class ChannelControllerTest {
         Instant.now()
     );
 
-    given(channelService.updateChannel(any(), any())).willReturn(channelResponse);
+    given(channelService.updateChannel(any(), any())).willReturn(channelDto);
 
     mockMvc.perform(patch("/api/channels/" + channelId)
             .contentType(MediaType.APPLICATION_JSON)
