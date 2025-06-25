@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller.docs;
 
-import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.request.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -23,6 +24,7 @@ public interface ReadStatusApiDocs {
         @ApiResponse(responseCode = "404", description = "해당 채널이나 유저가 존재하지 않습니다.")
     })
     ResponseEntity<ReadStatusResponse> createReadStatus(
+        @AuthenticationPrincipal CustomUserDetails user,
         @RequestBody ReadStatusRequest.Create readStatusRequest);
 
     @Operation(summary = "수신 상태 업데이트", description = "수신 상태를 업데이트 합니다.")
@@ -32,6 +34,7 @@ public interface ReadStatusApiDocs {
         @ApiResponse(responseCode = "404", description = "해당 수신 상태 정보가 존재하지 않습니다.")
     })
     ResponseEntity<ReadStatusResponse> updateReadStatus(
+        @AuthenticationPrincipal CustomUserDetails user,
         @PathVariable UUID readStatusId,
         @RequestBody ReadStatusRequest.Update readStatusRequest);
 

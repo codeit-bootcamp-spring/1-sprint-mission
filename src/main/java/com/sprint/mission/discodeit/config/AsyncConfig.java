@@ -4,9 +4,11 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Configuration
 @EnableAsync
@@ -38,6 +40,9 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setQueueCapacity(25);
         executor.setThreadNamePrefix("binary-storage-");
         executor.setTaskDecorator(decorator);   // MDC, SecurityContext 유지하기
+        executor.setRejectedExecutionHandler(      // 거부 정책
+            new ThreadPoolExecutor.CallerRunsPolicy()
+        );
         executor.initialize();
         return executor;
     }
@@ -49,8 +54,35 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setMaxPoolSize(10);
         executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("notification-");
+        executor.setRejectedExecutionHandler(      // 거부 정책
+            new ThreadPoolExecutor.CallerRunsPolicy()
+        );
         executor.initialize();
         return executor;
+    }
+
+    @Bean("eventExecutor")
+    public ThreadPoolTaskExecutor eventExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(1000);
+        executor.setThreadNamePrefix("sse-event-");
+        executor.setRejectedExecutionHandler(      // 거부 정책
+            new ThreadPoolExecutor.CallerRunsPolicy()
+        );
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean
+    public TaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(2); // 동시에 2개까지 실행
+        scheduler.setThreadNamePrefix("scheduler-");
+        scheduler.setRemoveOnCancelPolicy(true);
+        scheduler.initialize();
+        return scheduler;
     }
 
     // 기본 Executor 지정

@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
-import com.sprint.mission.discodeit.entity.Notification.NotificationType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.UserListChangedEvent;
+import com.sprint.mission.discodeit.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.global.exception.BusinessException;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -43,7 +43,6 @@ public class BasicAuthService implements AuthService {
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND,
                 Map.of("userId", targetUserId)));
 
-        // 권한 변경
         Role oldRole = targetUser.getRole();
 
         if (newRole == oldRole) {
@@ -58,14 +57,15 @@ public class BasicAuthService implements AuthService {
 
         log.info("사용자 권한 변경: {} -> {} (userId: {})", oldRole, newRole, targetUserId);
 
-        NotificationEvent event = NotificationEvent.builder()
-            .receiverId(targetUserId)
-            .type(NotificationType.ROLE_CHANGED)
-            .targetId(targetUserId)
-            .title("유저 권한이 변경되었습니다.")
-            .content(oldRole + "에서 " + newRole + "(으)로 권한이 변경되었습니다.")
+        UserRoleChangedEvent event = UserRoleChangedEvent.builder()
+            .userId(targetUserId)
+            .newRole(newRole)
+            .oldRole(oldRole)
+            .username(targetUser.getUsername())
             .build();
         eventPublisher.publishEvent(event);
+
+        eventPublisher.publishEvent(new UserListChangedEvent(targetUserId));
 
         return userMapper.entityToDto(targetUser);
     }

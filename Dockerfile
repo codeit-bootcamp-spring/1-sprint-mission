@@ -44,7 +44,7 @@ FROM amazoncorretto:17.0.7-alpine
 WORKDIR /app
 
 ENV PROJECT_NAME=discodeit
-ENV PROJECT_VERSION=1.2-M8
+ENV PROJECT_VERSION=v3.0-M12
 ENV JVM_OPTS=""
 
 COPY --from=builder /app/build/libs/*.jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar

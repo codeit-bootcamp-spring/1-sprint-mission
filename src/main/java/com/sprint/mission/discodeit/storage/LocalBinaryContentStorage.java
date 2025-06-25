@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentOperationException;
-import com.sprint.mission.discodeit.global.monitoring.AsyncTaskFailure;
+import com.sprint.mission.discodeit.global.interceptor.MDCLoggingInterceptor;
+import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -17,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -37,8 +41,17 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     private static final String TASK_NAME = "file-upload-local";
     private final Path root;
 
-    public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path path) {
+    private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+    private final ApplicationEventPublisher eventPublisher;
+
+    public LocalBinaryContentStorage(
+        @Value("${discodeit.storage.local.root-path}") Path path,
+        AsyncTaskFailureRepository asyncTaskFailureRepository,
+        ApplicationEventPublisher eventPublisher
+    ) {
         this.root = path;
+        this.asyncTaskFailureRepository = asyncTaskFailureRepository;
+        this.eventPublisher = eventPublisher;
         init();
     }
 
@@ -130,14 +143,19 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     @Recover
     public CompletableFuture<Void> recover(BinaryContentOperationException e, UUID id,
         byte[] bytes) {
-        String requestId = MDC.get("requestId");
+        UUID requestId = UUID.fromString(MDC.get(MDCLoggingInterceptor.REQUEST_ID));
         String failureReason = e.getMessage();
 
         AsyncTaskFailure failure = new AsyncTaskFailure(TASK_NAME, requestId, failureReason);
-        log.error("Async task failed : {}", failure);
+        asyncTaskFailureRepository.save(failure);
+
+        AsyncTaskFailedEvent event = new AsyncTaskFailedEvent(failure);
+        eventPublisher.publishEvent(event);
 
         CompletableFuture<Void> failed = new CompletableFuture<>();
         failed.completeExceptionally(e);
+
+        log.error("Failed file upload : {}", id);
         return failed;
     }
 

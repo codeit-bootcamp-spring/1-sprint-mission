@@ -6,12 +6,15 @@ import com.sprint.mission.discodeit.dto.response.ChannelResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.PrivateChannelListChangedEvent;
+import com.sprint.mission.discodeit.event.PublicChannelListChangedEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.global.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -27,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,8 +41,10 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelMapper channelMapper;
     private final ReadStatusService readStatusService;
+    private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final CacheManager cacheManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(cacheNames = "channels", allEntries = true)
     @Override
@@ -47,6 +53,8 @@ public class BasicChannelService implements ChannelService {
         Channel newChannel = Channel.createChannel(Channel.ChannelType.PUBLIC, request.getName(),
             request.getDescription());
         channelRepository.save(newChannel);
+
+        eventPublisher.publishEvent(new PublicChannelListChangedEvent(newChannel.getId()));
 
         log.info("Created public channel - id: {}", newChannel.getId());
         return channelMapper.entityToDto(newChannel);
@@ -58,14 +66,18 @@ public class BasicChannelService implements ChannelService {
         Channel newChannel = Channel.createChannel(Channel.ChannelType.PRIVATE, null, null);
         channelRepository.save(newChannel);
 
-        for (UUID userId : request.getParticipantIds()) {
-            readStatusService.create(
+        List<UUID> participantIds = request.getParticipantIds();
+        for (UUID userId : participantIds) {
+            readStatusService.create(userId,
                 new ReadStatusRequest.Create(userId, newChannel.getId(),
                     newChannel.getCreatedAt()));
 
             // 채팅 참여자에 한해 캐시 무효화
             Objects.requireNonNull(cacheManager.getCache("channels")).evict(userId);
         }
+
+        eventPublisher.publishEvent(
+            new PrivateChannelListChangedEvent(participantIds, newChannel.getId()));
 
         log.info("Created private channel - id: {}", newChannel.getId());
         return channelMapper.entityToDto(newChannel);
@@ -101,14 +113,25 @@ public class BasicChannelService implements ChannelService {
         Optional.ofNullable(request.getName()).ifPresent(channel::updateName); // TODO : 같은지 확인
         Optional.ofNullable(request.getDescription()).ifPresent(channel::updateDescription);
 
+        eventPublisher.publishEvent(new PublicChannelListChangedEvent(channel.getId()));
+
         log.info("Updated public channel - id: {}", channel.getId());
         return channelMapper.entityToDto(channel);
     }
 
     @Override
+    public List<UUID> findParticipantIdsById(UUID id) {
+        return readStatusRepository.findParticipantIdsByChannelId(id);
+    }
+
+    @Override
     public void deleteById(UUID id) {
-        findByIdOrThrow(id);
+        Channel channel = findByIdOrThrow(id);
+        List<UUID> userIds = findParticipantIdsById(id);
+
         channelRepository.deleteById(id);
+
+        safelySendChannelDelete(channel.getType(), channel.getId(), userIds);
         log.info("Deleted channel - id: {}", id);
     }
 
@@ -116,6 +139,16 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findById(id)
             .orElseThrow(
                 () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, Map.of("id", id)));
+    }
+
+    public void safelySendChannelDelete(ChannelType type, UUID channelId, List<UUID> userIds) {
+        switch (type) {
+            case PUBLIC ->
+                eventPublisher.publishEvent(new PublicChannelListChangedEvent(channelId));
+            case PRIVATE ->
+                eventPublisher.publishEvent(new PrivateChannelListChangedEvent(userIds, channelId));
+            default -> throw new IllegalArgumentException("지원하지 않는 채널 타입입니다: " + type);
+        }
     }
 
 }

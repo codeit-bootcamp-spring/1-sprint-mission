@@ -17,6 +17,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MessageController implements MessageApiDocs {
 
     private final MessageService messageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -86,5 +89,14 @@ public class MessageController implements MessageApiDocs {
         log.info("GET /api/messages/{} : channelId={}, cursor={}, pageable={}",
             channelId, channelId, cursor, pageable);
         return ResponseEntity.ok((messageService.findAllByChannelId(channelId, cursor, pageable)));
+    }
+
+    @MessageMapping("/messages")
+    public void sendMessage(MessageRequest.Create messageRequest) {
+        
+        MessageResponse result = messageService.createMessage(messageRequest, null);
+
+        String destination = "/sub/channels." + messageRequest.getChannelId() + ".messages";
+        messagingTemplate.convertAndSend(destination, result);
     }
 }

@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContent.BinaryContentUploadStatus;
-import com.sprint.mission.discodeit.entity.Notification.NotificationType;
-import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.FileUploadStatusChangedEvent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.global.exception.binarycontent.FileConversionException;
@@ -34,8 +33,8 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentStorage binaryContentStorage;
-    private final ApplicationEventPublisher eventPublisher;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Timed("file.upload.async")
     @Override
@@ -63,17 +62,12 @@ public class BasicBinaryContentService implements BinaryContentService {
                 } else {
                     newFile.updateUploadStatus(BinaryContentUploadStatus.FAILED);
                     log.error("File upload failed: {}", newFile.getId());
-
-                    NotificationEvent event = NotificationEvent.builder()
-                        .receiverId(userId)
-                        .type(NotificationType.ASYNC_FAILED)
-                        .targetId(requestId)
-                        .title("프로필 파일 저장에 실패하였습니다.")
-                        .content("실패")
-                        .build();
-                    eventPublisher.publishEvent(event);
                 }
-                binaryContentRepository.save(newFile);
+
+                BinaryContent binaryContent = binaryContentRepository.save(newFile);
+                BinaryContentResponse response = binaryContentMapper.entityToDto(binaryContent);
+                eventPublisher.publishEvent(new FileUploadStatusChangedEvent(userId, response));
+
                 return null;
             });
         return newFile;
