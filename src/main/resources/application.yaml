@@ -16,20 +16,40 @@ spring:
       - dev
   config:
     import: optional:file:.env[.properties]
+  cache:
+    type: redis
+    cache-names:
+      - channelsByUser
+      - notificationsByUser
+      - users
+    redis:
+      enable-statistics: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers
+        include: health,info,metrics,loggers,caches
   endpoint:
     health:
       show-details: always
-    metrics:
+  observations:
+    annotations:
       enabled: true
-  metrics:
-    enable:
-      all: true
 
 info:
   name: Discodeit

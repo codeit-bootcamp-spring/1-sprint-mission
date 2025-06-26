@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.entity.type.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,13 +14,13 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
 public class User extends BaseUpdatableEntity {
-
   @Column(length = 50, nullable = false, unique = true)
   private String username;
   @Column(length = 100, nullable = false, unique = true)
@@ -62,9 +62,5 @@ public class User extends BaseUpdatableEntity {
     if (this.role != newRole) {
       this.role = newRole;
     }
-  }
-
-  public void setProfile(BinaryContent profile) {
-    this.profile = profile;
   }
 }

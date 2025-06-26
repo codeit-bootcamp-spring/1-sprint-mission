@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
-import com.sprint.mission.discodeit.entity.type.Role;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.entity.type.Role;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
@@ -56,7 +56,6 @@ public class SecurityConfig {
         )
         .csrf(csrf ->
             csrf
-//                .ignoringRequestMatchers(SecurityMatchers.SIGN_UP)
                 .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())

@@ -1,107 +1,122 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.NotificationDto;
-import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
-import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.type.NotificationEvent;
-import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.mapper.NotificationMapper;
-import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
-import com.sprint.mission.discodeit.repository.NotificationRepository;
+import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.NotificationService;
-import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.access.AccessDeniedException;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+
+import com.sprint.mission.discodeit.dto.data.NotificationDto;
+import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
+import com.sprint.mission.discodeit.mapper.NotificationMapper;
+import com.sprint.mission.discodeit.repository.NotificationRepository;
+import com.sprint.mission.discodeit.service.NotificationService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicNotificationService implements NotificationService {
 
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
-  private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+  private final ApplicationEventPublisher eventPublisher;
   private final UserRepository userRepository;
+  private final SseService sseService;
 
-  @Cacheable(cacheNames = "notificationsByUser", key = "#receiverId")
-  @Transactional(readOnly = true)
+  @PreAuthorize("principal.userDto.id == #receiverId")
+  @Cacheable(value = "notificationsByUser", key = "#receiverId", unless = "#result.isEmpty()")
   @Override
   public List<NotificationDto> findAllByReceiverId(UUID receiverId) {
-    return notificationRepository.findByReceiverId(receiverId).stream()
+    log.debug("알림 목록 조회 시작: receiverId={}", receiverId);
+    List<NotificationDto> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(
+            receiverId)
+        .stream()
         .map(notificationMapper::toDto)
-        .collect(Collectors.toList());
+        .toList();
+    log.info("알림 목록 조회 완료: receiverId={}, 조회된 항목 수={}", receiverId, notifications.size());
+    return notifications;
+  }
+
+  @PreAuthorize("principal.userDto.id == #receiverId")
+  @Transactional
+  @CacheEvict(value = "notificationsByUser", key = "#receiverId")
+  @Override
+  public void delete(UUID notificationId, UUID receiverId) {
+    log.debug("알림 삭제 시작: id={}, receiverId={}", notificationId, receiverId);
+    try {
+      notificationRepository.deleteByIdAndReceiverId(notificationId, receiverId);
+      log.info("알림 삭제 완료: id={}, receiverId={}", notificationId, receiverId);
+    } catch (Exception e) {
+      log.error("알림 삭제 실패: id={}, receiverId={}", notificationId, receiverId, e);
+      throw NotificationNotFoundException.withId(notificationId);
+    }
+  }
+
+  @Transactional
+  @CacheEvict(value = "notificationsByUser", key = "#receiverId")
+  @Override
+  public void create(UUID receiverId, String title, String content,
+      NotificationType notificationType, UUID targetId) {
+    log.debug("새 알림 생성 시작: receiverId={}, channelId={}", receiverId);
+
+    Notification notification = new Notification(
+        receiverId,
+        title,
+        content,
+        notificationType,
+        targetId
+    );
+    notificationRepository.save(notification);
+
+    userRepository.findById(receiverId).ifPresent(user -> {
+      NotificationDto dto = notificationMapper.toDto(notification);
+      sseService.send(user.getUsername(), dto);
+    });
+
+    log.info("새 알림 생성 완료: id={}, receiverId={}, targetId={}",
+        notification.getId(), receiverId, targetId);
   }
 
   @Transactional
   @Override
-  public void deleteByReceiverId(UUID notificationId, UUID receiverId) {
-    Notification notification = notificationRepository.findById(notificationId)
-        .orElseThrow(() -> new NotificationNotFoundException());
+  public void createAll(Set<UUID> receiverIds, String title, String content,
+      NotificationType notificationType, UUID targetId) {
+    log.debug("새 알림 생성 시작: receiverIds={}, targetId={}", receiverIds, targetId);
+    List<Notification> notifications = receiverIds.stream()
+        .map(receiverId -> new Notification(
+            receiverId,
+            title,
+            content,
+            notificationType,
+            targetId
+        )).toList();
+    notificationRepository.saveAll(notifications);
 
-    if (!notification.getReceiver().getId().equals(receiverId)) {
-      throw new AccessDeniedException("Not your notification");
+    for (Notification notification : notifications) {
+      UUID receiverId = notification.getReceiverId();
+      userRepository.findById(receiverId).ifPresent(user -> {
+        NotificationDto dto = notificationMapper.toDto(notification);
+        sseService.send(user.getUsername(), dto);
+      });
     }
 
-    notificationRepository.deleteByIdAndReceiverId(notificationId, receiverId);
+    // 이벤트 발행
+    eventPublisher.publishEvent(new MultipleNotificationCreatedEvent(receiverIds));
 
+    log.info("새 알림 생성 완료: receiverIds={}, targetId={}",
+        receiverIds, targetId);
   }
-
-  @Async("asyncExecutor")
-  @Retryable(
-      value = Exception.class,
-      maxAttempts = 3,
-      backoff = @Backoff(delay = 1000))
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  @CacheEvict(cacheNames = "notificationsByUser", allEntries = true)
-  public void handleNotificationEvent(NotificationEvent event) {
-
-    User receiver = userRepository.findById(event.receiverId())
-        .orElseThrow(() -> new UserNotFoundException());
-
-    Notification notification = new Notification(
-        receiver,
-        event.title(),
-        event.content(),
-        event.type(),
-        event.targetId()
-    );
-    try {
-      notificationRepository.save(notification);
-      log.info("알림 저장 완료: user={}, title={}", receiver.getUsername(), event.title());
-    } catch (Exception e) {
-      log.error("알림 저장 실패", e);
-      throw e;
-    }
-  }
-
-  @Recover
-  public void recover(Exception e, NotificationEvent event) {
-    String requestId = MDC.get("requestId");
-
-    AsyncTaskFailure failure = AsyncTaskFailure.builder()
-        .taskName("NotificationEventListener")
-        .requestId(requestId)
-        .failureReason("알림 저장 실패: " + e.getMessage())
-        .build();
-
-    asyncTaskFailureRepository.save(failure);
-  }
-}
+} 

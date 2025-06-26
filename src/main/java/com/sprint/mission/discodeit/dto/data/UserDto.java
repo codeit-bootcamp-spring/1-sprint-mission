@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.data;
 
-import com.sprint.mission.discodeit.entity.type.Role;
+import com.sprint.mission.discodeit.entity.Role;
 import java.util.UUID;
 
 public record UserDto(

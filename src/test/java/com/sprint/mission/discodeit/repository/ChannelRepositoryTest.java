@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.type.ChannelType;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;

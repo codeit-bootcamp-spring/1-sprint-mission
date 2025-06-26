@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.storage.local;
 
+import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -11,12 +13,14 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -35,13 +39,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final Path root;
   private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   public LocalBinaryContentStorage(
       @Value("${discodeit.storage.local.root-path}") Path root,
-      AsyncTaskFailureRepository asyncTaskFailureRepository
+      AsyncTaskFailureRepository asyncTaskFailureRepository,
+      ApplicationEventPublisher eventPublisher
   ) {
     this.root = root;
     this.asyncTaskFailureRepository = asyncTaskFailureRepository;
+    this.eventPublisher = eventPublisher;
   }
 
   @PostConstruct
@@ -56,28 +63,48 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
   }
 
-  @Override
-  @Async("asyncExecutor")
-  @Retryable(
-      value = {IOException.class, InterruptedException.class},
-      maxAttempts = 3,
-      backoff = @Backoff(delay = 2000)
-  )
-  public CompletableFuture<Void> put(UUID binaryContentId, byte[] bytes) {
+  public UUID put(UUID binaryContentId, byte[] bytes) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.exists(filePath)) {
       throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
     }
     try (OutputStream outputStream = Files.newOutputStream(filePath)) {
-      Thread.sleep(5000);
       outputStream.write(bytes);
-      return CompletableFuture.completedFuture(null);
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
+    return binaryContentId;
   }
 
-  @Override
+  @Async("binaryContentTaskExecutor")
+  @Retryable(
+      value = {IOException.class, RuntimeException.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000, multiplier = 2)
+  )
+  public CompletableFuture<UUID> putAsync(UUID binaryContentId, byte[] bytes) {
+    log.info("파일 업로드 시도: {}", binaryContentId);
+    return CompletableFuture.completedFuture(put(binaryContentId, bytes));
+  }
+
+  @Recover
+  public CompletableFuture<UUID> recoverPutAsync(Exception e, UUID binaryContentId, byte[] bytes) {
+    String taskName = getClass().getSimpleName() + "#" + "putAsync";
+    String failureReason = String.format("파일 업로드 실패 (binaryContentId: %s): %s",
+        binaryContentId, e.getMessage());
+    String requestId = Optional.ofNullable(MDC.get(MDCLoggingInterceptor.REQUEST_ID))
+        .map(Object::toString)
+        .orElse("unknown");
+
+    AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId, failureReason);
+    asyncTaskFailureRepository.save(failure);
+
+    eventPublisher.publishEvent(new AsyncTaskFailedEvent(failure));
+
+    log.error("파일 업로드 최종 실패 (실패 정보 기록됨): {}", binaryContentId, e);
+    throw new RuntimeException("파일 업로드 최종 실패: " + binaryContentId, e);
+  }
+
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.notExists(filePath)) {
@@ -107,22 +134,5 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         .header(HttpHeaders.CONTENT_TYPE, metaData.contentType())
         .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metaData.size()))
         .body(resource);
-  }
-
-  @Recover
-  public UUID recover(IOException e, UUID binaryContentId, byte[] bytes) {
-    String requestId = MDC.get("requestId");
-
-    AsyncTaskFailure failure = AsyncTaskFailure.builder()
-        .taskName("LocalBinaryContentStorage")
-        .requestId(requestId)
-        .failureReason(e.getMessage())
-        .build();
-
-    asyncTaskFailureRepository.save(failure);
-
-    log.error("Async upload task failed for {}: {}", binaryContentId, e.getMessage());
-
-    return null;
   }
 }

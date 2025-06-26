@@ -50,8 +50,6 @@ public class ReadStatusController implements ReadStatusApi {
         .body(updatedReadStatus);
   }
 
-
-
   @GetMapping
   public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
     log.info("사용자별 읽음 상태 목록 조회 요청: userId={}", userId);
