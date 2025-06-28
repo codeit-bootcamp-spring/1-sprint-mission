@@ -8,7 +8,6 @@ import java.util.UUID;
 import com.sprint.mission.discodeit.dto.UserDto;
 import lombok.Getter;
 
-@NotNull
 public record MessageDto(
 
     UUID id,

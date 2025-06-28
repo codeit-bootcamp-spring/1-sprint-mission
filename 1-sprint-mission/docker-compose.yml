@@ -24,6 +24,40 @@ services:
     depends_on:
       - db
 
+  redis:
+    image: redis:7
+    container_name: discodeit-redis
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: discodeit-kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: discodeit-zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://discodeit-kafka:9092
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: discodeit-zookeeper
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    container_name: discodeit-nginx
+    ports:
+      - "3000:3000"
+    depends_on:
+      - app
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+
   db:
     image: postgres:17
     container_name: discodeit-db

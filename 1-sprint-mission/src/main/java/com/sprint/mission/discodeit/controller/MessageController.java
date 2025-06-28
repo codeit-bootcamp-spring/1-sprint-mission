@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -98,5 +102,15 @@ public class MessageController {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(messages);
+  }
+
+  private final SimpMessagingTemplate messagingTemplate;
+
+  @MessageMapping("/messages")
+  public void sendMessage(@Payload MessageCreateRequest request) {
+    MessageDto dto = messageService.create(request, Collections.EMPTY_LIST);
+
+    String destination = "/sub/channels." + request.channelId() + ".messages";
+    messagingTemplate.convertAndSend(destination, dto);
   }
 }
